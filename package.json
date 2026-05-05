@@ -15,14 +15,18 @@
     "audit:visual": "node scripts/visual-audit.mjs",
     "audit:full": "npm run audit && npm run audit:visual",
     "build": "node scripts/validate.mjs && node scripts/bundle.mjs && node scripts/audit.mjs",
-    "preview": "node scripts/bundle.mjs && node scripts/build-preview.mjs",
+    "preview": "wrangler dev",
     "backfill": "node scripts/backfill.mjs",
-    "serve": "node scripts/serve.mjs"
+    "serve": "node scripts/serve.mjs",
+    "deploy": "wrangler deploy"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
     "playwright": "^1.59.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.87.0"
   }
 }
