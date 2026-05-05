@@ -164,8 +164,9 @@ table.metric-table tr:hover td { background: rgba(255,255,255,.015); }
 /* ────────────────────────────────────────────────────────────── */
 /* SectionFrame · composite                                        */
 /* ────────────────────────────────────────────────────────────── */
-.section-frame { padding: 56px 0; border-top: 1px solid var(--line); font-family: var(--sans); }
-.section-frame:first-of-type { border-top: none; }
+.section-frame { padding: 64px 0 48px; border-top: 1px solid var(--line); font-family: var(--sans); }
+.section-frame:first-of-type { border-top: none; padding-top: 8px; }
+.section-frame + .section-frame { margin-top: 0; }
 .sf-header { margin-bottom: 24px; }
 .sf-title { font-size: 24px; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 6px; scroll-margin-top: 80px; }
 .sf-question { color: var(--ink-2); font-size: 14px; margin: 0; max-width: 640px; }
@@ -420,7 +421,7 @@ table.heatmap th:first-child { text-align: left; padding-left: 12px; }
 .hv-score-label { font-size: 11px; color: var(--ink-3); letter-spacing: .1em; text-transform: uppercase; }
 .hv-delta { margin-left: auto; font-size: 11.5px; color: var(--ink-3); }
 .hv-delta b { color: var(--ink-2); font-family: var(--mono); }
-.hv-score-big { font-size: 44px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.hv-score-big { font-size: 56px; font-weight: 700; letter-spacing: -0.025em; line-height: 1; font-family: var(--mono); font-feature-settings: "tnum"; }
 .hv-score-sub { color: var(--ink-3); font-size: 13px; }
 .hv-band-track { position: relative; height: 8px; background: linear-gradient(90deg, #1f3325 0% 35%, #2e2818 35% 65%, #2a1818 65% 100%); border-radius: 4px; margin: 12px 0 6px; }
 .hv-band-marker { position: absolute; top: -3px; width: 3px; height: 14px; background: var(--ink); border-radius: 2px; box-shadow: 0 0 8px rgba(255,255,255,.6); transition: left .3s; }
@@ -608,11 +609,13 @@ table.heatmap th:first-child { text-align: left; padding-left: 12px; }
   white-space: nowrap;
 }
 
-/* Dashboard trust band (above footer) */
+/* Dashboard trust band (above footer) — visually grouped with footer */
 .dashboard-trust-band {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-  margin: 60px 0 24px; padding-top: 36px; border-top: 1px solid var(--line);
+  margin: 48px 0 0; padding: 32px 0 0; border-top: 1px solid var(--line);
 }
+.dashboard-trust-band + .page-footer,
+.page-wrap > .page-footer:not(:first-child) { margin-top: 24px; padding-top: 24px; border-top: none; }
 .dtb-card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
 .dtb-label { font-size: 9.5px; color: var(--ink-3); letter-spacing: .1em; text-transform: uppercase; }
 .dtb-value { font-size: 22px; font-weight: 700; font-family: var(--mono); margin-top: 4px; line-height: 1; }
