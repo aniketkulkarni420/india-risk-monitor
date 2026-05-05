@@ -19,11 +19,18 @@ You are continuing work on India Risk Monitor — a static-site market risk dash
 
 ## Current state in 5 lines
 
-- Phase 5.5 redesign + Phase 8 (sources/backfill/drawer history) complete
-- Phase 9 starting: real ingest parsers, one source at a time
-- Phase 10 (deployment to CF Pages + GH Actions) pending Aniket's `gh auth login`
-- Page works end-to-end: `npm run build && npm run serve` → http://localhost:8080/
-- Standalone preview: `C:\Users\anike\Downloads\IRM_Preview.html` (double-click to open)
+- **LIVE** at https://india-risk-monitor.pages.dev/ (Cloudflare Pages, auto-deploys on push to main)
+- Repo: `aniketkulkarni420/india-risk-monitor` (private) — `gh` CLI authed locally
+- Phase 1–10 complete. Tabs working. 9 metrics live, 60+ on seed (Phase 9 selector tuning ongoing)
+- GH Actions: build.yml + ingest.yml. Cron has 6 IST slots. Manual: `gh workflow run ingest.yml -f slot=all`
+- Topbar shows honest `Live X/Y · others seed data` count — read `last_verified_at` per metric, don't trust "looks updated"
+
+## What needs doing next (priority order)
+
+1. **Selector tune the 12 failing parsers** — INR (RBI homepage regex), POSOCO power (PDF or alt endpoint), Hormuz (MarineTraffic), GST/IIP/WPI/CPI (PIB search), 5 FADA auto metrics. Pattern: open `scripts/ingest/parsers/{name}.mjs`, view-source the actual page, update regex, push, run `gh workflow run ingest.yml -f slot=all` to verify.
+2. **Add real parsers for the 36 skipped** — every other metric_id in `data/manifest.json` not yet in `scripts/ingest/registry.mjs`. Each is ~50 lines following the pattern in `parsers/nse_fii_dii_v1.mjs` (real reference impl).
+3. **Phase 11 monitoring** — UptimeRobot (free, sign up + add 2 monitors for `/` and `/sources/`), GitHub Actions failure email (already on if you have notifications enabled), optional Sentry.
+4. **Custom domain** — `irm.kamayakya.com` via Cloudflare Pages → Custom domains → add CNAME record at kamayakya.com DNS provider.
 
 ## How to resume
 

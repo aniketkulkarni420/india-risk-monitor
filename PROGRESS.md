@@ -1,6 +1,6 @@
 # IRM · Project state · single-glance status
 
-Last updated: 2026-05-05
+Last updated: 2026-05-05 (post-deploy, post-Phase 9 selector tuning starts)
 
 ---
 
@@ -10,16 +10,46 @@ Last updated: 2026-05-05
 |---|---|---|
 | 1 | Data contract scaffold (70 metric JSONs + schema + validator) | ✅ |
 | 2 | Ingest pipeline · daily metrics · mock mode | ✅ |
-| 3 | Atomic components (DisplayTile, TableRow, Sparkline, Band) | ✅ |
-| 4 | Composite components (SectionFrame, MetricDrawer, StickyTOC, CmdKPalette · HeatmapCell retired) | ✅ |
+| 3 | Atomic components | ✅ |
+| 4 | Composite components | ✅ |
 | 5 | Desktop page assembly | ✅ |
-| 5.5 | Redesign rebuild (vital signs / Today bullets / 5-lens Flows / 5-panel Macro / cluster cards / chart-led Freight / 4-panel Market / ranked Sectors + Cmd-K + trust band + per-row source pill + sticky-TOC upgrade + mobile rebuild) | ✅ |
+| 5.5 | Redesign rebuild + tabs + clarity fixes | ✅ |
 | 6 | Visual audit gate · Playwright at 5 viewports | ✅ |
 | 7 | Mobile tree at /m/ | ✅ |
 | 8 | /sources/ route + 5Y backfill + drawer period selector | ✅ |
-| 9 | Real ingest framework · 13 parsers registered (covers 25+ metric_ids via shared modules) | ✅ |
-| **10** | **Production deploy · CF Pages + GH Actions** | 🟡 **awaiting `gh auth login`** · see `IRM_Phase10_Deploy.md` |
+| 9 | Real ingest · 13 parsers registered · 9 fetch live data verified | ✅ framework / 🟡 selector tuning ongoing |
+| **10** | **Production deploy · LIVE at https://india-risk-monitor.pages.dev/** | ✅ |
 | 11 | Monitoring (UptimeRobot + Sentry) | pending |
+| 12 | Selector tuning per-source (Phase 9 follow-up) | 🟡 next |
+
+---
+
+## What just shipped (most recent session)
+
+- **LIVE** at https://india-risk-monitor.pages.dev/ via Cloudflare Pages + GitHub Actions
+- Repo: `aniketkulkarni420/india-risk-monitor` (private)
+- Tabs UI: Flows / Macro / Economy / Freight / Market / Sectors / All — sticky below hero, URL-hash driven
+- Period-aware trend labels: live/24h → `1D`/`1W`, weekly → `1W`/`1M`, monthly → `MoM`/`YoY`, quarterly → `1Q`/`1Y` (utils.mjs `trendLabels()`)
+- Value-format suffixes: `₹2.00 L Cr`, `$692.4 Bn`, `−14,305 Cr`, `+256 bps`, `$/40ft` etc.
+- Live-mode silent-mock bug FIXED: `registry.resolve(parser_id, {live:true})` returns `mode='unregistered'` when no real parser exists; ingest skips. Reverted commit `8568c66` that mock-poisoned timestamps.
+- Honest topbar: shows `⚠ Live X/Y · others seed data` (was: misleading "Updated date")
+- 9 metrics now have REAL live data (NSE indices, NSE FII/DII, Brent crude). 60+ metrics still seed because parsers either unregistered OR registered with selectors that don't match real HTML.
+- Cloudflare auto-PR for Workers/wrangler config closed (we use Pages, not Workers)
+
+## Live data status (2026-05-05 09:03 UTC ingest run)
+
+```
+9  verified live   — fii_equity_*, dii_*, nifty_50, bank_nifty, nifty_pe_5y, india_vix
+1  crosscheck_pending — brent_crude ($103.68, xcheck divergent)
+36 skipped       — no live parser registered (correct behavior, not a bug)
+12 failed        — registered parser threw on real HTML (selector tuning work):
+                   inr_usd, power_demand, hormuz_throughput, gst_gross, iip_growth,
+                   wpi_inflation, cpi_inflation, fada × 5 (auto block)
+```
+
+## Context note for next session
+
+Conversation ran out of context after deployment. Files in repo + decision HTMLs in `C:/Users/anike/Downloads/` are source of truth. Read this file + `RESUME.md` first.
 
 ---
 
