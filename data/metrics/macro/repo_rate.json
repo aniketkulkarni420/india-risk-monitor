@@ -4,52 +4,24 @@
   "display_subtitle": "RBI policy rate",
   "section": "macro",
   "sub_cluster": "rates",
-  "value": 5.5,
+  "value": 5.50,
   "unit": "%",
   "value_format": "decimal_2",
-  "as_of": "2026-05-05T08:58:35.602Z",
+  "as_of": "2026-04-09T11:00:00+05:30",
   "as_of_period": "policy_event",
-  "mom_pct": 0,
+  "mom_pct": 0.0,
   "yoy_pct": -16.7,
   "vs_5y_avg_pct": -2.5,
-  "sparkline_12m": [
-    6.5,
-    6.5,
-    6.25,
-    6.25,
-    6,
-    6,
-    5.75,
-    5.75,
-    5.5,
-    5.5,
-    5.5,
-    5.5
-  ],
+  "sparkline_12m": [6.50, 6.50, 6.50, 6.25, 6.25, 6.00, 6.00, 5.75, 5.75, 5.50, 5.50, 5.50],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
-  "source_primary": {
-    "name": "RBI policy press release",
-    "url": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx",
-    "type": "Official",
-    "frequency": "Per release",
-    "parser": "press_release:rbi_policy_v1"
-  },
+  "source_primary": { "name": "RBI policy press release", "url": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx", "type": "Official", "frequency": "Per release", "parser": "press_release:rbi_policy_v1" },
   "source_crosscheck": [
-    {
-      "name": "PIB MPC release",
-      "url": "https://www.pib.gov.in/",
-      "type": "Official"
-    }
+    { "name": "PIB MPC release", "url": "https://www.pib.gov.in/", "type": "Official" }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-05T08:58:35.602Z",
+  "last_verified_at": "2026-04-09T11:30:00+05:30",
   "why_it_matters": "Policy rate; the floor for short-end pricing. Rate cuts ease funding cost; pauses signal RBI judging price stability vs growth.",
-  "linked_metrics": [
-    "wacr_repo_spread",
-    "gsec_curve",
-    "real_10y_yield",
-    "cpi_inflation"
-  ]
+  "linked_metrics": ["wacr_repo_spread", "gsec_curve", "real_10y_yield", "cpi_inflation"]
 }

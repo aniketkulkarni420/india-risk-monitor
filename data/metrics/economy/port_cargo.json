@@ -4,52 +4,22 @@
   "display_subtitle": "Min of Ports · monthly · MT",
   "section": "economy",
   "sub_cluster": "movement",
-  "value": 77.6,
+  "value": 78.4,
   "unit": "Mn tonnes",
   "value_format": "decimal_1",
-  "as_of": "2026-05-05T08:58:35.600Z",
+  "as_of": "2026-04-10T17:30:00+05:30",
   "as_of_period": "monthly",
   "mom_pct": 2.1,
   "yoy_pct": 6.4,
   "vs_5y_avg_pct": 14.8,
-  "sparkline_12m": [
-    74.6,
-    75.2,
-    75.8,
-    76.4,
-    76.8,
-    77,
-    77.2,
-    77.4,
-    77.6,
-    76.8,
-    78.4,
-    77.6
-  ],
+  "sparkline_12m": [74.0, 74.6, 75.2, 75.8, 76.4, 76.8, 77.0, 77.2, 77.4, 77.6, 76.8, 78.4],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
-  "source_primary": {
-    "name": "Min of Ports / PIB",
-    "url": "https://shipmin.gov.in/",
-    "type": "Official",
-    "frequency": "Monthly",
-    "parser": "press_release:moports_v1"
-  },
-  "source_crosscheck": [
-    {
-      "name": "PIB Ports release",
-      "url": "https://www.pib.gov.in/",
-      "type": "Official"
-    }
-  ],
+  "source_primary": { "name": "Min of Ports / PIB", "url": "https://shipmin.gov.in/", "type": "Official", "frequency": "Monthly", "parser": "press_release:moports_v1" },
+  "source_crosscheck": [{ "name": "PIB Ports release", "url": "https://www.pib.gov.in/", "type": "Official" }],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-05T08:58:35.600Z",
+  "last_verified_at": "2026-04-10T18:30:00+05:30",
   "why_it_matters": "12 major ports cargo handle. EXIM cargo proxy. Hormuz disruption may show up here in next 4-6 weeks as crude shipments delay.",
-  "linked_metrics": [
-    "rail_freight",
-    "trade_deficit",
-    "india_port_dwell_time",
-    "hormuz_throughput"
-  ]
+  "linked_metrics": ["rail_freight", "trade_deficit", "india_port_dwell_time", "hormuz_throughput"]
 }

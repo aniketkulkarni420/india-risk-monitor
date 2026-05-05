@@ -4,52 +4,25 @@
   "display_subtitle": "Top-5 listed cos aggregate · monthly",
   "section": "economy",
   "sub_cluster": "production_energy",
-  "value": 38.1,
+  "value": 38.2,
   "unit": "Mn tonnes",
   "value_format": "decimal_1",
-  "as_of": "2026-05-05T08:58:35.597Z",
+  "as_of": "2026-04-05T17:30:00+05:30",
   "as_of_period": "monthly",
   "mom_pct": 4.8,
   "yoy_pct": 8.2,
   "vs_5y_avg_pct": 22.4,
-  "sparkline_12m": [
-    35,
-    35.4,
-    35.8,
-    36.2,
-    36.4,
-    36.6,
-    36.8,
-    37,
-    37.2,
-    36.4,
-    38.2,
-    38.1
-  ],
+  "sparkline_12m": [34.5, 35.0, 35.4, 35.8, 36.2, 36.4, 36.6, 36.8, 37.0, 37.2, 36.4, 38.2],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
-  "source_primary": {
-    "name": "BSE/NSE company filings (top-5 aggregate)",
-    "url": "https://www.bseindia.com/corporates/ann.html",
-    "type": "Filing",
-    "frequency": "Monthly",
-    "parser": "html_scrape:bse_cement_v1"
-  },
+  "source_primary": { "name": "BSE/NSE company filings (top-5 aggregate)", "url": "https://www.bseindia.com/corporates/ann.html", "type": "Filing", "frequency": "Monthly", "parser": "html_scrape:bse_cement_v1" },
   "source_crosscheck": [
-    {
-      "name": "CMA Annual + monthly news wire",
-      "url": "https://cmaindia.org/",
-      "type": "Public"
-    }
+    { "name": "CMA Annual + monthly news wire", "url": "https://cmaindia.org/", "type": "Public" }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-05T08:58:35.597Z",
+  "last_verified_at": "2026-04-05T18:30:00+05:30",
   "why_it_matters": "Cement = construction + infra activity proxy. Top-5 cos cover ~55% of India's cement market.",
-  "linked_metrics": [
-    "steel_consumption",
-    "rail_freight",
-    "govt_capex_runrate"
-  ],
+  "linked_metrics": ["steel_consumption", "rail_freight", "govt_capex_runrate"],
   "notes": "Aggregates Ultratech, Shree, Ambuja, ACC, Dalmia monthly disclosures."
 }
