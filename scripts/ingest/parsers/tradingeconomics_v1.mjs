@@ -116,6 +116,15 @@ const EXTRACTORS = {
     valueParser: (s) => parseInt(s.replace(/,/g, ''), 10)
   },
 
+  // gsec_curve: store the 10Y yield as the canonical value (unit: % (10Y)).
+  // The full 1Y/5Y/10Y curve is rendered from snapshot text in main.mjs;
+  // here we just keep the headline value live.
+  gsec_curve: {
+    url: 'https://tradingeconomics.com/india/government-bond-yield',
+    extractRe: /yield\s+on\s+India\s+10Y\s+Bond\s+Yield\s+(?:rose|fell|stands|holds)\s+to\s+(\d{1,2}\.\d{1,2})/i,
+    plausible: (v) => v > 4 && v < 12
+  },
+
   // High-yield credit spread proxy via India corporate bond yield (TE has no AAA-G-sec direct)
   high_yield_credit_spread: {
     url: 'https://tradingeconomics.com/india/government-bond-yield',

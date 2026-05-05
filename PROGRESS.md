@@ -36,17 +36,22 @@ Last updated: 2026-05-05 (post-PDF-pass · 11 parsers added in one session · 20
 - 9 metrics now have REAL live data (NSE indices, NSE FII/DII, Brent crude). 60+ metrics still seed because parsers either unregistered OR registered with selectors that don't match real HTML.
 - Cloudflare auto-PR for Workers/wrangler config closed (we use Pages, not Workers)
 
-## Live data status (2026-05-05 18:00 UTC · post-26-parser-grind)
+## Live data status (2026-05-05 21:30 UTC · post-Tier-1+2 grind)
 
 ```
-37 verified live    — net +28 since session start; covers virtually all
-                      free public macro + market + flows + freight + econ
+40 verified live    — covers all free macro + market + flows + freight + econ
  1 crosscheck_pending — brent_crude (xcheck divergent ~8%)
-19 skipped          — no live parser registered (mostly NSE-restricted,
-                      Indian-network-only sources, or PDF-only releases)
- 1 failed           — hormuz_throughput awaiting /api/snapshot from
-                      hormuz-watch.pages.dev (parser ready)
+ 3 skipped          — no live parser (mock seed only)
+14 failed           — registered parsers that regex-missed locally; will
+                      retry from CI / next selector tuning pass
 ```
+
+**Hormuz V1 endpoint shipped to hormuz-watch.pages.dev/api/snapshot.**
+Once Cloudflare deploys (~30-60s after push), IRM's hormuz_throughput
+flips from failed to verified live on next ingest tick.
+
+V2 (Cloudflare Worker + AISStream + KV live aggregation) deferred until
+Aniket approves V1 working. Plan in memory at irm/hormuz_v2_worker_pending.md.
 
 **Verified-live by section (37 total):**
 

@@ -15,6 +15,7 @@ import * as hormuz_v1 from './parsers/hormuz_v1.mjs';
 import * as tradingeconomics_v1 from './parsers/tradingeconomics_v1.mjs';
 import * as drewry_v1 from './parsers/drewry_v1.mjs';
 import * as derived_v1 from './parsers/derived_v1.mjs';
+import * as india_govt_v1 from './parsers/india_govt_v1.mjs';
 import * as mock from './parsers/mock.mjs';
 
 // Registered REAL implementations. Anything not in this map uses mock fetcher.
@@ -52,6 +53,24 @@ const REAL = new Map([
   ['html_scrape:drewry_v1', drewry_v1],
   // Pure-derived metrics (read peer metric values, no network)
   ['manual:derived_v1', derived_v1],
+  // gsec_curve via TE multi-tenor page (10Y as canonical value)
+  ['json_api:ccil_v1', tradingeconomics_v1],
+  // India govt + NSE/NSDL + PPAC + PIB-mediated sources
+  // These often fail from foreign networks but reach from CI / India IPs.
+  ['press_release:naukri_v1', india_govt_v1],
+  ['csv_download:nsdl_fpi_v1', india_govt_v1],
+  ['html_scrape:nsdl_sectoral_v1', india_govt_v1],
+  ['csv_download:nse_fno_v1', india_govt_v1],
+  ['csv_download:nse_blocks_v1', india_govt_v1],
+  ['press_release:ppac_v1', india_govt_v1],          // india_crude_basket + pol_demand
+  ['press_release:gstn_eway_v1', india_govt_v1],
+  ['press_release:npci_upi_v1', india_govt_v1],
+  ['press_release:ihmcl_v1', india_govt_v1],
+  ['press_release:railways_v1', india_govt_v1],
+  ['press_release:moports_v1', india_govt_v1],
+  ['press_release:dgca_v1', india_govt_v1],
+  ['html_scrape:bse_cement_v1', india_govt_v1],
+  ['html_scrape:port_authority_v1', india_govt_v1],
 ]);
 
 export function resolve(parser_id, { live = false } = {}) {

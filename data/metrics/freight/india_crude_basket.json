@@ -4,32 +4,70 @@
   "display_subtitle": "PPAC · weighted Dubai/Oman + Brent",
   "section": "freight",
   "sub_cluster": "oil",
-  "value": 96.84,
+  "value": 91.7,
   "unit": "$/bbl",
   "value_format": "decimal_2",
-  "as_of": "2026-04-28T17:00:00+05:30",
+  "as_of": "2026-05-05T16:07:17.815Z",
   "as_of_period": "24h",
-  "mom_pct": 17.6,
-  "yoy_pct": 25.8,
+  "mom_pct": -7.54,
+  "yoy_pct": -8.02,
   "vs_5y_avg_pct": 29.2,
-  "sparkline_12m": [76.0, 77.5, 79.4, 78.8, 81.2, 82.6, 82.1, 83.8, 82.5, 84.6, 82.4, 96.84],
+  "sparkline_12m": [
+    79.4,
+    78.8,
+    81.2,
+    82.6,
+    82.1,
+    83.8,
+    82.5,
+    84.6,
+    82.4,
+    96.84,
+    91.7,
+    91.7
+  ],
   "baseline_30d": 82.4,
   "deviation_from_baseline_pct": 17.5,
   "status": "shock",
   "shock_eligible": true,
   "shock_rule": "value > $95",
   "trend_direction": "bad",
-  "source_primary": { "name": "PPAC daily basket", "url": "https://ppac.gov.in/prices/international-prices-of-crude-oil", "type": "Official", "frequency": "Daily", "parser": "press_release:ppac_v1" },
+  "source_primary": {
+    "name": "PPAC daily basket",
+    "url": "https://ppac.gov.in/prices/international-prices-of-crude-oil",
+    "type": "Official",
+    "frequency": "Daily",
+    "parser": "press_release:ppac_v1"
+  },
   "source_crosscheck": [
-    { "name": "Reuters / Platts wire", "url": "https://www.reuters.com/business/energy/", "type": "Reputable media" },
-    { "name": "MoPNG release", "url": "https://mopng.gov.in/en", "type": "Official" }
+    {
+      "name": "Reuters / Platts wire",
+      "url": "https://www.reuters.com/business/energy/",
+      "type": "Reputable media"
+    },
+    {
+      "name": "MoPNG release",
+      "url": "https://mopng.gov.in/en",
+      "type": "Official"
+    }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-28T17:30:00+05:30",
+  "last_verified_at": "2026-05-05T16:07:17.817Z",
   "why_it_matters": "Actual price India pays for crude. PPAC weighted basket of Brent + Dubai/Oman; tracks Brent with ~$1.5 spread. The number that flows into CAD calculations.",
   "trigger_thresholds": [
-    { "level": "high", "rule": "value > $90 sustained 7d" },
-    { "level": "shock", "rule": "value > $95" }
+    {
+      "level": "high",
+      "rule": "value > $90 sustained 7d"
+    },
+    {
+      "level": "shock",
+      "rule": "value > $95"
+    }
   ],
-  "linked_metrics": ["brent_crude", "hormuz_throughput", "trade_deficit", "wpi_inflation"]
+  "linked_metrics": [
+    "brent_crude",
+    "hormuz_throughput",
+    "trade_deficit",
+    "wpi_inflation"
+  ]
 }
