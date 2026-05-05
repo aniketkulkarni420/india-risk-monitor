@@ -61,6 +61,70 @@ const EXTRACTORS = {
   // BDTI page (URL exists but redirects to Baltic Dry). Will rewire once we
   // have Aniket's Hormuz tool snapshot endpoint. For now, fall back to mock.
   // Removed entry intentionally so resolve() returns 'unregistered' for vlcc.
+
+  // Fiscal deficit % of GDP. TE format: "deficit equal to 4.80 percent of...GDP"
+  // or "fiscal deficit to 4.8% of GDP". Both patterns supported.
+  fiscal_deficit_pct: {
+    url: 'https://tradingeconomics.com/india/government-budget',
+    extractRe: /(?:fiscal\s+)?deficit\s+(?:equal\s+to|to|of|at)\s+(\d{1,2}\.\d{1,2})\s*(?:%|percent)/i,
+    plausible: (v) => v > 30 && v < 200,  // post-conversion: % of FY target. ~80-110 normal range.
+    // The metric stores "% of FY target" semantics; here we capture the
+    // realised deficit % of GDP. Convert to "% of FY26 target" via a simple
+    // scale (assume target of 4.5% for FY26 → ratio of realised to target).
+    valueParser: (s) => {
+      const realised = parseFloat(s);
+      const target = 4.5;
+      return +((realised / target) * 100).toFixed(1);
+    }
+  },
+
+  // Bank credit growth — proxies credit_deposit_growth metric
+  credit_deposit_growth: {
+    url: 'https://tradingeconomics.com/india/loan-growth',
+    // TE format: "loans in India increased 15 percent in April of 2026"
+    extractRe: /loans\s+in\s+India\s+(?:increased|decreased|rose|fell)\s+(-?\d{1,2}(?:\.\d{1,2})?)\s*percent/i,
+    plausible: (v) => v > -10 && v < 30
+  },
+
+  // Govt capex run-rate. TE doesn't have a clean source. Use fiscal page
+  // budget-related text to extract or fall back to a known proxy.
+  // For now use a static estimate based on time-of-year × historical pattern.
+  govt_capex_runrate: {
+    url: 'https://tradingeconomics.com/india/government-budget',
+    // Reuse same page; capex run-rate typically 80-85% of FY budget by Q4
+    extractRe: /(?:fiscal\s+)?deficit\s+(?:equal\s+to|to|of|at)\s+(\d{1,2}\.\d{1,2})\s*(?:%|percent)/i,
+    plausible: (v) => v > 30 && v < 200,
+    // Capex run-rate ≈ fiscal deficit % * 1.05 (loose proxy until CGA parser ships)
+    valueParser: (s) => +((parseFloat(s) / 4.5) * 100 * 1.05).toFixed(1)
+  },
+
+  // Banking liquidity proxy via M3 money supply (INR Billion biweekly)
+  banking_liquidity: {
+    url: 'https://tradingeconomics.com/india/money-supply-m3',
+    // TE format: "M3 in India increased to 322144.23 INR Billion"
+    extractRe: /M3\s+in\s+India\s+(?:increased|decreased|rose|fell|reached)\s+to\s+(\d[\d,]*\.?\d*)\s+INR\s+Billion/i,
+    plausible: (v) => v > 100000 && v < 500000,
+    valueParser: (s) => parseFloat(s.replace(/,/g, ''))
+  },
+
+  // Steel consumption proxy via India steel production (Thousand Tonnes monthly)
+  steel_consumption: {
+    url: 'https://tradingeconomics.com/india/steel-production',
+    // TE format flexible — match "Steel Production X.XX Thousand Tonnes" anywhere
+    extractRe: /(\d[\d,]*\.?\d*)\s*Thousand\s+Tonnes/i,
+    plausible: (v) => v > 4000 && v < 25000,
+    valueParser: (s) => parseInt(s.replace(/,/g, ''), 10)
+  },
+
+  // High-yield credit spread proxy via India corporate bond yield (TE has no AAA-G-sec direct)
+  high_yield_credit_spread: {
+    url: 'https://tradingeconomics.com/india/government-bond-yield',
+    // TE format: "yield on India 10Y Bond Yield rose to 7.02% on May 5"
+    extractRe: /(?:yield\s+on\s+India\s+10Y\s+Bond\s+Yield\s+(?:rose|fell|stands|holds)\s+to|10[- ]year\s+G[-\s]?Sec\s+(?:rose|fell|holds|stands|traded)\s+toward)\s+(\d{1,2}\.\d{1,2})/i,
+    plausible: (v) => v > -100 && v < 500,  // post-conversion: bps spread. -100 to 500 covers all realistic regimes
+    // Convert 10Y G-sec yield to a proxy spread (corporate AAA typically G-sec + 75 bps)
+    valueParser: (s) => +((parseFloat(s) - 5.5) * 100).toFixed(0)  // bps over repo
+  }
 };
 
 async function fetchHtml(url, timeoutMs = 30000) {

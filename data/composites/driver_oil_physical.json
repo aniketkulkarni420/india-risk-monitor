@@ -4,15 +4,28 @@
   "display_subtitle": "Driver score · 0–100",
   "section": "composites",
   "sub_cluster": "driver",
-  "value": 82,
+  "value": 92,
   "unit": "/ 100",
   "value_format": "integer",
-  "as_of": "2026-04-28T09:42:00+05:30",
+  "as_of": "2026-05-05T15:36:06.831Z",
   "as_of_period": "live",
   "mom_pct": 24.2,
   "yoy_pct": 41.4,
   "vs_5y_avg_pct": null,
-  "sparkline_12m": [55, 56, 58, 60, 62, 65, 64, 66, 68, 70, 66, 82],
+  "sparkline_12m": [
+    56,
+    58,
+    60,
+    62,
+    65,
+    64,
+    66,
+    68,
+    70,
+    66,
+    82,
+    92
+  ],
   "baseline_30d": 66,
   "deviation_from_baseline_pct": 24.2,
   "status": "shock",
@@ -27,17 +40,35 @@
     "parser": "manual:derived_v1"
   },
   "source_crosscheck": [
-    { "name": "Underlying metric reconciliation", "url": "https://irm.local/methodology/drivers", "type": "Manual estimate" }
+    {
+      "name": "Underlying metric reconciliation",
+      "url": "https://irm.local/methodology/drivers",
+      "type": "Manual estimate"
+    }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-28T09:42:00+05:30",
+  "last_verified_at": "2026-05-05T15:36:06.832Z",
   "why_it_matters": "Aggregates physical oil/shipping risk into one driver. Currently dominated by Hormuz collapse (the input metric in shock state), which is mechanically pushing this driver into shock too.",
   "formula": "weighted: 0.35 × normalize(brent_crude) + 0.30 × normalize_inverse(hormuz_throughput) + 0.20 × normalize(india_crude_basket) + 0.15 × normalize(vlcc_tanker_rates). Each input normalised to 0–100 vs its own 5Y range.",
   "trigger_thresholds": [
-    { "level": "med", "rule": "value > 50" },
-    { "level": "high", "rule": "value > 65" },
-    { "level": "shock", "rule": "value > 75 OR any input metric in shock state" }
+    {
+      "level": "med",
+      "rule": "value > 50"
+    },
+    {
+      "level": "high",
+      "rule": "value > 65"
+    },
+    {
+      "level": "shock",
+      "rule": "value > 75 OR any input metric in shock state"
+    }
   ],
-  "linked_metrics": ["hormuz_throughput", "brent_crude", "india_crude_basket", "vlcc_tanker_rates"],
+  "linked_metrics": [
+    "hormuz_throughput",
+    "brent_crude",
+    "india_crude_basket",
+    "vlcc_tanker_rates"
+  ],
   "notes": "Driver score auto-escalates to shock if any single underlying metric (Hormuz, Brent) is in shock — even if weighted average is below threshold."
 }

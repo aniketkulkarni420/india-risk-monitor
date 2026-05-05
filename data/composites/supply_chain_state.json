@@ -4,10 +4,10 @@
   "display_subtitle": "Auto-replaces with shock metric on breach",
   "section": "composites",
   "sub_cluster": "hero",
-  "value": "Shock",
+  "value": "Stress",
   "unit": "state",
   "value_format": "label",
-  "as_of": "2026-04-28T09:42:00+05:30",
+  "as_of": "2026-05-05T15:36:12.582Z",
   "as_of_period": "live",
   "mom_pct": -98.5,
   "yoy_pct": -98.6,
@@ -17,16 +17,43 @@
   "shock_eligible": true,
   "shock_rule": "any input metric in shock state",
   "trend_direction": "bad",
-  "source_primary": { "name": "IRM derived", "url": "https://irm.local/methodology/supply_chain", "type": "Manual estimate", "frequency": "Live", "parser": "manual:derived_v1" },
-  "source_crosscheck": [{ "name": "Hormuz + freight metric reconciliation", "url": "https://irm.local/methodology/supply_chain", "type": "Manual estimate" }],
+  "source_primary": {
+    "name": "IRM derived",
+    "url": "https://irm.local/methodology/supply_chain",
+    "type": "Manual estimate",
+    "frequency": "Live",
+    "parser": "manual:derived_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Hormuz + freight metric reconciliation",
+      "url": "https://irm.local/methodology/supply_chain",
+      "type": "Manual estimate"
+    }
+  ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-28T09:42:00+05:30",
+  "last_verified_at": "2026-05-05T15:36:12.583Z",
   "why_it_matters": "Composite supply-chain stress read. Currently dominated by Hormuz shock (the input in shock state), which mechanically promotes the entire tile. Headline shows the shock metric in this state.",
   "formula": "Default: weighted (Hormuz, BDI, WCI, port_dwell). Shock override: if any input has status=shock, this tile inherits shock + displays that metric's headline value.",
   "trigger_thresholds": [
-    { "level": "med", "rule": "any input metric in med state" },
-    { "level": "high", "rule": "any input metric in high state" },
-    { "level": "shock", "rule": "any input metric in shock state" }
+    {
+      "level": "med",
+      "rule": "any input metric in med state"
+    },
+    {
+      "level": "high",
+      "rule": "any input metric in high state"
+    },
+    {
+      "level": "shock",
+      "rule": "any input metric in shock state"
+    }
   ],
-  "linked_metrics": ["hormuz_throughput", "drewry_wci", "baltic_dry_index", "vlcc_tanker_rates", "india_port_dwell_time"]
+  "linked_metrics": [
+    "hormuz_throughput",
+    "drewry_wci",
+    "baltic_dry_index",
+    "vlcc_tanker_rates",
+    "india_port_dwell_time"
+  ]
 }

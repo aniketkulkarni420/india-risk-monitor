@@ -4,31 +4,73 @@
   "display_subtitle": "Driver score · 0–100",
   "section": "composites",
   "sub_cluster": "driver",
-  "value": 58,
+  "value": 43,
   "unit": "/ 100",
   "value_format": "integer",
-  "as_of": "2026-04-28T09:42:00+05:30",
+  "as_of": "2026-05-05T15:36:08.922Z",
   "as_of_period": "live",
   "mom_pct": 7.4,
   "yoy_pct": 11.5,
   "vs_5y_avg_pct": null,
-  "sparkline_12m": [48, 50, 51, 50, 52, 53, 54, 55, 56, 56, 54, 58],
+  "sparkline_12m": [
+    50,
+    51,
+    50,
+    52,
+    53,
+    54,
+    55,
+    56,
+    56,
+    54,
+    58,
+    43
+  ],
   "baseline_30d": 54,
   "deviation_from_baseline_pct": 7.4,
   "status": "med",
   "shock_eligible": true,
   "shock_rule": "value > 80",
   "trend_direction": "bad",
-  "source_primary": { "name": "IRM derived", "url": "https://irm.local/methodology/drivers#macro", "type": "Manual estimate", "frequency": "Daily", "parser": "manual:derived_v1" },
-  "source_crosscheck": [{ "name": "Underlying macro metrics reconciliation", "url": "https://irm.local/methodology/drivers", "type": "Manual estimate" }],
+  "source_primary": {
+    "name": "IRM derived",
+    "url": "https://irm.local/methodology/drivers#macro",
+    "type": "Manual estimate",
+    "frequency": "Daily",
+    "parser": "manual:derived_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Underlying macro metrics reconciliation",
+      "url": "https://irm.local/methodology/drivers",
+      "type": "Manual estimate"
+    }
+  ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-28T09:42:00+05:30",
+  "last_verified_at": "2026-05-05T15:36:08.923Z",
   "why_it_matters": "Macro driver weights INR + FX + curve + inflation + fiscal. Currently amber: INR weakening + WPI ticking up offset by fiscal discipline + strong reserves.",
   "formula": "0.20 × normalize_inverse(inr_usd) + 0.15 × normalize(fx_reserves) + 0.15 × normalize(cpi_inflation) + 0.10 × normalize(wpi_inflation) + 0.10 × normalize_inverse(real_10y_yield) + 0.10 × normalize(fiscal_deficit_pct) + 0.10 × normalize(pmi_combined) + 0.10 × normalize(iip_growth)",
   "trigger_thresholds": [
-    { "level": "med", "rule": "value > 50" },
-    { "level": "high", "rule": "value > 65" },
-    { "level": "shock", "rule": "value > 80" }
+    {
+      "level": "med",
+      "rule": "value > 50"
+    },
+    {
+      "level": "high",
+      "rule": "value > 65"
+    },
+    {
+      "level": "shock",
+      "rule": "value > 80"
+    }
   ],
-  "linked_metrics": ["inr_usd", "fx_reserves", "cpi_inflation", "wpi_inflation", "pmi_combined", "iip_growth", "fiscal_deficit_pct"]
+  "linked_metrics": [
+    "inr_usd",
+    "fx_reserves",
+    "cpi_inflation",
+    "wpi_inflation",
+    "pmi_combined",
+    "iip_growth",
+    "fiscal_deficit_pct"
+  ]
 }

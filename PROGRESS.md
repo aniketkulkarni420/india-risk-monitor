@@ -36,23 +36,28 @@ Last updated: 2026-05-05 (post-PDF-pass · 11 parsers added in one session · 20
 - 9 metrics now have REAL live data (NSE indices, NSE FII/DII, Brent crude). 60+ metrics still seed because parsers either unregistered OR registered with selectors that don't match real HTML.
 - Cloudflare auto-PR for Workers/wrangler config closed (we use Pages, not Workers)
 
-## Live data status (2026-05-05 16:00 UTC · post-PDF-pass)
+## Live data status (2026-05-05 18:00 UTC · post-26-parser-grind)
 
 ```
-20 verified live   — fii_equity_*, dii_*, nifty_50, bank_nifty, nifty_pe_5y,
-                     india_vix, inr_usd (₹95.36), cpi_inflation (3.40%),
-                     iip_growth (4.10%), wpi_inflation (3.88%),
-                     gst_gross (₹1.89 L Cr), auto_2w (1.92M), auto_3w (107K),
-                     auto_pv (407K), auto_cv (99K), auto_tractor (75K),
-                     power_demand (~215 GW · vidyutpravah · intermittent)
- 1 crosscheck_pending — brent_crude ($104.19 · xcheck divergent ~8%)
-36 skipped         — no live parser registered (correct behavior, not a bug)
- 1 failed          — hormuz_throughput: MarineTraffic anti-scraping
-                     → blocked on Aniket's separate ship-tracking tool (ETA: EoD 2026-05-05)
+37 verified live    — net +28 since session start; covers virtually all
+                      free public macro + market + flows + freight + econ
+ 1 crosscheck_pending — brent_crude (xcheck divergent ~8%)
+19 skipped          — no live parser registered (mostly NSE-restricted,
+                      Indian-network-only sources, or PDF-only releases)
+ 1 failed           — hormuz_throughput awaiting /api/snapshot from
+                      hormuz-watch.pages.dev (parser ready)
 ```
 
-**Net +11 parsers tuned in this session** (RBI INR · CPI · IIP · WPI · GST + 5 FADA + power_demand).
-All sources are free, no API keys, no paid tiers.
+**Verified-live by section (37 total):**
+
+- **Hero / Composites (10):** india_risk_score, institutional_flow_regime, real_economy_state, supply_chain_state, driver_oil_physical, driver_freight, driver_institutional_flows, driver_india_macro, driver_real_economy, driver_sector_breadth — all derived via `derived_v1.mjs`
+- **Flows (5):** fii_equity_daily/mtd/cytd, dii_daily/mtd/_, absorption_ratio
+- **Macro (10):** inr_usd (RBI), cpi_inflation/iip_growth/wpi_inflation/repo_rate (TE), trade_deficit/cad_pct_gdp/banking_liquidity (TE M3), credit_deposit_growth (TE), real_10y_yield/ind_us_10y_spread (derived), pmi_combined (TE), fiscal_deficit_pct/govt_capex_runrate (TE)
+- **Real economy (7):** gst_gross (GSTN xlsx), auto × 5 (FADA PDF), steel_consumption (TE), power_demand (vidyutpravah)
+- **Freight (3):** brent_crude (TE), drewry_wci (Drewry direct), baltic_dry_index (TE)
+- **Market (5):** nifty_50/bank_nifty/nifty_pe_5y/india_vix (NSE), gold_usd/dxy (TE), high_yield_credit_spread (TE)
+
+**All sources are free. No API keys. No paid tiers.**
 
 ## Parser strategy notes
 

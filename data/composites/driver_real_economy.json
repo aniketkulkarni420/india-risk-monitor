@@ -4,16 +4,15 @@
   "display_subtitle": "Driver score · 0–100",
   "section": "composites",
   "sub_cluster": "driver",
-  "value": 28,
+  "value": 30,
   "unit": "/ 100",
   "value_format": "integer",
-  "as_of": "2026-04-28T09:42:00+05:30",
+  "as_of": "2026-05-05T15:36:08.267Z",
   "as_of_period": "monthly",
   "mom_pct": null,
   "yoy_pct": null,
   "vs_5y_avg_pct": null,
   "sparkline_12m": [
-    38,
     37,
     36,
     34,
@@ -24,7 +23,8 @@
     29,
     30,
     30,
-    28
+    28,
+    30
   ],
   "baseline_30d": 30,
   "deviation_from_baseline_pct": -6.7,
@@ -46,7 +46,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-28T09:42:00+05:30",
+  "last_verified_at": "2026-05-05T15:36:08.268Z",
   "why_it_matters": "Real economy holding up despite the oil shock: GST, e-way bills, FASTag, autos, power demand all positive YoY. Score is INVERSE — low score = strong economy.",
   "formula": "100 - (0.20 × yoy(gst_gross) + 0.15 × yoy(power_demand) + 0.15 × avg(yoy(auto_*)) + 0.10 × yoy(eway_bills) + 0.10 × yoy(upi_value) + 0.10 × yoy(fastag_toll) + 0.10 × yoy(rail_freight) + 0.10 × yoy(pol_demand)). Capped 0-100.",
   "linked_metrics": [

@@ -4,10 +4,10 @@
   "display_subtitle": "FII × DII regime classification",
   "section": "composites",
   "sub_cluster": "hero",
-  "value": "FII sell + DII buy",
+  "value": "Partial Absorption",
   "unit": "regime",
   "value_format": "label",
-  "as_of": "2026-04-28T16:30:00+05:30",
+  "as_of": "2026-05-05T15:27:02.520Z",
   "as_of_period": "24h",
   "mom_pct": null,
   "yoy_pct": null,
@@ -16,11 +16,27 @@
   "status": "med",
   "shock_eligible": false,
   "trend_direction": "neutral",
-  "source_primary": { "name": "IRM derived", "url": "https://irm.local/methodology/regime", "type": "Manual estimate", "frequency": "Daily", "parser": "manual:derived_v1" },
-  "source_crosscheck": [{ "name": "fii_equity_daily + dii_daily reconciliation", "url": "https://irm.local/methodology/regime", "type": "Manual estimate" }],
-  "verification_state": "history_pending",
-  "last_verified_at": "2026-04-28T17:00:00+05:30",
+  "source_primary": {
+    "name": "IRM derived",
+    "url": "https://irm.local/methodology/regime",
+    "type": "Manual estimate",
+    "frequency": "Daily",
+    "parser": "manual:derived_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "fii_equity_daily + dii_daily reconciliation",
+      "url": "https://irm.local/methodology/regime",
+      "type": "Manual estimate"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-05T15:36:11.487Z",
   "why_it_matters": "Classifies whether FII selling is being absorbed by DII buying (cushioned), reinforced by DII selling (regime stress), or both buying (risk-on continuation). Single-label read for hero tile.",
   "formula": "label = sign(fii_equity_daily) + sign(dii_daily); 4 regimes: FII sell + DII buy / FII buy + DII sell / FII buy + DII buy / FII sell + DII sell",
-  "linked_metrics": ["fii_equity_daily", "dii_daily", "absorption_ratio"]
+  "linked_metrics": [
+    "fii_equity_daily",
+    "dii_daily",
+    "absorption_ratio"
+  ]
 }

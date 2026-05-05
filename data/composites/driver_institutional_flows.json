@@ -4,31 +4,71 @@
   "display_subtitle": "Driver score · 0–100",
   "section": "composites",
   "sub_cluster": "driver",
-  "value": 65,
+  "value": 43,
   "unit": "/ 100",
   "value_format": "integer",
-  "as_of": "2026-04-28T16:30:00+05:30",
+  "as_of": "2026-05-05T15:36:09.676Z",
   "as_of_period": "24h",
   "mom_pct": 12.1,
-  "yoy_pct": 30.0,
+  "yoy_pct": 30,
   "vs_5y_avg_pct": null,
-  "sparkline_12m": [50, 52, 48, 51, 55, 54, 56, 58, 60, 61, 58, 65],
+  "sparkline_12m": [
+    52,
+    48,
+    51,
+    55,
+    54,
+    56,
+    58,
+    60,
+    61,
+    58,
+    65,
+    43
+  ],
   "baseline_30d": 58,
   "deviation_from_baseline_pct": 12.1,
   "status": "high",
   "shock_eligible": true,
   "shock_rule": "value > 80 OR FII MTD outflow > ₹40,000 Cr in single month",
   "trend_direction": "bad",
-  "source_primary": { "name": "IRM derived", "url": "https://irm.local/methodology/drivers#flows", "type": "Manual estimate", "frequency": "Daily", "parser": "manual:derived_v1" },
-  "source_crosscheck": [{ "name": "Underlying flow metrics reconciliation", "url": "https://irm.local/methodology/drivers", "type": "Manual estimate" }],
+  "source_primary": {
+    "name": "IRM derived",
+    "url": "https://irm.local/methodology/drivers#flows",
+    "type": "Manual estimate",
+    "frequency": "Daily",
+    "parser": "manual:derived_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Underlying flow metrics reconciliation",
+      "url": "https://irm.local/methodology/drivers",
+      "type": "Manual estimate"
+    }
+  ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-28T17:05:00+05:30",
+  "last_verified_at": "2026-05-05T15:36:09.677Z",
   "why_it_matters": "Aggregates FII equity, FPI debt, DII, F&O OI, and block deals into one driver. Currently elevated on heavy MTD FII selling cushioned by DII absorption; reads as 'cautious' rather than 'shock'.",
   "formula": "0.30 × normalize_inverse(fii_equity_mtd) + 0.20 × normalize_inverse(fpi_debt_flows) + 0.15 × normalize_inverse(absorption_ratio_inverse) + 0.20 × normalize(fno_oi_buildup) + 0.15 × normalize(block_deals_notional)",
   "trigger_thresholds": [
-    { "level": "med", "rule": "value > 50" },
-    { "level": "high", "rule": "value > 65" },
-    { "level": "shock", "rule": "value > 80 OR FII MTD < -₹40,000 Cr" }
+    {
+      "level": "med",
+      "rule": "value > 50"
+    },
+    {
+      "level": "high",
+      "rule": "value > 65"
+    },
+    {
+      "level": "shock",
+      "rule": "value > 80 OR FII MTD < -₹40,000 Cr"
+    }
   ],
-  "linked_metrics": ["fii_equity_mtd", "fpi_debt_flows", "absorption_ratio", "fno_oi_buildup", "block_deals_notional"]
+  "linked_metrics": [
+    "fii_equity_mtd",
+    "fpi_debt_flows",
+    "absorption_ratio",
+    "fno_oi_buildup",
+    "block_deals_notional"
+  ]
 }

@@ -4,15 +4,28 @@
   "display_subtitle": "Composite, 0–100 · weighted across 6 drivers",
   "section": "composites",
   "sub_cluster": "hero",
-  "value": 72,
+  "value": 54,
   "unit": "/ 100",
   "value_format": "integer",
-  "as_of": "2026-04-28T09:42:00+05:30",
+  "as_of": "2026-05-05T15:36:10.921Z",
   "as_of_period": "live",
   "mom_pct": 7.5,
-  "yoy_pct": 20.0,
+  "yoy_pct": 20,
   "vs_5y_avg_pct": 18.5,
-  "sparkline_12m": [60, 58, 55, 57, 60, 62, 64, 65, 67, 68, 67, 72],
+  "sparkline_12m": [
+    58,
+    55,
+    57,
+    60,
+    62,
+    64,
+    65,
+    67,
+    68,
+    67,
+    72,
+    54
+  ],
   "baseline_30d": 67,
   "deviation_from_baseline_pct": 7.5,
   "status": "high",
@@ -27,17 +40,37 @@
     "parser": "manual:derived_v1"
   },
   "source_crosscheck": [
-    { "name": "Driver score reconciliation", "url": "https://irm.local/methodology/drivers", "type": "Manual estimate" }
+    {
+      "name": "Driver score reconciliation",
+      "url": "https://irm.local/methodology/drivers",
+      "type": "Manual estimate"
+    }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-28T09:42:00+05:30",
+  "last_verified_at": "2026-05-05T15:36:10.922Z",
   "why_it_matters": "Single-number summary of India risk across all six drivers. Designed for read-at-a-glance — the higher the number, the more drivers are concurrently elevated. Methodology page explains weights and bands.",
   "formula": "0.25 × driver_oil_physical + 0.20 × driver_institutional_flows + 0.20 × driver_india_macro + 0.15 × driver_real_economy + 0.12 × driver_freight + 0.08 × driver_sector_breadth",
   "trigger_thresholds": [
-    { "level": "med", "rule": "value > 50" },
-    { "level": "high", "rule": "value > 65" },
-    { "level": "shock", "rule": "value > 85" }
+    {
+      "level": "med",
+      "rule": "value > 50"
+    },
+    {
+      "level": "high",
+      "rule": "value > 65"
+    },
+    {
+      "level": "shock",
+      "rule": "value > 85"
+    }
   ],
-  "linked_metrics": ["driver_oil_physical", "driver_institutional_flows", "driver_india_macro", "driver_real_economy", "driver_freight", "driver_sector_breadth"],
+  "linked_metrics": [
+    "driver_oil_physical",
+    "driver_institutional_flows",
+    "driver_india_macro",
+    "driver_real_economy",
+    "driver_freight",
+    "driver_sector_breadth"
+  ],
   "notes": "Bands locked: Low 0–35, Med 35–65, High 65–85, Shock 85+. Recalculated on every driver update."
 }

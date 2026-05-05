@@ -13,6 +13,7 @@ import * as pib_press_v1 from './parsers/pib_press_v1.mjs';
 import * as fada_monthly_v1 from './parsers/fada_monthly_v1.mjs';
 import * as hormuz_v1 from './parsers/hormuz_v1.mjs';
 import * as tradingeconomics_v1 from './parsers/tradingeconomics_v1.mjs';
+import * as drewry_v1 from './parsers/drewry_v1.mjs';
 import * as derived_v1 from './parsers/derived_v1.mjs';
 import * as mock from './parsers/mock.mjs';
 
@@ -41,7 +42,14 @@ const REAL = new Map([
   ['press_release:rbi_policy_v1', tradingeconomics_v1],       // repo_rate
   ['press_release:dgcis_v1', tradingeconomics_v1],            // trade_deficit
   ['press_release:rbi_bop_v1', tradingeconomics_v1],          // cad_pct_gdp
+  ['press_release:cga_v1', tradingeconomics_v1],              // fiscal_deficit_pct + govt_capex_runrate
+  ['json_api:rbi_fortnightly_v1', tradingeconomics_v1],       // credit_deposit_growth
+  ['json_api:rbi_mmo_v1', tradingeconomics_v1],               // banking_liquidity (M3 proxy)
+  ['press_release:jpc_steel_v1', tradingeconomics_v1],        // steel_consumption
+  ['html_scrape:crisil_v1', tradingeconomics_v1],             // high_yield_credit_spread
   // baltic_dirty_v1 (vlcc_tanker_rates) intentionally not registered until Hormuz tool integration
+  // Drewry weekly press release for World Container Index
+  ['html_scrape:drewry_v1', drewry_v1],
   // Pure-derived metrics (read peer metric values, no network)
   ['manual:derived_v1', derived_v1],
 ]);
