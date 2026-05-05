@@ -32,6 +32,121 @@ try {
 const M = (id) => DATA.metrics[id] || null;
 wireDrawer(M);
 
+// Punchy auto-inference: short, human-sounding 1-line readout per panel.
+// Pulls from live metrics. No em dashes. No "—". Tone: punchy, data-first,
+// matches Aniket's voice file.
+function inferenceLine(panelId) {
+  const fmt = (n, dp = 2) => Number(n).toFixed(dp);
+  const trend = (n) => (n > 0 ? '+' : '') + fmt(n, 1) + '%';
+  switch (panelId) {
+    case 'brent': {
+      const b = DATA.metrics.brent_crude;
+      const ind = DATA.metrics.india_crude_basket;
+      if (!b) return null;
+      const above95 = b.value >= 95;
+      const spread = ind ? +(ind.value - b.value).toFixed(2) : null;
+      const parts = [];
+      parts.push(`Brent at $${fmt(b.value)} per barrel.`);
+      if (above95) parts.push(`Sitting above the $95 shock line.`);
+      if (b.mom_pct != null) parts.push(`Up ${fmt(b.mom_pct, 1)}% on the month.`);
+      if (spread != null && Math.abs(spread) > 0.5) {
+        parts.push(spread < 0 ? `India basket trailing by $${Math.abs(spread).toFixed(2)}.` : `India basket above Brent by $${spread.toFixed(2)}.`);
+      }
+      return parts.join(' ');
+    }
+    case 'yield_curve': {
+      const r10 = DATA.metrics.real_10y_yield;
+      const cpi = DATA.metrics.cpi_inflation;
+      const repo = DATA.metrics.repo_rate;
+      if (!r10) return null;
+      const positive = r10.value > 0;
+      const parts = [];
+      if (positive) parts.push(`Real 10Y yield positive at ${fmt(r10.value, 2)}%.`);
+      else parts.push(`Real 10Y yield negative at ${fmt(r10.value, 2)}%.`);
+      if (cpi) parts.push(`CPI at ${fmt(cpi.value, 2)}% gives RBI room.`);
+      if (repo) parts.push(`Repo holding at ${fmt(repo.value, 2)}%.`);
+      return parts.join(' ');
+    }
+    case 'inflation': {
+      const cpi = DATA.metrics.cpi_inflation;
+      const wpi = DATA.metrics.wpi_inflation;
+      if (!cpi || !wpi) return null;
+      const both4 = cpi.value < 4 && wpi.value < 4;
+      const wpiHotter = wpi.value > cpi.value;
+      const parts = [];
+      if (both4) parts.push(`CPI ${fmt(cpi.value, 2)}% and WPI ${fmt(wpi.value, 2)}%, both under 4%.`);
+      else parts.push(`CPI ${fmt(cpi.value, 2)}%, WPI ${fmt(wpi.value, 2)}%.`);
+      if (cpi.value < 4) parts.push(`RBI has room.`);
+      if (wpiHotter) parts.push(`WPI running hotter is the early warning.`);
+      return parts.join(' ');
+    }
+    case 'sentiment': {
+      const vix = DATA.metrics.india_vix;
+      const gold = DATA.metrics.gold_usd;
+      if (!vix && !gold) return null;
+      const parts = [];
+      if (vix) {
+        if (vix.value < 16) parts.push(`VIX at ${fmt(vix.value, 2)}, equity markets calm.`);
+        else if (vix.value < 22) parts.push(`VIX at ${fmt(vix.value, 2)}, near the 5Y mean.`);
+        else parts.push(`VIX at ${fmt(vix.value, 2)}, elevated.`);
+      }
+      if (gold) {
+        if (gold.value > 2500) parts.push(`Gold at $${Math.round(gold.value)}, still near all time highs.`);
+        else parts.push(`Gold at $${Math.round(gold.value)}.`);
+      }
+      if (vix && gold && vix.value < 22 && gold.value > 2500) parts.push(`Someone is hedging.`);
+      return parts.join(' ');
+    }
+    case 'equity': {
+      const nifty = DATA.metrics.nifty_50;
+      const bnk = DATA.metrics.bank_nifty;
+      const pe = DATA.metrics.nifty_pe_5y;
+      if (!nifty) return null;
+      const parts = [];
+      if (nifty.yoy_pct != null && bnk?.yoy_pct != null) {
+        const lead = +(bnk.yoy_pct - nifty.yoy_pct).toFixed(1);
+        if (Math.abs(lead) >= 0.3) {
+          parts.push(lead > 0
+            ? `Banks beating Nifty by ${Math.abs(lead).toFixed(1)} points YoY.`
+            : `Nifty beating Banks by ${Math.abs(lead).toFixed(1)} points YoY.`);
+        }
+      }
+      if (pe) {
+        if (pe.value < 19) parts.push(`PE at ${fmt(pe.value, 1)}x, cheap end.`);
+        else if (pe.value < 22) parts.push(`PE at ${fmt(pe.value, 1)}x, fair.`);
+        else if (pe.value < 24) parts.push(`PE at ${fmt(pe.value, 1)}x, fair to stretched.`);
+        else parts.push(`PE at ${fmt(pe.value, 1)}x, stretched.`);
+      }
+      if (nifty.yoy_pct != null) parts.push(`Nifty ${trend(nifty.yoy_pct)} YoY.`);
+      return parts.join(' ');
+    }
+  }
+  return null;
+}
+
+// Render a panel inference line below a chart panel.
+function inferenceLineEl(panelId) {
+  const text = inferenceLine(panelId);
+  if (!text) return null;
+  return el('div', {
+    class: 'panel-inference',
+    style: {
+      marginTop: '12px',
+      padding: '10px 14px',
+      background: '#0e1218',
+      border: '1px solid var(--line-2)',
+      borderRadius: '6px',
+      fontSize: '13px',
+      color: 'var(--ink-2)',
+      fontStyle: 'italic',
+      lineHeight: '1.55'
+    }
+  }, [
+    el('span', { style: { color: 'var(--accent)', fontStyle: 'normal', fontWeight: 600, marginRight: '8px' } }, '→'),
+    text
+  ]);
+}
+
 // Convert metric.sparkline_12m → chart-ready points. Labels are month names
 // ending at the metric's as_of date (last array entry). Falls back to no-op
 // if the metric / sparkline isn't present so callers can guard with `?.length`.
@@ -396,6 +511,8 @@ macroBody.appendChild(renderYieldCurve(
   [{ tenor: '1Y', value: gsec1y - 0.08 }, { tenor: '5Y', value: gsec5y - 0.07 }, { tenor: '10Y', value: gsec10y - 0.12 }],
   { asof: real10y?.as_of ? formatAsOf(real10y.as_of) + ' · prior: 1 week back' : '' }
 ));
+const yieldInf = inferenceLineEl('yield_curve');
+if (yieldInf) macroBody.appendChild(yieldInf);
 
 // Panel 2+3 · Inflation + Currency strip side by side
 const inflationCurrencyRow = el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '18px' } });
@@ -427,6 +544,8 @@ currencyWrap.appendChild(el('div', { class: 'viz-legend-row' }, [
 ]));
 inflationCurrencyRow.appendChild(currencyWrap);
 macroBody.appendChild(inflationCurrencyRow);
+const inflInf = inferenceLineEl('inflation');
+if (inflInf) macroBody.appendChild(inflInf);
 
 // Panel 4 · Fiscal progress bars
 const fiscalWrap = el('div', { class: 'viz-wrap' });
@@ -683,26 +802,29 @@ const brentChart = renderPairedLine(
   ],
   { title: '90-day trail · USD per barrel', thresholdLine: 95, summary: `Spread ${brentSpread >= 0 ? '+' : ''}${brentSpread} · both above $95 shock since 21 Apr`, asof: 'window: 5 Feb – 5 May 2026' }
 );
-freightBody.appendChild(renderHeadlinePanel({
+const brentPanel = renderHeadlinePanel({
   eyebrow: brentValue >= 95 ? '⚠ Shock · Brent crude above $95' : 'Brent crude · ICE 1-month',
   eyebrowColor: brentValue >= 95 ? 'var(--red)' : 'var(--ink-2)',
   value: '$' + brentValue.toFixed(2) + ' / bbl',
   metaLine: 'Brent ICE futures · Trading Economics · ' + (brent?.as_of ? formatAsOf(brent.as_of) : '5 May 2026'),
   threshold: '$95 / bbl',
-  mom: brent?.mom_pct != null ? { text: formatTrend(brent.mom_pct), color: brent.mom_pct > 0 ? 'var(--red)' : 'var(--green)' } : { text: '+19.4%', color: 'var(--red)' },
-  yoy: brent?.yoy_pct != null ? { text: formatTrend(brent.yoy_pct), color: brent.yoy_pct > 0 ? 'var(--red)' : 'var(--green)' } : { text: '+35.8%', color: 'var(--red)' },
-  percentile: { label: '5Y percentile ', text: '94th', color: 'var(--red)' },
+  mom: brent?.mom_pct != null ? { text: formatTrend(brent.mom_pct), color: brent.mom_pct > 0 ? 'var(--red)' : 'var(--green)' } : null,
+  yoy: brent?.yoy_pct != null ? { text: formatTrend(brent.yoy_pct), color: brent.yoy_pct > 0 ? 'var(--red)' : 'var(--green)' } : null,
+  // 5Y percentile removed (no reliable free 5Y daily Brent source); will return in V2 once FRED backfill runs from CI
   status: brentValue >= 95 ? 'shock' : 'high',
   statusPill: brentValue >= 95 ? 'SHOCK' : 'HIGH',
   statusSub: `Above $95 since 21 Apr · ${daysAboveShock} sessions`,
   chart: brentChart,
   matrix: [
     { label: 'India crude basket', value: '$' + indiaValue.toFixed(2), sub1: indiaCrude?.yoy_pct != null ? formatTrend(indiaCrude.yoy_pct) + ' YoY' : '+34.2% YoY', sub1Color: 'var(--red)', sub2: 'PPAC daily', asof: indiaCrude?.as_of ? formatAsOf(indiaCrude.as_of) : '5 May', tooltip: 'India crude basket = weighted avg of Dubai (75%) + Brent (25%) — what India actually pays' },
-    { label: 'Brent–India spread', value: (brentSpread >= 0 ? '+$' : '−$') + Math.abs(brentSpread).toFixed(2), sub1: brentSpread < 0 ? 'India trades below Brent' : 'India trades above Brent', sub2: '5Y avg: −$3.10', asof: 'derived', tooltip: 'Spread = India basket − Brent. Negative is the norm.' },
+    { label: 'Brent–India spread', value: (brentSpread >= 0 ? '+$' : '−$') + Math.abs(brentSpread).toFixed(2), sub1: brentSpread < 0 ? 'India trades below Brent' : 'India trades above Brent', sub2: 'live derived', asof: 'now', tooltip: 'Spread = India basket − Brent. Negative is the norm.' },
     { label: '90-day high · low', value: '$107 · $76', sub1: 'range $31', sub2: 'peak: 28 Apr 2026', asof: 'derived', tooltip: '90-day rolling high and low for Brent' },
-    { label: 'India weekly oil bill', value: '~$4.6 Bn', sub1: '+$0.8 Bn vs Mar', sub1Color: 'var(--red)', sub2: 'at current basket × ~5.1 Mb/d demand', asof: 'derived', tooltip: 'India imports ~5.1 Mb/d crude · weekly bill ≈ basket price × imports × 7' }
+    { label: 'India weekly oil bill', value: '$' + (indiaValue * 5.1 * 7 / 1000).toFixed(1) + ' Bn', sub1: 'estimate', sub1Color: 'var(--ink-2)', sub2: 'basket × 5.1 Mb/d × 7 days', asof: 'live formula', tooltip: 'India crude imports ≈ 5.1 Mb/d (PPAC). Weekly bill = basket price × imports × 7. Real number on next CI backfill.' }
   ]
-}));
+});
+freightBody.appendChild(brentPanel);
+const brentInf = inferenceLineEl('brent');
+if (brentInf) freightBody.appendChild(brentInf);
 
 // 3-up tanker / container / bulk small multiples
 freightBody.appendChild(renderSmallMultiples([
@@ -736,7 +858,7 @@ const equityChart = renderIndexedOverlay([
   { name: 'Nifty 50', color: 'var(--accent)', points: niftyPoints },
   { name: 'Bank Nifty', color: 'var(--blue)', points: bankPoints }
 ], { title: '90-day indexed trail · base = 100' });
-marketBody.appendChild(renderHeadlinePanel({
+const equityPanel = renderHeadlinePanel({
   eyebrow: 'Equity benchmarks · live',
   value: niftyM ? formatValue(niftyM.value, 'index', niftyM.unit || 'idx') : '24,180 idx',
   metaLine: 'Nifty 50 · NSE · ' + (niftyM?.as_of ? formatAsOf(niftyM.as_of) : '5 May 2026'),
@@ -753,7 +875,10 @@ marketBody.appendChild(renderHeadlinePanel({
     { label: 'Nifty PE vs 5Y', value: peM ? peM.value.toFixed(1) + '×' : '22.8×', sub1: 'mean 21.0× · +1σ 23.8×', sub1Color: 'var(--amber)', sub2: 'stretched but not extreme', asof: peM?.as_of ? formatAsOf(peM.as_of) : '5 May', tooltip: 'Trailing PE vs 5-year distribution' },
     { label: 'YTD return (USD)', value: '+5.2%', sub1: '+9.4% in INR', sub1Color: 'var(--green)', sub2: 'INR weakness eats 4.2pp', asof: 'derived', tooltip: 'YTD Nifty return adjusted for INR/USD depreciation' }
   ]
-}));
+});
+marketBody.appendChild(equityPanel);
+const equityInf = inferenceLineEl('equity');
+if (equityInf) marketBody.appendChild(equityInf);
 
 // Panel 2 · Valuation band
 const valWrap = el('div', { class: 'viz-wrap' });
@@ -808,6 +933,7 @@ vixWrap.appendChild(el('div', { style: { display: 'grid', gridTemplateColumns: '
   ])
 ]));
 sentimentSpreadRow.appendChild(vixWrap);
+// Sentiment inference rendered below the row (full width)
 
 const spreadWrap = el('div', { class: 'viz-wrap' });
 spreadWrap.appendChild(el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between' } }, [
@@ -835,6 +961,8 @@ spreadWrap.appendChild(renderCumulativeLine(
 ));
 sentimentSpreadRow.appendChild(spreadWrap);
 marketBody.appendChild(sentimentSpreadRow);
+const sentInf = inferenceLineEl('sentiment');
+if (sentInf) marketBody.appendChild(sentInf);
 
 // Supporting table
 marketBody.appendChild(el('div', { class: 'sub-head' }, 'Supporting metrics'));
@@ -995,31 +1123,40 @@ const TABS = [
   { id: 'all',     label: 'All' }
 ];
 
-function setActiveTab(tabId) {
-  if (!TABS.find(t => t.id === tabId)) tabId = 'flows';
+function setActiveTab(tabId, opts = {}) {
+  if (!TABS.find(t => t.id === tabId)) tabId = 'all';
   document.body.dataset.activeTab = tabId;
   document.querySelectorAll('.tab-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tab === tabId));
   // Mark visible section-frame(s) for CSS show/hide
   document.querySelectorAll('.section-frame').forEach(s => {
-    const isMatch = s.dataset.section === tabId;
+    const isMatch = tabId === 'all' || s.dataset.section === tabId;
     s.dataset.active = String(isMatch);
   });
-  // Update URL without scrolling
-  if (location.hash !== '#' + tabId) {
-    history.replaceState(null, '', '#' + tabId);
+  // Update URL only on user-initiated tab clicks. Initial load with no hash
+  // leaves the URL clean (no #all written).
+  if (!opts.skipHash) {
+    const targetHash = tabId === 'all' ? '' : '#' + tabId;
+    if (location.hash !== targetHash) {
+      history.replaceState(null, '', targetHash || location.pathname + location.search);
+    }
   }
-  // Scroll to tab bar (just below hero) so user sees the start of the section
-  const tb = document.getElementById('tab-bar');
-  if (tb) {
-    const y = tb.getBoundingClientRect().top + window.scrollY - 60;
-    if (Math.abs(window.scrollY - y) > 10) window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+  // Scroll to tab bar so user sees the start of the section. Skip scroll on
+  // initial load (user just landed, don't yank the page).
+  if (!opts.skipScroll) {
+    const tb = document.getElementById('tab-bar');
+    if (tb) {
+      const y = tb.getBoundingClientRect().top + window.scrollY - 60;
+      if (Math.abs(window.scrollY - y) > 10) window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    }
   }
 }
 
 function getInitialTab() {
   const hash = location.hash.slice(1);
-  return TABS.find(t => t.id === hash) ? hash : 'flows';
+  // Bare URL (no hash) → 'all' (full-scroll landing)
+  // Recognised hash → that tab. Anything else → 'all'
+  return TABS.find(t => t.id === hash) ? hash : 'all';
 }
 
 // Build tab buttons with counts + shock badges
@@ -1040,7 +1177,8 @@ TABS.forEach(t => {
   tabBar.appendChild(btn);
 });
 
-setActiveTab(getInitialTab());
+// Initial load: skip hash write (keep URL clean) + skip scroll (don't yank user)
+setActiveTab(getInitialTab(), { skipHash: !location.hash, skipScroll: true });
 window.addEventListener('hashchange', () => setActiveTab(getInitialTab()));
 
 // ──────────────────────────────────────────────────────────────

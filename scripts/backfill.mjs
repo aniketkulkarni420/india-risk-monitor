@@ -68,6 +68,45 @@ async function fetchBuffer(url, timeoutMs = 30000) {
   }
 }
 
+// Fetch text with abort + retry. Used by HTML/CSV backfillers.
+async function fetchText(url, timeoutMs = 30000, opts = {}) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, {
+        headers: { 'User-Agent': UA, 'Accept': 'text/html,*/*', ...opts.headers },
+        signal: ac.signal, redirect: 'follow'
+      });
+      if (!res.ok) throw new Error(`${url} → ${res.status}`);
+      return await res.text();
+    } catch (e) {
+      if (attempt === 1) throw e;
+    } finally {
+      clearTimeout(t);
+    }
+  }
+}
+
+// NSE cookie warmup (required for NSE historical API to return data).
+let _nseCookies = null;
+async function warmNseCookies() {
+  if (_nseCookies) return _nseCookies;
+  const ac = new AbortController();
+  const t = setTimeout(() => ac.abort(), 20000);
+  try {
+    const res = await fetch('https://www.nseindia.com/', {
+      headers: { 'User-Agent': UA, 'Accept': 'text/html,*/*' },
+      signal: ac.signal, redirect: 'follow'
+    });
+    const sc = res.headers.get('set-cookie') || '';
+    _nseCookies = sc.split(/,(?=[^ ]+=)/).map(s => s.split(';')[0]).join('; ');
+    return _nseCookies;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 const REAL_BACKFILLERS = {
   // GST: GSTN's authoritative xlsx has 23+ monthly sheets named "MMM-YY".
   // Each sheet has a "Total Gross GST Revenue" row at column C = current month.
@@ -96,6 +135,76 @@ const REAL_BACKFILLERS = {
     }
     series.sort((a, b) => a.date.localeCompare(b.date));
     return { source: 'GSTN xlsx', ok: true, series };
+  },
+
+  // Brent crude daily price from FRED (St Louis Fed). Free, no auth, daily.
+  // Series ID: DCOILBRENTEU. Years arg controls how far back we pull.
+  // Note: from local terminal this often times out; runs cleanly from CI.
+  brent_crude: async function brentFromFRED(years) {
+    const cosd = new Date();
+    cosd.setFullYear(cosd.getFullYear() - years);
+    const today = new Date();
+    const fmtDate = (d) => d.toISOString().slice(0, 10);
+    const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU&cosd=${fmtDate(cosd)}&coed=${fmtDate(today)}`;
+    const csv = await fetchText(url, 60000);
+    const lines = csv.trim().split('\n').slice(1);
+    const series = [];
+    for (const line of lines) {
+      const [date, raw] = line.split(',');
+      if (!date || raw === '.' || raw === '' || raw == null) continue;
+      const v = parseFloat(raw);
+      if (!Number.isFinite(v)) continue;
+      series.push({ date, value: +v.toFixed(2) });
+    }
+    if (series.length === 0) throw new Error('FRED Brent series empty');
+    return { source: 'FRED DCOILBRENTEU', ok: true, series };
+  },
+
+  // Nifty 50 daily close from NSE historical-indices API. Required: cookie warmup.
+  // From local terminal NSE returns 403/503; from CI (or India IP) it works.
+  nifty_50: async function niftyFromNSE(years) {
+    const cookies = await warmNseCookies();
+    const today = new Date();
+    const from = new Date();
+    from.setFullYear(from.getFullYear() - years);
+    const ddmmyyyy = (d) => `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+    const url = `https://www.nseindia.com/api/historical/indicesHistory?indexType=NIFTY%2050&from=${ddmmyyyy(from)}&to=${ddmmyyyy(today)}`;
+    const txt = await fetchText(url, 30000, {
+      headers: { 'Cookie': cookies, 'Referer': 'https://www.nseindia.com/market-data/live-market-indices', 'Accept': 'application/json' }
+    });
+    let json;
+    try { json = JSON.parse(txt); } catch { throw new Error('NSE response not JSON (likely WAF block)'); }
+    const rows = json?.data?.indexCloseOnlineRecords || [];
+    if (!rows.length) throw new Error('NSE empty rows · WAF or schema change');
+    const series = rows.map(r => {
+      const [d, m, y] = (r.EOD_TIMESTAMP || '').split('-');
+      return { date: `${y}-${m}-${d}`, value: +parseFloat(r.EOD_CLOSE_INDEX_VAL).toFixed(2) };
+    }).filter(p => p.date && Number.isFinite(p.value));
+    series.sort((a, b) => a.date.localeCompare(b.date));
+    return { source: 'NSE indicesHistory', ok: true, series };
+  },
+
+  // Bank Nifty: same NSE endpoint, different indexType
+  bank_nifty: async function bankNiftyFromNSE(years) {
+    const cookies = await warmNseCookies();
+    const today = new Date();
+    const from = new Date();
+    from.setFullYear(from.getFullYear() - years);
+    const ddmmyyyy = (d) => `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+    const url = `https://www.nseindia.com/api/historical/indicesHistory?indexType=NIFTY%20BANK&from=${ddmmyyyy(from)}&to=${ddmmyyyy(today)}`;
+    const txt = await fetchText(url, 30000, {
+      headers: { 'Cookie': cookies, 'Referer': 'https://www.nseindia.com/market-data/live-market-indices', 'Accept': 'application/json' }
+    });
+    let json;
+    try { json = JSON.parse(txt); } catch { throw new Error('NSE response not JSON (likely WAF block)'); }
+    const rows = json?.data?.indexCloseOnlineRecords || [];
+    if (!rows.length) throw new Error('NSE empty rows · WAF or schema change');
+    const series = rows.map(r => {
+      const [d, m, y] = (r.EOD_TIMESTAMP || '').split('-');
+      return { date: `${y}-${m}-${d}`, value: +parseFloat(r.EOD_CLOSE_INDEX_VAL).toFixed(2) };
+    }).filter(p => p.date && Number.isFinite(p.value));
+    series.sort((a, b) => a.date.localeCompare(b.date));
+    return { source: 'NSE indicesHistory', ok: true, series };
   }
 };
 
