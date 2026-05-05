@@ -1,0 +1,27 @@
+{
+  "metric_id": "auto_3w",
+  "display_name": "3-wheeler retail",
+  "display_subtitle": "FADA monthly registrations · India",
+  "section": "economy",
+  "sub_cluster": "auto",
+  "value": 96420,
+  "unit": "units",
+  "value_format": "integer",
+  "as_of": "2026-04-05T11:00:00+05:30",
+  "as_of_period": "monthly",
+  "mom_pct": 1.8,
+  "yoy_pct": 12.4,
+  "vs_5y_avg_pct": 28.6,
+  "sparkline_12m": [85800, 87200, 88500, 89800, 90400, 91200, 92100, 92800, 93600, 94400, 94720, 96420],
+  "status": "low",
+  "shock_eligible": false,
+  "trend_direction": "good",
+  "source_primary": { "name": "FADA monthly press release", "url": "https://fada.in/index.php/research-publication.php", "type": "Public", "frequency": "Monthly", "parser": "press_release:fada_monthly_v1" },
+  "source_crosscheck": [
+    { "name": "Vahan portal", "url": "https://vahan.parivahan.gov.in/vahan4dashboard/", "type": "Official" }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-04-05T15:00:00+05:30",
+  "why_it_matters": "3W retail = last-mile transport + gig economy + small-business demand. Growth signals informal-economy resilience.",
+  "linked_metrics": ["auto_2w", "upi_value", "naukri_jobspeak"]
+}

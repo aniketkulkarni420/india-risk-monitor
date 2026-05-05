@@ -1,0 +1,54 @@
+{
+  "metric_id": "absorption_ratio",
+  "display_name": "DII absorption ratio",
+  "display_subtitle": "DII buying / |FII selling| · MTD",
+  "section": "flows",
+  "sub_cluster": "headline",
+  "value": 1.3,
+  "unit": "×",
+  "value_format": "ratio_x",
+  "as_of": "2026-05-04T14:10:40.366Z",
+  "as_of_period": "monthly",
+  "mom_pct": 44.4,
+  "yoy_pct": 85.7,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    0.8,
+    0.9,
+    1,
+    1.1,
+    0.9,
+    1.2,
+    0.8,
+    1.4,
+    1,
+    0.9,
+    1.3,
+    1.3
+  ],
+  "status": "low",
+  "shock_eligible": false,
+  "trend_direction": "good",
+  "source_primary": {
+    "name": "IRM derived",
+    "url": "https://irm.local/methodology/absorption",
+    "type": "Manual estimate",
+    "frequency": "Daily",
+    "parser": "manual:derived_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "fii_equity_mtd / dii_mtd reconciliation",
+      "url": "https://irm.local/methodology/absorption",
+      "type": "Manual estimate"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.367Z",
+  "why_it_matters": "Ratio > 1.0 means domestic buying fully cushions foreign outflows. Currently 1.30× — DII strength is the regime-defining variable for India equities.",
+  "formula": "max(dii_equity_mtd, 0) / |min(fii_equity_mtd, 0)|. Returns ∞ if FII is net buyer (display 'N/A — FII net buyer').",
+  "linked_metrics": [
+    "fii_equity_mtd",
+    "dii_mtd"
+  ]
+}

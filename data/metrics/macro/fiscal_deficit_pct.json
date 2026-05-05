@@ -1,0 +1,27 @@
+{
+  "metric_id": "fiscal_deficit_pct",
+  "display_name": "Fiscal deficit % of target",
+  "display_subtitle": "CGA monthly accounts · cumulative",
+  "section": "macro",
+  "sub_cluster": "fiscal",
+  "value": 80.4,
+  "unit": "% of FY26 target",
+  "value_format": "decimal_1",
+  "as_of": "2026-03-25T17:30:00+05:30",
+  "as_of_period": "monthly",
+  "mom_pct": 8.6,
+  "yoy_pct": -3.4,
+  "vs_5y_avg_pct": -7.8,
+  "sparkline_12m": [12, 22, 32, 41, 49, 56, 62, 68, 72, 75, 74, 80.4],
+  "status": "low",
+  "shock_eligible": false,
+  "trend_direction": "good",
+  "source_primary": { "name": "CGA monthly accounts", "url": "https://cga.nic.in/MonthlyReport.aspx", "type": "Official", "frequency": "Monthly", "parser": "press_release:cga_v1" },
+  "source_crosscheck": [
+    { "name": "PIB CGA release", "url": "https://www.pib.gov.in/", "type": "Official" }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-03-25T18:30:00+05:30",
+  "why_it_matters": "On-track fiscal discipline supports rating + INR. <100% by March means government meeting glide path; overshoot = bond market stress.",
+  "linked_metrics": ["govt_capex_runrate", "gsec_curve", "trade_deficit"]
+}

@@ -1,0 +1,115 @@
+{
+  "version": "0.1.0-phase1",
+  "generated": "2026-05-04",
+  "note": "Master list of all metrics in IRM. The 8 exemplars are fully populated JSON files; the rest are listed here to confirm scope before bulk generation. addendum: brent_crude + india_crude_basket added to freight (called out as audit gap).",
+
+  "totals": {
+    "composites_hero": 4,
+    "composites_drivers": 6,
+    "flows": 10,
+    "macro": 16,
+    "economy": 18,
+    "freight": 7,
+    "market": 8,
+    "sectors": "1 file (15 sectors × matrix)",
+    "total_metric_files": 69,
+    "plus_sectors_file": 1,
+    "grand_total": 70
+  },
+
+  "composites_hero": [
+    { "metric_id": "india_risk_score", "display_name": "India Risk Score", "value_format": "integer", "parser": "manual:derived_v1", "exemplar": true },
+    { "metric_id": "institutional_flow_regime", "display_name": "Institutional Flow Regime", "value_format": "label", "parser": "manual:derived_v1" },
+    { "metric_id": "real_economy_state", "display_name": "Real Economy", "value_format": "label", "parser": "manual:derived_v1" },
+    { "metric_id": "supply_chain_state", "display_name": "Supply Chain", "value_format": "label", "parser": "manual:derived_v1" }
+  ],
+
+  "composites_drivers": [
+    { "metric_id": "driver_oil_physical", "display_name": "Oil & physical", "parser": "manual:derived_v1", "exemplar": true },
+    { "metric_id": "driver_institutional_flows", "display_name": "Institutional flows", "parser": "manual:derived_v1" },
+    { "metric_id": "driver_india_macro", "display_name": "India macro", "parser": "manual:derived_v1" },
+    { "metric_id": "driver_real_economy", "display_name": "Real economy", "parser": "manual:derived_v1" },
+    { "metric_id": "driver_freight", "display_name": "Freight", "parser": "manual:derived_v1" },
+    { "metric_id": "driver_sector_breadth", "display_name": "Sector breadth", "parser": "manual:derived_v1" }
+  ],
+
+  "flows": [
+    { "metric_id": "fii_equity_daily", "display_name": "FII equity daily", "sub_cluster": "headline", "parser": "csv_download:nse_fii_dii_v1", "source": "NSE bhavcopy", "exemplar": true },
+    { "metric_id": "fii_equity_mtd", "display_name": "FII equity MTD", "sub_cluster": "headline", "parser": "csv_download:nse_fii_dii_v1", "source": "NSE bhavcopy" },
+    { "metric_id": "fii_equity_cytd", "display_name": "FII equity CYTD", "sub_cluster": "headline", "parser": "csv_download:nse_fii_dii_v1", "source": "NSE bhavcopy" },
+    { "metric_id": "dii_daily", "display_name": "DII daily", "sub_cluster": "headline", "parser": "csv_download:nse_fii_dii_v1", "source": "NSE bhavcopy" },
+    { "metric_id": "dii_mtd", "display_name": "DII MTD", "sub_cluster": "headline", "parser": "csv_download:nse_fii_dii_v1", "source": "NSE bhavcopy" },
+    { "metric_id": "absorption_ratio", "display_name": "DII absorption ratio", "sub_cluster": "headline", "parser": "manual:derived_v1", "source": "Derived: dii_daily / |fii_equity_daily|" },
+    { "metric_id": "fpi_debt_flows", "display_name": "FPI debt flows", "sub_cluster": "debt", "parser": "csv_download:nsdl_fpi_v1", "source": "NSDL FPI portal" },
+    { "metric_id": "sectoral_fii_mtd", "display_name": "Sectoral FII flows MTD", "sub_cluster": "structure", "parser": "html_scrape:nsdl_sectoral_v1", "source": "NSDL FPI sectoral" },
+    { "metric_id": "fno_oi_buildup", "display_name": "F&O OI build-up", "sub_cluster": "structure", "parser": "csv_download:nse_fno_v1", "source": "NSE F&O bhavcopy" },
+    { "metric_id": "block_deals_notional", "display_name": "Block deals notional", "sub_cluster": "structure", "parser": "csv_download:nse_blocks_v1", "source": "NSE block deals report" }
+  ],
+
+  "macro": [
+    { "metric_id": "inr_usd", "display_name": "INR / USD", "sub_cluster": "external", "parser": "json_api:rbi_refrate_v1", "source": "RBI reference rate", "exemplar": true },
+    { "metric_id": "fx_reserves", "display_name": "FX reserves", "sub_cluster": "external", "parser": "json_api:rbi_wss_v1", "source": "RBI WSS" },
+    { "metric_id": "trade_deficit", "display_name": "Trade deficit", "sub_cluster": "external", "parser": "press_release:dgcis_v1", "source": "MoCI / DGCIS" },
+    { "metric_id": "cad_pct_gdp", "display_name": "CAD as % of GDP", "sub_cluster": "external", "parser": "press_release:rbi_bop_v1", "source": "RBI BoP" },
+    { "metric_id": "banking_liquidity", "display_name": "Banking system liquidity", "sub_cluster": "rates", "parser": "json_api:rbi_mmo_v1", "source": "RBI Money Market Ops" },
+    { "metric_id": "wacr_repo_spread", "display_name": "WACR – Repo spread", "sub_cluster": "rates", "parser": "json_api:ccil_v1", "source": "CCIL + RBI" },
+    { "metric_id": "repo_rate", "display_name": "Repo rate", "sub_cluster": "rates", "parser": "press_release:rbi_policy_v1", "source": "RBI policy press release" },
+    { "metric_id": "gsec_curve", "display_name": "G-sec curve (1Y/5Y/10Y)", "sub_cluster": "rates", "parser": "json_api:ccil_v1", "source": "CCIL FBIL" },
+    { "metric_id": "real_10y_yield", "display_name": "Real 10Y yield", "sub_cluster": "rates", "parser": "manual:derived_v1", "source": "Derived: gsec_10y - cpi_inflation" },
+    { "metric_id": "cpi_inflation", "display_name": "CPI Headline / Core / Food", "sub_cluster": "inflation", "parser": "press_release:mospi_cpi_v1", "source": "MoSPI" },
+    { "metric_id": "wpi_inflation", "display_name": "WPI inflation", "sub_cluster": "inflation", "parser": "press_release:eaindustry_wpi_v1", "source": "Office of Economic Adviser" },
+    { "metric_id": "pmi_combined", "display_name": "PMI Composite", "sub_cluster": "leading", "parser": "press_release:sp_pmi_india_v1", "source": "S&P Global India PMI", "exemplar": true },
+    { "metric_id": "iip_growth", "display_name": "IIP — Industrial Production", "sub_cluster": "leading", "parser": "press_release:mospi_iip_v1", "source": "MoSPI IIP" },
+    { "metric_id": "fiscal_deficit_pct", "display_name": "Fiscal deficit % of target", "sub_cluster": "fiscal", "parser": "press_release:cga_v1", "source": "CGA monthly accounts" },
+    { "metric_id": "govt_capex_runrate", "display_name": "Govt capex run-rate", "sub_cluster": "fiscal", "parser": "press_release:cga_v1", "source": "CGA monthly accounts" },
+    { "metric_id": "credit_deposit_growth", "display_name": "Credit / Deposit growth", "sub_cluster": "credit", "parser": "json_api:rbi_fortnightly_v1", "source": "RBI fortnightly bulletin" }
+  ],
+
+  "economy": [
+    { "metric_id": "gst_gross", "display_name": "GST gross collection", "sub_cluster": "tax_demand", "parser": "press_release:gst_monthly_v1", "source": "GST.gov.in", "exemplar": true },
+    { "metric_id": "eway_bills", "display_name": "E-way bills", "sub_cluster": "tax_demand", "parser": "press_release:gstn_eway_v1", "source": "GSTN" },
+    { "metric_id": "upi_value", "display_name": "UPI value + volume", "sub_cluster": "tax_demand", "parser": "press_release:npci_upi_v1", "source": "NPCI" },
+    { "metric_id": "fastag_toll", "display_name": "FASTag toll value", "sub_cluster": "movement", "parser": "press_release:ihmcl_v1", "source": "IHMCL / NHAI" },
+    { "metric_id": "rail_freight", "display_name": "Rail freight loading", "sub_cluster": "movement", "parser": "press_release:railways_v1", "source": "Indian Railways / PIB" },
+    { "metric_id": "port_cargo", "display_name": "Major port cargo", "sub_cluster": "movement", "parser": "press_release:moports_v1", "source": "Min of Ports / PIB" },
+    { "metric_id": "air_pax", "display_name": "Air passenger traffic", "sub_cluster": "movement", "parser": "press_release:dgca_v1", "source": "DGCA monthly" },
+    { "metric_id": "pol_demand", "display_name": "POL demand", "sub_cluster": "production_energy", "parser": "press_release:ppac_v1", "source": "PPAC" },
+    { "metric_id": "power_demand", "display_name": "Power demand", "sub_cluster": "production_energy", "parser": "json_api:gridindia_v1", "source": "Grid India / POSOCO" },
+    { "metric_id": "cement_dispatches", "display_name": "Cement dispatches (top-5)", "sub_cluster": "production_energy", "parser": "html_scrape:bse_cement_v1", "source": "BSE/NSE company filings" },
+    { "metric_id": "steel_consumption", "display_name": "Steel consumption", "sub_cluster": "production_energy", "parser": "press_release:jpc_steel_v1", "source": "JPC India" },
+    { "metric_id": "auto_2w", "display_name": "2W retail registrations", "sub_cluster": "auto", "parser": "press_release:fada_monthly_v1", "source": "FADA", "exemplar": true },
+    { "metric_id": "auto_3w", "display_name": "3W retail registrations", "sub_cluster": "auto", "parser": "press_release:fada_monthly_v1", "source": "FADA" },
+    { "metric_id": "auto_pv", "display_name": "PV (4W) retail", "sub_cluster": "auto", "parser": "press_release:fada_monthly_v1", "source": "FADA" },
+    { "metric_id": "auto_cv", "display_name": "CV retail (LCV + M&HCV)", "sub_cluster": "auto", "parser": "press_release:fada_monthly_v1", "source": "FADA" },
+    { "metric_id": "auto_tractor", "display_name": "Tractor retail", "sub_cluster": "auto", "parser": "press_release:fada_monthly_v1", "source": "FADA" },
+    { "metric_id": "naukri_jobspeak", "display_name": "Naukri JobSpeak Index", "sub_cluster": "discretionary", "parser": "press_release:naukri_v1", "source": "Naukri.com monthly" },
+    { "metric_id": "reservoir_levels", "display_name": "Reservoir levels", "sub_cluster": "discretionary", "parser": "json_api:cwc_v1", "source": "CWC weekly" }
+  ],
+
+  "freight": [
+    { "metric_id": "hormuz_throughput", "display_name": "Strait of Hormuz throughput", "shock_eligible": true, "parser": "html_scrape:hormuz_v1", "source": "MarineTraffic", "exemplar": true },
+    { "metric_id": "brent_crude", "display_name": "Brent crude", "shock_eligible": true, "parser": "json_api:public_oil_v1", "source": "Reuters / EIA", "audit_addendum": "Added during Phase 1 — was missing from §12" },
+    { "metric_id": "india_crude_basket", "display_name": "India crude basket", "shock_eligible": true, "parser": "press_release:ppac_v1", "source": "PPAC daily", "audit_addendum": "Added during Phase 1 — was missing from §12" },
+    { "metric_id": "drewry_wci", "display_name": "Drewry WCI", "parser": "html_scrape:drewry_v1", "source": "Drewry weekly" },
+    { "metric_id": "baltic_dry_index", "display_name": "Baltic Dry Index", "parser": "html_scrape:tradingeconomics_v1", "source": "Trading Economics / Baltic" },
+    { "metric_id": "vlcc_tanker_rates", "display_name": "VLCC tanker rates", "parser": "press_release:baltic_dirty_v1", "source": "Baltic Dirty Tanker Index" },
+    { "metric_id": "india_port_dwell_time", "display_name": "Indian port dwell time", "parser": "html_scrape:port_authority_v1", "source": "JNPT + Mundra weekly bulletins" }
+  ],
+
+  "market": [
+    { "metric_id": "nifty_50", "display_name": "Nifty 50", "parser": "csv_download:nse_indices_v1", "source": "NSE", "exemplar": true },
+    { "metric_id": "bank_nifty", "display_name": "Bank Nifty", "parser": "csv_download:nse_indices_v1", "source": "NSE" },
+    { "metric_id": "nifty_pe_5y", "display_name": "Nifty PE vs 5Y avg", "parser": "csv_download:nse_pe_v1", "source": "NSE daily PE/PB" },
+    { "metric_id": "india_vix", "display_name": "India VIX", "parser": "csv_download:nse_vix_v1", "source": "NSE" },
+    { "metric_id": "gold_usd", "display_name": "Gold ($/oz)", "parser": "json_api:public_gold_v1", "source": "Reuters / LBMA" },
+    { "metric_id": "dxy", "display_name": "DXY", "parser": "json_api:public_dxy_v1", "source": "Yahoo Finance / Investing.com" },
+    { "metric_id": "ind_us_10y_spread", "display_name": "India 10Y vs US 10Y spread", "parser": "manual:derived_v1", "source": "Derived: gsec_10y - fred_us_10y" },
+    { "metric_id": "high_yield_credit_spread", "display_name": "High yield credit spread (CRISIL AAA – G-sec)", "parser": "html_scrape:crisil_v1", "source": "CRISIL weekly bond yield" }
+  ],
+
+  "sectors": {
+    "file": "data/sectors/sectors.json",
+    "structure": "15 sectors × 7 driver columns (qualitative) + 3 quant columns (1M/3M/YTD return, PE vs 5Y, EPS revision %)",
+    "sector_ids": ["logistics_3pl", "road_epc", "ports_cfs", "rail_logistics", "aviation", "downstream_omc", "fertilizer", "cement", "steel_metals", "autos", "chemicals", "packaging", "capital_goods", "qsr_travel", "shipping"]
+  }
+}

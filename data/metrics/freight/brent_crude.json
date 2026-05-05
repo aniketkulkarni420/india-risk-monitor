@@ -1,0 +1,75 @@
+{
+  "metric_id": "brent_crude",
+  "display_name": "Brent crude",
+  "display_subtitle": "Front-month · USD per barrel",
+  "section": "freight",
+  "sub_cluster": "oil",
+  "value": 97.32,
+  "unit": "$/bbl",
+  "value_format": "decimal_2",
+  "as_of": "2026-05-04T14:10:40.338Z",
+  "as_of_period": "live",
+  "mom_pct": 18.1,
+  "yoy_pct": 27.6,
+  "vs_5y_avg_pct": 32.4,
+  "sparkline_12m": [
+    78.2,
+    80.1,
+    79.4,
+    82.3,
+    84,
+    83.5,
+    85.2,
+    84,
+    86.5,
+    84,
+    98.4,
+    97.32
+  ],
+  "baseline_30d": 84,
+  "deviation_from_baseline_pct": 17.1,
+  "status": "shock",
+  "shock_eligible": true,
+  "shock_rule": "value > $95 sustained 7d OR daily move > 8%",
+  "trend_direction": "bad",
+  "source_primary": {
+    "name": "EIA / Reuters energy wire",
+    "url": "https://www.eia.gov/petroleum/data.php",
+    "type": "Official",
+    "frequency": "Live",
+    "parser": "json_api:public_oil_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Investing.com Brent",
+      "url": "https://www.investing.com/commodities/brent-oil",
+      "type": "Aggregator"
+    },
+    {
+      "name": "Trading Economics Brent",
+      "url": "https://tradingeconomics.com/commodity/brent-crude-oil",
+      "type": "Aggregator"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.338Z",
+  "why_it_matters": "India imports 80%+ of crude. Brent is the price benchmark. Currently in shock state on Hormuz disruption — direct CAD + WPI + INR feed-through.",
+  "trigger_thresholds": [
+    {
+      "level": "high",
+      "rule": "value > $90 sustained 7d"
+    },
+    {
+      "level": "shock",
+      "rule": "value > $95 sustained OR daily move > 8%"
+    }
+  ],
+  "linked_metrics": [
+    "hormuz_throughput",
+    "india_crude_basket",
+    "vlcc_tanker_rates",
+    "wpi_inflation",
+    "trade_deficit",
+    "inr_usd"
+  ]
+}

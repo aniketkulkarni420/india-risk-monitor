@@ -1,0 +1,33 @@
+{
+  "metric_id": "fx_reserves",
+  "display_name": "FX reserves",
+  "display_subtitle": "RBI weekly · level + WoW change",
+  "section": "macro",
+  "sub_cluster": "external",
+  "value": 692.41,
+  "unit": "$ Bn",
+  "value_format": "currency_usd_bn",
+  "as_of": "2026-04-25T17:30:00+05:30",
+  "as_of_period": "weekly",
+  "mom_pct": -1.4,
+  "yoy_pct": 4.8,
+  "vs_5y_avg_pct": 16.2,
+  "sparkline_12m": [660, 663, 668, 672, 678, 682, 688, 695, 700, 703, 696, 692],
+  "status": "low",
+  "shock_eligible": true,
+  "shock_rule": "weekly drawdown > $10 Bn (RBI intervention)",
+  "trend_direction": "bad",
+  "source_primary": { "name": "RBI Weekly Statistical Supplement", "url": "https://www.rbi.org.in/Scripts/WSSView.aspx", "type": "Official", "frequency": "Weekly", "parser": "json_api:rbi_wss_v1" },
+  "source_crosscheck": [
+    { "name": "PIB weekly release", "url": "https://www.pib.gov.in/", "type": "Official" },
+    { "name": "IMF SDR data", "url": "https://www.imf.org/external/np/sec/decdo/sdr.htm", "type": "Official" }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-04-25T18:00:00+05:30",
+  "why_it_matters": "Reserves act as INR defense buffer. WoW drop > $5 Bn signals RBI intervention to defend currency. Weekly change is more informative than the level.",
+  "trigger_thresholds": [
+    { "level": "med", "rule": "WoW drop > $5 Bn" },
+    { "level": "shock", "rule": "WoW drop > $10 Bn" }
+  ],
+  "linked_metrics": ["inr_usd", "trade_deficit", "cad_pct_gdp"]
+}

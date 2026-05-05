@@ -1,0 +1,56 @@
+{
+  "metric_id": "gsec_curve",
+  "display_name": "G-sec curve",
+  "display_subtitle": "1Y · 5Y · 10Y benchmark yields",
+  "section": "macro",
+  "sub_cluster": "rates",
+  "value": 6.87,
+  "unit": "% (10Y)",
+  "value_format": "decimal_2",
+  "as_of": "2026-05-04T14:10:40.394Z",
+  "as_of_period": "live",
+  "mom_pct": 1.6,
+  "yoy_pct": -3.2,
+  "vs_5y_avg_pct": -2.4,
+  "sparkline_12m": [
+    7.18,
+    7.12,
+    7.08,
+    7.05,
+    7.02,
+    7,
+    6.98,
+    6.95,
+    6.92,
+    6.86,
+    6.97,
+    6.87
+  ],
+  "status": "low",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "source_primary": {
+    "name": "CCIL FBIL",
+    "url": "https://www.fbil.org.in/",
+    "type": "Official",
+    "frequency": "Daily",
+    "parser": "json_api:ccil_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "RBI Negotiated Dealing System",
+      "url": "https://www.rbi.org.in/",
+      "type": "Official"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.394Z",
+  "why_it_matters": "10Y G-sec is the benchmark anchor. Curve shape (steepness 10Y-1Y) signals growth/inflation expectations. Current spread: 87 bps (normal).",
+  "linked_metrics": [
+    "repo_rate",
+    "real_10y_yield",
+    "ind_us_10y_spread",
+    "fpi_debt_flows"
+  ],
+  "notes": "Drawer shows full curve: 1Y 6.10%, 5Y 6.72%, 10Y 6.97%, plus 10Y-1Y slope and 10Y-2Y slope."
+}

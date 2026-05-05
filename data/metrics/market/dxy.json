@@ -1,0 +1,54 @@
+{
+  "metric_id": "dxy",
+  "display_name": "DXY (US Dollar Index)",
+  "display_subtitle": "ICE futures · daily",
+  "section": "market",
+  "sub_cluster": "sentiment",
+  "value": 102.01,
+  "unit": "Index",
+  "value_format": "decimal_2",
+  "as_of": "2026-05-04T14:10:40.344Z",
+  "as_of_period": "live",
+  "mom_pct": 1.2,
+  "yoy_pct": 0.4,
+  "vs_5y_avg_pct": 6.8,
+  "sparkline_12m": [
+    102.6,
+    102.5,
+    102.3,
+    102.1,
+    101.8,
+    101.6,
+    101.4,
+    101.6,
+    101.8,
+    101.6,
+    102.84,
+    102.01
+  ],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "source_primary": {
+    "name": "Yahoo Finance DXY",
+    "url": "https://finance.yahoo.com/quote/DX-Y.NYB",
+    "type": "Aggregator",
+    "frequency": "Live",
+    "parser": "json_api:public_dxy_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Investing.com DXY",
+      "url": "https://www.investing.com/indices/usdollar",
+      "type": "Aggregator"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.344Z",
+  "why_it_matters": "DXY strength = INR weakness, FII outflow pressure, EM capital reversal. Strong dollar + oil shock = double squeeze on India.",
+  "linked_metrics": [
+    "inr_usd",
+    "gold_usd",
+    "fii_equity_mtd"
+  ]
+}

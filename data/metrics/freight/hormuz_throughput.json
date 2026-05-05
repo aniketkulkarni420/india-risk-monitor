@@ -1,0 +1,81 @@
+{
+  "metric_id": "hormuz_throughput",
+  "display_name": "Strait of Hormuz throughput",
+  "display_subtitle": "Ships passing per day · 24h average",
+  "section": "freight",
+  "sub_cluster": null,
+  "value": 2,
+  "unit": "ships/day",
+  "value_format": "integer",
+  "as_of": "2026-05-04T14:10:40.247Z",
+  "as_of_period": "24h",
+  "mom_pct": -98.5,
+  "yoy_pct": -98.6,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    138,
+    141,
+    139,
+    140,
+    142,
+    138,
+    140,
+    141,
+    139,
+    2,
+    2.0104,
+    2
+  ],
+  "baseline_30d": 140,
+  "deviation_from_baseline_pct": -98.6,
+  "status": "shock",
+  "shock_eligible": true,
+  "shock_rule": "value < 50% baseline_30d",
+  "trend_direction": "bad",
+  "source_primary": {
+    "name": "MarineTraffic",
+    "url": "https://www.marinetraffic.com/en/ais/home/centerx:56.2/centery:26.5/zoom:8",
+    "type": "Public",
+    "frequency": "Daily",
+    "parser": "html_scrape:hormuz_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "TankerTrackers",
+      "url": "https://www.tankertrackers.com/",
+      "type": "Public"
+    },
+    {
+      "name": "Reuters Shipping",
+      "url": "https://www.reuters.com/business/energy/",
+      "type": "Reputable media"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.249Z",
+  "why_it_matters": "Approximately 40% of India's crude imports route through the Strait of Hormuz. Strategic petroleum reserves cover only ~9.5 days of imports, so a sustained collapse forces immediate sourcing pivot.",
+  "formula": null,
+  "trigger_thresholds": [
+    {
+      "level": "high",
+      "rule": "value < 130 sustained 7d"
+    },
+    {
+      "level": "shock",
+      "rule": "value < 50% baseline_30d"
+    }
+  ],
+  "linked_metrics": [
+    "brent_crude",
+    "india_crude_basket",
+    "vlcc_tanker_rates",
+    "inr_usd",
+    "cad_pct_gdp"
+  ],
+  "watch_next": [
+    "Loaded cargoes from Ras Tanura",
+    "Cape route diversion volumes",
+    "Mumbai port arrivals 7-day moving avg"
+  ],
+  "notes": "AIS data has a ~2hr lag. Manual cross-check vs Reuters wire daily during shock periods."
+}

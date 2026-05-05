@@ -1,0 +1,35 @@
+{
+  "metric_id": "cpi_inflation",
+  "display_name": "CPI inflation",
+  "display_subtitle": "Headline · core · food (drawer)",
+  "section": "macro",
+  "sub_cluster": "inflation",
+  "value": 3.40,
+  "unit": "% YoY",
+  "value_format": "decimal_2",
+  "as_of": "2026-04-12T17:30:00+05:30",
+  "as_of_period": "monthly",
+  "mom_pct": -2.9,
+  "yoy_pct": -27.7,
+  "vs_5y_avg_pct": -34.6,
+  "sparkline_12m": [4.70, 4.50, 4.40, 4.20, 4.10, 4.00, 3.90, 3.80, 3.70, 3.50, 3.50, 3.40],
+  "status": "low",
+  "shock_eligible": true,
+  "shock_rule": "value > 6.5% (RBI upper tolerance)",
+  "trend_direction": "good",
+  "source_primary": { "name": "MoSPI CPI release", "url": "https://www.mospi.gov.in/cpi", "type": "Official", "frequency": "Monthly", "parser": "press_release:mospi_cpi_v1" },
+  "source_crosscheck": [
+    { "name": "PIB CPI release", "url": "https://www.pib.gov.in/", "type": "Official" },
+    { "name": "RBI Bulletin reference", "url": "https://www.rbi.org.in/", "type": "Official" }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-04-12T18:30:00+05:30",
+  "why_it_matters": "RBI tolerance band: 4% ± 2%. Currently well-anchored at 3.4% — gives RBI room to stay accommodative even with Brent shock. Watch for May print as oil pass-through hits.",
+  "trigger_thresholds": [
+    { "level": "med", "rule": "value > 5%" },
+    { "level": "high", "rule": "value > 6%" },
+    { "level": "shock", "rule": "value > 6.5%" }
+  ],
+  "linked_metrics": ["repo_rate", "real_10y_yield", "wpi_inflation"],
+  "notes": "Drawer shows split: Headline 3.40%, Core 3.42%, Food 3.87%, Fuel 2.10%."
+}

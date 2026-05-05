@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>India Risk Monitor — Sources & methodology</title>
+<meta name="description" content="Every metric × source × cross-check × verification state. Free sources, ≥ 2 cross-checks per metric.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../components/styles.css">
+<style>
+  html, body { overflow-x: clip; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); margin: 0; -webkit-font-smoothing: antialiased; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 40;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 32px;
+    background: rgba(10, 13, 18, .85); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    font-size: 13px; color: var(--ink-3);
+  }
+  .topbar .brand { color: var(--ink); font-weight: 600; }
+  .topbar .meta { display: flex; gap: 16px; align-items: center; }
+  .topbar a { color: var(--ink-2); text-decoration: none; }
+  .topbar a:hover { color: var(--accent); }
+
+  .page-wrap { max-width: 1180px; margin: 0 auto; padding: 56px 32px 80px; }
+
+  .doc-eyebrow { color: var(--accent); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 14px; }
+  .doc-title { font-size: 36px; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 14px; }
+  .doc-sub { color: var(--ink-2); font-size: 16px; max-width: 760px; margin: 0 0 40px; }
+
+  /* Trust band */
+  .trust-band { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 42px; }
+  .trust-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .tc-label { font-size: 10px; color: var(--ink-3); letter-spacing: .08em; text-transform: uppercase; }
+  .tc-value { font-size: 28px; font-weight: 700; font-family: var(--mono); margin-top: 4px; line-height: 1; }
+  .tc-sub { font-size: 11px; color: var(--ink-3); margin-top: 6px; }
+  @media (max-width: 800px) { .trust-band { grid-template-columns: repeat(2, 1fr); } }
+
+  /* Filter row */
+  .filter-row { display: flex; gap: 12px; margin-bottom: 22px; align-items: center; flex-wrap: wrap; }
+  .filter-row input[type="search"] {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    color: var(--ink); padding: 10px 14px; font-family: var(--sans); font-size: 13.5px;
+    flex: 1; min-width: 240px; outline: none;
+  }
+  .filter-row input[type="search"]:focus { border-color: var(--accent); }
+  .filter-row .filter-pill {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+    color: var(--ink-2); padding: 6px 14px; font-size: 12px; cursor: pointer;
+    font-family: var(--sans); transition: all .15s;
+  }
+  .filter-row .filter-pill:hover { border-color: var(--line-2); color: var(--ink); }
+  .filter-row .filter-pill.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  /* Sources table */
+  .sources-table-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  table.sources-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.sources-table th {
+    text-align: left; color: var(--ink-3); font-weight: 500; font-size: 10.5px;
+    letter-spacing: .08em; text-transform: uppercase; padding: 12px 14px;
+    background: var(--surface-2); border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 5;
+  }
+  table.sources-table td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+  table.sources-table tr:last-child td { border-bottom: none; }
+  table.sources-table tr:hover td { background: rgba(255, 255, 255, .015); }
+  table.sources-table .name { color: var(--ink); font-weight: 500; }
+  table.sources-table .name small { display: block; color: var(--ink-3); font-weight: 400; font-size: 11px; margin-top: 2px; }
+  table.sources-table .section-tag {
+    font-family: var(--mono); font-size: 10px; color: var(--ink-3); letter-spacing: .08em;
+    text-transform: uppercase; background: var(--surface-2); padding: 2px 7px; border-radius: 3px;
+  }
+  table.sources-table .src-link { color: var(--ink); text-decoration: none; font-weight: 500; }
+  table.sources-table .src-link:hover { color: var(--accent); }
+  table.sources-table .src-meta { display: block; color: var(--ink-3); font-size: 11px; margin-top: 2px; font-family: var(--mono); }
+  table.sources-table .crosschecks { color: var(--ink-3); font-size: 11px; }
+  table.sources-table .crosschecks a { color: var(--ink-2); text-decoration: none; }
+  table.sources-table .crosschecks a:hover { color: var(--accent); }
+  table.sources-table .verif { font-family: var(--mono); font-size: 11px; }
+  table.sources-table .verif.verified { color: var(--green); }
+  table.sources-table .verif.crosscheck_pending { color: var(--amber); }
+  table.sources-table .verif.history_pending { color: var(--blue); }
+  table.sources-table .verif.source_pending { color: var(--red); }
+  table.sources-table .freq { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+  table.sources-table .last { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+
+  .empty-row td { text-align: center; color: var(--ink-3); padding: 40px 14px; font-style: italic; }
+
+  /* Methodology section */
+  .methodology { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--line); }
+  .methodology h2 { font-size: 22px; margin: 0 0 14px; }
+  .methodology p { color: var(--ink-2); font-size: 14px; max-width: 760px; margin: 0 0 14px; }
+  .methodology ul { color: var(--ink-2); font-size: 14px; padding-left: 22px; }
+  .methodology li { padding: 4px 0; }
+  .methodology code {
+    font-family: var(--mono); font-size: 12px; color: var(--accent);
+    background: var(--surface-2); padding: 1px 6px; border-radius: 3px;
+  }
+
+  /* Source directory */
+  .source-directory { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+  .source-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .sc-name { color: var(--ink); font-weight: 500; font-size: 13.5px; margin-bottom: 4px; }
+  .sc-meta { color: var(--ink-3); font-size: 11.5px; font-family: var(--mono); margin-bottom: 6px; }
+  .sc-link { color: var(--accent); font-size: 11px; text-decoration: none; word-break: break-all; }
+  .sc-link:hover { text-decoration: underline; }
+  .sc-usage { color: var(--ink-2); font-size: 11px; margin-top: 6px; }
+  @media (max-width: 800px) { .source-directory { grid-template-columns: 1fr; } }
+
+  .page-footer {
+    margin-top: 60px; padding: 24px 0;
+    border-top: 1px solid var(--line);
+    color: var(--ink-3); font-size: 12.5px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;
+  }
+  .page-footer a { color: var(--accent); text-decoration: none; }
+
+  .loading { padding: 80px 0; text-align: center; color: var(--ink-3); font-family: var(--mono); font-size: 13px; }
+
+  @media (max-width: 700px) {
+    .topbar { padding: 12px 18px; font-size: 12px; }
+    .page-wrap { padding: 40px 18px 60px; }
+    .doc-title { font-size: 28px; }
+    table.sources-table { font-size: 11.5px; }
+    table.sources-table th, table.sources-table td { padding: 10px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">India Risk Monitor</div>
+  <div class="meta">
+    <a href="../index.html">Dashboard</a>
+    <a href="../m/">Mobile</a>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div class="doc-eyebrow">Sources &amp; methodology</div>
+  <h1 class="doc-title">Every metric. Every source. Every cross-check.</h1>
+  <p class="doc-sub">Free sources only. Minimum 2 cross-checks per metric. Cross-check disagreement &gt; 5% flips the metric to <code style="font-family:var(--mono); color:var(--accent); font-size:13px;">crosscheck_pending</code> and we display the lower value with a warning.</p>
+
+  <!-- Trust band -->
+  <div class="trust-band" id="trust-band">
+    <div class="loading" style="grid-column: 1 / -1;">Loading…</div>
+  </div>
+
+  <!-- Filter row -->
+  <div class="filter-row">
+    <input type="search" id="filter-search" placeholder="Search by metric name, source, or section…" autocomplete="off">
+    <button class="filter-pill active" data-filter="all">All <span id="count-all"></span></button>
+    <button class="filter-pill" data-filter="verified">Verified</button>
+    <button class="filter-pill" data-filter="crosscheck_pending">Crosscheck pending</button>
+    <button class="filter-pill" data-filter="history_pending">History pending</button>
+  </div>
+
+  <!-- Sources table -->
+  <div class="sources-table-wrap">
+    <table class="sources-table" id="sources-table">
+      <thead>
+        <tr>
+          <th style="width: 26%;">Metric</th>
+          <th style="width: 9%;">Section</th>
+          <th style="width: 22%;">Primary source</th>
+          <th style="width: 18%;">Cross-checks</th>
+          <th style="width: 8%;">Frequency</th>
+          <th style="width: 9%;">Verification</th>
+          <th style="width: 8%;">Last verified</th>
+        </tr>
+      </thead>
+      <tbody id="sources-body">
+        <tr class="empty-row"><td colspan="7"><div class="loading">Loading sources…</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Methodology -->
+  <section class="methodology" id="methodology">
+    <h2>Methodology</h2>
+    <p>Three rules apply to every metric on the dashboard:</p>
+    <ul>
+      <li><b style="color: var(--ink);">Free sources only.</b> No paid feeds in the displayed data layer. Paid sources may be cited as additional cross-references in the metric drawer.</li>
+      <li><b style="color: var(--ink);">≥ 2 sources per metric.</b> One primary, at least one cross-check. Build fails if cross-check is missing (audit Gate 2).</li>
+      <li><b style="color: var(--ink);">Disagreement protocol.</b> Cross-check fetch runs within 5 min of primary. If they disagree by &gt; 5%, metric flips to <code>crosscheck_pending</code> and renders the <i>lower</i> value with a warning badge.</li>
+    </ul>
+    <p style="margin-top: 18px;">Trend computation:</p>
+    <ul>
+      <li><b style="color: var(--ink);">MoM</b> = today vs same period 30 days ago. Mandatory for every verified metric (audit Gate 2).</li>
+      <li><b style="color: var(--ink);">YoY</b> = today vs same period 365 days ago. Mandatory for every verified metric.</li>
+      <li><b style="color: var(--ink);">vs 5Y avg</b> = today vs trailing 5-year mean. Optional; populated as history accrues.</li>
+      <li><b style="color: var(--ink);">12-month sparkline</b> = month-end values for the last 12 months. Empty during initial accrual; renders dashed line + "history pending."</li>
+    </ul>
+    <p style="margin-top: 18px;">Derived metrics (formula visible in metric drawer):</p>
+    <ul>
+      <li><code>india_risk_score</code> = weighted of 6 driver scores (oil 25% · flows 20% · macro 20% · real 15% · freight 12% · sector 8%)</li>
+      <li><code>absorption_ratio</code> = max(DII MTD, 0) / |min(FII MTD, 0)|</li>
+      <li><code>real_10y_yield</code> = G-sec 10Y − CPI YoY</li>
+      <li><code>ind_us_10y_spread</code> = G-sec 10Y − FRED US 10Y</li>
+      <li>Driver scores: weighted normalisations of underlying metrics; auto-shock if any input metric is in shock state</li>
+    </ul>
+    <p style="margin-top: 18px;">Update cadence — see <a href="../../IRM_Tech_Architecture.html#cadence" style="color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--line-2);">Tech Architecture §04</a> for the full 9-slot schedule.</p>
+  </section>
+
+  <!-- Source directory -->
+  <section class="methodology" id="source-directory-section">
+    <h2>Source directory</h2>
+    <p>Every source we draw from. Click to visit.</p>
+    <div class="source-directory" id="source-directory">
+      <div class="loading" style="grid-column: 1 / -1;">Loading…</div>
+    </div>
+  </section>
+
+  <footer class="page-footer">
+    <span>Built by <b style="color:var(--ink-2);">Aniket Kulkarni</b> · <span id="last-build">building…</span></span>
+    <a href="../index.html">← Back to dashboard</a>
+  </footer>
+</div>
+
+<script type="module" src="main.mjs"></script>
+</body>
+</html>

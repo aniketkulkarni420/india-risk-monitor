@@ -1,0 +1,29 @@
+{
+  "metric_id": "sectoral_fii_mtd",
+  "display_name": "Sectoral FII flows MTD",
+  "display_subtitle": "Top 3 buy / Top 3 sell sectors · April 2026",
+  "section": "flows",
+  "sub_cluster": "structure",
+  "value": "Sell: IT, Banks, Auto · Buy: Energy, Pharma, Metals",
+  "unit": "label",
+  "value_format": "label",
+  "as_of": "2026-04-15T18:00:00+05:30",
+  "as_of_period": "monthly",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "source_primary": { "name": "NSDL FPI sectoral", "url": "https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx?RptType=6", "type": "Public", "frequency": "Monthly", "parser": "html_scrape:nsdl_sectoral_v1" },
+  "source_crosscheck": [
+    { "name": "NSE sector indices flow approximation", "url": "https://www.nseindia.com/products-services/indices-sectoral", "type": "Exchange" },
+    { "name": "Moneycontrol sector FII data", "url": "https://www.moneycontrol.com/", "type": "Reputable media" }
+  ],
+  "verification_state": "history_pending",
+  "last_verified_at": "2026-04-15T19:00:00+05:30",
+  "why_it_matters": "Tells fund managers WHICH sectors FIIs are dumping. IT + banks selling = funding-cost rotation; Energy buying = oil-shock beneficiary play. Drives sector positioning.",
+  "linked_metrics": ["fii_equity_mtd", "nifty_50", "bank_nifty"],
+  "notes": "NSDL sectoral split publishes mid-month for prior month. Daily sectoral approximation derived from NSE block-level + sector index movement; flagged history_pending until full year of records."
+}

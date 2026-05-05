@@ -1,0 +1,65 @@
+{
+  "metric_id": "fii_equity_mtd",
+  "display_name": "FII equity MTD",
+  "display_subtitle": "Month-to-date net cash flow · April 2026",
+  "section": "flows",
+  "sub_cluster": "headline",
+  "value": -14196.7398,
+  "unit": "₹ Cr",
+  "value_format": "currency_inr_cr",
+  "as_of": "2026-05-04T14:10:40.354Z",
+  "as_of_period": "monthly",
+  "mom_pct": -184.2,
+  "yoy_pct": -167.8,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    8200,
+    -3400,
+    5100,
+    9800,
+    -8200,
+    14000,
+    -6500,
+    18200,
+    -2400,
+    16800,
+    -14305,
+    -14196.7398
+  ],
+  "status": "high",
+  "shock_eligible": true,
+  "shock_rule": "MTD < -₹40,000 Cr",
+  "trend_direction": "bad",
+  "source_primary": {
+    "name": "NSE bhavcopy",
+    "url": "https://www.nseindia.com/reports/fii-dii",
+    "type": "Exchange",
+    "frequency": "Daily",
+    "parser": "csv_download:nse_fii_dii_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "SEBI FPI bulletin",
+      "url": "https://www.sebi.gov.in/statistics/foreign-portfolio-investors-fpis-data.html",
+      "type": "Regulator"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.354Z",
+  "why_it_matters": "MTD aggregate is the operative number for fund managers — shows persistent regime, not single-day noise. April MTD outflow is the largest since Aug-2024.",
+  "trigger_thresholds": [
+    {
+      "level": "high",
+      "rule": "MTD < -₹15,000 Cr"
+    },
+    {
+      "level": "shock",
+      "rule": "MTD < -₹40,000 Cr"
+    }
+  ],
+  "linked_metrics": [
+    "fii_equity_daily",
+    "fii_equity_cytd",
+    "absorption_ratio"
+  ]
+}

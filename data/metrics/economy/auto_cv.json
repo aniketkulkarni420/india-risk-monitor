@@ -1,0 +1,27 @@
+{
+  "metric_id": "auto_cv",
+  "display_name": "CV retail",
+  "display_subtitle": "FADA · LCV + M&HCV combined",
+  "section": "economy",
+  "sub_cluster": "auto",
+  "value": 84260,
+  "unit": "units",
+  "value_format": "integer",
+  "as_of": "2026-04-05T11:00:00+05:30",
+  "as_of_period": "monthly",
+  "mom_pct": 2.4,
+  "yoy_pct": 6.8,
+  "vs_5y_avg_pct": 18.2,
+  "sparkline_12m": [76500, 77800, 78900, 80100, 80800, 81400, 82000, 82600, 83100, 83400, 82300, 84260],
+  "status": "low",
+  "shock_eligible": false,
+  "trend_direction": "good",
+  "source_primary": { "name": "FADA monthly press release", "url": "https://fada.in/index.php/research-publication.php", "type": "Public", "frequency": "Monthly", "parser": "press_release:fada_monthly_v1" },
+  "source_crosscheck": [
+    { "name": "SIAM dispatches", "url": "https://www.siam.in/statistics.aspx?mpgid=8&pgidtrail=14", "type": "Public" }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-04-05T15:00:00+05:30",
+  "why_it_matters": "CV retail = freight + industrial activity proxy. M&HCV especially sensitive to capex cycle. Drawer shows LCV vs M&HCV split.",
+  "linked_metrics": ["auto_pv", "rail_freight", "iip_growth", "fastag_toll"]
+}

@@ -1,0 +1,59 @@
+{
+  "metric_id": "nifty_pe_5y",
+  "display_name": "Nifty PE vs 5Y avg",
+  "display_subtitle": "Trailing PE · NSE daily · drawer: PB",
+  "section": "market",
+  "sub_cluster": "valuation",
+  "value": 23.1,
+  "unit": "× (trailing)",
+  "value_format": "decimal_1",
+  "as_of": "2026-05-04T14:10:40.383Z",
+  "as_of_period": "live",
+  "mom_pct": -1.7,
+  "yoy_pct": 4.6,
+  "vs_5y_avg_pct": 8.6,
+  "sparkline_12m": [
+    21.4,
+    21.8,
+    22,
+    21.6,
+    22.2,
+    22.4,
+    22.6,
+    22.8,
+    22.9,
+    23.2,
+    22.8,
+    23.1
+  ],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "source_primary": {
+    "name": "NSE daily PE/PB",
+    "url": "https://www.nseindia.com/products-services/indices-overview",
+    "type": "Exchange",
+    "frequency": "Daily",
+    "parser": "csv_download:nse_pe_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Trendlyne",
+      "url": "https://trendlyne.com/markets/sector/",
+      "type": "Aggregator"
+    },
+    {
+      "name": "Screener",
+      "url": "https://www.screener.in/",
+      "type": "Aggregator"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.383Z",
+  "why_it_matters": "Valuation context. Currently 22.8× vs 5Y avg ~21× = mildly stretched. Drawer shows PB (3.5×), Earnings yield (4.4%), comparison to MSCI EM.",
+  "linked_metrics": [
+    "nifty_50",
+    "bank_nifty",
+    "ind_us_10y_spread"
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "metric_id": "india_vix",
+  "display_name": "India VIX",
+  "display_subtitle": "NSE volatility index",
+  "section": "market",
+  "sub_cluster": "sentiment",
+  "value": 21.76,
+  "unit": "Index",
+  "value_format": "decimal_2",
+  "as_of": "2026-05-04T14:10:40.386Z",
+  "as_of_period": "live",
+  "mom_pct": 21,
+  "yoy_pct": 35.2,
+  "vs_5y_avg_pct": 8.4,
+  "sparkline_12m": [
+    16.8,
+    17.4,
+    18,
+    17.6,
+    18.4,
+    18.6,
+    18.8,
+    19.2,
+    19,
+    18.05,
+    21.84,
+    21.76
+  ],
+  "status": "med",
+  "shock_eligible": true,
+  "shock_rule": "value > 30 (panic)",
+  "trend_direction": "bad",
+  "source_primary": {
+    "name": "NSE India VIX",
+    "url": "https://www.nseindia.com/products-services/indices-india-vix-index",
+    "type": "Exchange",
+    "frequency": "Live",
+    "parser": "csv_download:nse_vix_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Moneycontrol VIX",
+      "url": "https://www.moneycontrol.com/indian-indices/india-vix-36.html",
+      "type": "Reputable media"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.386Z",
+  "why_it_matters": "Fear gauge. Sub-15 = complacency, 15-25 = normal, 25-30 = nervous, >30 = panic. Currently elevated on Hormuz event but no panic.",
+  "trigger_thresholds": [
+    {
+      "level": "med",
+      "rule": "value > 20"
+    },
+    {
+      "level": "high",
+      "rule": "value > 25"
+    },
+    {
+      "level": "shock",
+      "rule": "value > 30"
+    }
+  ],
+  "linked_metrics": [
+    "nifty_50",
+    "fno_oi_buildup"
+  ]
+}

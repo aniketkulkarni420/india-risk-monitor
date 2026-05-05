@@ -1,0 +1,28 @@
+{
+  "metric_id": "auto_pv",
+  "display_name": "PV (4W) retail",
+  "display_subtitle": "FADA monthly · passenger vehicles",
+  "section": "economy",
+  "sub_cluster": "auto",
+  "value": 348620,
+  "unit": "units",
+  "value_format": "integer",
+  "as_of": "2026-04-05T11:00:00+05:30",
+  "as_of_period": "monthly",
+  "mom_pct": 0.4,
+  "yoy_pct": 5.8,
+  "vs_5y_avg_pct": 32.4,
+  "sparkline_12m": [320000, 325000, 328000, 332000, 334000, 336000, 338000, 340000, 342000, 345000, 347200, 348620],
+  "status": "low",
+  "shock_eligible": false,
+  "trend_direction": "good",
+  "source_primary": { "name": "FADA monthly press release", "url": "https://fada.in/index.php/research-publication.php", "type": "Public", "frequency": "Monthly", "parser": "press_release:fada_monthly_v1" },
+  "source_crosscheck": [
+    { "name": "SIAM dispatches", "url": "https://www.siam.in/statistics.aspx?mpgid=8&pgidtrail=14", "type": "Public" },
+    { "name": "Vahan portal", "url": "https://vahan.parivahan.gov.in/vahan4dashboard/", "type": "Official" }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-04-05T15:00:00+05:30",
+  "why_it_matters": "PV retail = urban discretionary spending. Watch SUV vs hatchback split (drawer) for premiumisation trend.",
+  "linked_metrics": ["auto_2w", "auto_cv", "fastag_toll", "naukri_jobspeak"]
+}

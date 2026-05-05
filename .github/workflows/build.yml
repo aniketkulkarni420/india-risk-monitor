@@ -1,0 +1,40 @@
+name: Build & validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium for visual audit
+        run: npx playwright install chromium --with-deps
+
+      - name: Validate · bundle · audit (Gates 1, 2, 3)
+        run: npm run build
+
+      - name: Visual audit · 5 viewports (Gate 4)
+        run: npm run audit:visual
+
+      - name: Upload audit artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-output
+          path: audit-output/
+          retention-days: 7

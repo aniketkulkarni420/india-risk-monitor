@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRM Component Library — Storybook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="components/styles.css">
+<style>
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); margin: 0; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 56px 32px 120px; }
+  .doc-eyebrow { color: var(--accent); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 12px; }
+  h1 { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 12px; }
+  .lead { color: var(--ink-2); font-size: 16px; max-width: 720px; }
+  section.story { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--line); }
+  section.story h2 { font-size: 22px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
+  section.story .scope { color: var(--ink-3); font-family: var(--mono); font-size: 11px; letter-spacing: .08em; margin-bottom: 28px; }
+  .story-grid { display: grid; gap: 18px; }
+  .story-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .story-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .story-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .story-card { display: flex; flex-direction: column; gap: 10px; }
+  .story-card .label { color: var(--ink-3); font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; }
+  .table-frame { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px 18px; }
+  .band-frame { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px 28px; }
+  .spark-frame { display: flex; gap: 28px; align-items: center; padding: 22px 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  .spark-frame > div { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .toc { display: flex; gap: 18px; padding: 14px 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-top: 24px; flex-wrap: wrap; }
+  .toc a { color: var(--ink-2); text-decoration: none; font-size: 13px; }
+  .toc a:hover { color: var(--accent); }
+  @media (max-width: 900px) { .story-grid.cols-4, .story-grid.cols-3, .story-grid.cols-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="doc-eyebrow">Phase 3 · component library</div>
+    <h1>Atomic component storybook.</h1>
+    <p class="lead">Each of the four atomic components rendered in every state. Real metric data baked in from the Phase 1 contract. Click any metric → URL hash updates (drawer wiring is Phase 4).</p>
+    <nav class="toc">
+      <a href="#display-tile">DisplayTile</a>
+      <a href="#table-row">TableRow</a>
+      <a href="#sparkline">Sparkline</a>
+      <a href="#band">Band</a>
+      <a href="#section-frame">SectionFrame</a>
+      <a href="#heatmap">HeatmapCell</a>
+      <a href="#drawer">MetricDrawer</a>
+      <a href="#toc">StickyTOC</a>
+    </nav>
+  </header>
+
+  <!-- ============ DisplayTile ============ -->
+  <section class="story" id="display-tile">
+    <h2>DisplayTile</h2>
+    <div class="scope">Pattern 2 · max 8 instances per page · sizes: hero / section / mobile</div>
+
+    <h3 style="font-size:13px; color:var(--ink-3); letter-spacing:.08em; text-transform:uppercase; font-weight:600;">Hero size · 4 across · the deck row</h3>
+    <div id="story-hero-row" class="story-grid cols-4"></div>
+
+    <h3 style="font-size:13px; color:var(--ink-3); letter-spacing:.08em; text-transform:uppercase; font-weight:600; margin-top:32px;">Section size · 2 across</h3>
+    <div id="story-section-row" class="story-grid cols-2"></div>
+
+    <h3 style="font-size:13px; color:var(--ink-3); letter-spacing:.08em; text-transform:uppercase; font-weight:600; margin-top:32px;">Edge states · loading / error / history-pending / shock</h3>
+    <div id="story-states-row" class="story-grid cols-4"></div>
+  </section>
+
+  <!-- ============ TableRow ============ -->
+  <section class="story" id="table-row">
+    <h2>TableRow</h2>
+    <div class="scope">Pattern 1 · ≥ 80% of metric renders · default / shock / history-pending / loading skeleton</div>
+
+    <div class="table-frame">
+      <table class="metric-table" id="story-table-default"></table>
+    </div>
+
+    <h3 style="font-size:13px; color:var(--ink-3); letter-spacing:.08em; text-transform:uppercase; font-weight:600; margin-top:24px;">Edge states</h3>
+    <div class="table-frame">
+      <table class="metric-table" id="story-table-edges"></table>
+    </div>
+  </section>
+
+  <!-- ============ Sparkline ============ -->
+  <section class="story" id="sparkline">
+    <h2>Sparkline</h2>
+    <div class="scope">Primitive SVG · used inside DisplayTile and TableRow</div>
+
+    <div class="spark-frame" id="story-sparks"></div>
+  </section>
+
+  <!-- ============ SectionFrame ============ -->
+  <section class="story" id="section-frame">
+    <h2>SectionFrame</h2>
+    <div class="scope">Composite · the section-level wrapper · header + lens row + slot + footer</div>
+    <div id="story-section-frame"></div>
+  </section>
+
+  <!-- ============ HeatmapCell ============ -->
+  <section class="story" id="heatmap">
+    <h2>HeatmapCell</h2>
+    <div class="scope">Composite · sectors only · 15 × (7 driver cols + 3 quant cols)</div>
+    <div style="background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px;">
+      <table class="heatmap" id="story-heatmap"></table>
+    </div>
+  </section>
+
+  <!-- ============ MetricDrawer ============ -->
+  <section class="story" id="drawer">
+    <h2>MetricDrawer</h2>
+    <div class="scope">Composite · slide-from-right · URL deep-link · click any sample below to open</div>
+    <div style="background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px 26px;">
+      <p style="color: var(--ink-2); font-size: 14px; margin-top: 0;">Click any of the buttons below to open the drawer with a real metric. <kbd style="font-family: var(--mono); background: var(--surface-2); padding: 1px 6px; border-radius: 3px; font-size: 11px;">Esc</kbd> to close. URL updates with <code style="font-family: var(--mono); color: var(--accent); font-size: 12px;">?metric=&lt;id&gt;</code>.</p>
+      <div id="story-drawer-buttons" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;"></div>
+    </div>
+  </section>
+
+  <!-- ============ StickyTOC ============ -->
+  <section class="story" id="toc">
+    <h2>StickyTOC</h2>
+    <div class="scope">Composite · right-rail · engages after scrollY &gt; 720 · highlights active section</div>
+    <p style="color: var(--ink-2); font-size: 14px;">Already mounted to this page (top-right). Scroll up and back to see it slide in/out. Hidden below 1280px viewport.</p>
+  </section>
+
+  <!-- ============ Band ============ -->
+  <section class="story" id="band">
+    <h2>Band</h2>
+    <div class="scope">Risk-score viz · replaces the orb · 0–100 with low / med / high zones</div>
+
+    <div class="band-frame" id="story-band-1">
+      <div class="dt-label" style="margin-bottom:0">India Risk Score</div>
+      <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:6px;">
+        <div class="dt-value" style="font-size:36px;">72</div>
+        <div class="dt-state">/ 100</div>
+        <div style="margin-left:auto"><span class="pill pill-high">High</span></div>
+      </div>
+      <div id="band-mount-1"></div>
+    </div>
+
+    <div class="band-frame" style="margin-top:18px;">
+      <div class="dt-label" style="margin-bottom:0">Real economy driver</div>
+      <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:6px;">
+        <div class="dt-value" style="font-size:36px;">28</div>
+        <div class="dt-state">/ 100</div>
+        <div style="margin-left:auto"><span class="pill pill-low">Low</span></div>
+      </div>
+      <div id="band-mount-2"></div>
+    </div>
+  </section>
+
+</div>
+
+<script type="module">
+  import { renderDisplayTile } from './components/DisplayTile.mjs';
+  import { renderTableRow, renderTableHeader } from './components/TableRow.mjs';
+  import { renderSparkline } from './components/Sparkline.mjs';
+  import { renderBand } from './components/Band.mjs';
+  import { renderSectionFrame } from './components/SectionFrame.mjs';
+  // HeatmapCell retired in Phase 5.5 — replaced by ranked sector list (renderDriverBars)
+  const renderHeatmapRow = () => null; // shim to avoid breaking storybook
+  import { renderStickyTOC } from './components/StickyTOC.mjs';
+  import { wire as wireDrawer, open as openDrawer } from './components/MetricDrawer.mjs';
+  import { el } from './components/utils.mjs';
+
+  // ──────────────────────────────────────────────────────────────
+  // Sample metric data — representative slice of the Phase 1 contract
+  // ──────────────────────────────────────────────────────────────
+  const SAMPLES = {
+    india_risk_score: {
+      metric_id: 'india_risk_score', display_name: 'India Risk Score', display_subtitle: '0–100, weighted',
+      section: 'composites', value: 72, unit: '/ 100', value_format: 'integer',
+      as_of: '2026-04-28T09:42:00+05:30', as_of_period: 'live',
+      mom_pct: 7.5, yoy_pct: 20, vs_5y_avg_pct: 18.5,
+      sparkline_12m: [60,58,55,57,60,62,64,65,67,68,67,72],
+      status: 'high', shock_eligible: true, trend_direction: 'bad'
+    },
+    institutional_flow_regime: {
+      metric_id: 'institutional_flow_regime', display_name: 'Institutional Flow Regime',
+      section: 'composites', value: '1.30×', unit: 'absorption', value_format: 'label',
+      as_of: '2026-04-28T16:30:00+05:30', as_of_period: '24h',
+      mom_pct: 44.4, yoy_pct: 85.7, sparkline_12m: [0.7,0.8,0.9,1.0,1.1,0.9,1.2,0.8,1.4,1.0,0.9,1.30],
+      status: 'low', shock_eligible: false, trend_direction: 'good'
+    },
+    real_economy_state: {
+      metric_id: 'real_economy_state', display_name: 'Real Economy', display_subtitle: 'Resilient · GST +11.5% YoY',
+      section: 'composites', value: '+11.5%', unit: 'YoY', value_format: 'label',
+      as_of: '2026-04-01T11:00:00+05:30', as_of_period: 'monthly',
+      mom_pct: 11.5, yoy_pct: 11.5, sparkline_12m: [1.78,1.82,1.79,1.85,1.88,1.91,1.86,1.93,1.95,1.96,1.96,2.00],
+      status: 'low', shock_eligible: false, trend_direction: 'good'
+    },
+    hormuz_throughput: {
+      metric_id: 'hormuz_throughput', display_name: 'Strait of Hormuz throughput', display_subtitle: 'Ships/day · MarineTraffic',
+      section: 'freight', value: 2, unit: 'ships/day', value_format: 'integer',
+      as_of: '2026-04-28T09:42:00+05:30', as_of_period: '24h',
+      mom_pct: -98.5, yoy_pct: -98.6, sparkline_12m: [140,142,138,141,139,140,142,138,140,141,139,2],
+      baseline_30d: 140, status: 'shock', shock_eligible: true, trend_direction: 'bad'
+    },
+    brent_crude: {
+      metric_id: 'brent_crude', display_name: 'Brent crude', display_subtitle: 'Front-month · USD/bbl',
+      section: 'freight', value: 98.40, unit: '$/bbl', value_format: 'decimal_2',
+      as_of: '2026-04-28T18:00:00+05:30', as_of_period: 'live',
+      mom_pct: 18.1, yoy_pct: 27.6, vs_5y_avg_pct: 32.4,
+      sparkline_12m: [76.5,78.2,80.1,79.4,82.3,84.0,83.5,85.2,84.0,86.5,84.0,98.40],
+      status: 'shock', shock_eligible: true, trend_direction: 'bad'
+    },
+    nifty_50: {
+      metric_id: 'nifty_50', display_name: 'Nifty 50', display_subtitle: 'NSE benchmark',
+      section: 'market', value: 22468.30, unit: 'Index', value_format: 'decimal_2',
+      as_of: '2026-04-28T15:30:00+05:30', as_of_period: 'live',
+      mom_pct: -1.2, yoy_pct: 8.4, vs_5y_avg_pct: 41.6,
+      sparkline_12m: [20720,21080,21450,21680,21540,21900,22150,22380,22510,22610,22745,22468],
+      status: 'med', shock_eligible: true, trend_direction: 'neutral'
+    },
+    fii_equity_daily: {
+      metric_id: 'fii_equity_daily', display_name: 'FII equity daily', display_subtitle: 'Net cash · NSE',
+      section: 'flows', value: -2103.74, unit: '₹ Cr', value_format: 'currency_inr_cr',
+      as_of: '2026-04-28T16:30:00+05:30', as_of_period: '24h',
+      mom_pct: -84.2, yoy_pct: -167.4, sparkline_12m: [4521,8902,-3201,-5400,2100,-8700,-12300,-4500,-2800,-6100,-1900,-2103],
+      status: 'med', shock_eligible: false, trend_direction: 'neutral'
+    },
+    auto_2w: {
+      metric_id: 'auto_2w', display_name: '2W retail registrations', display_subtitle: 'FADA monthly',
+      section: 'economy', value: 1485620, unit: 'units', value_format: 'integer',
+      as_of: '2026-04-05T11:00:00+05:30', as_of_period: 'monthly',
+      mom_pct: 3.2, yoy_pct: 8.5, vs_5y_avg_pct: 14.2,
+      sparkline_12m: [1280000,1310000,1345000,1380000,1395000,1410000,1425000,1440000,1455000,1465000,1438000,1485620],
+      status: 'low', shock_eligible: false, trend_direction: 'good'
+    },
+    vlcc_tanker_rates: {
+      metric_id: 'vlcc_tanker_rates', display_name: 'VLCC tanker rates', display_subtitle: 'Baltic Dirty Tanker',
+      section: 'freight', value: 1842, unit: 'Index', value_format: 'integer',
+      as_of: '2026-04-28T18:00:00+05:30', as_of_period: 'live',
+      mom_pct: 220.4, yoy_pct: 184.6, sparkline_12m: [580,595,610,605,620,640,635,660,680,720,575,1842],
+      status: 'shock', shock_eligible: true, trend_direction: 'bad'
+    },
+    sectoral_fii_mtd: {
+      // history-pending exemplar
+      metric_id: 'sectoral_fii_mtd', display_name: 'Sectoral FII flows MTD', display_subtitle: 'NSDL monthly',
+      section: 'flows', value: 'IT, Banks · sell · Energy, Pharma · buy', unit: 'label', value_format: 'label',
+      as_of: '2026-04-15T18:00:00+05:30', as_of_period: 'monthly',
+      mom_pct: null, yoy_pct: null, sparkline_12m: [],
+      status: 'med', shock_eligible: false, trend_direction: 'neutral',
+      verification_state: 'history_pending', last_verified_at: '2026-04-15T19:00:00+05:30'
+    },
+    upi_value: {
+      metric_id: 'upi_value', display_name: 'UPI value', display_subtitle: 'NPCI monthly',
+      section: 'economy', value: 24.85, unit: '₹ Lakh Cr', value_format: 'currency_inr_lcr',
+      as_of: '2026-04-03T11:00:00+05:30', as_of_period: 'monthly',
+      mom_pct: 4.2, yoy_pct: 38.4, vs_5y_avg_pct: 285,
+      sparkline_12m: [18.0,18.6,19.2,19.8,20.4,21.0,21.6,22.2,22.8,23.4,23.85,24.85],
+      status: 'low', shock_eligible: false, trend_direction: 'good'
+    },
+    inr_usd: {
+      metric_id: 'inr_usd', display_name: 'INR / USD', display_subtitle: 'RBI reference',
+      section: 'macro', value: 83.42, unit: '₹/$', value_format: 'decimal_2',
+      as_of: '2026-04-28T13:00:00+05:30', as_of_period: 'live',
+      mom_pct: 0.8, yoy_pct: 1.4, vs_5y_avg_pct: 12.6,
+      sparkline_12m: [82.3,82.5,82.7,82.6,82.8,83.0,83.1,83.0,83.15,83.25,83.35,83.42],
+      status: 'med', shock_eligible: true, trend_direction: 'bad'
+    }
+  };
+
+  function captioned(label, content) {
+    return el('div', { class: 'story-card' }, [
+      el('div', { class: 'label' }, label),
+      content
+    ]);
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // DisplayTile · Hero size (4 across)
+  // ──────────────────────────────────────────────────────────────
+  const heroRow = document.getElementById('story-hero-row');
+  heroRow.appendChild(captioned('hero · default', renderDisplayTile(SAMPLES.india_risk_score, { size: 'hero' })));
+  heroRow.appendChild(captioned('hero · label value', renderDisplayTile(SAMPLES.institutional_flow_regime, { size: 'hero' })));
+  heroRow.appendChild(captioned('hero · positive trend', renderDisplayTile(SAMPLES.real_economy_state, { size: 'hero' })));
+  heroRow.appendChild(captioned('hero · SHOCK', renderDisplayTile(SAMPLES.hormuz_throughput, { size: 'hero' })));
+
+  // ──────────────────────────────────────────────────────────────
+  // DisplayTile · Section size (2 across)
+  // ──────────────────────────────────────────────────────────────
+  const sectionRow = document.getElementById('story-section-row');
+  sectionRow.appendChild(captioned('section · with sparkline', renderDisplayTile(SAMPLES.brent_crude, { size: 'section' })));
+  sectionRow.appendChild(captioned('section · positive', renderDisplayTile(SAMPLES.upi_value, { size: 'section' })));
+
+  // ──────────────────────────────────────────────────────────────
+  // DisplayTile · Edge states
+  // ──────────────────────────────────────────────────────────────
+  const statesRow = document.getElementById('story-states-row');
+  statesRow.appendChild(captioned('loading skeleton', renderDisplayTile(null, { size: 'section', state: 'loading' })));
+  statesRow.appendChild(captioned('error', renderDisplayTile(null, { size: 'section', state: 'error', errorMessage: 'NSE 503 — retry pending' })));
+  statesRow.appendChild(captioned('history pending', renderDisplayTile(SAMPLES.sectoral_fii_mtd, { size: 'section' })));
+  statesRow.appendChild(captioned('SHOCK · vlcc rates', renderDisplayTile(SAMPLES.vlcc_tanker_rates, { size: 'section' })));
+
+  // ──────────────────────────────────────────────────────────────
+  // TableRow · default + several rows
+  // ──────────────────────────────────────────────────────────────
+  const tDefault = document.getElementById('story-table-default');
+  tDefault.appendChild(renderTableHeader());
+  tDefault.appendChild(renderTableRow(SAMPLES.brent_crude));
+  tDefault.appendChild(renderTableRow(SAMPLES.hormuz_throughput));
+  tDefault.appendChild(renderTableRow(SAMPLES.vlcc_tanker_rates));
+  tDefault.appendChild(renderTableRow(SAMPLES.fii_equity_daily));
+  tDefault.appendChild(renderTableRow(SAMPLES.auto_2w));
+  tDefault.appendChild(renderTableRow(SAMPLES.upi_value));
+  tDefault.appendChild(renderTableRow(SAMPLES.inr_usd));
+
+  // ──────────────────────────────────────────────────────────────
+  // TableRow · Edge states
+  // ──────────────────────────────────────────────────────────────
+  const tEdges = document.getElementById('story-table-edges');
+  tEdges.appendChild(renderTableHeader());
+  tEdges.appendChild(renderTableRow(SAMPLES.sectoral_fii_mtd));   // history-pending
+  tEdges.appendChild(renderTableRow(null, { state: 'loading' })); // skeleton
+  tEdges.appendChild(renderTableRow(null, { state: 'error', errorMessage: 'NSE timeout · last value 5h ago' }));
+  tEdges.appendChild(renderTableRow(SAMPLES.hormuz_throughput));   // shock state highlighting
+
+  // ──────────────────────────────────────────────────────────────
+  // Sparkline · variants
+  // ──────────────────────────────────────────────────────────────
+  const sparks = document.getElementById('story-sparks');
+  sparks.appendChild(captioned('default · 80×22',
+    renderSparkline({ data: SAMPLES.brent_crude.sparkline_12m, width: 80, height: 22, trend_direction: 'bad' })));
+  sparks.appendChild(captioned('with fill · 120×32',
+    renderSparkline({ data: SAMPLES.brent_crude.sparkline_12m, width: 120, height: 32, fill: true, trend_direction: 'bad' })));
+  sparks.appendChild(captioned('positive trend · 120×32',
+    renderSparkline({ data: SAMPLES.upi_value.sparkline_12m, width: 120, height: 32, fill: true, trend_direction: 'good' })));
+  sparks.appendChild(captioned('hormuz cliff · 200×40',
+    renderSparkline({ data: SAMPLES.hormuz_throughput.sparkline_12m, width: 200, height: 40, fill: true, trend_direction: 'bad' })));
+  sparks.appendChild(captioned('empty · history pending',
+    renderSparkline({ data: [], width: 120, height: 32 })));
+
+  // ──────────────────────────────────────────────────────────────
+  // Band · two examples
+  // ──────────────────────────────────────────────────────────────
+  document.getElementById('band-mount-1').appendChild(renderBand({
+    value: 72,
+    context: { mom_pct: 5, yoy_pct: 12, range_min: 42, range_max: 78 }
+  }));
+  document.getElementById('band-mount-2').appendChild(renderBand({
+    value: 28,
+    context: { mom_pct: -2, yoy_pct: -8, range_min: 22, range_max: 38 }
+  }));
+
+  // ──────────────────────────────────────────────────────────────
+  // PHASE 4 · Composite demos
+  // ──────────────────────────────────────────────────────────────
+
+  // Wire MetricDrawer with a lookup against SAMPLES
+  wireDrawer((id) => SAMPLES[id] || null);
+
+  // ── SectionFrame demo · Flows section pattern
+  const sfBody = el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '18px' } });
+  sfBody.appendChild(renderDisplayTile(SAMPLES.institutional_flow_regime, { size: 'section' }));
+  const sfTable = el('table', { class: 'metric-table' });
+  sfTable.appendChild(renderTableHeader());
+  sfTable.appendChild(renderTableRow(SAMPLES.fii_equity_daily));
+  sfTable.appendChild(renderTableRow(SAMPLES.nifty_50));
+  sfTable.appendChild(renderTableRow(SAMPLES.brent_crude));
+  const sfTableFrame = el('div', { style: { background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '12px', padding: '6px 16px' } }, [sfTable]);
+  sfBody.appendChild(sfTableFrame);
+
+  document.getElementById('story-section-frame').appendChild(renderSectionFrame({
+    section_id: 'flows',
+    title: 'Institutional flows',
+    question: 'Who is buying, who is selling, where the money is rotating.',
+    lens_row: [
+      { id: 'daily', label: 'Daily', active: true },
+      { id: 'mtd', label: 'MTD' },
+      { id: 'cytd', label: 'CYTD' },
+      { id: 'absorption', label: 'Absorption' }
+    ],
+    onLensClick: (lens) => console.log('[storybook] lens click:', lens),
+    sources: {
+      count: 4,
+      names: ['NSE bhavcopy', 'SEBI FPI bulletin', 'NSDL FPI portal', 'AMFI'],
+      last_verified: '2026-04-28T17:05:00+05:30'
+    },
+    children: [sfBody]
+  }));
+
+  // ── Heatmap demo · fetch sectors.json with inline fallback
+  const driver_columns = ['oil', 'freight', 'fx', 'flows', 'real_activity', 'policy', 'overall'];
+  const quant_columns = ['return_1m_pct', 'return_3m_pct', 'pe_trailing', 'eps_revision_30d_pct'];
+  const headerLabels = ['Sector', 'Oil', 'Freight', 'FX', 'Flows', 'Real', 'Policy', 'Overall', '1M %', '3M %', 'PE', 'EPS rev'];
+
+  function mountHeatmap(sectorsData) {
+    const t = document.getElementById('story-heatmap');
+    const thead = el('thead');
+    thead.appendChild(el('tr', {}, headerLabels.map(l => el('th', {}, l))));
+    t.appendChild(thead);
+    const tbody = el('tbody');
+    for (const sector of sectorsData.sectors) {
+      tbody.appendChild(renderHeatmapRow(sector, driver_columns, quant_columns, {
+        onClick: (s) => console.log('[storybook] sector row click:', s.id)
+      }));
+    }
+    t.appendChild(tbody);
+  }
+
+  fetch('../data/sectors/sectors.json')
+    .then(r => { if (!r.ok) throw new Error('fetch failed: ' + r.status); return r.json(); })
+    .then(mountHeatmap)
+    .catch(err => {
+      console.warn('[storybook] sectors.json fetch failed (file:// protocol?), using inline fallback', err);
+      mountHeatmap({
+        sectors: [
+          { id: 'logistics_3pl', display_name: 'Logistics / 3PL',
+            drivers: { oil: 'red', freight: 'red', fx: 'amber', flows: 'amber', real_activity: 'green', policy: 'neutral', overall: 'amber' },
+            quant: { return_1m_pct: -3.2, return_3m_pct: -1.4, pe_trailing: 28.4, eps_revision_30d_pct: -1.8 } },
+          { id: 'ports_cfs', display_name: 'Ports / CFS / ICD',
+            drivers: { oil: 'red', freight: 'red', fx: 'amber', flows: 'amber', real_activity: 'amber', policy: 'neutral', overall: 'red' },
+            quant: { return_1m_pct: -5.8, return_3m_pct: -2.1, pe_trailing: 26.4, eps_revision_30d_pct: -3.2 } },
+          { id: 'autos', display_name: 'Autos',
+            drivers: { oil: 'amber', freight: 'neutral', fx: 'amber', flows: 'amber', real_activity: 'green', policy: 'green', overall: 'amber' },
+            quant: { return_1m_pct: 0.8, return_3m_pct: 8.4, pe_trailing: 28.4, eps_revision_30d_pct: 1.8 } },
+          { id: 'shipping', display_name: 'Shipping / shipbuilding',
+            drivers: { oil: 'amber', freight: 'green', fx: 'neutral', flows: 'amber', real_activity: 'green', policy: 'green', overall: 'green' },
+            quant: { return_1m_pct: 12.4, return_3m_pct: 28.2, pe_trailing: 18.6, eps_revision_30d_pct: 14.2 } }
+        ]
+      });
+    });
+
+  // ── Drawer trigger buttons — one per sample metric
+  const dBtn = document.getElementById('story-drawer-buttons');
+  for (const [id, m] of Object.entries(SAMPLES)) {
+    dBtn.appendChild(el('button', {
+      class: 'sf-lens',
+      style: { fontFamily: 'var(--sans)' },
+      onclick: () => openDrawer(id)
+    }, m.display_name));
+  }
+
+  // ── StickyTOC — mount to body, engages on scroll past 720
+  document.body.appendChild(renderStickyTOC({
+    sections: [
+      { id: 'display-tile',  label: 'DisplayTile' },
+      { id: 'table-row',     label: 'TableRow' },
+      { id: 'sparkline',     label: 'Sparkline' },
+      { id: 'band',          label: 'Band' },
+      { id: 'section-frame', label: 'SectionFrame' },
+      { id: 'heatmap',       label: 'HeatmapCell' },
+      { id: 'drawer',        label: 'MetricDrawer' },
+      { id: 'toc',           label: 'StickyTOC' }
+    ],
+    engage_after: 720
+  }));
+
+  // Click logging
+  window.addEventListener('hashchange', () => console.log('[storybook] hash →', location.hash));
+</script>
+
+</body>
+</html>

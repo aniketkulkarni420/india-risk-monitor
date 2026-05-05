@@ -1,0 +1,85 @@
+name: Scheduled ingest
+
+on:
+  schedule:
+    - cron: '30 0 * * *'      # 06:00 IST · daily_06       · Hormuz, BDI, VLCC, Brent, Gold, DXY, Power
+    - cron: '30 11 * * 1-5'   # 17:00 IST · weekday_close  · FII/DII, F&O OI, blocks, Nifty, Bank Nifty, VIX, Nifty PE
+    - cron: '30 13 * * 1-5'   # 19:00 IST · weekday_evening · FPI debt, G-sec, INR, banking liquidity
+    - cron: '30 11 * * 5'     # 17:00 Fri · fri_17         · FX reserves, CRISIL HY, WCI, port dwell, reservoir, India crude
+    - cron: '30 4 1 * *'      # 10:00 1st · monthly_1      · GST, auto block, UPI, POL, air pax
+    - cron: '30 4 5 * *'      # 10:00 5th · monthly_5      · IIP, WPI, CPI, Naukri, cement, steel, PMI, e-way, FASTag, fiscal
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Manual slot override (defaults to daily_06)'
+        required: false
+        default: 'daily_06'
+        type: choice
+        options:
+          - daily_06
+          - weekday_close
+          - weekday_evening
+          - fri_17
+          - monthly_1
+          - monthly_5
+          - all
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: npm install --no-audit --no-fund
+
+      - name: Determine slot from cron schedule
+        id: slot
+        run: |
+          if [ -n "${{ github.event.inputs.slot }}" ]; then
+            echo "slot=${{ github.event.inputs.slot }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          case "${{ github.event.schedule }}" in
+            "30 0 * * *")     echo "slot=daily_06" >> $GITHUB_OUTPUT ;;
+            "30 11 * * 1-5")  echo "slot=weekday_close" >> $GITHUB_OUTPUT ;;
+            "30 13 * * 1-5")  echo "slot=weekday_evening" >> $GITHUB_OUTPUT ;;
+            "30 11 * * 5")    echo "slot=fri_17" >> $GITHUB_OUTPUT ;;
+            "30 4 1 * *")     echo "slot=monthly_1" >> $GITHUB_OUTPUT ;;
+            "30 4 5 * *")     echo "slot=monthly_5" >> $GITHUB_OUTPUT ;;
+            *)                echo "slot=daily_06" >> $GITHUB_OUTPUT ;;
+          esac
+
+      - name: Run live ingest for slot
+        run: |
+          if [ "${{ steps.slot.outputs.slot }}" = "all" ]; then
+            npm run ingest -- --live --slot=all
+          else
+            npm run ingest -- --live --slot=${{ steps.slot.outputs.slot }}
+          fi
+        continue-on-error: true
+
+      - name: Validate updated data (Gate 2)
+        run: npm run validate
+
+      - name: Commit data updates if any changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/
+          if git diff --staged --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "ingest: ${{ steps.slot.outputs.slot }} @ $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi

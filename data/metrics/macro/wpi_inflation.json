@@ -1,0 +1,27 @@
+{
+  "metric_id": "wpi_inflation",
+  "display_name": "WPI inflation",
+  "display_subtitle": "Wholesale price index · monthly",
+  "section": "macro",
+  "sub_cluster": "inflation",
+  "value": 2.84,
+  "unit": "% YoY",
+  "value_format": "decimal_2",
+  "as_of": "2026-04-14T11:30:00+05:30",
+  "as_of_period": "monthly",
+  "mom_pct": 18.3,
+  "yoy_pct": 165.4,
+  "vs_5y_avg_pct": -5.2,
+  "sparkline_12m": [-0.80, -0.20, 0.40, 0.85, 1.10, 1.40, 1.65, 1.90, 2.20, 2.45, 2.40, 2.84],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "bad",
+  "source_primary": { "name": "Office of Economic Adviser", "url": "https://eaindustry.nic.in/", "type": "Official", "frequency": "Monthly", "parser": "press_release:eaindustry_wpi_v1" },
+  "source_crosscheck": [
+    { "name": "PIB WPI release", "url": "https://www.pib.gov.in/", "type": "Official" }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-04-14T12:30:00+05:30",
+  "why_it_matters": "WPI tracks producer-side prices — leading indicator for CPI by 2-3 months. Sharp tick-up alongside Brent shock telegraphs CPI pressure incoming.",
+  "linked_metrics": ["cpi_inflation", "brent_crude", "trade_deficit"]
+}

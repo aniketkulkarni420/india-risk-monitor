@@ -1,0 +1,28 @@
+{
+  "name": "india-risk-monitor",
+  "version": "0.1.0-phase1",
+  "description": "India Risk Monitor — data contract scaffold (Phase 1)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "validate:strict": "node scripts/validate.mjs --strict",
+    "ingest": "node scripts/ingest.mjs",
+    "ingest:dry": "node scripts/ingest.mjs --dry-run",
+    "ingest:live": "node scripts/ingest.mjs --live",
+    "bundle": "node scripts/bundle.mjs",
+    "audit": "node scripts/audit.mjs",
+    "audit:visual": "node scripts/visual-audit.mjs",
+    "audit:full": "npm run audit && npm run audit:visual",
+    "build": "node scripts/validate.mjs && node scripts/bundle.mjs && node scripts/audit.mjs",
+    "preview": "node scripts/bundle.mjs && node scripts/build-preview.mjs",
+    "backfill": "node scripts/backfill.mjs",
+    "serve": "node scripts/serve.mjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "playwright": "^1.59.1"
+  }
+}

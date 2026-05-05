@@ -1,0 +1,76 @@
+{
+  "metric_id": "nifty_50",
+  "display_name": "Nifty 50",
+  "display_subtitle": "NSE benchmark index",
+  "section": "market",
+  "sub_cluster": "equity",
+  "value": 22688.07,
+  "unit": "Index",
+  "value_format": "decimal_2",
+  "as_of": "2026-05-04T14:10:40.376Z",
+  "as_of_period": "live",
+  "mom_pct": -1.2,
+  "yoy_pct": 8.4,
+  "vs_5y_avg_pct": 41.6,
+  "sparkline_12m": [
+    21080,
+    21450,
+    21680,
+    21540,
+    21900,
+    22150,
+    22380,
+    22510,
+    22610,
+    22745,
+    22468,
+    22688.07
+  ],
+  "baseline_30d": 22730,
+  "deviation_from_baseline_pct": -1.2,
+  "status": "med",
+  "shock_eligible": true,
+  "shock_rule": "intraday move > 3% OR drawdown > 8% from rolling 60d high",
+  "trend_direction": "neutral",
+  "source_primary": {
+    "name": "NSE indices CSV",
+    "url": "https://www.nseindia.com/products-services/indices-nifty50-index",
+    "type": "Exchange",
+    "frequency": "Live",
+    "parser": "csv_download:nse_indices_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/%5ENSEI",
+      "type": "Aggregator"
+    },
+    {
+      "name": "Moneycontrol",
+      "url": "https://www.moneycontrol.com/indian-indices/nifty-50-9.html",
+      "type": "Reputable media"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.376Z",
+  "why_it_matters": "The headline equity index. A market risk dashboard without Nifty is incomplete; the level + drawdown vs rolling high contextualise every other risk signal.",
+  "formula": null,
+  "trigger_thresholds": [
+    {
+      "level": "high",
+      "rule": "drawdown > 5% from rolling 60d high"
+    },
+    {
+      "level": "shock",
+      "rule": "intraday move > 3% OR drawdown > 8%"
+    }
+  ],
+  "linked_metrics": [
+    "bank_nifty",
+    "nifty_pe_5y",
+    "india_vix",
+    "fii_equity_daily",
+    "fno_oi_buildup"
+  ],
+  "notes": "Live during market hours; we publish 15:30 IST close as canonical. 1D/1M/YTD percentages computed at fetch time."
+}

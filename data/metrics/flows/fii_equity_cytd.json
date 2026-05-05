@@ -1,0 +1,54 @@
+{
+  "metric_id": "fii_equity_cytd",
+  "display_name": "FII equity CYTD",
+  "display_subtitle": "Calendar year to date · 2026",
+  "section": "flows",
+  "sub_cluster": "headline",
+  "value": -41604.1842,
+  "unit": "₹ Cr",
+  "value_format": "currency_inr_cr",
+  "as_of": "2026-05-04T14:10:40.357Z",
+  "as_of_period": "monthly",
+  "mom_pct": -51.4,
+  "yoy_pct": -184.6,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    105000,
+    78000,
+    52000,
+    28000,
+    12000,
+    -5000,
+    -18000,
+    -22000,
+    -25000,
+    -28000,
+    -42180,
+    -41604.1842
+  ],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "bad",
+  "source_primary": {
+    "name": "NSE bhavcopy",
+    "url": "https://www.nseindia.com/reports/fii-dii",
+    "type": "Exchange",
+    "frequency": "Daily",
+    "parser": "csv_download:nse_fii_dii_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "SEBI FPI bulletin",
+      "url": "https://www.sebi.gov.in/statistics/foreign-portfolio-investors-fpis-data.html",
+      "type": "Regulator"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.357Z",
+  "why_it_matters": "CYTD context for the MTD figure. Year has tilted negative on Hormuz event; prior-year CYTD was strongly positive.",
+  "linked_metrics": [
+    "fii_equity_daily",
+    "fii_equity_mtd",
+    "fpi_debt_flows"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "metric_id": "bank_nifty",
+  "display_name": "Bank Nifty",
+  "display_subtitle": "NSE banking index",
+  "section": "market",
+  "sub_cluster": "equity",
+  "value": 48013.94,
+  "unit": "Index",
+  "value_format": "decimal_2",
+  "as_of": "2026-05-04T14:10:40.379Z",
+  "as_of_period": "live",
+  "mom_pct": -2.4,
+  "yoy_pct": 6.2,
+  "vs_5y_avg_pct": 38.4,
+  "sparkline_12m": [
+    45200,
+    45680,
+    46200,
+    46100,
+    46850,
+    47200,
+    47600,
+    47940,
+    48180,
+    49600,
+    48420,
+    48013.94
+  ],
+  "baseline_30d": 49000,
+  "deviation_from_baseline_pct": -1.2,
+  "status": "med",
+  "shock_eligible": true,
+  "shock_rule": "drawdown > 10% from rolling 60d high",
+  "trend_direction": "neutral",
+  "trigger_thresholds": [
+    {
+      "level": "high",
+      "rule": "drawdown > 6% from rolling 60d high"
+    },
+    {
+      "level": "shock",
+      "rule": "intraday move > 4% OR drawdown > 10%"
+    }
+  ],
+  "source_primary": {
+    "name": "NSE indices CSV",
+    "url": "https://www.nseindia.com/products-services/indices-banknifty",
+    "type": "Exchange",
+    "frequency": "Live",
+    "parser": "csv_download:nse_indices_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/%5ENSEBANK",
+      "type": "Aggregator"
+    },
+    {
+      "name": "Moneycontrol",
+      "url": "https://www.moneycontrol.com/indian-indices/nifty-bank-23.html",
+      "type": "Reputable media"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.379Z",
+  "why_it_matters": "Rate-sensitive lens. PSU + private bank composite. Moves on rate trajectory + credit growth + asset quality news.",
+  "linked_metrics": [
+    "nifty_50",
+    "credit_deposit_growth",
+    "repo_rate",
+    "real_10y_yield"
+  ]
+}

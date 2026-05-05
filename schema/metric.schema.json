@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://irm.local/schema/metric.schema.json",
+  "title": "IRM Metric",
+  "description": "Schema for one metric record. Locked per IRM_Build_Spec.html §04.",
+  "type": "object",
+  "required": [
+    "metric_id",
+    "display_name",
+    "section",
+    "value",
+    "unit",
+    "value_format",
+    "as_of",
+    "as_of_period",
+    "mom_pct",
+    "yoy_pct",
+    "sparkline_12m",
+    "status",
+    "shock_eligible",
+    "trend_direction",
+    "source_primary",
+    "source_crosscheck",
+    "verification_state",
+    "last_verified_at",
+    "why_it_matters"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "metric_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "snake_case, globally unique, used in URLs"
+    },
+    "display_name": { "type": "string", "minLength": 2 },
+    "display_subtitle": { "type": ["string", "null"] },
+    "section": {
+      "type": "string",
+      "enum": ["flows", "macro", "economy", "freight", "market", "composites", "sectors"]
+    },
+    "sub_cluster": { "type": ["string", "null"] },
+    "value": { "type": ["number", "string"] },
+    "unit": { "type": "string" },
+    "value_format": {
+      "type": "string",
+      "enum": ["integer", "decimal_1", "decimal_2", "percent", "currency_inr_cr", "currency_inr_lcr", "currency_usd_bn", "currency_usd_mn", "currency_usd_per_unit", "ratio_x", "bps", "index", "label"]
+    },
+    "as_of": { "type": "string", "format": "date-time" },
+    "as_of_period": {
+      "type": "string",
+      "enum": ["live", "24h", "weekly", "fortnightly", "monthly", "quarterly", "policy_event"]
+    },
+    "mom_pct": { "type": ["number", "null"] },
+    "yoy_pct": { "type": ["number", "null"] },
+    "vs_5y_avg_pct": { "type": ["number", "null"] },
+    "sparkline_12m": {
+      "type": "array",
+      "items": { "type": "number" },
+      "description": "Empty array allowed; renders dashed line + history-pending."
+    },
+    "baseline_30d": { "type": ["number", "null"] },
+    "deviation_from_baseline_pct": { "type": ["number", "null"] },
+    "status": { "type": "string", "enum": ["low", "med", "high", "shock"] },
+    "shock_eligible": { "type": "boolean" },
+    "shock_rule": { "type": ["string", "null"] },
+    "trend_direction": { "type": "string", "enum": ["good", "bad", "neutral"] },
+    "source_primary": {
+      "type": "object",
+      "required": ["name", "url", "type", "frequency", "parser"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "type": { "type": "string", "enum": ["Official", "Exchange", "Regulator", "Public", "Filing", "Rating agency", "Reputable media", "Aggregator", "Manual estimate"] },
+        "frequency": { "type": "string", "enum": ["Live", "Daily", "Weekly", "Fortnightly", "Monthly", "Quarterly", "Per release"] },
+        "parser": { "type": "string", "pattern": "^(csv_download|html_scrape|press_release|json_api|manual)(:[a-z0-9_]+)?$" }
+      }
+    },
+    "source_crosscheck": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "url", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "type": { "type": "string", "enum": ["Official", "Exchange", "Regulator", "Public", "Filing", "Rating agency", "Reputable media", "Aggregator", "Manual estimate"] }
+        }
+      }
+    },
+    "verification_state": {
+      "type": "string",
+      "enum": ["verified", "crosscheck_pending", "history_pending", "source_pending"]
+    },
+    "last_verified_at": { "type": "string", "format": "date-time" },
+    "why_it_matters": { "type": "string", "minLength": 12 },
+    "formula": { "type": ["string", "null"] },
+    "trigger_thresholds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["level", "rule"],
+        "additionalProperties": false,
+        "properties": {
+          "level": { "type": "string", "enum": ["med", "high", "shock"] },
+          "rule": { "type": "string" }
+        }
+      }
+    },
+    "linked_metrics": { "type": "array", "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" } },
+    "watch_next": { "type": "array", "items": { "type": "string" } },
+    "notes": { "type": ["string", "null"] }
+  }
+}

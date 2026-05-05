@@ -1,0 +1,73 @@
+{
+  "metric_id": "vlcc_tanker_rates",
+  "display_name": "VLCC tanker rates",
+  "display_subtitle": "Baltic Dirty Tanker Index · daily",
+  "section": "freight",
+  "sub_cluster": "tanker",
+  "value": 1837,
+  "unit": "Index",
+  "value_format": "integer",
+  "as_of": "2026-05-04T14:10:40.256Z",
+  "as_of_period": "live",
+  "mom_pct": 220.4,
+  "yoy_pct": 184.6,
+  "vs_5y_avg_pct": 142.8,
+  "sparkline_12m": [
+    595,
+    610,
+    605,
+    620,
+    640,
+    635,
+    660,
+    680,
+    720,
+    575,
+    1842,
+    1837
+  ],
+  "baseline_30d": 575,
+  "deviation_from_baseline_pct": 220.4,
+  "status": "shock",
+  "shock_eligible": true,
+  "shock_rule": "MoM > 100%",
+  "trend_direction": "bad",
+  "source_primary": {
+    "name": "Baltic Dirty Tanker Index (BDTI)",
+    "url": "https://www.balticexchange.com/en/data-services/market-information0/baltic-route-data.html",
+    "type": "Public",
+    "frequency": "Daily",
+    "parser": "press_release:baltic_dirty_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Reuters shipping wire",
+      "url": "https://www.reuters.com/business/energy/",
+      "type": "Reputable media"
+    },
+    {
+      "name": "Trading Economics tanker rates",
+      "url": "https://tradingeconomics.com/commodity/baltic",
+      "type": "Aggregator"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.256Z",
+  "why_it_matters": "VLCC = Very Large Crude Carrier. India's primary crude import vessel class. Rates +220% on Hormuz forces re-routing via Cape — adds $4-6/bbl to delivered cost.",
+  "trigger_thresholds": [
+    {
+      "level": "high",
+      "rule": "MoM > 50%"
+    },
+    {
+      "level": "shock",
+      "rule": "MoM > 100%"
+    }
+  ],
+  "linked_metrics": [
+    "hormuz_throughput",
+    "brent_crude",
+    "india_crude_basket",
+    "trade_deficit"
+  ]
+}

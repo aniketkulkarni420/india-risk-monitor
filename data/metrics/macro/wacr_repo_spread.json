@@ -1,0 +1,54 @@
+{
+  "metric_id": "wacr_repo_spread",
+  "display_name": "WACR – Repo spread",
+  "display_subtitle": "Weighted average call rate vs repo",
+  "section": "macro",
+  "sub_cluster": "rates",
+  "value": -19,
+  "unit": "bps",
+  "value_format": "bps",
+  "as_of": "2026-05-04T14:10:40.405Z",
+  "as_of_period": "live",
+  "mom_pct": 5.6,
+  "yoy_pct": -47.2,
+  "vs_5y_avg_pct": -28.4,
+  "sparkline_12m": [
+    -32,
+    -28,
+    -25,
+    -22,
+    -20,
+    -18,
+    -15,
+    -12,
+    -8,
+    -16,
+    -19,
+    -19
+  ],
+  "status": "low",
+  "shock_eligible": false,
+  "trend_direction": "good",
+  "source_primary": {
+    "name": "CCIL FBIL",
+    "url": "https://www.fbil.org.in/",
+    "type": "Official",
+    "frequency": "Daily",
+    "parser": "json_api:ccil_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "RBI policy reference",
+      "url": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx",
+      "type": "Official"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.405Z",
+  "why_it_matters": "Negative spread = surplus liquidity, call rate below repo. Spread compression toward 0 signals tightening — often precedes RBI action.",
+  "linked_metrics": [
+    "banking_liquidity",
+    "repo_rate",
+    "gsec_curve"
+  ]
+}

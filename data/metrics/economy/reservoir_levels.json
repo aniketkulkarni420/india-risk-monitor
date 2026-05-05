@@ -1,0 +1,34 @@
+{
+  "metric_id": "reservoir_levels",
+  "display_name": "Reservoir levels",
+  "display_subtitle": "CWC weekly · % of full capacity",
+  "section": "economy",
+  "sub_cluster": "discretionary",
+  "value": 47.2,
+  "unit": "% capacity",
+  "value_format": "decimal_1",
+  "as_of": "2026-04-25T17:30:00+05:30",
+  "as_of_period": "weekly",
+  "mom_pct": -8.4,
+  "yoy_pct": 5.6,
+  "vs_5y_avg_pct": 2.1,
+  "sparkline_12m": [78, 72, 68, 62, 55, 50, 56, 65, 72, 70, 51, 47.2],
+  "status": "med",
+  "shock_eligible": true,
+  "shock_rule": "value < 35% AND IMD pre-monsoon outlook below normal",
+  "trend_direction": "neutral",
+  "source_primary": { "name": "CWC reservoir bulletin", "url": "https://cwc.gov.in/en/reservoir-storage-content", "type": "Official", "frequency": "Weekly", "parser": "json_api:cwc_v1" },
+  "source_crosscheck": [
+    { "name": "IMD seasonal outlook", "url": "https://mausam.imd.gov.in/", "type": "Official" }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-04-25T18:30:00+05:30",
+  "why_it_matters": "Pre-monsoon storage shapes rural sentiment + irrigation. Below 40% pre-June often signals tractor + agri-input demand softness.",
+  "trigger_thresholds": [
+    { "level": "med", "rule": "value < 50% in April" },
+    { "level": "high", "rule": "value < 40% in May" },
+    { "level": "shock", "rule": "value < 35% AND IMD below-normal monsoon forecast" }
+  ],
+  "linked_metrics": ["auto_tractor", "cpi_inflation"],
+  "notes": "Drawer shows breakdown by basin: South 38%, Central 52%, North 45%, East 58%, West 41%."
+}
