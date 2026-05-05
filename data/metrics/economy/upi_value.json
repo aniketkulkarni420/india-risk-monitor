@@ -4,23 +4,51 @@
   "display_subtitle": "NPCI · monthly value (drawer: volume)",
   "section": "economy",
   "sub_cluster": "tax_demand",
-  "value": 24.85,
+  "value": 25.2,
   "unit": "₹ Lakh Cr",
   "value_format": "currency_inr_lcr",
-  "as_of": "2026-04-03T11:00:00+05:30",
+  "as_of": "2026-05-05T08:58:34.948Z",
   "as_of_period": "monthly",
   "mom_pct": 4.2,
   "yoy_pct": 38.4,
-  "vs_5y_avg_pct": 285.0,
-  "sparkline_12m": [18.0, 18.6, 19.2, 19.8, 20.4, 21.0, 21.6, 22.2, 22.8, 23.4, 23.85, 24.85],
+  "vs_5y_avg_pct": 285,
+  "sparkline_12m": [
+    18.6,
+    19.2,
+    19.8,
+    20.4,
+    21,
+    21.6,
+    22.2,
+    22.8,
+    23.4,
+    23.85,
+    24.85,
+    25.2
+  ],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
-  "source_primary": { "name": "NPCI", "url": "https://www.npci.org.in/what-we-do/upi/product-statistics", "type": "Official", "frequency": "Monthly", "parser": "press_release:npci_upi_v1" },
-  "source_crosscheck": [{ "name": "RBI Bulletin payment systems", "url": "https://www.rbi.org.in/", "type": "Official" }],
+  "source_primary": {
+    "name": "NPCI",
+    "url": "https://www.npci.org.in/what-we-do/upi/product-statistics",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "press_release:npci_upi_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "RBI Bulletin payment systems",
+      "url": "https://www.rbi.org.in/",
+      "type": "Official"
+    }
+  ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-03T12:00:00+05:30",
+  "last_verified_at": "2026-05-05T08:58:34.948Z",
   "why_it_matters": "UPI is the cleanest digital-economy + retail-spend proxy in India. Sustained 35%+ YoY growth = formalisation continuing.",
-  "linked_metrics": ["gst_gross", "eway_bills"],
+  "linked_metrics": [
+    "gst_gross",
+    "eway_bills"
+  ],
   "notes": "Drawer shows volume (1842 Cr txns), AOV (₹1,350), top issuer split."
 }

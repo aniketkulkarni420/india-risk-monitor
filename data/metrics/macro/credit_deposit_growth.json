@@ -4,25 +4,52 @@
   "display_subtitle": "RBI fortnightly bulletin · YoY",
   "section": "macro",
   "sub_cluster": "credit",
-  "value": 14.8,
+  "value": 14.7,
   "unit": "% YoY (credit)",
   "value_format": "decimal_1",
-  "as_of": "2026-04-18T18:00:00+05:30",
+  "as_of": "2026-05-05T08:58:35.601Z",
   "as_of_period": "fortnightly",
   "mom_pct": -2.6,
   "yoy_pct": -7.5,
   "vs_5y_avg_pct": 14.6,
-  "sparkline_12m": [16.0, 15.8, 15.6, 15.4, 15.2, 15.1, 15.0, 14.9, 14.8, 14.9, 14.8, 14.8],
+  "sparkline_12m": [
+    15.8,
+    15.6,
+    15.4,
+    15.2,
+    15.1,
+    15,
+    14.9,
+    14.8,
+    14.9,
+    14.8,
+    14.8,
+    14.7
+  ],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "neutral",
-  "source_primary": { "name": "RBI fortnightly bulletin", "url": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx", "type": "Official", "frequency": "Fortnightly", "parser": "json_api:rbi_fortnightly_v1" },
+  "source_primary": {
+    "name": "RBI fortnightly bulletin",
+    "url": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx",
+    "type": "Official",
+    "frequency": "Fortnightly",
+    "parser": "json_api:rbi_fortnightly_v1"
+  },
   "source_crosscheck": [
-    { "name": "RBI Bulletin reference", "url": "https://www.rbi.org.in/", "type": "Official" }
+    {
+      "name": "RBI Bulletin reference",
+      "url": "https://www.rbi.org.in/",
+      "type": "Official"
+    }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-18T19:00:00+05:30",
+  "last_verified_at": "2026-05-05T08:58:35.601Z",
   "why_it_matters": "Credit growth > deposit growth signals tight funding. Currently 14.8% credit vs 13.0% deposit = healthy gap, no funding stress.",
-  "linked_metrics": ["banking_liquidity", "wacr_repo_spread", "iip_growth"],
+  "linked_metrics": [
+    "banking_liquidity",
+    "wacr_repo_spread",
+    "iip_growth"
+  ],
   "notes": "Drawer shows split: Credit 14.8%, Deposit 13.0%, gap 1.8%. Industrial credit growth shown separately in drawer."
 }

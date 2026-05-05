@@ -4,22 +4,52 @@
   "display_subtitle": "Goods movement · monthly",
   "section": "economy",
   "sub_cluster": "tax_demand",
-  "value": 140.6,
+  "value": 140.2,
   "unit": "Mn",
   "value_format": "decimal_1",
-  "as_of": "2026-04-04T17:30:00+05:30",
+  "as_of": "2026-05-05T08:58:35.599Z",
   "as_of_period": "monthly",
   "mom_pct": 1.8,
   "yoy_pct": 9.2,
   "vs_5y_avg_pct": 32.8,
-  "sparkline_12m": [128.7, 130.2, 131.5, 132.8, 134.1, 135.4, 136.7, 137.2, 138.5, 138.9, 138.1, 140.6],
+  "sparkline_12m": [
+    130.2,
+    131.5,
+    132.8,
+    134.1,
+    135.4,
+    136.7,
+    137.2,
+    138.5,
+    138.9,
+    138.1,
+    140.6,
+    140.2
+  ],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
-  "source_primary": { "name": "GSTN", "url": "https://docs.ewaybillgst.gov.in/", "type": "Official", "frequency": "Monthly", "parser": "press_release:gstn_eway_v1" },
-  "source_crosscheck": [{ "name": "PIB e-way release", "url": "https://www.pib.gov.in/", "type": "Official" }],
+  "source_primary": {
+    "name": "GSTN",
+    "url": "https://docs.ewaybillgst.gov.in/",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "press_release:gstn_eway_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "PIB e-way release",
+      "url": "https://www.pib.gov.in/",
+      "type": "Official"
+    }
+  ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-04T18:00:00+05:30",
+  "last_verified_at": "2026-05-05T08:58:35.599Z",
   "why_it_matters": "E-way bills = inter-state goods movement. Direct goods-economy proxy, complements GST collections.",
-  "linked_metrics": ["gst_gross", "rail_freight", "fastag_toll", "iip_growth"]
+  "linked_metrics": [
+    "gst_gross",
+    "rail_freight",
+    "fastag_toll",
+    "iip_growth"
+  ]
 }

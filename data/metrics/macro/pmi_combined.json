@@ -4,15 +4,28 @@
   "display_subtitle": "Manufacturing + Services · S&P Global India",
   "section": "macro",
   "sub_cluster": "leading",
-  "value": 58.4,
+  "value": 57.8,
   "unit": "Index",
   "value_format": "decimal_1",
-  "as_of": "2026-04-04T11:30:00+05:30",
+  "as_of": "2026-05-05T08:58:35.598Z",
   "as_of_period": "monthly",
   "mom_pct": 0.7,
   "yoy_pct": 1.9,
   "vs_5y_avg_pct": 6.2,
-  "sparkline_12m": [55.5, 56.1, 56.4, 56.8, 57.2, 57.5, 57.0, 57.3, 57.7, 58.0, 58.0, 58.4],
+  "sparkline_12m": [
+    56.1,
+    56.4,
+    56.8,
+    57.2,
+    57.5,
+    57,
+    57.3,
+    57.7,
+    58,
+    58,
+    58.4,
+    57.8
+  ],
   "baseline_30d": null,
   "deviation_from_baseline_pct": null,
   "status": "low",
@@ -27,19 +40,45 @@
     "parser": "press_release:sp_pmi_india_v1"
   },
   "source_crosscheck": [
-    { "name": "Reuters India PMI wire", "url": "https://www.reuters.com/world/india/", "type": "Reputable media" },
-    { "name": "Business Standard", "url": "https://www.business-standard.com/economy/news", "type": "Reputable media" },
-    { "name": "Economic Times Markets", "url": "https://economictimes.indiatimes.com/markets", "type": "Reputable media" }
+    {
+      "name": "Reuters India PMI wire",
+      "url": "https://www.reuters.com/world/india/",
+      "type": "Reputable media"
+    },
+    {
+      "name": "Business Standard",
+      "url": "https://www.business-standard.com/economy/news",
+      "type": "Reputable media"
+    },
+    {
+      "name": "Economic Times Markets",
+      "url": "https://economictimes.indiatimes.com/markets",
+      "type": "Reputable media"
+    }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-04T12:30:00+05:30",
+  "last_verified_at": "2026-05-05T08:58:35.598Z",
   "why_it_matters": "The most-watched leading indicator globally. PMI > 50 signals expansion; sub-indices (new orders, employment, input prices) telegraph IIP and CPI trajectory by 4-8 weeks.",
   "formula": "weighted average: 0.4 × PMI_Manufacturing + 0.6 × PMI_Services (S&P Global India weighting)",
   "trigger_thresholds": [
-    { "level": "med", "rule": "value < 52" },
-    { "level": "high", "rule": "value < 50.5 (near-stall)" },
-    { "level": "shock", "rule": "value < 50 sustained 2 months" }
+    {
+      "level": "med",
+      "rule": "value < 52"
+    },
+    {
+      "level": "high",
+      "rule": "value < 50.5 (near-stall)"
+    },
+    {
+      "level": "shock",
+      "rule": "value < 50 sustained 2 months"
+    }
   ],
-  "linked_metrics": ["iip_growth", "cpi_inflation", "wpi_inflation", "credit_deposit_growth"],
+  "linked_metrics": [
+    "iip_growth",
+    "cpi_inflation",
+    "wpi_inflation",
+    "credit_deposit_growth"
+  ],
   "notes": "Headline number is free in S&P Global press release; sub-indices are licensed. We display headline + report direction; sub-index commentary cited from media. PMI release is 1st business day of month."
 }

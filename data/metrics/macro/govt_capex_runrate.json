@@ -4,24 +4,52 @@
   "display_subtitle": "% of FY26 RE · cumulative",
   "section": "macro",
   "sub_cluster": "fiscal",
-  "value": 81.2,
+  "value": 82,
   "unit": "% of RE",
   "value_format": "decimal_1",
-  "as_of": "2026-03-25T17:30:00+05:30",
+  "as_of": "2026-05-05T08:58:35.601Z",
   "as_of_period": "monthly",
   "mom_pct": 9.4,
   "yoy_pct": 4.8,
   "vs_5y_avg_pct": 18.2,
-  "sparkline_12m": [10, 19, 27, 35, 42, 50, 56, 63, 69, 74, 75, 81.2],
+  "sparkline_12m": [
+    19,
+    27,
+    35,
+    42,
+    50,
+    56,
+    63,
+    69,
+    74,
+    75,
+    81.2,
+    82
+  ],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
-  "source_primary": { "name": "CGA monthly accounts", "url": "https://cga.nic.in/MonthlyReport.aspx", "type": "Official", "frequency": "Monthly", "parser": "press_release:cga_v1" },
+  "source_primary": {
+    "name": "CGA monthly accounts",
+    "url": "https://cga.nic.in/MonthlyReport.aspx",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "press_release:cga_v1"
+  },
   "source_crosscheck": [
-    { "name": "PIB capex release", "url": "https://www.pib.gov.in/", "type": "Official" }
+    {
+      "name": "PIB capex release",
+      "url": "https://www.pib.gov.in/",
+      "type": "Official"
+    }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-03-25T18:30:00+05:30",
+  "last_verified_at": "2026-05-05T08:58:35.601Z",
   "why_it_matters": "Capex pace = real-economy support. >75% of RE by Mar = on-track. Slowing capex during stress = double-headwind to growth.",
-  "linked_metrics": ["fiscal_deficit_pct", "iip_growth", "steel_consumption", "cement_dispatches"]
+  "linked_metrics": [
+    "fiscal_deficit_pct",
+    "iip_growth",
+    "steel_consumption",
+    "cement_dispatches"
+  ]
 }

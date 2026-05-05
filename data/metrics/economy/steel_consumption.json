@@ -4,24 +4,52 @@
   "display_subtitle": "JPC · finished steel · monthly",
   "section": "economy",
   "sub_cluster": "production_energy",
-  "value": 12.4,
+  "value": 12.5,
   "unit": "Mn tonnes",
   "value_format": "decimal_1",
-  "as_of": "2026-04-12T17:30:00+05:30",
+  "as_of": "2026-05-05T08:58:35.598Z",
   "as_of_period": "monthly",
   "mom_pct": 2.1,
   "yoy_pct": 7.4,
   "vs_5y_avg_pct": 24.6,
-  "sparkline_12m": [11.0, 11.2, 11.4, 11.6, 11.8, 11.9, 12.0, 12.1, 12.2, 12.3, 12.15, 12.4],
+  "sparkline_12m": [
+    11.2,
+    11.4,
+    11.6,
+    11.8,
+    11.9,
+    12,
+    12.1,
+    12.2,
+    12.3,
+    12.15,
+    12.4,
+    12.5
+  ],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
-  "source_primary": { "name": "JPC India", "url": "https://www.jpcindiansteel.nic.in/", "type": "Official", "frequency": "Monthly", "parser": "press_release:jpc_steel_v1" },
+  "source_primary": {
+    "name": "JPC India",
+    "url": "https://www.jpcindiansteel.nic.in/",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "press_release:jpc_steel_v1"
+  },
   "source_crosscheck": [
-    { "name": "Min of Steel PIB release", "url": "https://www.pib.gov.in/", "type": "Official" }
+    {
+      "name": "Min of Steel PIB release",
+      "url": "https://www.pib.gov.in/",
+      "type": "Official"
+    }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-12T18:30:00+05:30",
+  "last_verified_at": "2026-05-05T08:58:35.598Z",
   "why_it_matters": "Steel demand = heavy industry + auto + construction signal. Sustained 7%+ growth = industrial expansion intact.",
-  "linked_metrics": ["iip_growth", "cement_dispatches", "auto_cv", "rail_freight"]
+  "linked_metrics": [
+    "iip_growth",
+    "cement_dispatches",
+    "auto_cv",
+    "rail_freight"
+  ]
 }

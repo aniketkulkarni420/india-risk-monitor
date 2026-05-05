@@ -4,31 +4,71 @@
   "display_subtitle": "CRISIL AAA – G-sec 5Y · bps",
   "section": "market",
   "sub_cluster": "credit",
-  "value": 78,
+  "value": 77,
   "unit": "bps",
   "value_format": "bps",
-  "as_of": "2026-04-25T17:30:00+05:30",
+  "as_of": "2026-05-05T08:58:14.633Z",
   "as_of_period": "weekly",
   "mom_pct": 18.2,
-  "yoy_pct": 4.0,
+  "yoy_pct": 4,
   "vs_5y_avg_pct": -12.4,
-  "sparkline_12m": [82, 80, 78, 75, 72, 70, 68, 66, 64, 62, 66, 78],
+  "sparkline_12m": [
+    80,
+    78,
+    75,
+    72,
+    70,
+    68,
+    66,
+    64,
+    62,
+    66,
+    78,
+    77
+  ],
   "status": "low",
   "shock_eligible": true,
   "shock_rule": "value > 200 bps (credit stress)",
   "trend_direction": "neutral",
-  "source_primary": { "name": "CRISIL weekly bond yield", "url": "https://www.crisil.com/en/home/our-businesses/research/data-and-analytics.html", "type": "Rating agency", "frequency": "Weekly", "parser": "html_scrape:crisil_v1" },
+  "source_primary": {
+    "name": "CRISIL weekly bond yield",
+    "url": "https://www.crisil.com/en/home/our-businesses/research/data-and-analytics.html",
+    "type": "Rating agency",
+    "frequency": "Weekly",
+    "parser": "html_scrape:crisil_v1"
+  },
   "source_crosscheck": [
-    { "name": "ICRA daily bond yields", "url": "https://www.icra.in/", "type": "Rating agency" },
-    { "name": "CARE Ratings yield matrix", "url": "https://www.careratings.com/", "type": "Rating agency" }
+    {
+      "name": "ICRA daily bond yields",
+      "url": "https://www.icra.in/",
+      "type": "Rating agency"
+    },
+    {
+      "name": "CARE Ratings yield matrix",
+      "url": "https://www.careratings.com/",
+      "type": "Rating agency"
+    }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-25T18:30:00+05:30",
+  "last_verified_at": "2026-05-05T08:58:14.633Z",
   "why_it_matters": "Credit spread widening = corporate funding stress. Currently widening on Hormuz event but well below stress thresholds.",
   "trigger_thresholds": [
-    { "level": "med", "rule": "value > 100 bps" },
-    { "level": "high", "rule": "value > 150 bps" },
-    { "level": "shock", "rule": "value > 200 bps" }
+    {
+      "level": "med",
+      "rule": "value > 100 bps"
+    },
+    {
+      "level": "high",
+      "rule": "value > 150 bps"
+    },
+    {
+      "level": "shock",
+      "rule": "value > 200 bps"
+    }
   ],
-  "linked_metrics": ["gsec_curve", "credit_deposit_growth", "wacr_repo_spread"]
+  "linked_metrics": [
+    "gsec_curve",
+    "credit_deposit_growth",
+    "wacr_repo_spread"
+  ]
 }
