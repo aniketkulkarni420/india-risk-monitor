@@ -17,6 +17,9 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { metricIndex } from './ingest/persistence.mjs';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const XLSX = require('xlsx');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -45,16 +48,83 @@ function parseArgs(argv) {
 // Real backfillers · registered per metric_id
 // One reference implementation (RBI WSS for fx_reserves) — pattern to extend.
 // ──────────────────────────────────────────────────────────────
-const REAL_BACKFILLERS = {
-  fx_reserves: async function fxReservesRBI(years) {
-    // RBI WSS publishes weekly data going back decades.
-    // CSV download URL pattern: https://rbidocs.rbi.org.in/...
-    // For phase 8 framework, real implementation deferred per-metric.
-    const url = 'https://www.rbi.org.in/Scripts/WSSView.aspx';
-    return { source: 'RBI WSS', url, ok: false, reason: 'parser implementation pending — endpoint requires session' };
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 IRM-Backfill/1.0';
+const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// Helper: fetch binary buffer with abort + retry
+async function fetchBuffer(url, timeoutMs = 30000) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { headers: { 'User-Agent': UA }, signal: ac.signal });
+      if (!res.ok) throw new Error(`${url} → ${res.status}`);
+      return Buffer.from(await res.arrayBuffer());
+    } catch (e) {
+      if (attempt === 1) throw e;
+    } finally {
+      clearTimeout(t);
+    }
   }
-  // Add more as we implement: brent_crude (EIA), nifty_50 (NSE archives), etc.
+}
+
+const REAL_BACKFILLERS = {
+  // GST: GSTN's authoritative xlsx has 23+ monthly sheets named "MMM-YY".
+  // Each sheet has a "Total Gross GST Revenue" row at column C = current month.
+  // We extract every sheet → historical CSV + 12-month sparkline.
+  gst_gross: async function gstFromGSTN(years) {
+    const url = 'https://tutorial.gst.gov.in/offlineutilities/gst_statistics/Gross_Net_Tax_collection.xlsx';
+    const buf = await fetchBuffer(url);
+    const wb = XLSX.read(buf, { type: 'buffer' });
+    const series = [];
+    for (const name of wb.SheetNames) {
+      const m = name.match(/^([A-Za-z]{3})-(\d{2})$/);
+      if (!m) continue;
+      const monthIdx = MONTHS_SHORT.findIndex(x => x.toLowerCase() === m[1].toLowerCase());
+      if (monthIdx < 0) continue;
+      const year = 2000 + parseInt(m[2], 10);
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, defval: null });
+      const grossRow = rows.find(r => r && typeof r[0] === 'string' && /Total\s+Gross\s+GST\s+Revenue/i.test(r[0]));
+      if (!grossRow) continue;
+      const crore = parseFloat(grossRow[2]);
+      if (!Number.isFinite(crore)) continue;
+      // Last day of reporting month
+      const dt = new Date(year, monthIdx + 1, 0);
+      const dateStr = dt.toISOString().slice(0, 10);
+      const lakhCrore = +(crore / 100000).toFixed(4);
+      series.push({ date: dateStr, value: lakhCrore });
+    }
+    series.sort((a, b) => a.date.localeCompare(b.date));
+    return { source: 'GSTN xlsx', ok: true, series };
+  }
 };
+
+// Update metric JSON's sparkline_12m + mom_pct + yoy_pct from the historical
+// series. Series is assumed sorted oldest → newest. Sparkline aggregates to 12
+// month-end values (last 12 series points if cadence is monthly, else samples).
+function updateMetricFromSeries(metric, series) {
+  if (!series || series.length === 0) return null;
+  // Take last 12 points for sparkline_12m (works for monthly; for daily we'd
+  // typically resample, but for this iteration we keep simple)
+  const last12 = series.slice(-12).map(p => p.value);
+  while (last12.length < 12) last12.unshift(last12[0]);  // pad if short
+
+  const current = series[series.length - 1].value;
+  const monthBack = series[series.length - 2];
+  const yearBack = series.length >= 13 ? series[series.length - 13] : null;
+  const out = {
+    sparkline_12m: last12,
+    value: current,
+    as_of: new Date(series[series.length - 1].date + 'T17:30:00+05:30').toISOString()
+  };
+  if (monthBack && monthBack.value !== 0) {
+    out.mom_pct = +(((current - monthBack.value) / monthBack.value) * 100).toFixed(2);
+  }
+  if (yearBack && yearBack.value !== 0) {
+    out.yoy_pct = +(((current - yearBack.value) / yearBack.value) * 100).toFixed(2);
+  }
+  return out;
+}
 
 // ──────────────────────────────────────────────────────────────
 // Mock backfiller — synthesises realistic 5Y series from current value
@@ -126,7 +196,21 @@ for (const id of targets) {
 
   const csv = 'date,value\n' + result.series.map(p => `${p.date},${p.value}`).join('\n') + '\n';
   writeFileSync(file, csv, 'utf8');
-  console.log(`  ${GREEN('✓')} ${id.padEnd(30)} ${DIM(result.source.padEnd(20))} ${result.series.length} pts → ${DIM('history/' + id + '.csv')}`);
+
+  // For LIVE backfills, also update the metric JSON's sparkline_12m + trends
+  // from the real series. Mock backfill does not — its synthetic series would
+  // poison the trend fields.
+  let updated = '';
+  if (ARGS.live && REAL_BACKFILLERS[id]) {
+    const update = updateMetricFromSeries(metric, result.series);
+    if (update) {
+      const path = metricIndex().get(id);
+      const merged = { ...metric, ...update };
+      writeFileSync(path, JSON.stringify(merged, null, 2) + '\n', 'utf8');
+      updated = ` · sparkline+trends updated (mom ${update.mom_pct ?? '—'} · yoy ${update.yoy_pct ?? '—'})`;
+    }
+  }
+  console.log(`  ${GREEN('✓')} ${id.padEnd(30)} ${DIM(result.source.padEnd(20))} ${result.series.length} pts → ${DIM('history/' + id + '.csv')}${updated}`);
   okCount++;
 }
 
