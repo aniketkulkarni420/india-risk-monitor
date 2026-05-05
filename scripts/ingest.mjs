@@ -60,6 +60,12 @@ async function ingestOne(metric_id) {
 
     const { mode, parser } = resolve(parser_id, { live: ARGS.live });
 
+    // In live mode, skip metrics without a registered real parser — don't silently mock
+    if (mode === 'unregistered') {
+      info('ingest_skip_unregistered', { metric_id, parser_id });
+      return { ok: true, skipped: true, metric_id, mode, parser_id, reason: 'no live parser registered' };
+    }
+
     // Primary fetch
     const primary = await parser.fetchPrimary(metric);
 
@@ -130,23 +136,25 @@ for (const metric_id of targets) {
   const res = await ingestOne(metric_id);
   results.push(res);
   const tag = !res.ok ? RED('✗') :
+    res.skipped ? DIM('—') :
     res.verification_state === 'verified' ? GREEN('✓') :
     res.verification_state === 'crosscheck_pending' ? YELLOW('⚠') : DIM('·');
-  const meta = res.ok
-    ? `${DIM(res.mode)} ${DIM(res.parser_id)} → value ${BOLD(String(res.value))} · ${res.verification_state}${res.divergence_pct != null ? ` · div ${res.divergence_pct}%` : ''} · ${res.took_ms}ms`
-    : RED(res.err);
+  const meta = !res.ok ? RED(res.err)
+    : res.skipped ? DIM(`${res.parser_id} · ${res.reason}`)
+    : `${DIM(res.mode)} ${DIM(res.parser_id)} → value ${BOLD(String(res.value))} · ${res.verification_state}${res.divergence_pct != null ? ` · div ${res.divergence_pct}%` : ''} · ${res.took_ms}ms`;
   console.log(`  ${tag} ${metric_id.padEnd(30)} ${meta}`);
 }
 
 // Summary
-const ok = results.filter(r => r.ok).length;
+const ok = results.filter(r => r.ok && !r.skipped).length;
+const skipped = results.filter(r => r.skipped).length;
 const verified = results.filter(r => r.verification_state === 'verified').length;
 const pending = results.filter(r => r.verification_state === 'crosscheck_pending').length;
 const failed = results.filter(r => !r.ok).length;
 
 console.log();
 console.log(BOLD(
-  `Result: ${GREEN(verified + ' verified')}, ${pending ? YELLOW(pending + ' crosscheck_pending') : '0 crosscheck_pending'}, ${failed ? RED(failed + ' failed') : '0 failed'}`
+  `Result: ${GREEN(verified + ' verified')}, ${pending ? YELLOW(pending + ' crosscheck_pending') : '0 crosscheck_pending'}, ${skipped ? DIM(skipped + ' skipped (no live parser)') : '0 skipped'}, ${failed ? RED(failed + ' failed') : '0 failed'}`
 ));
 if (ARGS.dryRun) console.log(YELLOW('DRY RUN — no files written.'));
 if (!ARGS.live) console.log(DIM('Mock mode — no network. Re-run with --live once parsers are registered.'));

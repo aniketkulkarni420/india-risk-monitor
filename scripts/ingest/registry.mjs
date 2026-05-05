@@ -35,6 +35,7 @@ const REAL = new Map([
 
 export function resolve(parser_id, { live = false } = {}) {
   if (live && REAL.has(parser_id)) return { mode: 'live', parser: REAL.get(parser_id), parser_id };
+  if (live) return { mode: 'unregistered', parser: null, parser_id };  // honest: skip in live mode
   return { mode: 'mock', parser: mock, parser_id };
 }
 

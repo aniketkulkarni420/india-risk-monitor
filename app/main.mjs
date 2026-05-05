@@ -34,16 +34,21 @@ wireDrawer(M);
 // ──────────────────────────────────────────────────────────────
 // Topbar timestamp
 // ──────────────────────────────────────────────────────────────
-// Detect if data is stale (seed data) — check if newest "live" metric is older than 24h
-const newest = Object.values(DATA.metrics)
-  .filter(m => m.as_of_period === 'live' || m.as_of_period === '24h')
-  .map(m => m.as_of).sort().pop() || DATA.generated_at;
-const ageHours = (Date.now() - new Date(newest).getTime()) / 36e5;
-const isSeedData = ageHours > 24;
+// Honest data-freshness reporter — counts of metrics with real live updates in last 24h
+const allMetricsList = Object.values(DATA.metrics);
+const totalMetrics = allMetricsList.length;
+const fresh24h = allMetricsList.filter(m => {
+  const age = (Date.now() - new Date(m.last_verified_at).getTime()) / 36e5;
+  return age < 24 && m.verification_state === 'verified';
+}).length;
+const freshRatio = fresh24h / totalMetrics;
 const asofEl = document.getElementById('topbar-asof');
-if (isSeedData) {
-  asofEl.innerHTML = `<span style="color: var(--amber);">Seed data · ${formatAsOf(newest)}</span> <span style="color: var(--ink-3); font-size: 11px;" title="Live ingest activates with deployment cron. Values will refresh on schedule.">· live ingest pending</span>`;
+if (freshRatio < 0.5) {
+  asofEl.innerHTML = `<span style="color: var(--amber);" title="Most metrics show seed data. Live ingest scheduled but per-source selector tuning ongoing.">⚠ Live ${fresh24h}/${totalMetrics} · others seed data</span>`;
+} else if (freshRatio < 0.9) {
+  asofEl.innerHTML = `<span style="color: var(--ink-2);" title="Most fresh; ${totalMetrics - fresh24h} pending">Live ${fresh24h}/${totalMetrics}</span>`;
 } else {
+  const newest = allMetricsList.map(m => m.as_of).sort().pop();
   asofEl.textContent = 'Updated ' + formatAsOf(newest);
 }
 
