@@ -617,9 +617,83 @@ const tocSections = [
 document.body.appendChild(renderStickyTOC({ sections: tocSections, engage_after: 720 }));
 
 // ──────────────────────────────────────────────────────────────
-// Cmd-K palette — global navigation
+// TAB BAR · section navigation
+// Hero stays always visible; tabs scope which section-frame renders below.
+// "All" tab = original full-scroll behavior.
+// URL hash drives state: #flows / #macro / #all etc.
 // ──────────────────────────────────────────────────────────────
-wireCmdK({ metrics: DATA.metrics, sections: tocSections, openMetric: openDrawer });
+const TABS = [
+  { id: 'flows',   label: 'Flows' },
+  { id: 'macro',   label: 'Macro' },
+  { id: 'economy', label: 'Real economy' },
+  { id: 'freight', label: 'Freight' },
+  { id: 'market',  label: 'Market' },
+  { id: 'sectors', label: 'Sectors' },
+  { id: 'all',     label: 'All' }
+];
+
+function setActiveTab(tabId) {
+  if (!TABS.find(t => t.id === tabId)) tabId = 'flows';
+  document.body.dataset.activeTab = tabId;
+  document.querySelectorAll('.tab-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === tabId));
+  // Mark visible section-frame(s) for CSS show/hide
+  document.querySelectorAll('.section-frame').forEach(s => {
+    const isMatch = s.dataset.section === tabId;
+    s.dataset.active = String(isMatch);
+  });
+  // Update URL without scrolling
+  if (location.hash !== '#' + tabId) {
+    history.replaceState(null, '', '#' + tabId);
+  }
+  // Scroll to tab bar (just below hero) so user sees the start of the section
+  const tb = document.getElementById('tab-bar');
+  if (tb) {
+    const y = tb.getBoundingClientRect().top + window.scrollY - 60;
+    if (Math.abs(window.scrollY - y) > 10) window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+  }
+}
+
+function getInitialTab() {
+  const hash = location.hash.slice(1);
+  return TABS.find(t => t.id === hash) ? hash : 'flows';
+}
+
+// Build tab buttons with counts + shock badges
+const tabBar = document.getElementById('tab-bar');
+TABS.forEach(t => {
+  const btn = el('button', {
+    class: 'tab-btn',
+    'data-tab': t.id,
+    onclick: () => setActiveTab(t.id)
+  }, [
+    el('span', {}, t.label)
+  ]);
+  if (t.id !== 'all') {
+    const stats = sectionStats(t.id);
+    if (stats.count) btn.appendChild(el('span', { class: 'tab-count' }, String(stats.count)));
+    if (stats.shockCount) btn.appendChild(el('span', { class: 'tab-shock' }, stats.shockCount + ' SHOCK'));
+  }
+  tabBar.appendChild(btn);
+});
+
+setActiveTab(getInitialTab());
+window.addEventListener('hashchange', () => setActiveTab(getInitialTab()));
+
+// ──────────────────────────────────────────────────────────────
+// Cmd-K palette — global navigation
+// Section actions navigate via hash (triggers tab switch)
+// ──────────────────────────────────────────────────────────────
+const cmdkSections = TABS.filter(t => t.id !== 'all').map(t => ({
+  id: t.id,
+  label: t.label,
+  ...(t.id !== 'all' ? sectionStats(t.id) : {})
+}));
+wireCmdK({
+  metrics: DATA.metrics,
+  sections: cmdkSections.map(s => ({ ...s, action: () => { location.hash = '#' + s.id; } })),
+  openMetric: openDrawer
+});
 
 // Wire topbar Cmd-K hint click
 const cmdkHint = document.getElementById('cmdk-hint');

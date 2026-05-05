@@ -87,7 +87,13 @@ function buildItems() {
       name: s.label,
       meta: (s.count || 0) + ' metrics' + (s.shockCount ? ' · ' + s.shockCount + ' SHOCK' : ''),
       status: s.shockCount > 0 ? 'shock' : null,
-      action: () => { closeCmdK(); document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' }); },
+      action: () => {
+        closeCmdK();
+        // Prefer caller's action (e.g. tab-system hash router); fall back to hash; fallback to scroll
+        if (typeof s.action === 'function') s.action();
+        else if (location.hash !== '#' + s.id) location.hash = '#' + s.id;
+        else document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' });
+      },
       keywords: [s.id, s.label].join(' ').toLowerCase()
     });
   }

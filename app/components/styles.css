@@ -589,6 +589,74 @@ table.heatmap th:first-child { text-align: left; padding-left: 12px; }
 }
 
 /* ────────────────────────────────────────────────────────────── */
+/* TAB BAR · sticky section navigation (desktop)                  */
+/* ────────────────────────────────────────────────────────────── */
+.tab-bar {
+  position: sticky;
+  top: 49px; /* below the .topbar (height 49px including border) */
+  z-index: 30;
+  background: rgba(10, 13, 18, .92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 4px;
+  padding: 8px 32px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  font-family: var(--sans);
+  scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--ink-3);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color .15s, background .15s, border-color .15s;
+}
+.tab-btn:hover { color: var(--ink); background: var(--surface-2); }
+.tab-btn.active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.tab-btn .tab-count {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+}
+.tab-btn.active .tab-count { color: var(--accent); }
+.tab-btn .tab-shock {
+  background: var(--red); color: #1a0808;
+  padding: 1px 6px; border-radius: 3px;
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: .06em;
+}
+
+/* Section-frame visibility driven by body[data-active-tab] */
+body[data-active-tab]:not([data-active-tab="all"]) .section-frame { display: none; }
+body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="true"] { display: block; }
+
+/* StickyTOC redundant when tabs active — only show on "All" */
+body[data-active-tab]:not([data-active-tab="all"]) .sticky-toc { display: none; }
+
+@media (max-width: 700px) {
+  .tab-bar { padding: 8px 14px; }
+  .tab-btn { padding: 6px 12px; font-size: 12.5px; }
+}
+
+/* ────────────────────────────────────────────────────────────── */
 /* PHASE 5.5 ADDITIONS · trust signals + upgraded TOC + Cmd-K     */
 /* ────────────────────────────────────────────────────────────── */
 
