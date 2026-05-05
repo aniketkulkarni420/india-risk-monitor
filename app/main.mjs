@@ -1053,33 +1053,43 @@ body.appendChild(renderSectionFrame({
 }));
 
 // ──────────────────────────────────────────────────────────────
-// Trust band — above footer (Design Audit §12)
+// Trust band — above footer (Design Audit §12). V1 reframe (2026-05-05):
+// shows "12m history: 1 of 20 verified" honestly so users see backfill state.
 // ──────────────────────────────────────────────────────────────
 const allMetrics = Object.values(DATA.metrics);
 const verifN = allMetrics.filter(m => m.verification_state === 'verified').length;
 const xcheckN = allMetrics.filter(m => m.verification_state === 'crosscheck_pending').length;
-const histN  = allMetrics.filter(m => m.verification_state === 'history_pending').length;
+// "Source pending" = anything not yet verified + not yet cross-checked.
+// Captures unregistered parsers, failed parsers, and seed-only metrics.
+const sourcePendingN = allMetrics.length - verifN - xcheckN;
+// "12m history" count = metrics where sparkline_12m has at least 12 distinct
+// non-null values AND the metric has been verified live. Today: GST only.
+const has12mHistory = (m) => m.verification_state === 'verified'
+  && Array.isArray(m.sparkline_12m)
+  && m.sparkline_12m.length >= 12
+  && new Set(m.sparkline_12m.filter(v => v != null)).size >= 6;  // 6+ unique values means real history, not mock-padded
+const histN = allMetrics.filter(has12mHistory).length;
 
 body.appendChild(el('div', { class: 'dashboard-trust-band' }, [
   el('a', { class: 'dtb-card', href: './sources/', style: { textDecoration: 'none' } }, [
-    el('div', { class: 'dtb-label' }, 'Verified'),
+    el('div', { class: 'dtb-label' }, 'Verified live'),
     el('div', { class: 'dtb-value', style: { color: 'var(--green)' } }, String(verifN)),
-    el('div', { class: 'dtb-sub' }, `of ${allMetrics.length} · primary + ≥ 1 cross-check`)
+    el('div', { class: 'dtb-sub' }, `of ${allMetrics.length} · primary + cross-check`)
   ]),
   el('a', { class: 'dtb-card', href: './sources/', style: { textDecoration: 'none' } }, [
-    el('div', { class: 'dtb-label' }, 'Cross-check pending'),
-    el('div', { class: 'dtb-value', style: { color: 'var(--amber)' } }, String(xcheckN)),
-    el('div', { class: 'dtb-sub' }, 'divergence > 5%')
+    el('div', { class: 'dtb-label' }, 'Source pending'),
+    el('div', { class: 'dtb-value', style: { color: 'var(--amber)' } }, String(sourcePendingN + xcheckN)),
+    el('div', { class: 'dtb-sub' }, 'parser pending or seed only')
   ]),
   el('a', { class: 'dtb-card', href: './sources/', style: { textDecoration: 'none' } }, [
-    el('div', { class: 'dtb-label' }, 'History pending'),
+    el('div', { class: 'dtb-label' }, '12m history'),
     el('div', { class: 'dtb-value', style: { color: 'var(--blue)' } }, String(histN)),
-    el('div', { class: 'dtb-sub' }, 'accruing 12m series')
+    el('div', { class: 'dtb-sub' }, `of ${verifN} verified${histN < verifN ? ' · V2 backfill in progress' : ''}`)
   ]),
   el('a', { class: 'dtb-card', href: './sources/', style: { textDecoration: 'none' } }, [
     el('div', { class: 'dtb-label' }, 'Free sources'),
     el('div', { class: 'dtb-value', style: { color: 'var(--accent)' } }, '100%'),
-    el('div', { class: 'dtb-sub' }, 'no paid feeds in display')
+    el('div', { class: 'dtb-sub' }, 'no paid feeds')
   ])
 ]));
 
