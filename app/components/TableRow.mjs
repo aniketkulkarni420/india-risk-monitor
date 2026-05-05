@@ -8,7 +8,7 @@
 //   state: 'default' | 'loading' | 'error' | 'history-pending' | 'shock' (auto-detected from metric)
 //   onClick: optional callback (default: open ?metric=metric_id deep-link)
 
-import { el, formatValue, formatTrend, trendClass, statusClass, isHistoryPending, isShock } from './utils.mjs';
+import { el, formatValue, formatTrend, trendClass, statusClass, isHistoryPending, isShock, formatAsOf } from './utils.mjs';
 import { renderSparkline } from './Sparkline.mjs';
 
 function rowDetectState(metric, override) {
@@ -104,8 +104,10 @@ export function renderTableRow(metric, opts = {}) {
     el('td', { class: 'status-cell' }, [
       // Per-row source pill (Design Audit §12 · trust signal at scan-time)
       sourcePill(metric.source_primary?.name),
+      // Per-row as-of stamp — every metric must show when its data is from
+      metric.as_of ? el('span', { class: 'asof-pill', title: 'Data as of ' + new Date(metric.as_of).toString(), style: { fontFamily: 'var(--mono)', fontSize: '10px', color: 'var(--ink-3)', marginRight: '4px' } }, formatAsOf(metric.as_of)) : null,
       el('span', { class: 'pill ' + statusClass(metric.status) }, state === 'shock' ? 'SHOCK' : metric.status.charAt(0).toUpperCase() + metric.status.slice(1))
-    ])
+    ].filter(Boolean))
   ].filter(Boolean));
 
   return tr;

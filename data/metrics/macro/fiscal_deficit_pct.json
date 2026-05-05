@@ -9,19 +9,46 @@
   "value_format": "decimal_1",
   "as_of": "2026-03-25T17:30:00+05:30",
   "as_of_period": "monthly",
-  "mom_pct": 8.6,
-  "yoy_pct": -3.4,
+  "mom_pct": null,
+  "yoy_pct": null,
   "vs_5y_avg_pct": -7.8,
-  "sparkline_12m": [12, 22, 32, 41, 49, 56, 62, 68, 72, 75, 74, 80.4],
+  "sparkline_12m": [
+    12,
+    22,
+    32,
+    41,
+    49,
+    56,
+    62,
+    68,
+    72,
+    75,
+    74,
+    80.4
+  ],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
-  "source_primary": { "name": "CGA monthly accounts", "url": "https://cga.nic.in/MonthlyReport.aspx", "type": "Official", "frequency": "Monthly", "parser": "press_release:cga_v1" },
+  "source_primary": {
+    "name": "CGA monthly accounts",
+    "url": "https://cga.nic.in/MonthlyReport.aspx",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "press_release:cga_v1"
+  },
   "source_crosscheck": [
-    { "name": "PIB CGA release", "url": "https://www.pib.gov.in/", "type": "Official" }
+    {
+      "name": "PIB CGA release",
+      "url": "https://www.pib.gov.in/",
+      "type": "Official"
+    }
   ],
   "verification_state": "verified",
   "last_verified_at": "2026-03-25T18:30:00+05:30",
   "why_it_matters": "On-track fiscal discipline supports rating + INR. <100% by March means government meeting glide path; overshoot = bond market stress.",
-  "linked_metrics": ["govt_capex_runrate", "gsec_curve", "trade_deficit"]
+  "linked_metrics": [
+    "govt_capex_runrate",
+    "gsec_curve",
+    "trade_deficit"
+  ]
 }

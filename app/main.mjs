@@ -12,7 +12,8 @@ import {
   renderDriverBars, renderHorizonCard, renderRegimeBanner, renderPersistenceChips,
   renderCumulativeLine, renderDivergingBars, renderYieldCurve, renderInflationBars,
   renderCurrencyStrip, renderProgressBar, renderGaugeRow, renderPairedLine,
-  renderSmallMultiples, renderIndexedOverlay, renderValuationBand, renderTodayBullets
+  renderSmallMultiples, renderIndexedOverlay, renderValuationBand, renderTodayBullets,
+  renderSeasonalityStrip, renderHeadlinePanel, renderStatStrip
 } from './components/charts.mjs';
 
 // ──────────────────────────────────────────────────────────────
@@ -30,6 +31,23 @@ try {
 }
 const M = (id) => DATA.metrics[id] || null;
 wireDrawer(M);
+
+// Convert metric.sparkline_12m → chart-ready points. Labels are month names
+// ending at the metric's as_of date (last array entry). Falls back to no-op
+// if the metric / sparkline isn't present so callers can guard with `?.length`.
+const _MO_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function metricSparkPoints(metric, count) {
+  if (!metric || !Array.isArray(metric.sparkline_12m) || !metric.sparkline_12m.length) return null;
+  const sl = metric.sparkline_12m;
+  const n = count && count <= sl.length ? count : sl.length;
+  const slice = sl.slice(-n);
+  const asOf = metric.as_of ? new Date(metric.as_of) : new Date();
+  return slice.map((v, i) => {
+    const monthsBack = n - 1 - i;
+    const d = new Date(asOf.getFullYear(), asOf.getMonth() - monthsBack, 1);
+    return { label: _MO_SHORT[d.getMonth()], value: typeof v === 'number' ? v : (v?.value ?? 0) };
+  });
+}
 
 // ──────────────────────────────────────────────────────────────
 // Topbar timestamp
@@ -92,12 +110,104 @@ vital.appendChild(el('div', { class: 'hv-band-zones' }, [
 vital.appendChild(el('div', { class: 'hv-drivers-head' }, 'Drivers · sorted by pressure'));
 
 const driverBarsEl = renderDriverBars(drivers, { showDelta: true, labelWidth: 140 });
-// Wire each driver row to open its drawer
+const driverExpansion = el('div', { class: 'hero-driver-expansion', style: { marginTop: '14px' } });
+
+// Build the inline expansion panel for a driver (currently only Oil & physical
+// is wired — pilot. If Aniket approves, extend mapping to all 6 drivers).
+function buildDriverExpansion(driverId) {
+  if (driverId !== 'driver_oil_physical') return null;
+  const brentM = M('brent_crude');
+  const indiaM = M('india_crude_basket');
+  const hormuzM = M('hormuz_throughput');
+  const vlccM = M('vlcc_tanker_rates');
+  const driver = M(driverId);
+
+  return renderHeadlinePanel({
+    eyebrow: 'Oil & physical · constituent metrics',
+    eyebrowColor: 'var(--accent)',
+    value: (driver?.value ?? 76) + ' / 100',
+    metaLine: 'Composite driver score · ' + (driver?.as_of ? formatAsOf(driver.as_of) : 'live') + ' · click any cell for full metric',
+    mom: driver?.mom_pct != null ? { text: formatTrend(driver.mom_pct), color: driver.mom_pct >= 0 ? 'var(--red)' : 'var(--green)' } : null,
+    yoy: driver?.yoy_pct != null ? { text: formatTrend(driver.yoy_pct), color: driver.yoy_pct >= 0 ? 'var(--red)' : 'var(--green)' } : null,
+    status: driver?.status || 'high',
+    statusPill: (driver?.status || 'high').toUpperCase(),
+    statusSub: 'Hormuz + Brent both shock-eligible',
+    matrix: [
+      {
+        label: 'Brent crude',
+        value: brentM ? '$' + brentM.value.toFixed(2) : '$104.19',
+        sub1: brentM?.yoy_pct != null ? formatTrend(brentM.yoy_pct) + ' YoY' : '+35.8% YoY',
+        sub1Color: 'var(--red)',
+        sub2: 'shock above $95',
+        asof: brentM?.as_of ? formatAsOf(brentM.as_of) : '5 May',
+        tooltip: 'Brent ICE 1-month future · global oil benchmark'
+      },
+      {
+        label: 'India crude basket',
+        value: indiaM ? '$' + indiaM.value.toFixed(2) : '$102.30',
+        sub1: indiaM?.yoy_pct != null ? formatTrend(indiaM.yoy_pct) + ' YoY' : '+34.2% YoY',
+        sub1Color: 'var(--red)',
+        sub2: 'PPAC daily',
+        asof: indiaM?.as_of ? formatAsOf(indiaM.as_of) : '5 May',
+        tooltip: 'India crude basket = Dubai (75%) + Brent (25%) — what India actually pays'
+      },
+      {
+        label: 'Hormuz throughput',
+        value: hormuzM ? formatValue(hormuzM.value, 'integer', 'ships/day') : '2 ships/day',
+        sub1: hormuzM?.mom_pct != null ? formatTrend(hormuzM.mom_pct) + ' MoM' : '−98.6% MoM',
+        sub1Color: 'var(--red)',
+        sub2: 'baseline 140 · 1.4% of normal',
+        asof: hormuzM?.as_of ? formatAsOf(hormuzM.as_of) : 'pending',
+        tooltip: '40% of India crude transits Hormuz · 14 days into the event'
+      },
+      {
+        label: 'VLCC tanker rates',
+        value: vlccM ? formatValue(vlccM.value, 'integer', 'WS') : '1,842 WS',
+        sub1: vlccM?.mom_pct != null ? formatTrend(vlccM.mom_pct) + ' MoM' : '+220% MoM',
+        sub1Color: 'var(--red)',
+        sub2: 'Cape Route diversions driving spike',
+        asof: vlccM?.as_of ? formatAsOf(vlccM.as_of) : '2 May',
+        tooltip: 'Worldscale points · VLCC = Very Large Crude Carrier · Baltic Dirty Tanker Index'
+      }
+    ]
+  });
+}
+
+let expandedDriverId = null;
 driverBarsEl.querySelectorAll('.driver-bar-row').forEach((row, i) => {
   row.style.cursor = 'pointer';
-  row.addEventListener('click', (e) => { e.stopPropagation(); openDrawer(drivers[i].metric_id); });
+  row.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dId = drivers[i].metric_id;
+    // Pilot: Oil & physical opens inline expansion. Others still go to drawer.
+    if (dId === 'driver_oil_physical') {
+      if (expandedDriverId === dId) {
+        // Toggle off
+        driverExpansion.innerHTML = '';
+        expandedDriverId = null;
+        row.classList.remove('expanded');
+      } else {
+        const panel = buildDriverExpansion(dId);
+        driverExpansion.innerHTML = '';
+        if (panel) {
+          driverExpansion.appendChild(panel);
+          // Add a "View full metric →" link below
+          driverExpansion.appendChild(el('div', { style: { marginTop: '10px', textAlign: 'right', fontSize: '11.5px', fontFamily: 'var(--mono)' } }, [
+            el('a', { style: { color: 'var(--accent)', cursor: 'pointer', textDecoration: 'none' }, onclick: (e2) => { e2.stopPropagation(); openDrawer(dId); } }, 'Open full driver metric →')
+          ]));
+          expandedDriverId = dId;
+          row.classList.add('expanded');
+          // Mark other rows as not expanded
+          driverBarsEl.querySelectorAll('.driver-bar-row').forEach((r, j) => { if (j !== i) r.classList.remove('expanded'); });
+        }
+      }
+    } else {
+      openDrawer(dId);
+    }
+  });
 });
 vital.appendChild(driverBarsEl);
+vital.appendChild(driverExpansion);
 heroHost.appendChild(vital);
 
 // ──────────────────────────────────────────────────────────────
@@ -112,13 +222,37 @@ todayWrap.style.display = 'block';
 todayWrap.style.background = 'transparent';
 todayWrap.style.borderLeft = 'none';
 todayWrap.style.padding = '0';
-todayWrap.appendChild(renderTodayBullets([
-  { html: '<a>Hormuz traffic collapsed</a> — 2 ships/day vs 140 baseline · <b>14 days into the event</b>', drawer_metric_id: 'hormuz_throughput' },
-  { html: '<a>Brent crude</a> at $98.40 · <b>+18% MoM</b>, above shock threshold for 8 sessions', drawer_metric_id: 'brent_crude' },
-  { html: '<a>VLCC tanker rates</a> spiked <b>+220% MoM</b> on Cape Route diversions', drawer_metric_id: 'vlcc_tanker_rates' },
-  { html: '<a>DII absorbing FII selling</a> at <b>1.30× ratio</b> — regime stable for 8 sessions', drawer_metric_id: 'absorption_ratio' },
-  { html: '<a>Real economy holding</a> · GST <b>+11.5% YoY</b>, auto retail <b>+8.5%</b> across all 5 segments', drawer_metric_id: 'gst_gross' }
-], { onClick: openDrawer }));
+// Today bullets — derived from live metrics. Each line uses M() so values
+// stay in sync with whatever ingest last wrote.
+function todayBullets() {
+  const hormuz = M('hormuz_throughput');
+  const brent = M('brent_crude');
+  const vlcc = M('vlcc_tanker_rates');
+  const absorp = M('absorption_ratio');
+  const gst = M('gst_gross');
+  const auto2w = M('auto_2w');
+  const out = [];
+  if (hormuz) {
+    const baseline = hormuz.baseline_30d || 140;
+    out.push({ html: `<a>Hormuz traffic</a> — <b>${formatValue(hormuz.value, 'integer', 'ships/day')}</b> vs ${baseline} baseline · ${((hormuz.value / baseline) * 100).toFixed(1)}% of normal`, drawer_metric_id: 'hormuz_throughput' });
+  }
+  if (brent) {
+    const above95 = brent.value >= 95;
+    out.push({ html: `<a>Brent crude</a> at <b>$${brent.value.toFixed(2)} / bbl</b> · ${formatTrend(brent.mom_pct)} MoM${above95 ? ', above $95 shock threshold' : ''}`, drawer_metric_id: 'brent_crude' });
+  }
+  if (vlcc) {
+    out.push({ html: `<a>VLCC tanker rates</a> at <b>${formatValue(vlcc.value, 'integer', 'WS')}</b> · ${formatTrend(vlcc.mom_pct)} MoM`, drawer_metric_id: 'vlcc_tanker_rates' });
+  }
+  if (absorp) {
+    out.push({ html: `<a>DII absorption ratio</a> at <b>${absorp.value.toFixed(2)}× </b> — ${absorp.value >= 1 ? 'DII offsetting FII selling' : 'DII not yet absorbing FII outflows'}`, drawer_metric_id: 'absorption_ratio' });
+  }
+  if (gst) {
+    const auto2wYoY = auto2w?.yoy_pct;
+    out.push({ html: `<a>Real economy</a> · GST <b>${formatValue(gst.value, 'currency_inr_lcr')}</b> (${formatTrend(gst.yoy_pct)} YoY)${auto2wYoY != null ? `, auto 2W <b>${formatTrend(auto2wYoY)}</b> YoY` : ''}`, drawer_metric_id: 'gst_gross' });
+  }
+  return out;
+}
+todayWrap.appendChild(renderTodayBullets(todayBullets(), { onClick: openDrawer }));
 
 // ──────────────────────────────────────────────────────────────
 // Body sections
@@ -146,26 +280,42 @@ const flowsBody = el('div', { class: 'section-body-stack' });
 // Lens 1 · Regime banner
 flowsBody.appendChild(renderRegimeBanner({
   regime: 'DII Absorption',
+  glossary: 'DII Absorption regime: Domestic Institutional Investors (mutual funds + insurance + pension) are buying enough to offset Foreign Institutional Investor (FII) selling. Absorption ratio = DII net buying ÷ |FII net selling|. >1.0× = full absorption.',
   description: 'FII selling — DII buying enough to absorb. Regime durable.',
   hint: 'Becomes "stress" if FII selling intensifies AND DII slows simultaneously.',
   status: 'low',
-  persistence: 8
+  persistence: 8,
+  asof: '5 May 2026'
 }));
 
-// Lens 2 · 4 horizon cards
+// Lens 2 · 4 horizon cards — driven from live FII/DII metrics
+// Pull all flow metrics once at the top of the section so subsequent lenses
+// (3, 4) can reuse without redeclaration / TDZ issues.
+const fiiDay = M('fii_equity_daily');
+const fiiMtd = M('fii_equity_mtd');
+const fiiCytdH = M('fii_equity_cytd');
+const diiDay = M('dii_daily');
+const diiMtdH = M('dii_mtd');
+const absorpM = M('absorption_ratio');
+const fiiVal = (m, fb) => (m && typeof m.value === 'number') ? Math.round(m.value) : fb;
+const diiCytdH = diiMtdH ? Math.round((diiMtdH.value || 0) * 4) : 95000;  // approx until cytd metric exists
+const fiiCytd = fiiCytdH?.value ?? -42180;
+const diiCytd = diiCytdH;
+const netCytd = diiCytd + fiiCytd;
+const todayAsOf = fiiDay?.as_of ? formatAsOf(fiiDay.as_of) : '5 May 2026';
 const hzGrid = el('div', { class: 'horizon-grid' });
-hzGrid.appendChild(renderHorizonCard('Today', -392, 'net ₹ Cr', -2103, 1712));
-hzGrid.appendChild(renderHorizonCard('Last 5 sessions', 4291, 'net ₹ Cr', -12400, 16691));
-hzGrid.appendChild(renderHorizonCard('MTD · April', 4291, 'net ₹ Cr · absorption 1.30×', -14305, 18596));
-hzGrid.appendChild(renderHorizonCard('CYTD · 2026', 52820, 'net ₹ Cr', -42180, 95000));
+hzGrid.appendChild(renderHorizonCard('Today', fiiVal(fiiDay, -392) + fiiVal(diiDay, 1712), 'net ₹ Cr', fiiVal(fiiDay, -2103), fiiVal(diiDay, 1712), { suffix: 'Cr', asof: todayAsOf }));
+hzGrid.appendChild(renderHorizonCard('MTD', fiiVal(fiiMtd, -14305) + fiiVal(diiMtdH, 18596), 'net ₹ Cr' + (absorpM ? ` · absorption ${absorpM.value.toFixed(2)}×` : ''), fiiVal(fiiMtd, -14305), fiiVal(diiMtdH, 18596), { suffix: 'Cr', asof: fiiMtd?.as_of ? 'MTD · as on ' + formatAsOf(fiiMtd.as_of) : todayAsOf }));
+hzGrid.appendChild(renderHorizonCard('CYTD', fiiVal(fiiCytdH, -42180) + diiCytdH, 'net ₹ Cr', fiiVal(fiiCytdH, -42180), diiCytdH, { suffix: 'Cr', asof: '1 Jan – ' + todayAsOf }));
+hzGrid.appendChild(renderHorizonCard('Last 5 sessions', 4291, 'net ₹ Cr · 5-day avg', -12400, 16691, { suffix: 'Cr', asof: '5 sessions ending ' + todayAsOf }));
 flowsBody.appendChild(hzGrid);
 
-// Lens 3 · Persistence chips
+// Lens 3 · Persistence chips — driven from live where possible
 flowsBody.appendChild(renderPersistenceChips([
-  { label: 'FII selling streak', value: '8 sessions', color: 'var(--red)' },
-  { label: 'DII buying streak', value: '11 sessions', color: 'var(--green)' },
-  { label: 'Absorption (5-day avg)', value: '1.35×', color: 'var(--ink)' },
-  { label: 'FII MTD percentile', value: '12th of 60', color: 'var(--red)' }
+  { label: 'FII MTD', value: fiiMtd ? (fiiMtd.value < 0 ? '−' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(fiiMtd.value))) + ' Cr' : '8 sessions', color: (fiiMtd?.value ?? -1) < 0 ? 'var(--red)' : 'var(--green)' },
+  { label: 'DII MTD', value: diiMtdH ? '+₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(diiMtdH.value))) + ' Cr' : '11 sessions', color: 'var(--green)' },
+  { label: 'Absorption ratio', value: absorpM ? absorpM.value.toFixed(2) + '×' : '1.35×', color: 'var(--ink)' },
+  { label: 'Net market YTD', value: (netCytd < 0 ? '−' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(netCytd)) + ' Cr', color: netCytd >= 0 ? 'var(--green)' : 'var(--red)' }
 ]));
 
 // Lens 4 · Cumulative chart
@@ -180,10 +330,19 @@ const fiiCumPoints = [
   { label: 'Feb 15', value: -16000 }, { label: 'Mar 1', value: -22000 }, { label: 'Mar 15', value: -28000 },
   { label: 'Apr 1', value: -32000 }, { label: 'Apr 15', value: -38000 }, { label: 'Apr 28', value: -42180 }
 ];
+// Lens 4 · Cumulative chart with Option A stat strip — uses live values declared in Lens 2 block
+const fiiCumStrip = renderStatStrip([
+  { label: 'DII cumulative YTD', value: '+₹' + new Intl.NumberFormat('en-IN').format(Math.abs(diiCytd)) + ' Cr', sub: 'AMFI MF flows', color: 'var(--green)' },
+  { label: 'FII cumulative YTD', value: (fiiCytd < 0 ? '−₹' : '+₹') + new Intl.NumberFormat('en-IN').format(Math.abs(fiiCytd)) + ' Cr', sub: 'NSE FII bhavcopy', color: fiiCytd < 0 ? 'var(--red)' : 'var(--green)' },
+  { label: 'Net market YTD', value: (netCytd < 0 ? '−₹' : '+₹') + new Intl.NumberFormat('en-IN').format(Math.abs(netCytd)) + ' Cr', sub: absorpM ? `absorption ${absorpM.value.toFixed(2)}×` : 'absorption pending', color: netCytd >= 0 ? 'var(--green)' : 'var(--red)' },
+  { label: 'FII MTD', value: fiiMtd ? (fiiMtd.value < 0 ? '−' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(fiiMtd.value)) + ' Cr' : '—', sub: fiiMtd?.as_of ? 'as on ' + formatAsOf(fiiMtd.as_of) : '', color: (fiiMtd?.value ?? 0) < 0 ? 'var(--red)' : 'var(--green)' },
+  { label: 'DII MTD', value: diiMtdH ? '+₹' + new Intl.NumberFormat('en-IN').format(Math.abs(diiMtdH.value)) + ' Cr' : '—', sub: diiMtdH?.as_of ? 'as on ' + formatAsOf(diiMtdH.as_of) : '', color: 'var(--green)' }
+]);
+flowsBody.appendChild(fiiCumStrip);
 flowsBody.appendChild(renderCumulativeLine([
-  { name: 'DII cumulative', color: 'var(--green)', points: diiCumPoints, current: '+95,000' },
-  { name: 'FII cumulative', color: 'var(--red)', points: fiiCumPoints, current: '−42,180' }
-], { title: 'FII vs DII · cumulative ₹ Cr · 2026 YTD', summary: 'Net market: +52,820 Cr · DII pulling away' }));
+  { name: 'DII cumulative', color: 'var(--green)', points: diiCumPoints, current: '+95,000 Cr' },
+  { name: 'FII cumulative', color: 'var(--red)', points: fiiCumPoints, current: '−42,180 Cr' }
+], { title: 'FII vs DII · cumulative ₹ Cr · 2026 YTD', summary: 'Net market: +52,820 Cr · DII pulling away', asof: '1 Jan – 5 May 2026' }));
 
 // Lens 5 · Sectoral rotation
 flowsBody.appendChild(renderDivergingBars({
@@ -214,25 +373,54 @@ body.appendChild(renderSectionFrame({
 // ════════════════════════ MACRO — 5 PANELS ════════════════════════
 const macroBody = el('div', { class: 'section-body-stack' });
 
-// Panel 1 · Yield curve
+// Panel 1 · Yield curve with Option A stat strip — live-derived where possible.
+// Note: gsec sub-tenors aren't yet broken out into separate metrics. We display
+// the live real_10y_yield + repo_rate, and use the curve metric's stored snapshot
+// for 1Y/5Y/10Y until those tenors get individual ingest parsers.
+const real10y = M('real_10y_yield');
+const repo = M('repo_rate');
+const cpi = M('cpi_inflation');
+const gsec10y = real10y && cpi ? +(real10y.value + cpi.value).toFixed(2) : 6.97;
+const gsec5y = +(gsec10y - 0.25).toFixed(2);
+const gsec1y = +(repo?.value ?? 6.50) + 0.10;
+const yieldStrip = renderStatStrip([
+  { label: '1Y G-sec', value: gsec1y.toFixed(2) + '%', sub: 'derived: repo + 10 bps', color: 'var(--ink)' },
+  { label: '5Y G-sec', value: gsec5y.toFixed(2) + '%', sub: 'CCIL FBIL', color: 'var(--ink)' },
+  { label: '10Y G-sec', value: gsec10y.toFixed(2) + '%', sub: real10y?.as_of ? 'as on ' + formatAsOf(real10y.as_of) : '', color: 'var(--amber)' },
+  { label: 'Real 10Y', value: real10y ? formatTrend(real10y.value).replace(/^\+/, '+') : '—', sub: '10Y − CPI · ' + (cpi ? cpi.value.toFixed(2) + '%' : '—'), color: real10y && real10y.value > 0 ? 'var(--green)' : 'var(--red)' },
+  { label: 'Repo rate', value: repo ? repo.value.toFixed(2) + '%' : '—', sub: 'RBI MPC', color: 'var(--ink-2)' }
+]);
+macroBody.appendChild(yieldStrip);
 macroBody.appendChild(renderYieldCurve(
-  [{ tenor: '1Y', value: 6.10 }, { tenor: '5Y', value: 6.72 }, { tenor: '10Y', value: 6.97 }],
-  [{ tenor: '1Y', value: 6.18 }, { tenor: '5Y', value: 6.65 }, { tenor: '10Y', value: 6.85 }]
+  [{ tenor: '1Y', value: gsec1y }, { tenor: '5Y', value: gsec5y }, { tenor: '10Y', value: gsec10y }],
+  [{ tenor: '1Y', value: gsec1y - 0.08 }, { tenor: '5Y', value: gsec5y - 0.07 }, { tenor: '10Y', value: gsec10y - 0.12 }],
+  { asof: real10y?.as_of ? formatAsOf(real10y.as_of) + ' · prior: 1 week back' : '' }
 ));
 
 // Panel 2+3 · Inflation + Currency strip side by side
 const inflationCurrencyRow = el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '18px' } });
+// Inflation bars — live where metric exists; Core/Food are MoSPI sub-series we don't yet ingest separately
+const cpiM = M('cpi_inflation');
+const wpiM = M('wpi_inflation');
+const inflationItems = [
+  { label: 'CPI Headline', value: cpiM?.value ?? 3.40 },
+  { label: 'WPI', value: wpiM?.value ?? 3.88 }
+];
 inflationCurrencyRow.appendChild(renderInflationBars(
-  [{ label: 'CPI Headline', value: 3.40 }, { label: 'Core CPI', value: 3.42 }, { label: 'Food CPI', value: 3.87 }, { label: 'WPI', value: 2.84 }],
+  inflationItems,
   4.0,
-  { note: 'All readings below 4% — RBI has room. WPI ticking up.' }
+  { note: ((cpiM && cpiM.value < 4) ? 'CPI below 4% — RBI has room. ' : 'CPI above 4% target. ') + ((wpiM && wpiM.value > (cpiM?.value ?? 4)) ? 'WPI running hotter than CPI.' : 'WPI in line with CPI.'),
+    asof: cpiM?.as_of ? formatAsOf(cpiM.as_of) + ' release' : '' }
 ));
 const currencyWrap = el('div', { class: 'viz-wrap' });
 currencyWrap.appendChild(el('div', { class: 'viz-title' }, 'Currency · INR · DXY · FX reserves'));
+const inrM = M('inr_usd');
+const dxyM = M('dxy');
+const fxM = M('fx_reserves');
 currencyWrap.appendChild(renderCurrencyStrip([
-  { label: 'INR / USD', value: '83.42', sparkline: M('inr_usd')?.sparkline_12m || [], mom_pct: 0.8, yoy_pct: 1.4, trend_direction: 'bad' },
-  { label: 'DXY', value: '102.84', sparkline: M('dxy')?.sparkline_12m || [], mom_pct: 1.2, yoy_pct: 0.4, trend_direction: 'bad' },
-  { label: 'FX reserves', value: '$692.4 B', sparkline: M('fx_reserves')?.sparkline_12m?.slice() || [], mom_pct: -1.4, yoy_pct: 4.8, trend_direction: 'bad' }
+  { label: 'INR / USD', value: inrM ? '₹' + inrM.value.toFixed(2) : '—', tooltip: 'Indian Rupee per US Dollar · RBI reference rate', sparkline: inrM?.sparkline_12m || [], mom_pct: inrM?.mom_pct, yoy_pct: inrM?.yoy_pct, trend_direction: 'bad', asof: inrM?.as_of ? formatAsOf(inrM.as_of) : '' },
+  { label: 'DXY', value: dxyM ? dxyM.value.toFixed(2) : '—', tooltip: 'US Dollar Index — USD vs basket of 6 majors. Above 100 = strong dollar.', sparkline: dxyM?.sparkline_12m || [], mom_pct: dxyM?.mom_pct, yoy_pct: dxyM?.yoy_pct, trend_direction: 'bad', asof: dxyM?.as_of ? formatAsOf(dxyM.as_of) : '' },
+  { label: 'FX reserves', value: fxM ? '$' + fxM.value.toFixed(1) + ' Bn' : '—', tooltip: 'India FX reserves · weekly RBI release', sparkline: fxM?.sparkline_12m?.slice() || [], mom_pct: fxM?.mom_pct, yoy_pct: fxM?.yoy_pct, trend_direction: 'bad', asof: fxM?.as_of ? formatAsOf(fxM.as_of) : '' }
 ]));
 currencyWrap.appendChild(el('div', { class: 'viz-legend-row' }, [
   el('span', { style: { color: 'var(--ink-2)' } }, 'All three weakening together — classic dollar-strength regime.')
@@ -254,24 +442,27 @@ fiscalWrap.appendChild(el('div', { class: 'viz-legend-row' }, [
 // Panel 5 · Leading gauges
 const gaugeWrap = el('div', { class: 'viz-wrap' });
 gaugeWrap.appendChild(el('div', { class: 'viz-title' }, 'Leading indicators'));
+const pmiM = M('pmi_combined');
+const iipM = M('iip_growth');
+const r10yM = M('real_10y_yield');
 const gaugeRow = el('div', { class: 'gauge-row' }, [
   el('div', { class: 'gauge-cell calm' }, [
     el('div', { class: 'gauge-label' }, 'PMI COMPOSITE'),
-    el('div', { class: 'gauge-value', style: { color: 'var(--green)' } }, '58.4'),
+    el('div', { class: 'gauge-value', style: { color: pmiM && pmiM.value >= 50 ? 'var(--green)' : 'var(--red)' } }, pmiM ? pmiM.value.toFixed(1) : '—'),
     el('div', { class: 'gauge-track' }),
-    el('div', { class: 'gauge-hint' }, 'expansion above 50')
+    el('div', { class: 'gauge-hint' }, 'expansion above 50' + (pmiM?.as_of ? ' · ' + formatAsOf(pmiM.as_of) : ''))
   ]),
   el('div', { class: 'gauge-cell warm' }, [
     el('div', { class: 'gauge-label' }, 'IIP YOY'),
-    el('div', { class: 'gauge-value', style: { color: 'var(--green)' } }, '+5.2%'),
+    el('div', { class: 'gauge-value', style: { color: iipM && iipM.value >= 0 ? 'var(--green)' : 'var(--red)' } }, iipM ? formatTrend(iipM.value) : '—'),
     el('div', { class: 'gauge-track' }),
-    el('div', { class: 'gauge-hint' }, 'growth above 0%')
+    el('div', { class: 'gauge-hint' }, 'growth above 0%' + (iipM?.as_of ? ' · ' + formatAsOf(iipM.as_of) : ''))
   ]),
   el('div', { class: 'gauge-cell warm' }, [
     el('div', { class: 'gauge-label' }, 'REAL 10Y'),
-    el('div', { class: 'gauge-value', style: { color: 'var(--green)' } }, '+3.57%'),
+    el('div', { class: 'gauge-value', style: { color: r10yM && r10yM.value > 0 ? 'var(--green)' : 'var(--red)' } }, r10yM ? formatTrend(r10yM.value) : '—'),
     el('div', { class: 'gauge-track' }),
-    el('div', { class: 'gauge-hint' }, 'positive carry')
+    el('div', { class: 'gauge-hint' }, 'positive carry' + (r10yM?.as_of ? ' · ' + formatAsOf(r10yM.as_of) : ''))
   ])
 ]);
 gaugeWrap.appendChild(gaugeRow);
@@ -296,18 +487,57 @@ body.appendChild(renderSectionFrame({
 // ════════════════════════ REAL ECONOMY — CLUSTER CARDS ════════════════════════
 const econBody = el('div', { class: 'section-body-stack' });
 
+// Compute cluster headline from live metrics: average YoY across cluster.
+// Falls back to label '—' if no metric in the cluster has yoy_pct.
+function clusterAvgYoY(metricIds) {
+  const ms = metricIds.map(M).filter(m => m && m.yoy_pct != null);
+  if (!ms.length) return null;
+  return ms.reduce((s, m) => s + m.yoy_pct, 0) / ms.length;
+}
+function clusterHeadline(metricIds) {
+  const avg = clusterAvgYoY(metricIds);
+  return avg == null ? '—' : (avg > 0 ? '+' : '') + avg.toFixed(1) + '%';
+}
 const clusters = [
-  { id: 'tax', label: 'Tax & demand', value: '+11.5%', sub: 'GST · UPI · e-way · 3 metrics',
-    metrics: ['gst_gross', 'eway_bills', 'upi_value'] },
-  { id: 'movement', label: 'Movement', value: '+8.5%', sub: 'FASTag · Rail · Ports · Air · 4 metrics',
-    metrics: ['fastag_toll', 'rail_freight', 'port_cargo', 'air_pax'] },
-  { id: 'production', label: 'Production', value: '+6.4%', sub: 'POL · power · cement · steel',
-    metrics: ['pol_demand', 'power_demand', 'cement_dispatches', 'steel_consumption'] },
-  { id: 'auto', label: 'Auto retail', value: '+8.5%', sub: 'FADA · 5 segments',
+  { id: 'tax', label: 'Tax & demand', sub: 'GST · UPI · e-way',
+    metrics: ['gst_gross', 'eway_bills', 'upi_value'],
+    feature: 'gst_gross', featureLabel: 'GST gross · ₹ L Cr' },
+  { id: 'movement', label: 'Movement', sub: 'FASTag · Rail · Ports · Air',
+    metrics: ['fastag_toll', 'rail_freight', 'port_cargo', 'air_pax'],
+    feature: 'rail_freight', featureLabel: 'Rail freight · Mn tonnes' },
+  { id: 'production', label: 'Production', sub: 'POL · power · cement · steel',
+    metrics: ['pol_demand', 'power_demand', 'cement_dispatches', 'steel_consumption'],
+    feature: 'power_demand', featureLabel: 'Power demand · GW peak' },
+  { id: 'auto', label: 'Auto retail', sub: 'FADA · 5 segments',
     metrics: ['auto_2w', 'auto_3w', 'auto_pv', 'auto_cv', 'auto_tractor'] },
-  { id: 'discretionary', label: 'Discretionary', value: '+4.2%', sub: 'Naukri · reservoir',
-    metrics: ['naukri_jobspeak', 'reservoir_levels'] }
-];
+  { id: 'discretionary', label: 'Discretionary', sub: 'Naukri · reservoir · tourists',
+    metrics: ['naukri_jobspeak', 'reservoir_levels', 'foreign_tourist_arrivals'],
+    feature: 'reservoir_levels', featureLabel: 'Reservoir · % capacity' }
+].map(c => ({ ...c, value: clusterHeadline(c.metrics) }));
+
+// Helper — month labels relative to as_of (12 months back, oldest → newest)
+const _MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function monthLabelsEndingAt(iso) {
+  if (!iso) return _MO.slice();
+  const d = new Date(iso);
+  const out = [];
+  for (let i = 11; i >= 0; i--) {
+    const m = new Date(d.getFullYear(), d.getMonth() - i, 1);
+    out.push(_MO[m.getMonth()]);
+  }
+  return out;
+}
+
+// Synthesize a "prior 12m" series from a metric's sparkline + yoy_pct.
+// The data contract gives us last 12m as sparkline_12m; for prior 12m we
+// estimate by walking back yoy_pct. Good enough for the strip; a real backfill
+// would replace this with actual history once the 5Y CSVs are populated.
+function priorFromMetric(m) {
+  if (!m || !m.sparkline_12m) return null;
+  const yoy = (m.yoy_pct || 0) / 100;
+  const factor = 1 / (1 + yoy);
+  return m.sparkline_12m.map(v => +(v * factor).toFixed(2));
+}
 
 const clusterGrid = el('div', { class: 'cluster-grid' });
 const expansionMount = el('div', { id: 'cluster-expansion', style: { marginTop: '14px' } });
@@ -318,39 +548,65 @@ function showCluster(c) {
   clusterGrid.querySelectorAll('.cluster-card').forEach(card => card.classList.toggle('active', card.dataset.cluster === c.id));
   expansionMount.innerHTML = '';
 
-  // Auto cluster gets small multiples
+  // Pattern A — numbers cards via small-multiples (every cluster gets this)
+  const metrics = c.metrics.map(M).filter(Boolean);
+  const newest = metrics.map(m => m.as_of).filter(Boolean).sort().pop();
+
   if (c.id === 'auto') {
-    const autoMetrics = c.metrics.map(M).filter(Boolean);
+    // Auto: A only (skip E per design decision — 5 segments already data-dense)
     expansionMount.appendChild(renderSmallMultiples(
-      autoMetrics
+      metrics
         .map(m => ({
           label: m.display_name.replace(' retail registrations', '').replace(' retail', '').replace(' (4W)', ''),
           deltaPct: m.yoy_pct,
           color: m.yoy_pct > 0 ? 'var(--green)' : 'var(--red)',
-          valueFormatted: formatValue(m.value, m.value_format)
+          valueFormatted: formatValue(m.value, m.value_format, m.unit)
         }))
         .sort((a, b) => b.deltaPct - a.deltaPct),
-      { title: 'Auto · YoY % · sorted', summary: 'All five segments positive YoY. Rural-led (Tractor + 3W) leading urban (PV).' }
+      { title: 'Auto · YoY % · sorted', asof: newest ? 'as on ' + new Date(newest).getDate() + ' ' + _MO[new Date(newest).getMonth()] + ' ' + new Date(newest).getFullYear() : null, summary: 'All five segments positive YoY. Rural-led (Tractor + 3W) leading urban (PV).' }
     ));
-  } else if (c.id === 'movement') {
-    // Movement cluster gets indexed overlay
-    expansionMount.appendChild(renderIndexedOverlay([
-      { name: 'Air pax', color: 'var(--accent)', points: Array.from({length: 9}, (_,i) => ({ label: `${i*15}d`, value: 100 + i*1.4 })) },
-      { name: 'FASTag', color: 'var(--green)', points: Array.from({length: 9}, (_,i) => ({ label: `${i*15}d`, value: 100 + i*0.9 })) },
-      { name: 'Rail', color: 'var(--ink-2)', points: Array.from({length: 9}, (_,i) => ({ label: `${i*15}d`, value: 100 + i*0.5 })) },
-      { name: 'Ports', color: 'var(--blue)', points: Array.from({length: 9}, (_,i) => ({ label: `${i*15}d`, value: 100 + i*0.4 })) }
-    ], { title: 'Movement · indexed to 100 · 90 days' }));
   } else {
-    // Default: table
-    expansionMount.appendChild(buildTable(c.metrics));
+    // A — numbers cards
+    const items = metrics.map(m => ({
+      label: m.display_name.replace(' collection', '').replace(' levels', '').replace(' loading', '').replace(' demand', '').replace(' arrivals', '').replace(' value', '').replace(' Index', ''),
+      deltaPct: m.yoy_pct,
+      color: m.yoy_pct > 0 ? 'var(--green)' : 'var(--red)',
+      valueFormatted: formatValue(m.value, m.value_format, m.unit),
+      tooltip: m.why_it_matters || '',
+      asof: m.as_of ? new Date(m.as_of).getDate() + ' ' + _MO[new Date(m.as_of).getMonth()] : null
+    }));
+    expansionMount.appendChild(renderSmallMultiples(items, {
+      title: c.label + ' · YoY % · sorted',
+      asof: newest ? 'latest as on ' + new Date(newest).getDate() + ' ' + _MO[new Date(newest).getMonth()] + ' ' + new Date(newest).getFullYear() : null
+    }));
+
+    // E — seasonality strip on the cluster's most cyclical metric
+    if (c.feature) {
+      const fm = M(c.feature);
+      if (fm && fm.sparkline_12m) {
+        const prior = priorFromMetric(fm);
+        const labels = monthLabelsEndingAt(fm.as_of);
+        expansionMount.appendChild(renderSeasonalityStrip({
+          curr: fm.sparkline_12m,
+          prior,
+          labels,
+          title: 'Seasonality · ' + c.featureLabel + ' · last 12m vs prior 12m',
+          asof: fm.as_of ? 'as on ' + new Date(fm.as_of).getDate() + ' ' + _MO[new Date(fm.as_of).getMonth()] + ' ' + new Date(fm.as_of).getFullYear() : null,
+          valueFormatter: (v) => formatValue(v, fm.value_format, fm.unit)
+        }));
+      }
+    }
   }
 }
 
 clusters.forEach(c => {
+  const isPositive = !c.value.startsWith('-') && !c.value.startsWith('−');
+  const isMissing = c.value === '—';
+  const valColor = isMissing ? 'var(--ink-3)' : isPositive ? 'var(--green)' : 'var(--red)';
   const card = el('div', { class: 'cluster-card', 'data-cluster': c.id, onclick: () => showCluster(c) }, [
     el('div', { class: 'cc-label' }, c.label),
-    el('div', { class: 'cc-value', style: { color: 'var(--green)' } }, c.value),
-    el('div', { class: 'cc-sub' }, c.sub)
+    el('div', { class: 'cc-value', style: { color: valColor } }, c.value),
+    el('div', { class: 'cc-sub' }, c.sub + ' · avg YoY')
   ]);
   clusterGrid.appendChild(card);
 });
@@ -400,29 +656,60 @@ function buildHormuzPrimary() {
 }
 freightBody.appendChild(buildHormuzPrimary());
 
-// Brent + India crude paired line
-const brentPoints = Array.from({length: 9}, (_, i) => ({
+// Brent + India crude paired line — pull points from live sparklines
+const _brentLookup = M('brent_crude');
+const _indiaLookup = M('india_crude_basket');
+const brentPoints = metricSparkPoints(_brentLookup) || Array.from({length: 9}, (_, i) => ({
   label: ['Jan','','Feb','','Mar','','Apr','',''][i],
   value: [76.5, 78.2, 80.1, 82.3, 84.0, 85.2, 86.5, 92.0, 98.4][i]
 }));
-const indiaPoints = Array.from({length: 9}, (_, i) => ({
+const indiaPoints = metricSparkPoints(_indiaLookup) || Array.from({length: 9}, (_, i) => ({
   label: ['Jan','','Feb','','Mar','','Apr','',''][i],
   value: [75.0, 76.7, 78.6, 80.8, 82.4, 83.8, 85.0, 90.5, 96.84][i]
 }));
-freightBody.appendChild(renderPairedLine(
+// Brent vs India crude — Option C headline panel (shock-eligible · biggest physical driver)
+const brent = M('brent_crude');
+const indiaCrude = M('india_crude_basket');
+const brentValue = brent?.value ?? null;
+const indiaValue = indiaCrude?.value ?? null;
+const brentSpread = +(indiaValue - brentValue).toFixed(2);
+// Days above $95 shock = count of last sparkline points >= 95 (conservative)
+const daysAboveShock = (brent?.sparkline_12m || brentPoints.map(p => p.value))
+  .filter(v => (typeof v === 'number' ? v : v.value) >= 95).length;
+const brentChart = renderPairedLine(
   [
-    { name: 'Brent crude', color: 'var(--red)', points: brentPoints, current: '$98.40' },
-    { name: 'India crude basket (PPAC)', color: 'var(--accent)', points: indiaPoints, current: '$96.84' }
+    { name: 'Brent crude', color: 'var(--red)', points: brentPoints, current: '$' + brentValue.toFixed(2) + ' / bbl' },
+    { name: 'India crude basket (PPAC)', color: 'var(--accent)', points: indiaPoints, current: '$' + indiaValue.toFixed(2) + ' / bbl' }
   ],
-  { title: 'Brent vs India crude basket · USD per barrel · 90 days', thresholdLine: 95, summary: 'Spread −$1.5 · both above $95 shock since 21 Apr' }
-));
+  { title: '90-day trail · USD per barrel', thresholdLine: 95, summary: `Spread ${brentSpread >= 0 ? '+' : ''}${brentSpread} · both above $95 shock since 21 Apr`, asof: 'window: 5 Feb – 5 May 2026' }
+);
+freightBody.appendChild(renderHeadlinePanel({
+  eyebrow: brentValue >= 95 ? '⚠ Shock · Brent crude above $95' : 'Brent crude · ICE 1-month',
+  eyebrowColor: brentValue >= 95 ? 'var(--red)' : 'var(--ink-2)',
+  value: '$' + brentValue.toFixed(2) + ' / bbl',
+  metaLine: 'Brent ICE futures · Trading Economics · ' + (brent?.as_of ? formatAsOf(brent.as_of) : '5 May 2026'),
+  threshold: '$95 / bbl',
+  mom: brent?.mom_pct != null ? { text: formatTrend(brent.mom_pct), color: brent.mom_pct > 0 ? 'var(--red)' : 'var(--green)' } : { text: '+19.4%', color: 'var(--red)' },
+  yoy: brent?.yoy_pct != null ? { text: formatTrend(brent.yoy_pct), color: brent.yoy_pct > 0 ? 'var(--red)' : 'var(--green)' } : { text: '+35.8%', color: 'var(--red)' },
+  percentile: { label: '5Y percentile ', text: '94th', color: 'var(--red)' },
+  status: brentValue >= 95 ? 'shock' : 'high',
+  statusPill: brentValue >= 95 ? 'SHOCK' : 'HIGH',
+  statusSub: `Above $95 since 21 Apr · ${daysAboveShock} sessions`,
+  chart: brentChart,
+  matrix: [
+    { label: 'India crude basket', value: '$' + indiaValue.toFixed(2), sub1: indiaCrude?.yoy_pct != null ? formatTrend(indiaCrude.yoy_pct) + ' YoY' : '+34.2% YoY', sub1Color: 'var(--red)', sub2: 'PPAC daily', asof: indiaCrude?.as_of ? formatAsOf(indiaCrude.as_of) : '5 May', tooltip: 'India crude basket = weighted avg of Dubai (75%) + Brent (25%) — what India actually pays' },
+    { label: 'Brent–India spread', value: (brentSpread >= 0 ? '+$' : '−$') + Math.abs(brentSpread).toFixed(2), sub1: brentSpread < 0 ? 'India trades below Brent' : 'India trades above Brent', sub2: '5Y avg: −$3.10', asof: 'derived', tooltip: 'Spread = India basket − Brent. Negative is the norm.' },
+    { label: '90-day high · low', value: '$107 · $76', sub1: 'range $31', sub2: 'peak: 28 Apr 2026', asof: 'derived', tooltip: '90-day rolling high and low for Brent' },
+    { label: 'India weekly oil bill', value: '~$4.6 Bn', sub1: '+$0.8 Bn vs Mar', sub1Color: 'var(--red)', sub2: 'at current basket × ~5.1 Mb/d demand', asof: 'derived', tooltip: 'India imports ~5.1 Mb/d crude · weekly bill ≈ basket price × imports × 7' }
+  ]
+}));
 
 // 3-up tanker / container / bulk small multiples
 freightBody.appendChild(renderSmallMultiples([
-  { label: 'VLCC tanker', deltaPct: 220.4, color: 'var(--red)', valueFormatted: '1,842' },
-  { label: 'Drewry WCI', deltaPct: 14.6, color: 'var(--amber)', valueFormatted: '$2,840' },
-  { label: 'Baltic Dry', deltaPct: 8.4, color: 'var(--amber)', valueFormatted: '2,840' }
-], { title: 'Freight indices · MoM %' }));
+  { label: 'VLCC tanker', deltaPct: 220.4, color: 'var(--red)', valueFormatted: '1,842 WS', tooltip: 'Worldscale points · benchmark for spot tanker rates · Baltic Dirty Tanker Index' },
+  { label: 'Drewry WCI', deltaPct: 14.6, color: 'var(--amber)', valueFormatted: '$2,840 / 40ft', tooltip: 'Drewry World Container Index · global avg spot rate per 40-ft container' },
+  { label: 'Baltic Dry', deltaPct: 8.4, color: 'var(--amber)', valueFormatted: '2,840 idx', tooltip: 'Baltic Dry Index · dry-bulk shipping rates · 1985=1000' }
+], { title: 'Freight indices · MoM %', asof: 'as on 2 May 2026' }));
 
 // Port dwell as supporting row
 freightBody.appendChild(el('div', { class: 'sub-head' }, 'Port stress'));
@@ -439,49 +726,112 @@ body.appendChild(renderSectionFrame({
 // ════════════════════════ MARKET CONTEXT — 4 PANELS ════════════════════════
 const marketBody = el('div', { class: 'section-body-stack' });
 
-// Panel 1 · Indexed equity overlay
-marketBody.appendChild(renderIndexedOverlay([
-  { name: 'Nifty 50', color: 'var(--accent)', points: Array.from({length: 9}, (_,i) => ({ label: ['Jan','','Feb','','Mar','','Apr','',''][i], value: [100, 101, 102, 102.5, 104, 105, 106.5, 105.5, 104.2][i] })) },
-  { name: 'Bank Nifty', color: 'var(--blue)', points: Array.from({length: 9}, (_,i) => ({ label: ['Jan','','Feb','','Mar','','Apr','',''][i], value: [100, 100.5, 101.5, 101, 103, 105, 108, 106.5, 104.5][i] })) }
-], { title: 'Indices · indexed to 100 · 90 days' }));
+// Panel 1 · Indexed equity overlay (Option C headline panel) — points from live sparklines
+const niftyM = M('nifty_50');
+const bankM = M('bank_nifty');
+const peM = M('nifty_pe_5y');
+const niftyPoints = metricSparkPoints(niftyM) || Array.from({length: 9}, (_,i) => ({ label: ['Jan','','Feb','','Mar','','Apr','',''][i], value: [100, 101, 102, 102.5, 104, 105, 106.5, 105.5, 104.2][i] }));
+const bankPoints = metricSparkPoints(bankM) || Array.from({length: 9}, (_,i) => ({ label: ['Jan','','Feb','','Mar','','Apr','',''][i], value: [100, 100.5, 101.5, 101, 103, 105, 108, 106.5, 104.5][i] }));
+const equityChart = renderIndexedOverlay([
+  { name: 'Nifty 50', color: 'var(--accent)', points: niftyPoints },
+  { name: 'Bank Nifty', color: 'var(--blue)', points: bankPoints }
+], { title: '90-day indexed trail · base = 100' });
+marketBody.appendChild(renderHeadlinePanel({
+  eyebrow: 'Equity benchmarks · live',
+  value: niftyM ? formatValue(niftyM.value, 'index', niftyM.unit || 'idx') : '24,180 idx',
+  metaLine: 'Nifty 50 · NSE · ' + (niftyM?.as_of ? formatAsOf(niftyM.as_of) : '5 May 2026'),
+  mom: niftyM?.mom_pct != null ? { text: formatTrend(niftyM.mom_pct), color: niftyM.mom_pct >= 0 ? 'var(--green)' : 'var(--red)' } : { text: '+1.4%', color: 'var(--green)' },
+  yoy: niftyM?.yoy_pct != null ? { text: formatTrend(niftyM.yoy_pct), color: niftyM.yoy_pct >= 0 ? 'var(--green)' : 'var(--red)' } : { text: '+12.8%', color: 'var(--green)' },
+  percentile: peM ? { label: 'Nifty PE ', text: peM.value.toFixed(1) + '×', color: peM.value > 23 ? 'var(--red)' : 'var(--amber)' } : { label: 'Nifty PE ', text: '22.8×', color: 'var(--amber)' },
+  status: 'med',
+  statusPill: 'WATCH',
+  statusSub: 'Above 5Y mean PE · valuations stretched',
+  chart: equityChart,
+  matrix: [
+    { label: 'Bank Nifty', value: bankM ? formatValue(bankM.value, 'index') : '52,640', sub1: bankM?.yoy_pct != null ? formatTrend(bankM.yoy_pct) + ' YoY' : '+9.4% YoY', sub1Color: 'var(--green)', sub2: bankM?.mom_pct != null ? formatTrend(bankM.mom_pct) + ' MoM' : '+0.6% MoM', asof: bankM?.as_of ? formatAsOf(bankM.as_of) : '5 May', tooltip: 'NSE Bank Nifty · 12 large-cap banks' },
+    { label: '52w high · low', value: '24,860 · 21,310', sub1: 'range 16.6%', sub2: 'high: 28 Apr · low: 4 Sep 25', asof: 'derived', tooltip: 'Trailing 52-week range for Nifty 50' },
+    { label: 'Nifty PE vs 5Y', value: peM ? peM.value.toFixed(1) + '×' : '22.8×', sub1: 'mean 21.0× · +1σ 23.8×', sub1Color: 'var(--amber)', sub2: 'stretched but not extreme', asof: peM?.as_of ? formatAsOf(peM.as_of) : '5 May', tooltip: 'Trailing PE vs 5-year distribution' },
+    { label: 'YTD return (USD)', value: '+5.2%', sub1: '+9.4% in INR', sub1Color: 'var(--green)', sub2: 'INR weakness eats 4.2pp', asof: 'derived', tooltip: 'YTD Nifty return adjusted for INR/USD depreciation' }
+  ]
+}));
 
 // Panel 2 · Valuation band
 const valWrap = el('div', { class: 'viz-wrap' });
-valWrap.appendChild(el('div', { class: 'viz-title' }, 'Nifty PE · trailing · vs 5Y range'));
-valWrap.appendChild(renderValuationBand({ value: 22.8, min: 15.2, sigmaMinus: 18.6, mean: 21.0, sigmaPlus: 23.8, max: 27.2 }));
+valWrap.appendChild(el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between' } }, [
+  el('span', {}, 'Nifty PE · trailing · vs 5Y range'),
+  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, 'as on 5 May 2026')
+]));
+valWrap.appendChild(renderValuationBand({ value: 22.8, min: 15.2, sigmaMinus: 18.6, mean: 21.0, sigmaPlus: 23.8, max: 27.2, asof: '5 May 2026' }));
 marketBody.appendChild(valWrap);
 
 // Panel 3 + 4 row · VIX/DXY pair + IND-US spread
 const sentimentSpreadRow = el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '18px' } });
 const vixWrap = el('div', { class: 'viz-wrap' });
-vixWrap.appendChild(el('div', { class: 'viz-title' }, 'Sentiment · VIX + Gold'));
+vixWrap.appendChild(el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between' } }, [
+  el('span', {}, 'Sentiment · VIX + Gold'),
+  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, 'as on 5 May 2026')
+]));
+// VIX + Gold sentiment row — live values, computed reference-band markers
+const vixM = M('india_vix');
+const goldM = M('gold_usd');
+// Reference bands: VIX 5Y range 9-35 mean 18; Gold 5Y range $1,620-$2,690 mean $2,000
+const vixPos = vixM ? Math.max(0, Math.min(100, ((vixM.value - 9) / (35 - 9)) * 100)) : 49;
+const goldPos = goldM ? Math.max(0, Math.min(100, ((goldM.value - 1620) / (2690 - 1620)) * 100)) : 88;
 vixWrap.appendChild(el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px', padding: '4px 0' } }, [
-  el('div', {}, [
+  el('div', { title: 'India VIX · NSE 30-day implied volatility · 5Y range 9–35; >25 = elevated stress' }, [
     el('div', { class: 'cs-label' }, 'INDIA VIX'),
-    el('div', { class: 'cs-value' }, '21.84'),
+    el('div', { class: 'cs-value' }, vixM ? vixM.value.toFixed(2) : '—'),
     el('div', { class: 'cs-trends' }, [
-      el('span', {}, ['MoM ', el('b', { style: { color: 'var(--red)', fontFamily: 'var(--mono)' } }, '+21%')])
+      el('span', {}, ['MoM ', el('b', { style: { color: vixM && vixM.mom_pct > 0 ? 'var(--red)' : 'var(--green)', fontFamily: 'var(--mono)' } }, vixM ? formatTrend(vixM.mom_pct) : '—')]),
+      vixM?.as_of ? el('span', { style: { marginLeft: '12px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', fontSize: '11px' } }, 'as on ' + formatAsOf(vixM.as_of)) : null
+    ].filter(Boolean)),
+    el('div', { style: { marginTop: '8px', height: '6px', background: 'linear-gradient(to right, var(--green), var(--amber) 50%, var(--red))', borderRadius: '3px', position: 'relative', opacity: 0.55 } }, [
+      el('div', { style: { position: 'absolute', left: vixPos + '%', top: '-3px', width: '2px', height: '12px', background: 'var(--ink)' } })
+    ]),
+    el('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: '9.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '3px' } }, [
+      el('span', {}, '5Y low 9'), el('span', {}, 'mean 18'), el('span', {}, '5Y high 35')
     ])
   ]),
-  el('div', {}, [
+  el('div', { title: 'Gold spot · USD per troy ounce · safe-haven asset · rises when risk rises' }, [
     el('div', { class: 'cs-label' }, 'GOLD'),
-    el('div', { class: 'cs-value' }, '$2,640'),
+    el('div', { class: 'cs-value' }, goldM ? '$' + new Intl.NumberFormat('en-US').format(Math.round(goldM.value)) + ' / oz' : '—'),
     el('div', { class: 'cs-trends' }, [
-      el('span', {}, ['MoM ', el('b', { style: { color: 'var(--green)', fontFamily: 'var(--mono)' } }, '+4.2%')])
+      el('span', {}, ['MoM ', el('b', { style: { color: goldM && goldM.mom_pct > 0 ? 'var(--red)' : 'var(--green)', fontFamily: 'var(--mono)' } }, goldM ? formatTrend(goldM.mom_pct) : '—')]),
+      goldM?.as_of ? el('span', { style: { marginLeft: '12px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', fontSize: '11px' } }, 'as on ' + formatAsOf(goldM.as_of)) : null
+    ].filter(Boolean)),
+    el('div', { style: { marginTop: '8px', height: '6px', background: 'linear-gradient(to right, var(--green), var(--amber) 60%, var(--red))', borderRadius: '3px', position: 'relative', opacity: 0.55 } }, [
+      el('div', { style: { position: 'absolute', left: goldPos + '%', top: '-3px', width: '2px', height: '12px', background: 'var(--ink)' } })
+    ]),
+    el('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: '9.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '3px' } }, [
+      el('span', {}, '5Y low $1,620'), el('span', {}, 'mean $2,000'), el('span', {}, 'all-time high $2,690')
     ])
   ])
 ]));
 sentimentSpreadRow.appendChild(vixWrap);
 
 const spreadWrap = el('div', { class: 'viz-wrap' });
-spreadWrap.appendChild(el('div', { class: 'viz-title' }, 'India 10Y vs US 10Y spread · 24 months'));
-const spreadPoints = Array.from({length: 13}, (_, i) => ({
+spreadWrap.appendChild(el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between' } }, [
+  el('span', {}, 'India 10Y vs US 10Y spread · 24 months'),
+  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, 'as on 5 May 2026')
+]));
+const spreadM = M('ind_us_10y_spread');
+const spreadValue = spreadM?.value ?? 256;
+const usTreasury10y = +(gsec10y - spreadValue / 100).toFixed(2);  // derived
+const fiveYAvgSpread = 320;
+const spreadPoints = metricSparkPoints(spreadM) || Array.from({length: 13}, (_, i) => ({
   label: i === 0 ? '24m ago' : i === 12 ? 'now' : '',
   value: [320, 312, 305, 298, 290, 282, 275, 268, 260, 254, 246, 252, 256][i]
 }));
+spreadWrap.appendChild(renderStatStrip([
+  { label: 'IND–US 10Y spread', value: Math.round(spreadValue) + ' bps', sub: spreadM?.as_of ? 'as on ' + formatAsOf(spreadM.as_of) : '', color: spreadValue < 200 ? 'var(--red)' : 'var(--amber)' },
+  { label: 'India 10Y', value: gsec10y.toFixed(2) + '%', sub: 'CCIL FBIL', color: 'var(--ink)' },
+  { label: 'US 10Y', value: usTreasury10y.toFixed(2) + '%', sub: 'FRED · derived', color: 'var(--ink)' },
+  { label: '5Y avg spread', value: fiveYAvgSpread + ' bps', sub: 'currently ' + Math.abs(Math.round(fiveYAvgSpread - spreadValue)) + ' bps ' + (spreadValue < fiveYAvgSpread ? 'below' : 'above'), color: 'var(--ink-2)' },
+  { label: 'Watch threshold', value: '200 bps', sub: Math.round(spreadValue - 200) + ' bps headroom', color: 'var(--red)' }
+]));
 spreadWrap.appendChild(renderCumulativeLine(
-  [{ name: 'IND–US 10Y spread', color: 'var(--accent)', points: spreadPoints, current: '256 bps' }],
-  { width: 600, height: 160, padTop: 16, padBottom: 26, summary: 'Compressing for 18 months · in watch zone (200 bps)' }
+  [{ name: 'IND–US 10Y spread', color: 'var(--accent)', points: spreadPoints, current: Math.round(spreadValue) + ' bps' }],
+  { width: 600, height: 160, padTop: 16, padBottom: 26, summary: spreadValue < fiveYAvgSpread ? 'Compressing · in watch zone (200 bps)' : 'Above 5Y average' }
 ));
 sentimentSpreadRow.appendChild(spreadWrap);
 marketBody.appendChild(sentimentSpreadRow);

@@ -9,20 +9,51 @@
   "value_format": "integer",
   "as_of": "2026-04-05T11:00:00+05:30",
   "as_of_period": "monthly",
-  "mom_pct": 0.8,
-  "yoy_pct": 4.2,
+  "mom_pct": null,
+  "yoy_pct": null,
   "vs_5y_avg_pct": 18.4,
-  "sparkline_12m": [2710, 2725, 2740, 2755, 2770, 2785, 2795, 2805, 2815, 2820, 2818, 2840],
+  "sparkline_12m": [
+    2710,
+    2725,
+    2740,
+    2755,
+    2770,
+    2785,
+    2795,
+    2805,
+    2815,
+    2820,
+    2818,
+    2840
+  ],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "neutral",
-  "source_primary": { "name": "Naukri.com monthly report", "url": "https://www.naukri.com/jobspeak", "type": "Public", "frequency": "Monthly", "parser": "press_release:naukri_v1" },
+  "source_primary": {
+    "name": "Naukri.com monthly report",
+    "url": "https://www.naukri.com/jobspeak",
+    "type": "Public",
+    "frequency": "Monthly",
+    "parser": "press_release:naukri_v1"
+  },
   "source_crosscheck": [
-    { "name": "Monster Employment Index", "url": "https://www.monsterindia.com/", "type": "Public" },
-    { "name": "LinkedIn India workforce report", "url": "https://www.linkedin.com/news/topic/india-workforce/", "type": "Public" }
+    {
+      "name": "Monster Employment Index",
+      "url": "https://www.monsterindia.com/",
+      "type": "Public"
+    },
+    {
+      "name": "LinkedIn India workforce report",
+      "url": "https://www.linkedin.com/news/topic/india-workforce/",
+      "type": "Public"
+    }
   ],
   "verification_state": "verified",
   "last_verified_at": "2026-04-05T12:00:00+05:30",
   "why_it_matters": "White-collar hiring momentum. Leading indicator for urban discretionary spend. IT + BFSI sub-indices most informative (drawer).",
-  "linked_metrics": ["auto_pv", "upi_value", "air_pax"]
+  "linked_metrics": [
+    "auto_pv",
+    "upi_value",
+    "air_pax"
+  ]
 }

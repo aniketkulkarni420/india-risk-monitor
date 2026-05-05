@@ -22,6 +22,16 @@ function statusColor(status) {
   return { low: 'var(--green)', med: 'var(--amber)', high: 'var(--red)', shock: 'var(--red)' }[status] || 'var(--ink-3)';
 }
 
+// Title row with optional inline "as on …" stamp on the right.
+// Used by every chart helper so as-of is consistently rendered.
+function vizTitleEl(title, asof) {
+  if (!asof) return el('div', { class: 'viz-title' }, title);
+  return el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' } }, [
+    el('span', {}, title),
+    el('span', { class: 'viz-asof', style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0, fontFamily: 'var(--mono)' } }, asof)
+  ]);
+}
+
 // ──────────────────────────────────────────────────────────────
 // renderDriverBars · used by Hero vital signs + Sector drilldown
 // items: [{ label, value, max, status, delta? }]  (sorted by value desc)
@@ -54,29 +64,36 @@ export function renderDriverBars(items, opts = {}) {
 // ──────────────────────────────────────────────────────────────
 // renderHorizonCard · Flows 4-card row
 // ──────────────────────────────────────────────────────────────
-export function renderHorizonCard(label, net, sub, fii, dii) {
+export function renderHorizonCard(label, net, sub, fii, dii, opts = {}) {
   const netColor = net > 0 ? 'var(--green)' : net < 0 ? 'var(--red)' : 'var(--amber)';
+  const suf = opts.suffix ? ' ' + opts.suffix : '';
+  const fmt = (n) => new Intl.NumberFormat('en-IN').format(Math.round(n));
   return el('div', { class: 'horizon-card' }, [
     el('div', { class: 'hc-label' }, label),
-    el('div', { class: 'hc-value', style: { color: netColor } }, (net > 0 ? '+' : '') + new Intl.NumberFormat('en-IN').format(Math.round(net))),
+    el('div', { class: 'hc-value', style: { color: netColor } }, (net > 0 ? '+' : '') + fmt(net) + suf),
     el('div', { class: 'hc-sub' }, sub),
     el('div', { class: 'hc-split' }, [
-      el('span', { style: { color: 'var(--red)', fontFamily: 'var(--mono)' } }, `FII ${fii > 0 ? '+' : ''}${new Intl.NumberFormat('en-IN').format(Math.round(fii))}`),
-      el('span', { style: { color: 'var(--green)', fontFamily: 'var(--mono)' } }, `DII ${dii > 0 ? '+' : ''}${new Intl.NumberFormat('en-IN').format(Math.round(dii))}`)
-    ])
-  ]);
+      el('span', { style: { color: 'var(--red)', fontFamily: 'var(--mono)' } }, `FII ${fii > 0 ? '+' : ''}${fmt(fii)}${suf}`),
+      el('span', { style: { color: 'var(--green)', fontFamily: 'var(--mono)' } }, `DII ${dii > 0 ? '+' : ''}${fmt(dii)}${suf}`)
+    ]),
+    opts.asof ? el('div', { class: 'hc-asof', style: { fontSize: '10px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '8px', borderTop: '1px dashed var(--line-2)', paddingTop: '6px' } }, 'as on ' + opts.asof) : null
+  ].filter(Boolean));
 }
 
 // ──────────────────────────────────────────────────────────────
 // renderRegimeBanner · Flows lens 1
 // ──────────────────────────────────────────────────────────────
-export function renderRegimeBanner({ regime, description, hint, status, persistence }) {
+export function renderRegimeBanner({ regime, description, hint, status, persistence, glossary, asof }) {
   return el('div', { class: 'regime-banner' }, [
-    el('div', { class: 'rb-label' }, regime),
+    el('div', { class: 'rb-label' }, [
+      regime,
+      glossary ? el('span', { title: glossary, style: { marginLeft: '6px', cursor: 'help', color: 'var(--ink-3)', fontSize: '11px', border: '1px solid var(--line-2)', borderRadius: '50%', width: '14px', height: '14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', verticalAlign: 'middle', fontFamily: 'var(--mono)' } }, '?') : null
+    ].filter(Boolean)),
     el('div', { class: 'rb-body' }, [
       el('div', { class: 'rb-desc' }, description),
-      el('div', { class: 'rb-hint' }, hint)
-    ]),
+      el('div', { class: 'rb-hint' }, hint),
+      asof ? el('div', { style: { fontSize: '10px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '6px' } }, 'as on ' + asof) : null
+    ].filter(Boolean)),
     el('div', { class: 'rb-status' }, [
       el('span', { class: 'pill ' + statusClass(status) }, persistence ? `STABLE · ${persistence} sess` : status.toUpperCase())
     ])
@@ -140,7 +157,7 @@ export function renderCumulativeLine(series, opts = {}) {
   }
 
   const wrap = el('div', { class: 'viz-wrap' });
-  if (title) wrap.appendChild(el('div', { class: 'viz-title' }, title));
+  if (title) wrap.appendChild(vizTitleEl(title, opts.asof));
   wrap.appendChild(svg);
 
   // Legend
@@ -184,7 +201,7 @@ export function renderDivergingBars({ sells = [], buys = [] }, opts = {}) {
   ]));
 
   const wrap = el('div', { class: 'viz-wrap' });
-  if (title) wrap.appendChild(el('div', { class: 'viz-title' }, title));
+  if (title) wrap.appendChild(vizTitleEl(title, opts.asof));
   wrap.appendChild(el('div', { class: 'div-bars-grid' }, [
     el('div', {}, [
       el('div', { class: 'div-bars-head sell' }, 'SELLING'),
@@ -203,7 +220,7 @@ export function renderDivergingBars({ sells = [], buys = [] }, opts = {}) {
 // today/lastWeek: [{ tenor: '1Y'|'5Y'|'10Y', value: number }]
 // ──────────────────────────────────────────────────────────────
 export function renderYieldCurve(today, lastWeek, opts = {}) {
-  const { width = 480, height = 200, title = 'G-sec curve · today vs last week' } = opts;
+  const { width = 480, height = 200, title = 'G-sec curve · today vs last week', asof } = opts;
   const padTop = 50, padBottom = 30, padLeft = 60, padRight = 40;
   const innerW = width - padLeft - padRight;
   const innerH = height - padTop - padBottom;
@@ -245,7 +262,7 @@ export function renderYieldCurve(today, lastWeek, opts = {}) {
   });
 
   const wrap = el('div', { class: 'viz-wrap' });
-  if (title) wrap.appendChild(el('div', { class: 'viz-title' }, title));
+  if (title) wrap.appendChild(vizTitleEl(title, opts.asof));
   wrap.appendChild(svg);
 
   const slope = today[today.length - 1].value - today[0].value;
@@ -268,7 +285,7 @@ export function renderYieldCurve(today, lastWeek, opts = {}) {
 // items: [{ label, value }]; target: number
 // ──────────────────────────────────────────────────────────────
 export function renderInflationBars(items, target, opts = {}) {
-  const { width = 360, height = 200, title = 'Inflation · % YoY' } = opts;
+  const { width = 360, height = 200, title = 'Inflation · % YoY', asof } = opts;
   const padTop = 40, padBottom = 40, padLeft = 40, padRight = 20;
   const innerW = width - padLeft - padRight;
   const innerH = height - padTop - padBottom;
@@ -293,21 +310,49 @@ export function renderInflationBars(items, target, opts = {}) {
   const targetY = yScale(target);
   svg.appendChild(svgEl('line', { x1: padLeft, y1: targetY, x2: width - padRight, y2: targetY, stroke: 'var(--accent)', 'stroke-dasharray': '3,4', 'stroke-width': 1.5 }));
 
-  // Bars
+  // Bars + value labels
+  // Value labels sit above the bar by default. If they would collide with the
+  // dashed target line, render them inside the bar (below bar top) so the
+  // dashed line never cuts through a number.
+  const COLLIDE_PX = 12;
   items.forEach((item, i) => {
     const x = padLeft + i * slotW + (slotW - barW) / 2;
     const y = yScale(item.value);
     const h = padTop + innerH - y;
     const fillColor = item.value > target ? 'var(--red)' : 'var(--green)';
-    svg.appendChild(svgEl('rect', { x, y, width: barW, height: h, fill: fillColor, opacity: 0.78 }));
-    const valLabel = svgEl('text', { x: x + barW / 2, y: y - 8, fill: fillColor, 'font-family': 'JetBrains Mono', 'font-size': 11, 'text-anchor': 'middle', 'font-weight': 600 });
-    valLabel.textContent = item.value.toFixed(2); svg.appendChild(valLabel);
+    svg.appendChild(svgEl('rect', { x, y, width: barW, height: h, fill: fillColor, opacity: 0.85 }));
+
+    // Decide label position based on dashed-target proximity.
+    let labelY = y - 8;            // default: above bar
+    let labelFill = fillColor;
+    let labelInside = false;
+    if (Math.abs(labelY - targetY) < COLLIDE_PX) {
+      // Collision: place label inside the bar, top edge, in white-ish
+      labelY = y + 14;
+      labelFill = '#0a0d12';       // dark bg colour reads on a coloured bar
+      labelInside = true;
+      // Only render inside the bar if the bar is tall enough; otherwise fall back below the dashed line
+      if (h < 22) {
+        labelY = targetY + 16;
+        labelFill = fillColor;
+        labelInside = false;
+      }
+    }
+    const valLabel = svgEl('text', {
+      x: x + barW / 2, y: labelY,
+      fill: labelFill,
+      'font-family': 'JetBrains Mono', 'font-size': 11,
+      'text-anchor': 'middle', 'font-weight': 700
+    });
+    valLabel.textContent = item.value.toFixed(2);
+    svg.appendChild(valLabel);
+
     const xLbl = svgEl('text', { x: x + barW / 2, y: height - 12, fill: 'var(--ink-2)', 'font-family': 'Manrope', 'font-size': 11, 'text-anchor': 'middle' });
     xLbl.textContent = item.label; svg.appendChild(xLbl);
   });
 
   const wrap = el('div', { class: 'viz-wrap' });
-  if (title) wrap.appendChild(el('div', { class: 'viz-title' }, title));
+  if (title) wrap.appendChild(vizTitleEl(title, opts.asof));
   wrap.appendChild(svg);
   wrap.appendChild(el('div', { class: 'viz-legend-row' }, [
     el('span', { class: 'viz-legend-item' }, [
@@ -326,9 +371,10 @@ export function renderInflationBars(items, target, opts = {}) {
 export function renderCurrencyStrip(items) {
   return el('div', { class: 'currency-strip' }, items.map(item => {
     const dir = item.trend_direction || 'neutral';
-    return el('div', { class: 'cs-cell' }, [
+    return el('div', { class: 'cs-cell', title: item.tooltip || '' }, [
       el('div', { class: 'cs-label' }, item.label),
       el('div', { class: 'cs-value' }, item.value),
+      item.asof ? el('div', { style: { fontSize: '10px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '2px' } }, 'as on ' + item.asof) : null,
       el('div', { class: 'cs-spark' }, [renderSparkline({
         data: item.sparkline, width: 120, height: 32, fill: false, trend_direction: dir
       })]),
@@ -442,7 +488,7 @@ export function renderPairedLine(series, opts = {}) {
   }
 
   const wrap = el('div', { class: 'viz-wrap' });
-  if (title) wrap.appendChild(el('div', { class: 'viz-title' }, title));
+  if (title) wrap.appendChild(vizTitleEl(title, opts.asof));
   wrap.appendChild(svg);
   const legend = el('div', { class: 'viz-legend-row' });
   for (const s of series) {
@@ -464,7 +510,7 @@ export function renderSmallMultiples(items, opts = {}) {
   const { showBars = true, title } = opts;
   const maxAbs = Math.max(...items.map(i => Math.abs(i.deltaPct || 0)), 1);
   const wrap = el('div', { class: 'viz-wrap' });
-  if (title) wrap.appendChild(el('div', { class: 'viz-title' }, title));
+  if (title) wrap.appendChild(vizTitleEl(title, opts.asof));
   wrap.appendChild(el('div', { class: 'small-multiples-grid', style: { gridTemplateColumns: `repeat(${items.length}, 1fr)` } },
     items.map(item => {
       const cells = [
@@ -479,7 +525,8 @@ export function renderSmallMultiples(items, opts = {}) {
       }
       cells.push(el('div', { class: 'sm-label' }, item.label));
       if (item.valueFormatted) cells.push(el('div', { class: 'sm-units' }, item.valueFormatted));
-      return el('div', { class: 'sm-cell' }, cells);
+      if (item.asof) cells.push(el('div', { style: { fontSize: '9.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '4px' } }, 'as on ' + item.asof));
+      return el('div', { class: 'sm-cell', title: item.tooltip || '' }, cells);
     })
   ));
   if (opts.summary) wrap.appendChild(el('div', { class: 'viz-legend-row' }, [
@@ -536,7 +583,7 @@ export function renderIndexedOverlay(series, opts = {}) {
   }
 
   const wrap = el('div', { class: 'viz-wrap' });
-  if (title) wrap.appendChild(el('div', { class: 'viz-title' }, title));
+  if (title) wrap.appendChild(vizTitleEl(title, opts.asof));
   wrap.appendChild(svg);
   const legend = el('div', { class: 'viz-legend-row' });
   for (const s of indexed) {
@@ -555,7 +602,7 @@ export function renderIndexedOverlay(series, opts = {}) {
 // ──────────────────────────────────────────────────────────────
 // renderValuationBand · Nifty PE vs 5Y avg
 // ──────────────────────────────────────────────────────────────
-export function renderValuationBand({ value, min, sigmaMinus, mean, sigmaPlus, max, label = 'NIFTY PE TRAILING' }) {
+export function renderValuationBand({ value, min, sigmaMinus, mean, sigmaPlus, max, label = 'NIFTY PE TRAILING', asof }) {
   const range = max - min || 1;
   const pct = (v) => ((v - min) / range) * 100;
   return el('div', { class: 'valuation-band' }, [
@@ -580,8 +627,9 @@ export function renderValuationBand({ value, min, sigmaMinus, mean, sigmaPlus, m
       el('span', {}, `${mean.toFixed(1)} mean`),
       el('span', {}, `+1σ ${sigmaPlus.toFixed(1)}`),
       el('span', {}, `${max.toFixed(1)} max`)
-    ])
-  ]);
+    ]),
+    asof ? el('div', { style: { fontSize: '10px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '8px', textAlign: 'right' } }, 'as on ' + asof) : null
+  ].filter(Boolean));
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -615,6 +663,132 @@ export function renderPercentileStrip({ dist, percentile, valueLabel, lowLabel, 
   const wrap = el('div', { class: 'viz-wrap' });
   wrap.appendChild(svg);
   if (summary) wrap.appendChild(el('div', { style: { fontSize: '11.5px', color: 'var(--ink-3)', marginTop: '6px' } }, summary));
+  return wrap;
+}
+
+// ──────────────────────────────────────────────────────────────
+// renderSeasonalityStrip · paired-bar 12-month chart, current vs prior 12m
+// Used in Real Economy cluster expansions (Option 1 placement) to show
+// whether a metric's reading is structural growth or just seasonal rhythm.
+// curr / prior: arrays of 12 numeric values, oldest → newest, ending at as_of
+// labels: array of 12 month names (e.g. ['May','Jun', ...]) — caller-provided
+// ──────────────────────────────────────────────────────────────
+export function renderSeasonalityStrip({ curr, prior, labels, title, asof, summary, valueFormatter }) {
+  const max = Math.max(...curr, ...prior, 1);
+  const fmt = valueFormatter || ((v) => v.toFixed(1));
+  const wrap = el('div', { class: 'viz-wrap', style: { background: '#0e1218', border: '1px solid var(--line)', borderRadius: '6px', padding: '14px 16px', marginTop: '14px' } });
+  wrap.appendChild(vizTitleEl(title || 'Seasonality · current 12m vs prior 12m', asof));
+  const grid = el('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '4px', marginTop: '10px' } });
+  for (let i = 0; i < 12; i++) {
+    const cH = (curr[i] / max) * 70;
+    const pH = (prior[i] / max) * 70;
+    const month = el('div', { style: { textAlign: 'center' } }, [
+      el('div', { style: { display: 'flex', justifyContent: 'center', gap: '2px', alignItems: 'flex-end', height: '70px', marginBottom: '6px' }, title: `${labels[i]}: prior ${fmt(prior[i])} · current ${fmt(curr[i])}` }, [
+        el('div', { style: { width: '8px', height: pH + 'px', background: 'var(--ink-3)', borderRadius: '2px 2px 0 0' } }),
+        el('div', { style: { width: '8px', height: cH + 'px', background: 'var(--accent)', borderRadius: '2px 2px 0 0' } })
+      ]),
+      el('div', { style: { fontSize: '9.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)' } }, labels[i])
+    ]);
+    grid.appendChild(month);
+  }
+  wrap.appendChild(grid);
+  // Above-prior count
+  const above = curr.reduce((n, v, i) => n + (v > prior[i] ? 1 : 0), 0);
+  const lege = el('div', { class: 'viz-legend-row', style: { marginTop: '10px' } }, [
+    el('span', { class: 'viz-legend-item' }, [el('span', { class: 'viz-swatch', style: { background: 'var(--accent)' } }), 'last 12m']),
+    el('span', { class: 'viz-legend-item' }, [el('span', { class: 'viz-swatch', style: { background: 'var(--ink-3)' } }), 'prior 12m']),
+    el('span', { style: { marginLeft: 'auto', color: 'var(--ink-2)' } },
+      summary || `Above prior in ${above} of 12 — ${above >= 9 ? 'structural growth' : above >= 6 ? 'mostly above trend' : above >= 3 ? 'mixed' : 'below trend'}.`)
+  ]);
+  wrap.appendChild(lege);
+  return wrap;
+}
+
+// ──────────────────────────────────────────────────────────────
+// renderStatStrip · Option A · 5-cell horizontal stats above a chart
+// items: [{ label, value, sub, color }] — caller picks 3-5 cells
+// Designed to sit directly above an existing viz; collapses on small screens.
+// ──────────────────────────────────────────────────────────────
+export function renderStatStrip(items, opts = {}) {
+  const cells = items.map(it => el('div', { class: 'stat-cell' }, [
+    el('div', { class: 'stat-label' }, it.label),
+    el('div', { class: 'stat-value', style: { color: it.color || 'var(--ink)' } }, it.value),
+    it.sub ? el('div', { class: 'stat-sub' }, it.sub) : null
+  ].filter(Boolean)));
+  return el('div', { class: 'stat-strip', style: { gridTemplateColumns: `repeat(${items.length}, 1fr)` } }, cells);
+}
+
+// ──────────────────────────────────────────────────────────────
+// renderHeadlinePanel · Option C · Hormuz-style header + 4-cell matrix
+// Used for shock-eligible / driver panels (Brent, Indexed Equity, Oil & physical).
+//
+// Shape:
+//   [eyebrow line]
+//   [BIG VALUE]                          [STATUS PILL]
+//   [meta line · threshold]              [meta sub]
+//   [MoM | YoY | percentile inline]
+//   [optional chart]
+//   [4-cell sub-metrics matrix]
+// ──────────────────────────────────────────────────────────────
+export function renderHeadlinePanel({
+  eyebrow, value, metaLine, threshold, mom, yoy, percentile,
+  statusPill, statusSub, status,
+  chart, chartTitle, chartAsof,
+  matrix, asof, eyebrowColor
+}) {
+  // Header card — alarming red bg if shock, neutral panel-2 otherwise
+  const isShock = status === 'shock';
+  const headerStyle = isShock
+    ? { background: 'rgba(58,28,28,0.55)', border: '1px solid rgba(120,40,40,0.6)' }
+    : { background: 'var(--panel-2)', border: '1px solid var(--line)' };
+
+  const trendsLine = el('div', { class: 'hp-trends', style: { display: 'flex', gap: '18px', marginTop: '10px', fontSize: '12px', color: 'var(--ink-2)', fontFamily: 'var(--mono)', flexWrap: 'wrap' } }, [
+    mom ? el('span', {}, ['MoM ', el('b', { style: { color: mom.color || 'var(--ink)' } }, mom.text)]) : null,
+    yoy ? el('span', {}, ['YoY ', el('b', { style: { color: yoy.color || 'var(--ink)' } }, yoy.text)]) : null,
+    percentile ? el('span', {}, [percentile.label || '5Y percentile ', el('b', { style: { color: percentile.color || 'var(--ink)' } }, percentile.text)]) : null
+  ].filter(Boolean));
+
+  const header = el('div', { class: 'headline-panel-header', style: { ...headerStyle, borderRadius: '8px', padding: '18px 22px', marginBottom: '14px' } }, [
+    el('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' } }, [
+      el('div', { style: { flex: 1, minWidth: 0 } }, [
+        eyebrow ? el('div', { style: { fontSize: '11px', color: eyebrowColor || 'var(--ink-2)', textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'var(--mono)', marginBottom: '6px', fontWeight: 600 } }, eyebrow) : null,
+        el('div', { style: { fontSize: '32px', fontWeight: 700, fontFamily: 'var(--mono)', color: 'var(--ink)', marginBottom: '4px', lineHeight: '1.1' } }, value),
+        metaLine ? el('div', { style: { fontSize: '11.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)' } }, [
+          metaLine,
+          threshold ? el('span', { style: { color: 'var(--ink-2)', marginLeft: '14px' } }, [
+            'Threshold: ', el('b', { style: { color: 'var(--ink)' } }, threshold)
+          ]) : null
+        ].filter(Boolean)) : null,
+        trendsLine
+      ].filter(Boolean)),
+      statusPill ? el('div', { style: { textAlign: 'right', flexShrink: 0 } }, [
+        el('span', { class: 'pill ' + statusClass(status || 'med') }, statusPill),
+        statusSub ? el('div', { style: { marginTop: '8px', fontSize: '11px', color: 'var(--ink-3)', fontFamily: 'var(--mono)' } }, statusSub) : null
+      ].filter(Boolean)) : null
+    ].filter(Boolean))
+  ]);
+
+  const wrap = el('div', { class: 'viz-wrap headline-panel' });
+  wrap.appendChild(header);
+  if (chart) {
+    if (chartTitle) wrap.appendChild(vizTitleEl(chartTitle, chartAsof));
+    wrap.appendChild(chart);
+  }
+  if (matrix && matrix.length) {
+    const matrixWrap = el('div', { class: 'hp-matrix', style: { marginTop: '14px', borderTop: '1px solid var(--line)', paddingTop: '14px' } });
+    const grid = el('div', { style: { display: 'grid', gridTemplateColumns: `repeat(${matrix.length}, 1fr)`, gap: '14px' } });
+    for (const cell of matrix) {
+      grid.appendChild(el('div', { class: 'hp-matrix-cell', title: cell.tooltip || '', style: { background: '#0e1218', border: '1px solid var(--line)', borderRadius: '6px', padding: '12px 14px' } }, [
+        el('div', { style: { fontSize: '10px', color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--mono)', fontWeight: 600 } }, cell.label),
+        el('div', { style: { fontSize: '17px', fontWeight: 700, fontFamily: 'var(--mono)', marginTop: '6px', color: cell.valueColor || 'var(--ink)' } }, cell.value),
+        cell.sub1 ? el('div', { style: { fontSize: '11.5px', fontFamily: 'var(--mono)', marginTop: '4px', color: cell.sub1Color || 'var(--ink-2)' } }, cell.sub1) : null,
+        cell.sub2 ? el('div', { style: { fontSize: '10.5px', fontFamily: 'var(--mono)', marginTop: '2px', color: 'var(--ink-3)' } }, cell.sub2) : null,
+        cell.asof ? el('div', { style: { fontSize: '9.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '8px', borderTop: '1px dashed var(--line-2)', paddingTop: '5px' } }, 'as on ' + cell.asof) : null
+      ].filter(Boolean)));
+    }
+    matrixWrap.appendChild(grid);
+    wrap.appendChild(matrixWrap);
+  }
   return wrap;
 }
 

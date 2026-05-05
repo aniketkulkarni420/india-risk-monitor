@@ -1,6 +1,6 @@
 # IRM · Project state · single-glance status
 
-Last updated: 2026-05-05 (post-deploy, post-Phase 9 selector tuning starts)
+Last updated: 2026-05-05 (post-PDF-pass · 11 parsers added in one session · 20/21 free-source metrics now live)
 
 ---
 
@@ -36,16 +36,56 @@ Last updated: 2026-05-05 (post-deploy, post-Phase 9 selector tuning starts)
 - 9 metrics now have REAL live data (NSE indices, NSE FII/DII, Brent crude). 60+ metrics still seed because parsers either unregistered OR registered with selectors that don't match real HTML.
 - Cloudflare auto-PR for Workers/wrangler config closed (we use Pages, not Workers)
 
-## Live data status (2026-05-05 09:03 UTC ingest run)
+## Live data status (2026-05-05 16:00 UTC · post-PDF-pass)
 
 ```
-9  verified live   — fii_equity_*, dii_*, nifty_50, bank_nifty, nifty_pe_5y, india_vix
-1  crosscheck_pending — brent_crude ($103.68, xcheck divergent)
-36 skipped       — no live parser registered (correct behavior, not a bug)
-12 failed        — registered parser threw on real HTML (selector tuning work):
-                   inr_usd, power_demand, hormuz_throughput, gst_gross, iip_growth,
-                   wpi_inflation, cpi_inflation, fada × 5 (auto block)
+20 verified live   — fii_equity_*, dii_*, nifty_50, bank_nifty, nifty_pe_5y,
+                     india_vix, inr_usd (₹95.36), cpi_inflation (3.40%),
+                     iip_growth (4.10%), wpi_inflation (3.88%),
+                     gst_gross (₹1.89 L Cr), auto_2w (1.92M), auto_3w (107K),
+                     auto_pv (407K), auto_cv (99K), auto_tractor (75K),
+                     power_demand (~215 GW · vidyutpravah · intermittent)
+ 1 crosscheck_pending — brent_crude ($104.19 · xcheck divergent ~8%)
+36 skipped         — no live parser registered (correct behavior, not a bug)
+ 1 failed          — hormuz_throughput: MarineTraffic anti-scraping
+                     → blocked on Aniket's separate ship-tracking tool (ETA: EoD 2026-05-05)
 ```
+
+**Net +11 parsers tuned in this session** (RBI INR · CPI · IIP · WPI · GST + 5 FADA + power_demand).
+All sources are free, no API keys, no paid tiers.
+
+## Parser strategy notes
+
+- **PIB endpoints (search.pib.gov.in, AllRelease.aspx) are unreachable from
+  non-IN networks / aggressive WAFs.** Pivoted CPI/IIP/WPI to Trading Economics
+  India pages — same source data (MoSPI/OEA), much more stable HTML.
+  See `scripts/ingest/parsers/pib_press_v1.mjs` (file kept its name for now;
+  function changed).
+- **FADA = PDF-only**, `pdf-parse` v2 (PDFParse class API) installed and wired.
+  Module-scoped 5-min cache: 5 metrics resolve from 1 PDF download.
+  All 5 segments verified live within ≤2% cross-check tolerance.
+- **POSOCO replaced by `vidyutpravah.in`** (Ministry of Power · National Power Portal).
+  Stable selectors `id="CurrentDemandMET"` / `id="PrevDemandMET"`. Source has slow
+  TLS handshake; parser uses 45s timeout + 1 retry. Yesterday's reading serves as
+  built-in cross-check.
+- **GST gross uses GSTN's authoritative `Gross_Net_Tax_collection.xlsx`** (linked
+  from gst.gov.in/download/gststatistics). Sheet picker grabs the most-recent
+  `MMM-YY` sheet, extracts the "Total Gross GST Revenue" row column C
+  (current-month value in crore), converts to lakh crore. `xlsx` (SheetJS) installed.
+
+## Recent UI clarity pass (2026-05-05)
+
+Per `IRM_Movement_Options.html` + `IRM_Cluster_Placement_Options.html` reviews:
+- `formatValue()` now honours `unit` arg → bare numbers get suffixes everywhere
+- Per-row `as on …` pill in TableRow + viz-title stamps on every chart
+- Reference bands on VIX + Gold (5Y range with marker)
+- Glossary `?` icon on Regime Banner
+- Tooltips on currency strip + freight indices
+- New chart helper `renderSeasonalityStrip()` — 12m vs prior 12m paired bars
+- A+E pattern shipped to 4 Real-Economy clusters (Tax/Movement/Production/Discretionary)
+  Featured cyclical metric per cluster: GST · Rail · Power · Reservoir
+- New metric: `foreign_tourist_arrivals` in Discretionary
+- Box-office source (BoxOfficeIndia) verified fragile — skipped per "only if verified"
 
 ## Context note for next session
 

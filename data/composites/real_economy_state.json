@@ -9,18 +9,36 @@
   "value_format": "label",
   "as_of": "2026-04-28T09:42:00+05:30",
   "as_of_period": "monthly",
-  "mom_pct": 11.5,
-  "yoy_pct": 11.5,
+  "mom_pct": null,
+  "yoy_pct": null,
   "vs_5y_avg_pct": null,
   "sparkline_12m": [],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
-  "source_primary": { "name": "IRM derived", "url": "https://irm.local/methodology/real_economy", "type": "Manual estimate", "frequency": "Monthly", "parser": "manual:derived_v1" },
-  "source_crosscheck": [{ "name": "Underlying metric reconciliation", "url": "https://irm.local/methodology/real_economy", "type": "Manual estimate" }],
+  "source_primary": {
+    "name": "IRM derived",
+    "url": "https://irm.local/methodology/real_economy",
+    "type": "Manual estimate",
+    "frequency": "Monthly",
+    "parser": "manual:derived_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Underlying metric reconciliation",
+      "url": "https://irm.local/methodology/real_economy",
+      "type": "Manual estimate"
+    }
+  ],
   "verification_state": "verified",
   "last_verified_at": "2026-04-28T09:42:00+05:30",
   "why_it_matters": "Composite read across tax/movement/auto/power. Currently Resilient: GST +11.5% YoY, auto retail +8.5% YoY, power demand +6% YoY. Mom_pct displays GST gross YoY as the headline number.",
   "formula": "Score: 0.30 × yoy(gst_gross) + 0.20 × yoy(power_demand) + 0.20 × avg(yoy(auto_*)) + 0.15 × yoy(eway_bills) + 0.15 × yoy(upi_value). Bands: Weak < 4 / Mixed 4-7 / Resilient 7+",
-  "linked_metrics": ["gst_gross", "power_demand", "auto_2w", "eway_bills", "upi_value"]
+  "linked_metrics": [
+    "gst_gross",
+    "power_demand",
+    "auto_2w",
+    "eway_bills",
+    "upi_value"
+  ]
 }

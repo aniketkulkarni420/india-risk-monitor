@@ -12,10 +12,14 @@ const REF_URL = 'https://www.rbi.org.in/Scripts/ReferenceRateArchive.aspx';
 const FBIL_URL = 'https://www.fbil.org.in/';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 IRM-Ingest/1.0';
 
-// RBI's homepage has a "Current Rates" widget with a span like:
-//   <span class="text-color-2">USD/INR : 83.4172</span>
-// Match generously to survive small markup changes.
-const RBI_RATE_RE = /USD\s*\/\s*INR[^0-9]*?(\d{2}\.\d{2,4})/i;
+// RBI's homepage "Current Rates · Exchange Rates" widget. As of 2026-05,
+// the format is "INR / 1 USD : 95.3602" sourced from FBIL.
+// Earlier wording ("USD/INR : 83.xxxx") is also accepted as a fallback so a
+// future markup flip in either direction continues to parse.
+const RBI_RATE_RES = [
+  /INR\s*\/\s*1\s*USD[^0-9]*?(\d{2,3}\.\d{2,4})/i,
+  /USD\s*\/\s*INR[^0-9]*?(\d{2,3}\.\d{2,4})/i
+];
 
 async function fetchText(url, opts = {}) {
   const res = await fetch(url, {
@@ -29,17 +33,22 @@ async function fetchText(url, opts = {}) {
 export async function fetchPrimary(metric) {
   // Try the homepage widget first — it carries today's reference rate
   const html = await fetchText(HOME);
-  const m = html.match(RBI_RATE_RE);
-  if (!m) throw new Error('RBI homepage USD/INR widget not found — selector may have moved');
-  const value = parseFloat(m[1]);
+  let match = null;
+  let usedRe = null;
+  for (const re of RBI_RATE_RES) {
+    const m = html.match(re);
+    if (m) { match = m; usedRe = re; break; }
+  }
+  if (!match) throw new Error('RBI homepage USD/INR widget not found — selector may have moved');
+  const value = parseFloat(match[1]);
   if (Number.isNaN(value) || value < 50 || value > 200) {
-    throw new Error(`RBI rate parsed as ${m[1]} — implausible, refusing`);
+    throw new Error(`RBI rate parsed as ${match[1]} — implausible, refusing`);
   }
   return {
     value,
     as_of: new Date().toISOString(),
-    parse_meta: { source: 'RBI homepage widget', selector: 'USD/INR_re', endpoint: HOME },
-    raw: m[0]
+    parse_meta: { source: 'RBI homepage widget · FBIL', regex: usedRe.toString(), endpoint: HOME },
+    raw: match[0]
   };
 }
 

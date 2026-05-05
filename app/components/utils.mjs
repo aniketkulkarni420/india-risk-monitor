@@ -12,21 +12,24 @@ export function formatValue(value, value_format, unit) {
   if (typeof value === 'string') return value;
   if (typeof value !== 'number') return String(value);
 
+  // Suffix attached to formats that don't already carry a unit in the format itself.
+  const u = (unit && unit.trim()) ? ' ' + unit.trim() : '';
+
   switch (value_format) {
-    case 'integer':         return INR.format(Math.round(value));
-    case 'decimal_1':       return value.toFixed(1);
-    case 'decimal_2':       return value.toFixed(2);
+    case 'integer':         return INR.format(Math.round(value)) + u;
+    case 'decimal_1':       return value.toFixed(1) + u;
+    case 'decimal_2':       return value.toFixed(2) + u;
     case 'percent':         return value.toFixed(2) + '%';
     case 'currency_inr_cr': return (value < 0 ? '−' : '') + '₹' + INR.format(Math.abs(Math.round(value))) + ' Cr';
     case 'currency_inr_lcr':return '₹' + value.toFixed(2) + ' L Cr';
     case 'currency_usd_bn': return '$' + value.toFixed(1) + ' Bn';
     case 'currency_usd_mn': return '$' + value.toFixed(1) + ' Mn';
-    case 'currency_usd_per_unit': return '$' + INR.format(Math.round(value));
+    case 'currency_usd_per_unit': return '$' + INR.format(Math.round(value)) + (unit ? ' / ' + unit.replace(/^\/\s*/, '').trim() : '');
     case 'ratio_x':         return value.toFixed(2) + '×';
     case 'bps':             return (value > 0 ? '+' : '') + Math.round(value) + ' bps';
-    case 'index':           return INR.format(Math.round(value));
+    case 'index':           return INR.format(Math.round(value)) + (unit ? ' ' + unit.trim() : '');
     case 'label':           return String(value);
-    default:                return NUM.format(value);
+    default:                return NUM.format(value) + u;
   }
 }
 
@@ -89,6 +92,20 @@ export function formatAsOf(iso) {
   if (!iso) return '';
   const d = new Date(iso);
   return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
+
+// Long-form as-of including year — used for viz titles where space allows
+export function formatAsOfLong(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// "as on …" prefixed asof, with optional period qualifier (Apr 2026, Q4 FY26 etc)
+export function asOfLabel(iso, opts = {}) {
+  if (!iso) return '';
+  const long = formatAsOfLong(iso);
+  return `as on ${long}`;
 }
 
 // ──────────────────────────────────────────────────────────────

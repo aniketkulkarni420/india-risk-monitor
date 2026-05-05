@@ -1,0 +1,55 @@
+{
+  "metric_id": "foreign_tourist_arrivals",
+  "display_name": "Foreign tourist arrivals",
+  "display_subtitle": "MoT monthly · FTA + FEE",
+  "section": "economy",
+  "sub_cluster": "discretionary",
+  "value": 9.84,
+  "unit": "Lakh",
+  "value_format": "decimal_2",
+  "as_of": "2026-03-31T17:30:00+05:30",
+  "as_of_period": "monthly",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": 12.4,
+  "sparkline_12m": [
+    7.2,
+    7.6,
+    6.4,
+    5.8,
+    6.1,
+    7.2,
+    8.4,
+    10.2,
+    11.8,
+    12.4,
+    10.6,
+    9.84
+  ],
+  "status": "low",
+  "shock_eligible": false,
+  "trend_direction": "good",
+  "source_primary": {
+    "name": "MoT monthly FTA bulletin",
+    "url": "https://tourism.gov.in/market-research-and-statistics",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "press_release:mot_fta_v1"
+  },
+  "source_crosscheck": [
+    {
+      "name": "Bureau of Immigration arrival cards",
+      "url": "https://boi.gov.in/",
+      "type": "Official"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-04-15T12:00:00+05:30",
+  "why_it_matters": "Discretionary inbound demand. Leads hotel ARR, aviation pricing, retail in tier-1 metros and Goa/Kerala/Rajasthan. Strong winter (Nov–Feb) seasonality.",
+  "linked_metrics": [
+    "air_pax",
+    "auto_pv",
+    "upi_value"
+  ],
+  "notes": "FTA = Foreign Tourist Arrivals (excludes NRIs and same-day visitors). Drawer would show top-5 source countries + state-wise distribution."
+}

@@ -9,19 +9,47 @@
   "value_format": "currency_usd_bn",
   "as_of": "2026-04-15T11:30:00+05:30",
   "as_of_period": "monthly",
-  "mom_pct": 21.4,
-  "yoy_pct": 32.4,
-  "vs_5y_avg_pct": 42.0,
-  "sparkline_12m": [22.1, 21.8, 22.5, 23.4, 22.2, 23.8, 24.1, 23.6, 24.5, 24.8, 23.4, 28.4],
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": 42,
+  "sparkline_12m": [
+    22.1,
+    21.8,
+    22.5,
+    23.4,
+    22.2,
+    23.8,
+    24.1,
+    23.6,
+    24.5,
+    24.8,
+    23.4,
+    28.4
+  ],
   "status": "high",
   "shock_eligible": false,
   "trend_direction": "bad",
-  "source_primary": { "name": "MoCI / DGCIS", "url": "https://commerce.gov.in/", "type": "Official", "frequency": "Monthly", "parser": "press_release:dgcis_v1" },
+  "source_primary": {
+    "name": "MoCI / DGCIS",
+    "url": "https://commerce.gov.in/",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "press_release:dgcis_v1"
+  },
   "source_crosscheck": [
-    { "name": "PIB monthly trade release", "url": "https://www.pib.gov.in/", "type": "Official" }
+    {
+      "name": "PIB monthly trade release",
+      "url": "https://www.pib.gov.in/",
+      "type": "Official"
+    }
   ],
   "verification_state": "verified",
   "last_verified_at": "2026-04-15T13:00:00+05:30",
   "why_it_matters": "Sharp widening in March-April reflects oil-price shock pass-through to import bill. Sustained > $25 Bn pressures CAD and INR.",
-  "linked_metrics": ["cad_pct_gdp", "inr_usd", "fx_reserves", "brent_crude"]
+  "linked_metrics": [
+    "cad_pct_gdp",
+    "inr_usd",
+    "fx_reserves",
+    "brent_crude"
+  ]
 }

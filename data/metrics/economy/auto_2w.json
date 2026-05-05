@@ -4,15 +4,28 @@
   "display_subtitle": "FADA monthly registrations · India",
   "section": "economy",
   "sub_cluster": "auto",
-  "value": 1485620,
+  "value": 1916258,
   "unit": "units",
   "value_format": "integer",
-  "as_of": "2026-04-05T11:00:00+05:30",
+  "as_of": "2026-04-30T12:00:00.000Z",
   "as_of_period": "monthly",
-  "mom_pct": 3.2,
-  "yoy_pct": 8.5,
+  "mom_pct": null,
+  "yoy_pct": null,
   "vs_5y_avg_pct": 14.2,
-  "sparkline_12m": [1280000, 1310000, 1345000, 1380000, 1395000, 1410000, 1425000, 1440000, 1455000, 1465000, 1438000, 1485620],
+  "sparkline_12m": [
+    1440000,
+    1455000,
+    1465000,
+    1438000,
+    1485620,
+    1916258,
+    1916258,
+    1916258,
+    1916258,
+    1916258,
+    1916258,
+    1916258
+  ],
   "baseline_30d": null,
   "deviation_from_baseline_pct": null,
   "status": "low",
@@ -27,13 +40,28 @@
     "parser": "press_release:fada_monthly_v1"
   },
   "source_crosscheck": [
-    { "name": "SIAM dispatches", "url": "https://www.siam.in/statistics.aspx?mpgid=8&pgidtrail=14", "type": "Public" },
-    { "name": "Vahan portal", "url": "https://vahan.parivahan.gov.in/vahan4dashboard/", "type": "Official" }
+    {
+      "name": "SIAM dispatches",
+      "url": "https://www.siam.in/statistics.aspx?mpgid=8&pgidtrail=14",
+      "type": "Public"
+    },
+    {
+      "name": "Vahan portal",
+      "url": "https://vahan.parivahan.gov.in/vahan4dashboard/",
+      "type": "Official"
+    }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-05T15:00:00+05:30",
+  "last_verified_at": "2026-05-05T11:26:41.943Z",
   "why_it_matters": "2W retail is the cleanest rural demand proxy. ~70% of 2W sales are in tier-2/3/rural markets and are lead-funded; weakness here precedes broader rural slowdown by 1-2 quarters.",
   "formula": null,
-  "linked_metrics": ["auto_3w", "auto_pv", "auto_cv", "auto_tractor", "naukri_jobspeak", "reservoir_levels"],
+  "linked_metrics": [
+    "auto_3w",
+    "auto_pv",
+    "auto_cv",
+    "auto_tractor",
+    "naukri_jobspeak",
+    "reservoir_levels"
+  ],
   "notes": "FADA = retail registrations (demand). SIAM = factory dispatches (channel fill). FADA is the demand-truth; we cite SIAM only on divergence > 5%."
 }

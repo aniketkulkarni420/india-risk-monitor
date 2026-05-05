@@ -16,6 +16,51 @@ import { resolve, listRealParsers } from './ingest/registry.mjs';
 import { verify } from './ingest/crosscheck.mjs';
 import { SLOTS, ALL_DAILY, ALL_EVERY, COMPOSITES, slotFor } from './ingest/schedule.mjs';
 import { info, warn, error } from './ingest/logger.mjs';
+import { readFileSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const _SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
+const HISTORY_DIR = join(_SCRIPT_DIR, '..', 'data', 'history');
+
+// Recompute mom_pct / yoy_pct from the metric's history CSV. If the CSV doesn't
+// have a value ~30 days back / ~365 days back (within a tolerance window), the
+// corresponding trend is left undefined so applyIngest preserves the current
+// value rather than zeroing it out. As history accumulates, both fill in.
+function computeTrendsFromHistory(metric_id, currentValue, currentAsOfIso) {
+  const file = join(HISTORY_DIR, `${metric_id}.csv`);
+  if (!existsSync(file)) return {};
+  let rows;
+  try {
+    rows = readFileSync(file, 'utf8').trim().split('\n').slice(1)
+      .map(l => l.split(','))
+      .filter(r => r.length === 2 && !Number.isNaN(parseFloat(r[1])))
+      .map(r => ({ date: new Date(r[0] + 'T00:00:00Z'), value: parseFloat(r[1]) }))
+      .sort((a, b) => a.date - b.date);
+  } catch { return {}; }
+  if (rows.length < 2) return {};
+  const now = new Date(currentAsOfIso || rows[rows.length - 1].date);
+  const targetMoM = now.getTime() - 30 * 24 * 3600 * 1000;
+  const targetYoY = now.getTime() - 365 * 24 * 3600 * 1000;
+
+  // Find row closest to target within tolerance window
+  function nearest(target, toleranceDays) {
+    const tol = toleranceDays * 24 * 3600 * 1000;
+    let best = null, bestDelta = Infinity;
+    for (const r of rows) {
+      const d = Math.abs(r.date.getTime() - target);
+      if (d < bestDelta && d <= tol) { best = r; bestDelta = d; }
+    }
+    return best;
+  }
+  const momRow = nearest(targetMoM, 14);   // ±2 weeks for MoM
+  const yoyRow = nearest(targetYoY, 45);   // ±~1.5 months for YoY
+
+  const out = {};
+  if (momRow && momRow.value !== 0) out.mom_pct = +(((currentValue - momRow.value) / momRow.value) * 100).toFixed(2);
+  if (yoyRow && yoyRow.value !== 0) out.yoy_pct = +(((currentValue - yoyRow.value) / yoyRow.value) * 100).toFixed(2);
+  return out;
+}
 
 const ARGS = parseArgs(process.argv.slice(2));
 
@@ -83,14 +128,22 @@ async function ingestOne(metric_id) {
     // Verification
     const verdict = verify(primary, crosschecks);
 
+    // Recompute trends from history CSV — but ONLY for daily/live cadence metrics.
+    // Monthly/weekly metrics get the same value reported many days in a row
+    // (because the underlying release only changes once a month/week), so a
+    // naive 30-day lookback gives a misleading "MoM". For those, leave existing
+    // mom_pct/yoy_pct intact — they're correct relative to the prior release.
+    const cadence = (metric.as_of_period || metric.source_primary?.frequency || '').toLowerCase();
+    const isDailyish = ['live', '24h', 'daily', 'live (15-min)'].some(c => cadence.includes(c));
+    const trends = isDailyish ? computeTrendsFromHistory(metric_id, verdict.value, primary.as_of) : {};
+
     // Build ingest result
     const result = {
       value: verdict.value,
       as_of: primary.as_of,
       last_verified_at: new Date().toISOString(),
-      verification_state: verdict.verification_state
-      // mom_pct / yoy_pct trend recompute deferred to Phase 8 backfill.
-      // Phase 2 leaves those values intact.
+      verification_state: verdict.verification_state,
+      ...trends
     };
 
     // Persist + history

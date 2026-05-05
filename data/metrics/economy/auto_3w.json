@@ -4,24 +4,51 @@
   "display_subtitle": "FADA monthly registrations · India",
   "section": "economy",
   "sub_cluster": "auto",
-  "value": 96420,
+  "value": 106908,
   "unit": "units",
   "value_format": "integer",
-  "as_of": "2026-04-05T11:00:00+05:30",
+  "as_of": "2026-04-30T12:00:00.000Z",
   "as_of_period": "monthly",
-  "mom_pct": 1.8,
-  "yoy_pct": 12.4,
+  "mom_pct": null,
+  "yoy_pct": null,
   "vs_5y_avg_pct": 28.6,
-  "sparkline_12m": [85800, 87200, 88500, 89800, 90400, 91200, 92100, 92800, 93600, 94400, 94720, 96420],
+  "sparkline_12m": [
+    92100,
+    92800,
+    93600,
+    94400,
+    94720,
+    96420,
+    106908,
+    106908,
+    106908,
+    106908,
+    106908,
+    106908
+  ],
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
-  "source_primary": { "name": "FADA monthly press release", "url": "https://fada.in/index.php/research-publication.php", "type": "Public", "frequency": "Monthly", "parser": "press_release:fada_monthly_v1" },
+  "source_primary": {
+    "name": "FADA monthly press release",
+    "url": "https://fada.in/index.php/research-publication.php",
+    "type": "Public",
+    "frequency": "Monthly",
+    "parser": "press_release:fada_monthly_v1"
+  },
   "source_crosscheck": [
-    { "name": "Vahan portal", "url": "https://vahan.parivahan.gov.in/vahan4dashboard/", "type": "Official" }
+    {
+      "name": "Vahan portal",
+      "url": "https://vahan.parivahan.gov.in/vahan4dashboard/",
+      "type": "Official"
+    }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-05T15:00:00+05:30",
+  "last_verified_at": "2026-05-05T11:26:41.946Z",
   "why_it_matters": "3W retail = last-mile transport + gig economy + small-business demand. Growth signals informal-economy resilience.",
-  "linked_metrics": ["auto_2w", "upi_value", "naukri_jobspeak"]
+  "linked_metrics": [
+    "auto_2w",
+    "upi_value",
+    "naukri_jobspeak"
+  ]
 }

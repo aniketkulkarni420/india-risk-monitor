@@ -9,19 +9,46 @@
   "value_format": "currency_usd_per_unit",
   "as_of": "2026-04-23T17:00:00+05:30",
   "as_of_period": "weekly",
-  "mom_pct": 14.6,
-  "yoy_pct": 32.4,
+  "mom_pct": null,
+  "yoy_pct": null,
   "vs_5y_avg_pct": 38.2,
-  "sparkline_12m": [2150, 2210, 2280, 2320, 2380, 2410, 2450, 2480, 2520, 2480, 2480, 2840],
+  "sparkline_12m": [
+    2150,
+    2210,
+    2280,
+    2320,
+    2380,
+    2410,
+    2450,
+    2480,
+    2520,
+    2480,
+    2480,
+    2840
+  ],
   "status": "med",
   "shock_eligible": false,
   "trend_direction": "bad",
-  "source_primary": { "name": "Drewry weekly press release", "url": "https://www.drewry.co.uk/supply-chain-advisors/supply-chain-expertise/world-container-index-assessed-by-drewry", "type": "Public", "frequency": "Weekly", "parser": "html_scrape:drewry_v1" },
+  "source_primary": {
+    "name": "Drewry weekly press release",
+    "url": "https://www.drewry.co.uk/supply-chain-advisors/supply-chain-expertise/world-container-index-assessed-by-drewry",
+    "type": "Public",
+    "frequency": "Weekly",
+    "parser": "html_scrape:drewry_v1"
+  },
   "source_crosscheck": [
-    { "name": "Freightos Baltic Index", "url": "https://fbx.freightos.com/", "type": "Aggregator" }
+    {
+      "name": "Freightos Baltic Index",
+      "url": "https://fbx.freightos.com/",
+      "type": "Aggregator"
+    }
   ],
   "verification_state": "verified",
   "last_verified_at": "2026-04-23T17:30:00+05:30",
   "why_it_matters": "Global container shipping cost benchmark. Spike during Hormuz disruption signals broader supply-chain stress beyond tanker rates. Drawer shows IACI (Intra-Asia) drill-in.",
-  "linked_metrics": ["baltic_dry_index", "vlcc_tanker_rates", "india_port_dwell_time"]
+  "linked_metrics": [
+    "baltic_dry_index",
+    "vlcc_tanker_rates",
+    "india_port_dwell_time"
+  ]
 }
