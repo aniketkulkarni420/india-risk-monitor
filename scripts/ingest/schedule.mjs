@@ -77,12 +77,17 @@ export const COMPOSITES = [
   'supply_chain_state'
 ];
 
-// All daily-cadence metric_ids, used when --slot=all_daily
+// All daily-cadence metric_ids
 export const ALL_DAILY = Array.from(new Set([
   ...SLOTS.daily_06.metric_ids,
   ...SLOTS.weekday_close.metric_ids,
   ...SLOTS.weekday_evening.metric_ids
 ]));
+
+// Every metric across every slot (manual "ingest everything fresh now" use case)
+export const ALL_EVERY = Array.from(new Set(
+  Object.values(SLOTS).flatMap(s => s.metric_ids)
+));
 
 export function slotFor(name) {
   if (!SLOTS[name]) throw new Error(`unknown slot: ${name}. Available: ${Object.keys(SLOTS).join(', ')}`);

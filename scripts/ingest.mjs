@@ -14,7 +14,7 @@
 import { readMetric, applyIngest, appendHistory, listMetrics } from './ingest/persistence.mjs';
 import { resolve, listRealParsers } from './ingest/registry.mjs';
 import { verify } from './ingest/crosscheck.mjs';
-import { SLOTS, ALL_DAILY, COMPOSITES, slotFor } from './ingest/schedule.mjs';
+import { SLOTS, ALL_DAILY, ALL_EVERY, COMPOSITES, slotFor } from './ingest/schedule.mjs';
 import { info, warn, error } from './ingest/logger.mjs';
 
 const ARGS = parseArgs(process.argv.slice(2));
@@ -41,7 +41,8 @@ function parseArgs(argv) {
 // ──────────────────────────────────────────────────────────────
 function resolveTargets() {
   if (ARGS.metric) return [ARGS.metric];
-  if (ARGS.slot === 'all') return ALL_DAILY;
+  if (ARGS.slot === 'all') return ALL_EVERY;            // every metric, every cadence
+  if (ARGS.slot === 'all_daily') return ALL_DAILY;      // daily-cadence subset only
   if (ARGS.slot) return slotFor(ARGS.slot).metric_ids;
   // Default: all daily
   return ALL_DAILY;
@@ -120,7 +121,8 @@ const targets = resolveTargets();
 console.log();
 console.log(BOLD('IRM ingest · Phase 2'));
 console.log(DIM(`mode: ${ARGS.live ? 'LIVE' : 'MOCK'}${ARGS.dryRun ? ' · DRY RUN' : ''}  ·  targets: ${targets.length}  ·  real parsers registered: ${listRealParsers().length}`));
-if (ARGS.slot) console.log(DIM(`slot: ${ARGS.slot} — ${slotFor(ARGS.slot).description}`));
+if (ARGS.slot && ARGS.slot !== 'all') console.log(DIM(`slot: ${ARGS.slot} — ${slotFor(ARGS.slot).description}`));
+else if (ARGS.slot === 'all') console.log(DIM('slot: all daily-cadence metrics'));
 console.log();
 
 const results = [];
