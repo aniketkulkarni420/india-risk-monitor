@@ -34,10 +34,18 @@ wireDrawer(M);
 // ──────────────────────────────────────────────────────────────
 // Topbar timestamp
 // ──────────────────────────────────────────────────────────────
+// Detect if data is stale (seed data) — check if newest "live" metric is older than 24h
 const newest = Object.values(DATA.metrics)
   .filter(m => m.as_of_period === 'live' || m.as_of_period === '24h')
   .map(m => m.as_of).sort().pop() || DATA.generated_at;
-document.getElementById('topbar-asof').textContent = 'Updated ' + formatAsOf(newest);
+const ageHours = (Date.now() - new Date(newest).getTime()) / 36e5;
+const isSeedData = ageHours > 24;
+const asofEl = document.getElementById('topbar-asof');
+if (isSeedData) {
+  asofEl.innerHTML = `<span style="color: var(--amber);">Seed data · ${formatAsOf(newest)}</span> <span style="color: var(--ink-3); font-size: 11px;" title="Live ingest activates with deployment cron. Values will refresh on schedule.">· live ingest pending</span>`;
+} else {
+  asofEl.textContent = 'Updated ' + formatAsOf(newest);
+}
 
 // ──────────────────────────────────────────────────────────────
 // HERO — vital signs panel (replaces 4-tile deck)

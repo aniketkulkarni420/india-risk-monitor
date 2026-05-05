@@ -8,7 +8,7 @@
 //   show_5y: bool = true   — hide vs_5y_avg_pct on mobile if false
 //   onClick: optional callback (default: open ?metric=metric_id deep-link)
 
-import { el, formatValue, formatTrend, trendClass, statusClass, formatAsOf, isHistoryPending, isShock } from './utils.mjs';
+import { el, formatValue, formatTrend, trendClass, statusClass, formatAsOf, isHistoryPending, isShock, trendLabels } from './utils.mjs';
 import { renderSparkline } from './Sparkline.mjs';
 
 function tileDetectState(metric, override) {
@@ -64,15 +64,16 @@ export function renderDisplayTile(metric, opts = {}) {
     trendsContent = [el('div', { class: 'dt-history-pending' }, 'history pending — building from ' + formatAsOf(metric.last_verified_at))];
   } else {
     trendsContent = [];
+    const labels = trendLabels(metric.as_of_period);
     if (metric.mom_pct != null) trendsContent.push(
       el('div', { class: 'dt-trend ' + trendClass(metric.mom_pct, dir) }, [
-        el('span', { class: 'lbl', style: { color: 'var(--ink-3)' } }, 'MoM'),
+        el('span', { class: 'lbl', style: { color: 'var(--ink-3)' } }, labels.primary),
         el('b', {}, formatTrend(metric.mom_pct))
       ])
     );
     if (metric.yoy_pct != null) trendsContent.push(
       el('div', { class: 'dt-trend ' + trendClass(metric.yoy_pct, dir) }, [
-        el('span', { class: 'lbl', style: { color: 'var(--ink-3)' } }, 'YoY'),
+        el('span', { class: 'lbl', style: { color: 'var(--ink-3)' } }, labels.secondary),
         el('b', {}, formatTrend(metric.yoy_pct))
       ])
     );

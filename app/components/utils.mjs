@@ -17,16 +17,40 @@ export function formatValue(value, value_format, unit) {
     case 'decimal_1':       return value.toFixed(1);
     case 'decimal_2':       return value.toFixed(2);
     case 'percent':         return value.toFixed(2) + '%';
-    case 'currency_inr_cr': return (value < 0 ? '−' : '') + '₹' + INR.format(Math.abs(Math.round(value)));
-    case 'currency_inr_lcr':return '₹' + value.toFixed(2);
-    case 'currency_usd_bn': return '$' + value.toFixed(1);
-    case 'currency_usd_mn': return '$' + value.toFixed(1);
+    case 'currency_inr_cr': return (value < 0 ? '−' : '') + '₹' + INR.format(Math.abs(Math.round(value))) + ' Cr';
+    case 'currency_inr_lcr':return '₹' + value.toFixed(2) + ' L Cr';
+    case 'currency_usd_bn': return '$' + value.toFixed(1) + ' Bn';
+    case 'currency_usd_mn': return '$' + value.toFixed(1) + ' Mn';
     case 'currency_usd_per_unit': return '$' + INR.format(Math.round(value));
     case 'ratio_x':         return value.toFixed(2) + '×';
-    case 'bps':             return (value > 0 ? '+' : '') + Math.round(value);
+    case 'bps':             return (value > 0 ? '+' : '') + Math.round(value) + ' bps';
     case 'index':           return INR.format(Math.round(value));
     case 'label':           return String(value);
     default:                return NUM.format(value);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Trend labels — period-aware
+// Schema fields mom_pct + yoy_pct are POSITIONAL (first/second trend).
+// Their displayed labels depend on as_of_period:
+//   live, 24h     → 1D / 1W
+//   weekly        → 1W / 1M
+//   fortnightly   → 1W / 1M
+//   monthly       → MoM / YoY
+//   quarterly     → 1Q / 1Y
+//   policy_event  → MoM / YoY (last change vs year-ago)
+// ──────────────────────────────────────────────────────────────
+export function trendLabels(as_of_period) {
+  switch (as_of_period) {
+    case 'live':
+    case '24h':         return { primary: '1D',  secondary: '1W' };
+    case 'weekly':      return { primary: '1W',  secondary: '1M' };
+    case 'fortnightly': return { primary: '1W',  secondary: '1M' };
+    case 'quarterly':   return { primary: '1Q',  secondary: '1Y' };
+    case 'monthly':
+    case 'policy_event':
+    default:            return { primary: 'MoM', secondary: 'YoY' };
   }
 }
 

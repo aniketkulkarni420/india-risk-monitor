@@ -15,7 +15,7 @@
 //
 // The drawer respects the data contract — every field in the schema can render here.
 
-import { el, formatValue, formatTrend, trendClass, statusClass, formatAsOf, isHistoryPending } from './utils.mjs';
+import { el, formatValue, formatTrend, trendClass, statusClass, formatAsOf, isHistoryPending, trendLabels } from './utils.mjs';
 import { renderSparkline } from './Sparkline.mjs';
 import { renderBand } from './Band.mjs';
 
@@ -146,9 +146,10 @@ function renderContent(metric) {
     pad.appendChild(el('p', { class: 'md-history-pending' },
       'history pending — building from ' + formatAsOf(metric.last_verified_at)));
   } else {
+    const labels = trendLabels(metric.as_of_period);
     const trendsRow = el('div', { class: 'md-trends' }, [
-      metric.mom_pct != null ? trendCell('MoM', formatTrend(metric.mom_pct), trendClass(metric.mom_pct, dir)) : null,
-      metric.yoy_pct != null ? trendCell('YoY', formatTrend(metric.yoy_pct), trendClass(metric.yoy_pct, dir)) : null,
+      metric.mom_pct != null ? trendCell(labels.primary, formatTrend(metric.mom_pct), trendClass(metric.mom_pct, dir)) : null,
+      metric.yoy_pct != null ? trendCell(labels.secondary, formatTrend(metric.yoy_pct), trendClass(metric.yoy_pct, dir)) : null,
       metric.vs_5y_avg_pct != null ? trendCell('vs 5Y', formatTrend(metric.vs_5y_avg_pct), '') : null,
       metric.baseline_30d != null ? trendCell('30d baseline', formatValue(metric.baseline_30d, metric.value_format, metric.unit), '') : null,
       metric.as_of ? trendCell('As of', formatAsOf(metric.as_of), '') : null
