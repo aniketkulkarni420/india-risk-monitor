@@ -4,7 +4,7 @@
 
 import { renderTableRow, renderTableHeader } from './components/TableRow.mjs';
 import { renderSectionFrame } from './components/SectionFrame.mjs';
-import { renderStickyTOC } from './components/StickyTOC.mjs';
+// StickyTOC removed 2026-05-06 — Tab Bar handles section nav now
 import { wire as wireDrawer, open as openDrawer } from './components/MetricDrawer.mjs';
 import { wireCmdK, openCmdK } from './components/CmdKPalette.mjs';
 import { el, formatValue, formatTrend, formatAsOf, statusClass } from './components/utils.mjs';
@@ -1163,17 +1163,9 @@ function sectionStats(sectionId) {
   };
 }
 
-const tocSections = [
-  { id: 'top',     label: 'Today’s read' },
-  { id: 'flows',   label: 'Flows',         ...sectionStats('flows') },
-  { id: 'macro',   label: 'Macro',         ...sectionStats('macro') },
-  { id: 'economy', label: 'Real economy',  ...sectionStats('economy') },
-  { id: 'freight', label: 'Freight',       ...sectionStats('freight') },
-  { id: 'market',  label: 'Market context',...sectionStats('market') },
-  { id: 'sectors', label: 'Sectors' }
-];
-
-document.body.appendChild(renderStickyTOC({ sections: tocSections, engage_after: 720 }));
+// StickyTOC removed (2026-05-06) — Tab Bar already handles section navigation.
+// Two stacked nav surfaces was redundant and the right-rail vertical strip
+// looked like a "vertical tab bar" on first glance.
 
 // ──────────────────────────────────────────────────────────────
 // TAB BAR · section navigation
