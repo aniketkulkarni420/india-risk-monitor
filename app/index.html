@@ -135,9 +135,21 @@
     margin-top: 80px; padding: 28px 32px;
     border-top: 1px solid var(--line);
     color: var(--ink-3); font-size: 12.5px;
+    display: flex; flex-direction: column;
+    gap: 18px;
+  }
+  .page-footer .pf-row {
     display: flex; justify-content: space-between; align-items: center;
     flex-wrap: wrap; gap: 14px;
   }
+  .page-footer .pf-disclaimer {
+    font-size: 11.5px; color: var(--ink-3); line-height: 1.6;
+    max-width: 980px; padding: 12px 14px;
+    background: rgba(233,196,102,0.04);
+    border-left: 2px solid rgba(233,196,102,0.4);
+    border-radius: 0 4px 4px 0;
+  }
+  .page-footer .pf-disclaimer b { color: var(--ink-2); }
   .page-footer a { color: var(--accent); text-decoration: none; }
   .page-footer a:hover { text-decoration: underline; }
 
@@ -215,8 +227,13 @@
 
   <!-- FOOTER -->
   <footer class="page-footer">
-    <div>Built by <b style="color: var(--ink-2);">Aniket Kulkarni</b></div>
-    <a href="./sources/">View full source map →</a>
+    <div class="pf-row">
+      <div>Built by <b style="color: var(--ink-2);">Aniket Kulkarni</b> · SEBI RA <span style="font-family: var(--mono); font-size: 12px;">INH000009843</span></div>
+      <a href="./sources/">View full source map →</a>
+    </div>
+    <div class="pf-disclaimer">
+      <b>Not investment advice.</b> India Risk Monitor is an educational analytical tool aggregating publicly available macro and market data. Nothing on this page constitutes a recommendation to buy, sell, or hold any security. Always consult a qualified financial advisor before making investment decisions. Data is sourced from public releases (RBI, MoSPI, NSE, GSTN, etc.) and may contain errors, delays, or omissions; users should verify critical figures independently from primary sources.
+    </div>
   </footer>
 
 </div>

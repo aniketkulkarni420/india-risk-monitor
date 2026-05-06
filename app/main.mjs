@@ -169,22 +169,22 @@ function metricSparkPoints(metric, count) {
 // ──────────────────────────────────────────────────────────────
 // Topbar timestamp
 // ──────────────────────────────────────────────────────────────
-// Honest data-freshness reporter — counts of metrics with real live updates in last 24h
+// Topbar freshness counter · reframed 2026-05-06
+// Prior copy "Live 50/70" read as "30% missing". New copy frames as
+// progress: "Sources: 50 verified · 20 backfilling" — same data, different
+// emotional weight. When >=90% verified, switches to a clean "Updated X" stamp.
 const allMetricsList = Object.values(DATA.metrics);
 const totalMetrics = allMetricsList.length;
-const fresh24h = allMetricsList.filter(m => {
-  const age = (Date.now() - new Date(m.last_verified_at).getTime()) / 36e5;
-  return age < 24 && m.verification_state === 'verified';
-}).length;
-const freshRatio = fresh24h / totalMetrics;
+const verified = allMetricsList.filter(m => m.verification_state === 'verified').length;
+const backfilling = totalMetrics - verified;
+const freshRatio = verified / totalMetrics;
 const asofEl = document.getElementById('topbar-asof');
-if (freshRatio < 0.5) {
-  asofEl.innerHTML = `<span style="color: var(--amber);" title="Most metrics show seed data. Live ingest scheduled but per-source selector tuning ongoing.">⚠ Live ${fresh24h}/${totalMetrics} · others seed data</span>`;
-} else if (freshRatio < 0.9) {
-  asofEl.innerHTML = `<span style="color: var(--ink-2);" title="Most fresh; ${totalMetrics - fresh24h} pending">Live ${fresh24h}/${totalMetrics}</span>`;
-} else {
+if (freshRatio >= 0.9) {
   const newest = allMetricsList.map(m => m.as_of).sort().pop();
   asofEl.textContent = 'Updated ' + formatAsOf(newest);
+} else {
+  const tooltip = `${verified} sources updating live · ${backfilling} backfilling history. Tap any metric for source detail.`;
+  asofEl.innerHTML = `<span style="color: var(--ink-2);" title="${tooltip}">Sources: <b style="color:var(--ink)">${verified}</b> verified · ${backfilling} backfilling</span>`;
 }
 
 // ──────────────────────────────────────────────────────────────

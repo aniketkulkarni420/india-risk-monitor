@@ -92,14 +92,51 @@ export const CADENCE_DAYS = {
   supply_chain_state:         3,
 };
 
+// Tolerance buffer · we only flag STALE when age > cadence × 1.5.
+// Without this buffer, monthly metrics get flagged the day after their
+// expected refresh (cadence 35d → "STALE 36d") which trains users to ignore
+// the badge. 1.5× gives a real "this is genuinely behind" signal.
+const TOLERANCE = 1.5;
+
+// Monthly-publication metrics where the next release date is predictable.
+// We exempt these from STALE until the publish-by date passes. CPI for example
+// is published around the 12th of each month covering the prior month's data.
+// Day-of-month after which the previous month's release SHOULD have shipped.
+const MONTHLY_PUBLISH_DAY = {
+  cpi_inflation:  14,    // MoSPI publishes ~12th
+  wpi_inflation:  16,    // OEA publishes ~14th
+  iip_growth:     14,    // MoSPI publishes ~12th
+  gst_gross:       6,    // PIB publishes ~1st of next month (already-late after 5)
+  trade_deficit:  18,    // MoCI publishes ~15th
+  pmi_combined:    5,    // S&P publishes ~3rd
+};
+
+function nextExpectedRelease(metricId, asOf, now) {
+  const day = MONTHLY_PUBLISH_DAY[metricId];
+  if (!day) return null;
+  const asOfDate = new Date(asOf);
+  // Expected release: day-of-month in the month AFTER the as_of period
+  const next = new Date(asOfDate.getFullYear(), asOfDate.getMonth() + 2, day);
+  return next;
+}
+
 // Returns { is_stale, age_days, cadence_days } for a metric.
 export function freshnessFor(metricId, asOf, now = new Date()) {
   if (!asOf) return { is_stale: true, age_days: null, cadence_days: null };
   const cadence = CADENCE_DAYS[metricId];
   if (cadence == null) return { is_stale: false, age_days: null, cadence_days: null };
   const age = Math.floor((now - new Date(asOf)) / 86400000);
+
+  // Monthly metrics: not stale until the next expected release date passes.
+  // Catches CPI/WPI/IIP that only publish monthly — flagging them at age=cadence
+  // would mark them stale BEFORE the next release was due.
+  const expected = nextExpectedRelease(metricId, asOf, now);
+  if (expected && now < expected) {
+    return { is_stale: false, age_days: age, cadence_days: cadence, next_release: expected.toISOString().slice(0,10) };
+  }
+
   return {
-    is_stale: age > cadence,
+    is_stale: age > cadence * TOLERANCE,
     age_days: age,
     cadence_days: cadence
   };
