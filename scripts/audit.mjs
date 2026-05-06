@@ -33,11 +33,16 @@ const warnings = [];
 const fail = (gate, msg) => errors.push({ gate, msg });
 const warn = (gate, msg) => warnings.push({ gate, msg });
 
-// The 8 allowed component names (per Build Spec §03 + Phase 5.5 swap)
-// HeatmapCell retired Phase 5.5 (replaced by ranked sector list); CmdKPalette added.
+// Allowed component names (per Build Spec §03 + Phase 5.5 + 2026-05-06 tiering).
+// HeatmapCell retired Phase 5.5; CmdKPalette added.
+// SupportingTier added 2026-05-06: Tier-2 expander wrapping renderTableRow with
+//   per-metric comparison-period filter. Wraps existing components, not new viz.
+// ComparisonSpec added 2026-05-06: data spec (period override per metric); not a
+//   render component but lives in components/ for proximity to TableRow which uses it.
 const ALLOWED_COMPONENTS = new Set([
   'DisplayTile', 'TableRow', 'Sparkline', 'Band',
-  'SectionFrame', 'MetricDrawer', 'StickyTOC', 'CmdKPalette'
+  'SectionFrame', 'MetricDrawer', 'StickyTOC', 'CmdKPalette',
+  'SupportingTier', 'ComparisonSpec'
 ]);
 
 // Legacy component names that must NOT appear (from V40/V57/V60)
@@ -97,10 +102,14 @@ const componentFiles = readdirSync(componentDir)
 const componentNames = componentFiles.map(f => f.replace('.mjs', ''));
 
 console.log();
-if (componentNames.length > 8) {
-  fail('Gate 1', `Component count ${componentNames.length} exceeds locked cap of 8: ${componentNames.join(', ')}`);
+// Cap raised 8 → 10 on 2026-05-06 to admit SupportingTier (Tier-2 expander)
+// and ComparisonSpec (period-override data spec). Both are explicitly listed
+// in ALLOWED_COMPONENTS above; cap stays in lock-step with that allowlist.
+const COMPONENT_CAP = 10;
+if (componentNames.length > COMPONENT_CAP) {
+  fail('Gate 1', `Component count ${componentNames.length} exceeds locked cap of ${COMPONENT_CAP}: ${componentNames.join(', ')}`);
 } else {
-  console.log(`  ${GREEN('✓')} component count: ${componentNames.length} / 8 (${componentNames.join(', ')})`);
+  console.log(`  ${GREEN('✓')} component count: ${componentNames.length} / ${COMPONENT_CAP} (${componentNames.join(', ')})`);
 }
 
 // All component names are in the allowed list

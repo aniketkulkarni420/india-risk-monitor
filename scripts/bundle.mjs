@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 
 import { existsSync } from 'node:fs';
 import { freshnessFor } from './freshness-spec.mjs';
+import { evaluateStatus } from './evaluate-status.mjs';
+import { applyPlausibilityGuard } from './plausibility-guard.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -77,6 +79,31 @@ function sanitizeSparkline(metric) {
   metric._sparkline_sanitized = `dropped ${sl.length - clean.length} unit-shift values`;
 }
 
+// Cleanup #2 · trailing flat-line tail. When a parser ships with N months of
+// real history and pads the rest with the current value, the sparkline shows
+// a fake flat trend on the right edge. Detect and trim. Example before:
+//   [1.89, 1.96, 1.75, 1.79, 1.99, 1.89, 1.89, 1.89, 1.89, 1.89, 1.89, 1.89]
+// After:
+//   [1.89, 1.96, 1.75, 1.79, 1.99, 1.89]   ← caller can show "X/12 months"
+function trimFlatTail(metric) {
+  const sl = metric.sparkline_12m;
+  if (!Array.isArray(sl) || sl.length < 4) return;
+  // Find the run of identical trailing values
+  const last = sl[sl.length - 1];
+  let runStart = sl.length;
+  for (let i = sl.length - 1; i >= 0; i--) {
+    if (sl[i] === last) runStart = i;
+    else break;
+  }
+  const runLen = sl.length - runStart;
+  if (runLen < 3) return;   // 1-2 identical trailing values can be coincidence
+  // Trim to the last value before the flat run, plus the flat-tail's first value
+  // (so renderers know "this is where data stopped"). Keep at least 2 values.
+  const kept = sl.slice(0, Math.max(2, runStart + 1));
+  metric.sparkline_12m = kept;
+  metric._sparkline_tail_trimmed = `dropped ${runLen - 1} flat-tail values (parser seed contamination)`;
+}
+
 // Sanity guard for day-over-day deltas. The history CSV may contain Phase-1
 // mock-seed values from before a parser was registered; when the parser later
 // switched to real data with different units / sign convention, the prev/current
@@ -105,26 +132,45 @@ function dodIsTrustworthy(metric, prev) {
 
 const metrics = {};
 let sectors = null;
-let dodAccepted = 0, dodRejected = 0, sparklineSanitized = 0;
+let dodAccepted = 0, dodRejected = 0, sparklineSanitized = 0, anomalyCount = 0;
 
 for (const file of walk(DATA)) {
   const data = JSON.parse(readFileSync(file, 'utf8'));
   if (data.metric_id) {
-    // Sanitize sparkline first (unit-shift detection)
+    // Sanitize sparkline first (unit-shift detection + flat-tail trim)
     sanitizeSparkline(data);
-    if (data._sparkline_sanitized) sparklineSanitized++;
+    trimFlatTail(data);
+    if (data._sparkline_sanitized || data._sparkline_tail_trimmed) sparklineSanitized++;
+
+    // Plausibility guard · runs BEFORE dod compute. If today's value is wildly
+    // off from yesterday's (e.g. INR/USD jumping 14% in a day), roll back to
+    // yesterday's value to avoid showing a screenshot-bait number on the live site.
+    const prev = previousDayValue(data.metric_id, data.as_of);
+    const anomaly = prev ? applyPlausibilityGuard(data, prev.value) : null;
+    if (anomaly) {
+      anomalyCount++;
+      console.log(`  · plausibility rollback · ${data.metric_id}: ${anomaly.rolledBack} → ${anomaly.restoredTo} (move ${anomaly.dodAbsPct}% > cap ${anomaly.cap}%)`);
+    }
 
     // Compute day-over-day delta + percentage if history allows AND data is trustworthy
-    const prev = previousDayValue(data.metric_id, data.as_of);
-    if (prev && dodIsTrustworthy(data, prev)) {
+    if (prev && !anomaly && dodIsTrustworthy(data, prev)) {
       data.dod_delta = +(data.value - prev.value).toFixed(4);
       data.dod_pct = +(((data.value - prev.value) / Math.abs(prev.value)) * 100).toFixed(2);
       data.dod_prev_date = prev.date;
       data.dod_prev_value = prev.value;
       dodAccepted++;
-    } else if (prev) {
+    } else if (prev && !anomaly) {
       dodRejected++;
     }
+    // Status auto-recompute · against trigger_thresholds (or score band for composites).
+    // Prior bug: data.status was a stamped field that never updated when value changed,
+    // causing false SHOCK pills on Brent/Hormuz after they dropped below thresholds.
+    const newStatus = evaluateStatus(data);
+    if (newStatus && newStatus !== data.status) {
+      data._status_was = data.status;       // breadcrumb for debugging
+      data.status = newStatus;
+    }
+
     // Freshness flag · derived from per-metric expected cadence (freshness-spec.mjs).
     // is_stale = true when (today - as_of) > cadence_days. UI surfaces a STALE
     // pill so users can see at scan-time which numbers are past their refresh window.
