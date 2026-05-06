@@ -416,14 +416,15 @@ heroHost.appendChild(vital);
 // Today bullet rows (replaces lead paragraph + Today line)
 // ──────────────────────────────────────────────────────────────
 document.getElementById('hero-h1').textContent = 'Stress is high, but activity hasn’t broken.';
-document.getElementById('hero-lead').style.display = 'none';
+const heroLead = document.getElementById('hero-lead');
+if (heroLead) heroLead.style.display = 'none';
 
 const todayWrap = document.getElementById('hero-today');
 todayWrap.innerHTML = '';
 todayWrap.style.display = 'block';
-todayWrap.style.background = 'transparent';
-todayWrap.style.borderLeft = 'none';
-todayWrap.style.padding = '0';
+// Show the divider between Today bullets and Vital Signs
+const heroDivider = document.getElementById('hero-divider');
+if (heroDivider) heroDivider.style.display = 'block';
 // Today bullets — derived from live metrics with status icons.
 // icon: 'shock' (red ◆) / 'watch' (amber ●) / 'calm' (green ✓)
 function todayBullets() {
