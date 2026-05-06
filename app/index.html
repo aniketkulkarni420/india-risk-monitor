@@ -48,10 +48,12 @@
   }
   /* Today line — promoted from caption to lede (Design Audit §10) */
   .hero-today {
-    margin: 0 0 36px;
+    margin: 24px 0 36px;
   }
+  /* Removed max-width 760px so today-bullets span the full hero width
+     (matches other section panels). 2-col grid kicks in at >=1100px (CSS). */
   .hero-today .today-bullets {
-    max-width: 760px; padding: 18px 22px;
+    padding: 18px 22px;
     font-size: 14.5px;
   }
   .hero-today .tb-row { font-size: 14.5px; padding: 3px 0; }
@@ -60,12 +62,8 @@
   .hero-today a { color: var(--accent); text-decoration: none; cursor: pointer; }
   .hero-today a:hover { text-decoration: underline; }
 
-  /* Hero deck row · 4 across */
-  .hero-decks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-  .hero-decks .display-tile { border-radius: 0; border: none; background: var(--surface); }
-  .hero-decks .display-tile.state-shock { background: linear-gradient(180deg, #1a0c0c, #15090c); }
-  @media (max-width: 1000px) { .hero-decks { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px)  { .hero-decks { grid-template-columns: 1fr; } }
+  /* Hero panel container · spans full hero width (was 4-col grid pre-redesign) */
+  .hero-decks { display: block; width: 100%; }
 
   /* Sections — uses .section-frame from components/styles.css; just adjust spacing here */
   main.body { margin-top: 16px; }

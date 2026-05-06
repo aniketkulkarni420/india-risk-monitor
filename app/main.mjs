@@ -214,15 +214,15 @@ function hasRealHistory(arr) {
 
 const vital = el('div', { class: 'hero-vital', onclick: (e) => { e.stopPropagation(); openDrawer('india_risk_score'); } });
 
-// Header row · label + dual delta (w/w + day-on-day)
+// Header row · label + dual delta · clearer "vs last week" / "vs yesterday" labels
 const wwDelta = (risk.mom_pct ?? 0) > 0 ? '+' : '';
 const wwVal = risk.mom_pct != null ? wwDelta + Math.round(risk.value * risk.mom_pct / 100) : null;
 const dodVal = risk.dod_delta != null ? (risk.dod_delta > 0 ? '+' : '') + risk.dod_delta : null;
 vital.appendChild(el('div', { class: 'hv-score-row' }, [
   el('span', { class: 'hv-score-label' }, 'India Risk Score'),
-  el('span', { class: 'hv-delta' }, [
-    wwVal != null ? el('span', {}, ['w/w ', el('b', { style: { color: risk.mom_pct >= 0 ? 'var(--red)' : 'var(--green)' } }, wwVal)]) : null,
-    dodVal != null ? el('span', { style: { marginLeft: '14px' } }, ['today ', el('b', { style: { color: risk.dod_delta >= 0 ? 'var(--red)' : 'var(--green)' } }, dodVal)]) : null
+  el('span', { class: 'hv-delta', title: 'Change vs prior reference (week / day)' }, [
+    wwVal != null ? el('span', { title: 'Score change vs reading from 7 days ago' }, ['vs last week ', el('b', { style: { color: risk.mom_pct >= 0 ? 'var(--red)' : 'var(--green)' } }, wwVal + ' pts')]) : null,
+    dodVal != null ? el('span', { style: { marginLeft: '14px' }, title: 'Score change vs yesterday' }, ['vs yesterday ', el('b', { style: { color: risk.dod_delta >= 0 ? 'var(--red)' : 'var(--green)' } }, dodVal + ' pts')]) : null
   ].filter(Boolean))
 ]));
 
@@ -266,12 +266,20 @@ vital.appendChild(el('div', { class: 'hv-band-zones' }, [
 const narrativeEl = buildHeroNarrative(drivers, risk);
 if (narrativeEl) vital.appendChild(narrativeEl);
 
-// Attribution line · "Today's +N driven by: Brent +1.4% · Hormuz -2 ships · ..."
-// Pulls top 3 movers since yesterday from any verified-live metric.
-// Only renders if at least 1 metric has dod_delta computed.
+// Attribution line · "Today's movers: +1.4% Brent · -2 Hormuz · ..."
+// Only shows movers with TRUSTWORTHY dod_pct (bundle.mjs already filters
+// out unit-shift / sign-flip / mock-seed deltas). Additional UI-side guard:
+// require |pct| < 20 to avoid edge cases that slipped through.
 function buildAttributionLine() {
   const movers = Object.values(DATA.metrics)
-    .filter(m => m.verification_state === 'verified' && typeof m.dod_pct === 'number' && Math.abs(m.dod_pct) >= 0.5 && !m.metric_id.startsWith('driver_') && m.metric_id !== 'india_risk_score')
+    .filter(m =>
+      m.verification_state === 'verified'
+      && typeof m.dod_pct === 'number'
+      && Math.abs(m.dod_pct) >= 0.5
+      && Math.abs(m.dod_pct) < 20  // belt-and-braces guard against any escapee
+      && !m.metric_id.startsWith('driver_')
+      && m.metric_id !== 'india_risk_score'
+    )
     .sort((a, b) => Math.abs(b.dod_pct) - Math.abs(a.dod_pct))
     .slice(0, 3);
   if (movers.length === 0) return null;
@@ -280,7 +288,8 @@ function buildAttributionLine() {
     const colour = m.trend_direction === 'bad' ? (m.dod_pct > 0 ? 'var(--red)' : 'var(--green)')
                  : m.trend_direction === 'good' ? (m.dod_pct > 0 ? 'var(--green)' : 'var(--red)')
                  : (m.dod_pct > 0 ? 'var(--red)' : 'var(--green)');
-    return `<span style="color:${colour};font-family:var(--mono)">${sign}${m.dod_pct.toFixed(1)}%</span> ${m.display_name.replace(/^.*?(\w+).*$/, m.display_name).slice(0, 20)}`;
+    const shortName = (m.display_name || m.metric_id).slice(0, 22);
+    return `<span style="color:${colour};font-family:var(--mono)">${sign}${m.dod_pct.toFixed(1)}%</span> <span style="color:var(--ink-2)">${shortName}</span>`;
   });
   return el('div', {
     class: 'hv-attribution',

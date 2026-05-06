@@ -50,25 +50,56 @@ function previousDayValue(metric_id, currentAsOf) {
   return null;
 }
 
+// Sanity guard for day-over-day deltas. The history CSV may contain Phase-1
+// mock-seed values from before a parser was registered; when the parser later
+// switched to real data with different units / sign convention, the prev/current
+// ratio explodes. We refuse to publish dod if any of these is true:
+//   1. |dod_pct| > 25 AND metric is not shock_eligible (rate moves > 25/day are
+//      either a unit shift or a genuine event we should treat carefully)
+//   2. ratio current/prev is outside [0.5, 2.0] (suggests unit shift)
+//   3. sign flipped between prev and current AND metric isn't naturally zero-crossing
+function dodIsTrustworthy(metric, prev) {
+  const cur = metric.value;
+  if (typeof cur !== 'number' || typeof prev?.value !== 'number') return false;
+  if (prev.value === 0) return false;
+  const dodPct = ((cur - prev.value) / Math.abs(prev.value)) * 100;
+  // (1) magnitude check
+  const isShockEligible = !!metric.shock_eligible;
+  if (Math.abs(dodPct) > 25 && !isShockEligible) return false;
+  // (2) ratio check
+  const ratio = cur / prev.value;
+  if (Math.abs(ratio) < 0.5 || Math.abs(ratio) > 2.0) return false;
+  // (3) sign flip check (allow only if metric naturally crosses zero — spreads, deltas)
+  const allowSignFlip = ['ind_us_10y_spread', 'high_yield_credit_spread', 'wacr_repo_spread', 'real_10y_yield'].includes(metric.metric_id)
+    || metric.value_format === 'bps';
+  if (!allowSignFlip && Math.sign(cur) !== Math.sign(prev.value) && cur !== 0 && prev.value !== 0) return false;
+  return true;
+}
+
 const metrics = {};
 let sectors = null;
+let dodAccepted = 0, dodRejected = 0;
 
 for (const file of walk(DATA)) {
   const data = JSON.parse(readFileSync(file, 'utf8'));
   if (data.metric_id) {
-    // Compute day-over-day delta + percentage if history allows
+    // Compute day-over-day delta + percentage if history allows AND data is trustworthy
     const prev = previousDayValue(data.metric_id, data.as_of);
-    if (prev && typeof data.value === 'number' && typeof prev.value === 'number' && prev.value !== 0) {
+    if (prev && dodIsTrustworthy(data, prev)) {
       data.dod_delta = +(data.value - prev.value).toFixed(4);
       data.dod_pct = +(((data.value - prev.value) / Math.abs(prev.value)) * 100).toFixed(2);
       data.dod_prev_date = prev.date;
       data.dod_prev_value = prev.value;
+      dodAccepted++;
+    } else if (prev) {
+      dodRejected++;
     }
     metrics[data.metric_id] = data;
   } else if (data.section === 'sectors' && Array.isArray(data.sectors)) {
     sectors = data;
   }
 }
+console.log(`  · dod accepted: ${dodAccepted} · rejected (unit shift / sign flip / mock seed): ${dodRejected}`);
 
 const bundle = {
   generated_at: new Date().toISOString(),
