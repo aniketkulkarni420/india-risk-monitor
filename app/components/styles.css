@@ -167,9 +167,83 @@ table.metric-table tr:hover td { background: rgba(255,255,255,.015); }
 .section-frame { padding: 64px 0 48px; border-top: 1px solid var(--line); font-family: var(--sans); }
 .section-frame:first-of-type { border-top: none; padding-top: 8px; }
 .section-frame + .section-frame { margin-top: 0; }
-.sf-header { margin-bottom: 24px; }
-.sf-title { font-size: 24px; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 6px; scroll-margin-top: 80px; }
-.sf-question { color: var(--ink-2); font-size: 14px; margin: 0; max-width: 640px; }
+/* Section header · horizontal strip · title left + question right */
+.sf-header {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 14px;
+}
+.sf-title { font-size: 22px; font-weight: 700; letter-spacing: -0.015em; margin: 0; scroll-margin-top: 80px; flex-shrink: 0; }
+.sf-question { color: var(--ink-2); font-size: 13.5px; margin: 0; flex: 1; min-width: 0; }
+@media (max-width: 600px) {
+  .sf-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .sf-title { font-size: 19px; }
+}
+
+/* Hero · narrative + sparkline + Today bullet 2-col grid + status icons */
+.hv-narrative { /* attributes set inline in buildHeroNarrative */ }
+.hv-spark-inline { display: inline-block; vertical-align: middle; margin-left: 14px; flex-shrink: 0; }
+
+.today-bullets .tb-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px 18px;
+  margin-top: 4px;
+}
+.today-bullets .tb-row {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.today-bullets .tb-row:hover { background: rgba(212,165,116,0.04); }
+.today-bullets .tb-icon { font-size: 11px; margin-top: 4px; text-align: center; line-height: 1; }
+.today-bullets .tb-text { color: var(--ink-2); }
+.today-bullets .tb-text b { color: var(--ink); font-weight: 600; }
+.today-bullets .tb-text i { color: var(--ink-3); font-style: italic; }
+@media (min-width: 1100px) {
+  .today-bullets .tb-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ───── Standardized responsive breakpoint hierarchy ───── */
+/* 4-col grids (matrix, trust band): 4 → 2 at 1200 → 1 at 600 */
+@media (max-width: 1200px) {
+  .dashboard-trust-band { grid-template-columns: repeat(2, 1fr) !important; }
+  .headline-panel .hp-matrix > div { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 600px) {
+  .dashboard-trust-band { grid-template-columns: 1fr !important; }
+  .headline-panel .hp-matrix > div { grid-template-columns: 1fr !important; }
+}
+
+/* 5-col grids: 5 → 3 at 1200 → 2 at 900 → 1 at 600 (overrides earlier rules) */
+@media (max-width: 1200px) {
+  .cluster-grid { grid-template-columns: repeat(3, 1fr); }
+  .stat-strip { grid-template-columns: repeat(3, 1fr) !important; }
+}
+@media (max-width: 900px) {
+  .stat-strip { grid-template-columns: repeat(2, 1fr) !important; }
+  /* Auto small-multiples within cluster expansion */
+  .small-multiples-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 600px) {
+  .stat-strip { grid-template-columns: 1fr !important; }
+  .small-multiples-grid { grid-template-columns: 1fr !important; }
+}
+
+/* 2-col rows in Macro + Market: stack at 900px */
+@media (max-width: 900px) {
+  .section-body-stack > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+}
 .sf-lens-row { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
 .sf-lens {
   background: var(--surface); border: 1px solid var(--line); border-radius: 20px;

@@ -13,7 +13,7 @@ import {
   renderCumulativeLine, renderDivergingBars, renderYieldCurve, renderInflationBars,
   renderCurrencyStrip, renderProgressBar, renderGaugeRow, renderPairedLine,
   renderSmallMultiples, renderIndexedOverlay, renderValuationBand, renderTodayBullets,
-  renderSeasonalityStrip, renderHeadlinePanel, renderStatStrip
+  renderSeasonalityStrip, renderHeadlinePanel, renderStatStrip, buildHeroNarrative
 } from './components/charts.mjs';
 
 // ──────────────────────────────────────────────────────────────
@@ -209,11 +209,32 @@ vital.appendChild(el('div', { class: 'hv-score-row' }, [
   el('span', { class: 'hv-score-label' }, 'India Risk Score'),
   el('span', { class: 'hv-delta' }, ['w/w ', el('b', {}, (risk.mom_pct > 0 ? '+' : '') + Math.round(risk.value * risk.mom_pct / 100))])
 ]));
-vital.appendChild(el('div', { class: 'hv-score-row' }, [
+
+// Score row · big number + inline 12-week sparkline + status pill
+const scoreRow = el('div', { class: 'hv-score-row', style: { alignItems: 'flex-end', gap: '14px' } }, [
   el('div', { class: 'hv-score-big' }, String(risk.value)),
-  el('div', { class: 'hv-score-sub' }, '/ 100'),
-  el('div', { style: { marginLeft: 'auto' } }, [el('span', { class: 'pill ' + statusClass(risk.status) }, risk.status[0].toUpperCase() + risk.status.slice(1))])
+  el('div', { class: 'hv-score-sub' }, '/ 100')
+]);
+// Build inline sparkline of risk score itself if history is available
+const riskHist = Array.isArray(risk.sparkline_12m) && risk.sparkline_12m.length >= 3 ? risk.sparkline_12m : null;
+if (riskHist) {
+  const minV = Math.min(...riskHist), maxV = Math.max(...riskHist), range = (maxV - minV) || 1;
+  const points = riskHist.map((v, i) => {
+    const x = (i / (riskHist.length - 1)) * 130 + 5;
+    const y = 32 - ((v - minV) / range) * 26;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  const lastX = (1) * 130 + 5;
+  const lastY = 32 - ((riskHist[riskHist.length - 1] - minV) / range) * 26;
+  const sparkSvg = el('svg', { class: 'hv-spark-inline', width: '140', height: '40', viewBox: '0 0 140 40' }, []);
+  sparkSvg.innerHTML = `<polyline fill="none" stroke="var(--accent)" stroke-width="1.8" points="${points}"/><circle cx="${lastX}" cy="${lastY}" r="3" fill="var(--accent)"/>`;
+  scoreRow.appendChild(sparkSvg);
+}
+scoreRow.appendChild(el('div', { style: { marginLeft: 'auto' } }, [
+  el('span', { class: 'pill ' + statusClass(risk.status) }, risk.status[0].toUpperCase() + risk.status.slice(1))
 ]));
+vital.appendChild(scoreRow);
+
 vital.appendChild(el('div', { class: 'hv-band-track' }, [
   el('div', { class: 'hv-band-marker', style: { left: risk.value + '%' } })
 ]));
@@ -222,9 +243,14 @@ vital.appendChild(el('div', { class: 'hv-band-zones' }, [
   el('span', { style: { color: '#e9c466' } }, 'MED 35–65'),
   el('span', { style: { color: '#e88' } }, 'HIGH 65–100')
 ]));
+
+// Auto-narrative · "Stress is led by Oil & physical 92 and Freight 74..."
+const narrativeEl = buildHeroNarrative(drivers, risk);
+if (narrativeEl) vital.appendChild(narrativeEl);
+
 vital.appendChild(el('div', { class: 'hv-drivers-head' }, 'Drivers · sorted by pressure'));
 
-const driverBarsEl = renderDriverBars(drivers, { showDelta: true, labelWidth: 140 });
+const driverBarsEl = renderDriverBars(drivers, { showArrow: true, labelWidth: 140 });
 const driverExpansion = el('div', { class: 'hero-driver-expansion', style: { marginTop: '14px' } });
 
 // Build the inline expansion panel for a driver (currently only Oil & physical
@@ -337,8 +363,8 @@ todayWrap.style.display = 'block';
 todayWrap.style.background = 'transparent';
 todayWrap.style.borderLeft = 'none';
 todayWrap.style.padding = '0';
-// Today bullets — derived from live metrics. Each line uses M() so values
-// stay in sync with whatever ingest last wrote.
+// Today bullets — derived from live metrics with status icons.
+// icon: 'shock' (red ◆) / 'watch' (amber ●) / 'calm' (green ✓)
 function todayBullets() {
   const hormuz = M('hormuz_throughput');
   const brent = M('brent_crude');
@@ -346,24 +372,56 @@ function todayBullets() {
   const absorp = M('absorption_ratio');
   const gst = M('gst_gross');
   const auto2w = M('auto_2w');
+  const nifty = M('nifty_50');
+  const bnk = M('bank_nifty');
   const out = [];
   if (hormuz) {
     const baseline = hormuz.baseline_30d || 140;
-    out.push({ html: `<a>Hormuz traffic</a> — <b>${formatValue(hormuz.value, 'integer', 'ships/day')}</b> vs ${baseline} baseline · ${((hormuz.value / baseline) * 100).toFixed(1)}% of normal`, drawer_metric_id: 'hormuz_throughput' });
+    out.push({
+      icon: hormuz.status === 'shock' ? 'shock' : hormuz.status === 'high' ? 'watch' : 'calm',
+      html: `<b>Hormuz traffic</b> at ${formatValue(hormuz.value, 'integer', 'ships/day')} vs ${baseline} baseline. <i>${((hormuz.value / baseline) * 100).toFixed(1)}% of normal</i>`,
+      drawer_metric_id: 'hormuz_throughput'
+    });
   }
   if (brent) {
     const above95 = brent.value >= 95;
-    out.push({ html: `<a>Brent crude</a> at <b>$${brent.value.toFixed(2)} / bbl</b> · ${formatTrend(brent.mom_pct)} MoM${above95 ? ', above $95 shock threshold' : ''}`, drawer_metric_id: 'brent_crude' });
+    out.push({
+      icon: above95 ? 'shock' : (brent.status === 'high' ? 'watch' : 'calm'),
+      html: `<b>Brent crude</b> at $${brent.value.toFixed(2)} per barrel. ${formatTrend(brent.mom_pct)} MoM${above95 ? ', <i>above $95 shock threshold</i>' : ''}`,
+      drawer_metric_id: 'brent_crude'
+    });
   }
-  if (vlcc) {
-    out.push({ html: `<a>VLCC tanker rates</a> at <b>${formatValue(vlcc.value, 'integer', 'WS')}</b> · ${formatTrend(vlcc.mom_pct)} MoM`, drawer_metric_id: 'vlcc_tanker_rates' });
+  if (vlcc && vlcc.mom_pct != null && Math.abs(vlcc.mom_pct) > 30) {
+    out.push({
+      icon: vlcc.mom_pct > 0 ? 'watch' : 'calm',
+      html: `<b>VLCC tanker rates</b> ${formatValue(vlcc.value, 'integer', 'WS')}, ${formatTrend(vlcc.mom_pct)} MoM. <i>Cape Route diversions</i>`,
+      drawer_metric_id: 'vlcc_tanker_rates'
+    });
   }
   if (absorp) {
-    out.push({ html: `<a>DII absorption ratio</a> at <b>${absorp.value.toFixed(2)}× </b> — ${absorp.value >= 1 ? 'DII offsetting FII selling' : 'DII not yet absorbing FII outflows'}`, drawer_metric_id: 'absorption_ratio' });
+    out.push({
+      icon: absorp.value >= 1 ? 'calm' : 'watch',
+      html: `<b>DII absorption</b> ${absorp.value.toFixed(2)}×. <i>${absorp.value >= 1 ? 'DII offsetting FII selling' : 'DII not fully absorbing FII outflows'}</i>`,
+      drawer_metric_id: 'absorption_ratio'
+    });
   }
   if (gst) {
     const auto2wYoY = auto2w?.yoy_pct;
-    out.push({ html: `<a>Real economy</a> · GST <b>${formatValue(gst.value, 'currency_inr_lcr')}</b> (${formatTrend(gst.yoy_pct)} YoY)${auto2wYoY != null ? `, auto 2W <b>${formatTrend(auto2wYoY)}</b> YoY` : ''}`, drawer_metric_id: 'gst_gross' });
+    out.push({
+      icon: 'calm',
+      html: `<b>Real economy</b>. GST ${formatValue(gst.value, 'currency_inr_lcr')} (${formatTrend(gst.yoy_pct)} YoY)${auto2wYoY != null ? `, auto 2W ${formatTrend(auto2wYoY)}` : ''}`,
+      drawer_metric_id: 'gst_gross'
+    });
+  }
+  if (nifty && bnk && nifty.yoy_pct != null && bnk.yoy_pct != null) {
+    const lead = +(bnk.yoy_pct - nifty.yoy_pct).toFixed(1);
+    if (Math.abs(lead) >= 0.3) {
+      out.push({
+        icon: 'calm',
+        html: `<b>${lead > 0 ? 'Banks beating Nifty' : 'Nifty beating Banks'}</b> by ${Math.abs(lead).toFixed(1)} points YoY. <i>${nifty.value.toFixed(0)} vs ${bnk.value.toFixed(0)}</i>`,
+        drawer_metric_id: lead > 0 ? 'bank_nifty' : 'nifty_50'
+      });
+    }
   }
   return out;
 }

@@ -37,7 +37,7 @@ function vizTitleEl(title, asof) {
 // items: [{ label, value, max, status, delta? }]  (sorted by value desc)
 // ──────────────────────────────────────────────────────────────
 export function renderDriverBars(items, opts = {}) {
-  const { showDelta = true, labelWidth = 130, max = 100, deltaUnit = '' } = opts;
+  const { showDelta = true, showArrow = false, labelWidth = 130, max = 100, deltaUnit = '' } = opts;
   const rows = items.map(item => {
     const pct = Math.max(0, Math.min(100, (item.value / (item.max || max)) * 100));
     const color = statusColor(item.status);
@@ -48,14 +48,23 @@ export function renderDriverBars(items, opts = {}) {
       ]),
       el('span', { class: 'driver-bar-value', style: { color } }, String(item.value))
     ];
-    if (showDelta && item.delta != null) {
+    if (showArrow) {
+      // Direction arrow based on delta sign · ↑ red (rising stress) / ↓ green (easing) / → grey (flat)
+      let arrow = '→', aColor = 'var(--ink-3)';
+      if (item.delta != null && Math.abs(item.delta) >= 1) {
+        if (item.delta > 0) { arrow = '↑'; aColor = 'var(--red)'; }
+        else { arrow = '↓'; aColor = 'var(--green)'; }
+      }
+      cells.push(el('span', { class: 'driver-bar-arrow', style: { color: aColor, fontFamily: 'var(--mono)', fontSize: '13px', textAlign: 'center' } }, arrow));
+    } else if (showDelta && item.delta != null) {
       const dColor = item.delta > 0 ? color : 'var(--green)';
       cells.push(el('span', { class: 'driver-bar-delta', style: { color: dColor } },
         (item.delta > 0 ? '+' : '') + item.delta + deltaUnit));
     }
+    const colWidth = showArrow ? '32px' : (showDelta ? '40px' : '');
     return el('div', {
       class: 'driver-bar-row',
-      style: { gridTemplateColumns: `${labelWidth}px 1fr 50px ${showDelta ? '40px' : ''}` }
+      style: { gridTemplateColumns: `${labelWidth}px 1fr 50px ${colWidth}` }
     }, cells);
   });
   return el('div', { class: 'driver-bars' }, rows);
@@ -796,16 +805,56 @@ export function renderHeadlinePanel({
 // renderTodayBullets · bullet-row Today line (Design Audit §10 fix)
 // items: [{ html, drawer_metric_id }]
 // ──────────────────────────────────────────────────────────────
+// Items now support optional `icon` ('shock' | 'watch' | 'calm' | 'arrow')
+// and the bullet grid lays out as 2-col on screens ≥1100px (CSS-driven).
+const ICON_GLYPH = { shock: '◆', watch: '●', calm: '✓', arrow: '→' };
+const ICON_COLOR = { shock: 'var(--red)', watch: 'var(--amber)', calm: 'var(--green)', arrow: 'var(--accent)' };
+
 export function renderTodayBullets(items, opts = {}) {
   const onClick = opts.onClick || (() => {});
   return el('div', { class: 'today-bullets' }, [
     el('div', { class: 'tb-head' }, 'Today'),
-    ...items.map(item => el('div', {
-      class: 'tb-row',
-      onclick: () => item.drawer_metric_id && onClick(item.drawer_metric_id)
-    }, [
-      el('span', { class: 'tb-arrow' }, '→'),
-      el('span', { class: 'tb-text', html: item.html })
-    ]))
+    el('div', { class: 'tb-grid' }, items.map(item => {
+      const iconType = item.icon || 'arrow';
+      const glyph = ICON_GLYPH[iconType] || '→';
+      const colour = ICON_COLOR[iconType] || 'var(--accent)';
+      return el('div', {
+        class: 'tb-row',
+        onclick: () => item.drawer_metric_id && onClick(item.drawer_metric_id)
+      }, [
+        el('span', { class: 'tb-icon', style: { color: colour } }, glyph),
+        el('span', { class: 'tb-text', html: item.html })
+      ]);
+    }))
   ]);
+}
+
+// Auto-narrative for the Hero · pulls from live driver scores and produces
+// a punchy 1-2 sentence readout. Returns null if data is missing.
+export function buildHeroNarrative(driverEntries, riskMetric) {
+  if (!driverEntries || driverEntries.length === 0) return null;
+  // Top-2 stress drivers by score
+  const sorted = driverEntries.filter(d => typeof d.value === 'number')
+    .sort((a, b) => b.value - a.value);
+  if (sorted.length < 2) return null;
+  const top1 = sorted[0];
+  const top2 = sorted[1];
+  const calmest = sorted[sorted.length - 1];
+  const lead = `Stress is led by <b>${top1.label.replace(/^⚠\s/, '')} ${Math.round(top1.value)}</b> and <b>${top2.label.replace(/^⚠\s/, '')} ${Math.round(top2.value)}</b>.`;
+  const tail = ` Real economy holding at <b>${Math.round(calmest.value)}</b>.`;
+  return el('div', {
+    class: 'hv-narrative',
+    style: {
+      marginTop: '12px',
+      padding: '10px 14px',
+      background: 'rgba(212,165,116,0.05)',
+      borderLeft: '3px solid var(--accent)',
+      borderRadius: '0 4px 4px 0',
+      fontSize: '12.5px',
+      color: 'var(--ink-2)',
+      fontStyle: 'italic',
+      lineHeight: '1.55'
+    },
+    html: lead + tail
+  });
 }
