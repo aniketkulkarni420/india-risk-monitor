@@ -95,11 +95,25 @@ export function renderTableRow(metric, opts = {}) {
       ? null
       : el('td', { class: 'trend-cell ' + trendClass(metric.yoy_pct, dir) }, formatTrend(metric.yoy_pct)),
     el('td', { class: 'spark-cell' }, [
-      renderSparkline({
-        data: metric.sparkline_12m || [],
-        width: 80, height: 22,
-        trend_direction: dir
-      })
+      // Only render the sparkline when there's real history (≥4 unique values).
+      // Otherwise show a tiny "pending" pill to be honest about V1 data depth.
+      (() => {
+        const sl = metric.sparkline_12m || [];
+        const uniqueCount = new Set(sl.filter(v => v != null)).size;
+        if (uniqueCount >= 4) {
+          return renderSparkline({ data: sl, width: 80, height: 22, trend_direction: dir });
+        }
+        return el('span', {
+          style: {
+            fontSize: '9px',
+            color: 'var(--ink-3)',
+            fontFamily: 'var(--mono)',
+            fontStyle: 'italic',
+            opacity: 0.7
+          },
+          title: 'Historical series accruing · returns when 12 unique readings collected'
+        }, 'history pending');
+      })()
     ]),
     el('td', { class: 'status-cell' }, [
       // Per-row source pill (Design Audit §12 · trust signal at scan-time)

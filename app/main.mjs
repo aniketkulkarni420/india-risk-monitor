@@ -204,31 +204,49 @@ const drivers = driverIds.map(M).filter(Boolean).map(d => ({
   metric_id: d.metric_id
 })).sort((a, b) => b.value - a.value);
 
+// A sparkline is "real history" only when it has at least 4 unique values.
+// Below that threshold we hide the chart to avoid showing a near-flat line
+// that pretends to be a trend.
+function hasRealHistory(arr) {
+  if (!Array.isArray(arr) || arr.length < 4) return false;
+  return new Set(arr.filter(v => v != null)).size >= 4;
+}
+
 const vital = el('div', { class: 'hero-vital', onclick: (e) => { e.stopPropagation(); openDrawer('india_risk_score'); } });
+
+// Header row · label + dual delta (w/w + day-on-day)
+const wwDelta = (risk.mom_pct ?? 0) > 0 ? '+' : '';
+const wwVal = risk.mom_pct != null ? wwDelta + Math.round(risk.value * risk.mom_pct / 100) : null;
+const dodVal = risk.dod_delta != null ? (risk.dod_delta > 0 ? '+' : '') + risk.dod_delta : null;
 vital.appendChild(el('div', { class: 'hv-score-row' }, [
   el('span', { class: 'hv-score-label' }, 'India Risk Score'),
-  el('span', { class: 'hv-delta' }, ['w/w ', el('b', {}, (risk.mom_pct > 0 ? '+' : '') + Math.round(risk.value * risk.mom_pct / 100))])
+  el('span', { class: 'hv-delta' }, [
+    wwVal != null ? el('span', {}, ['w/w ', el('b', { style: { color: risk.mom_pct >= 0 ? 'var(--red)' : 'var(--green)' } }, wwVal)]) : null,
+    dodVal != null ? el('span', { style: { marginLeft: '14px' } }, ['today ', el('b', { style: { color: risk.dod_delta >= 0 ? 'var(--red)' : 'var(--green)' } }, dodVal)]) : null
+  ].filter(Boolean))
 ]));
 
-// Score row · big number + inline 12-week sparkline + status pill
+// Score row · big number + inline 12-week sparkline (only if real history) + status pill
 const scoreRow = el('div', { class: 'hv-score-row', style: { alignItems: 'flex-end', gap: '14px' } }, [
   el('div', { class: 'hv-score-big' }, String(risk.value)),
   el('div', { class: 'hv-score-sub' }, '/ 100')
 ]);
-// Build inline sparkline of risk score itself if history is available
-const riskHist = Array.isArray(risk.sparkline_12m) && risk.sparkline_12m.length >= 3 ? risk.sparkline_12m : null;
-if (riskHist) {
+if (hasRealHistory(risk.sparkline_12m)) {
+  const riskHist = risk.sparkline_12m;
   const minV = Math.min(...riskHist), maxV = Math.max(...riskHist), range = (maxV - minV) || 1;
   const points = riskHist.map((v, i) => {
     const x = (i / (riskHist.length - 1)) * 130 + 5;
     const y = 32 - ((v - minV) / range) * 26;
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(' ');
-  const lastX = (1) * 130 + 5;
+  const lastX = 135;
   const lastY = 32 - ((riskHist[riskHist.length - 1] - minV) / range) * 26;
   const sparkSvg = el('svg', { class: 'hv-spark-inline', width: '140', height: '40', viewBox: '0 0 140 40' }, []);
   sparkSvg.innerHTML = `<polyline fill="none" stroke="var(--accent)" stroke-width="1.8" points="${points}"/><circle cx="${lastX}" cy="${lastY}" r="3" fill="var(--accent)"/>`;
   scoreRow.appendChild(sparkSvg);
+} else {
+  // Honest placeholder · no fake trend line
+  scoreRow.appendChild(el('span', { class: 'hv-spark-pending', style: { fontSize: '11px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginLeft: '14px' } }, '12w trend · history accruing'));
 }
 scoreRow.appendChild(el('div', { style: { marginLeft: 'auto' } }, [
   el('span', { class: 'pill ' + statusClass(risk.status) }, risk.status[0].toUpperCase() + risk.status.slice(1))
@@ -247,6 +265,40 @@ vital.appendChild(el('div', { class: 'hv-band-zones' }, [
 // Auto-narrative · "Stress is led by Oil & physical 92 and Freight 74..."
 const narrativeEl = buildHeroNarrative(drivers, risk);
 if (narrativeEl) vital.appendChild(narrativeEl);
+
+// Attribution line · "Today's +N driven by: Brent +1.4% · Hormuz -2 ships · ..."
+// Pulls top 3 movers since yesterday from any verified-live metric.
+// Only renders if at least 1 metric has dod_delta computed.
+function buildAttributionLine() {
+  const movers = Object.values(DATA.metrics)
+    .filter(m => m.verification_state === 'verified' && typeof m.dod_pct === 'number' && Math.abs(m.dod_pct) >= 0.5 && !m.metric_id.startsWith('driver_') && m.metric_id !== 'india_risk_score')
+    .sort((a, b) => Math.abs(b.dod_pct) - Math.abs(a.dod_pct))
+    .slice(0, 3);
+  if (movers.length === 0) return null;
+  const parts = movers.map(m => {
+    const sign = m.dod_pct > 0 ? '+' : '';
+    const colour = m.trend_direction === 'bad' ? (m.dod_pct > 0 ? 'var(--red)' : 'var(--green)')
+                 : m.trend_direction === 'good' ? (m.dod_pct > 0 ? 'var(--green)' : 'var(--red)')
+                 : (m.dod_pct > 0 ? 'var(--red)' : 'var(--green)');
+    return `<span style="color:${colour};font-family:var(--mono)">${sign}${m.dod_pct.toFixed(1)}%</span> ${m.display_name.replace(/^.*?(\w+).*$/, m.display_name).slice(0, 20)}`;
+  });
+  return el('div', {
+    class: 'hv-attribution',
+    style: {
+      marginTop: '8px',
+      fontSize: '11.5px',
+      color: 'var(--ink-3)',
+      fontFamily: 'var(--mono)',
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '14px',
+      alignItems: 'center'
+    },
+    html: `<span style="color:var(--ink-2)">Today's movers:</span> ${parts.join(' · ')}`
+  });
+}
+const attribEl = buildAttributionLine();
+if (attribEl) vital.appendChild(attribEl);
 
 vital.appendChild(el('div', { class: 'hv-drivers-head' }, 'Drivers · sorted by pressure'));
 
