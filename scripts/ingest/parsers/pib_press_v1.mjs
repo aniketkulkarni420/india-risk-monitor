@@ -128,10 +128,23 @@ export async function fetchPrimary(metric) {
     if (!ext.plausible(lakhCrore)) {
       throw new Error(`gst_gross: parsed ${lakhCrore} L Cr — outside plausibility band`);
     }
+    // Source-staleness check · 2026-05-06.
+    // GSTN's canonical xlsx publishes monthly but has historically lagged
+    // by 60-90 days during certain periods. If the latest sheet is older
+    // than 70 days, refuse the value rather than silently re-stamping the
+    // same stale figure with today's as_of. The downstream metric file
+    // keeps its last known value + as_of from the prior successful pull,
+    // and the STALE pill in UI surfaces the lag honestly.
+    // Future: replace this throw with a fallback to PIB press release
+    // once a stable PIB selector is verified.
+    const sheetAgeDays = Math.floor((Date.now() - new Date(asOfIso).getTime()) / 86400000);
+    if (sheetAgeDays > 70) {
+      throw new Error(`gst_gross: GSTN xlsx latest sheet "${latestSheet}" is ${sheetAgeDays}d old (>70d threshold). Refusing stale value. PIB fallback needed — see TODO in pib_press_v1.mjs.`);
+    }
     return {
       value: lakhCrore,
       as_of: asOfIso,
-      parse_meta: { source: 'GSTN Gross_Net_Tax_collection.xlsx', endpoint: ext.url, sheet: latestSheet },
+      parse_meta: { source: 'GSTN Gross_Net_Tax_collection.xlsx', endpoint: ext.url, sheet: latestSheet, sheet_age_days: sheetAgeDays },
       raw
     };
   }
