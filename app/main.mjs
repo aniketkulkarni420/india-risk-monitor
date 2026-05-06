@@ -419,6 +419,55 @@ document.getElementById('hero-h1').textContent = 'Stress is high, but activity h
 const heroLead = document.getElementById('hero-lead');
 if (heroLead) heroLead.style.display = 'none';
 
+// B · Collapsible hero (mobile only) — adds a condensed lead line + toggle
+// shown only in collapsed state. Default state: collapsed on mobile,
+// remembered via localStorage. Desktop ignores entirely (CSS-driven).
+function setupCollapsibleHero() {
+  const heroCard = document.getElementById('hero-card');
+  if (!heroCard) return;
+  const stored = localStorage.getItem('irm.heroCollapsed');
+  const initialCollapsed = stored == null ? true : stored === 'true';
+  document.body.dataset.heroCollapsed = String(initialCollapsed);
+
+  // Build condensed lead — one-line summary used when collapsed
+  const hormuz = M('hormuz_throughput');
+  const brent = M('brent_crude');
+  const leadParts = [];
+  if (hormuz && hormuz.value < (hormuz.baseline_30d || 140)) {
+    leadParts.push(`Hormuz ${hormuz.value} ships/day`);
+  }
+  if (brent && brent.value >= 95) {
+    leadParts.push(`Brent $${brent.value.toFixed(2)}`);
+  }
+  if (risk && risk.dod_delta != null) {
+    leadParts.push(`risk ${risk.value}/100${risk.dod_delta >= 0 ? ' +' : ' '}${risk.dod_delta} today`);
+  }
+  if (leadParts.length === 0 && risk) leadParts.push(`Risk ${risk.value}/100 · ${risk.status}`);
+  const condLead = el('div', { class: 'hero-condensed-lead' }, leadParts.join(' · '));
+  // Insert just after hero-h1
+  const h1 = document.getElementById('hero-h1');
+  h1.parentNode.insertBefore(condLead, h1.nextSibling);
+
+  // Toggle button — appended at end of hero-card
+  const toggle = el('button', {
+    class: 'hero-collapse-toggle',
+    'aria-expanded': String(!initialCollapsed),
+    onclick: () => {
+      const cur = document.body.dataset.heroCollapsed === 'true';
+      document.body.dataset.heroCollapsed = String(!cur);
+      toggle.setAttribute('aria-expanded', String(cur));
+      toggle.querySelector('.label').textContent = cur ? 'Hide drivers' : 'Show drivers';
+      localStorage.setItem('irm.heroCollapsed', String(!cur));
+    }
+  }, [
+    el('span', { class: 'label' }, initialCollapsed ? 'Show drivers' : 'Hide drivers'),
+    el('span', { class: 'arrow' }, '▾')
+  ]);
+  heroCard.appendChild(toggle);
+}
+// Defer to end of hero render so all elements exist
+setTimeout(setupCollapsibleHero, 0);
+
 const todayWrap = document.getElementById('hero-today');
 todayWrap.innerHTML = '';
 todayWrap.style.display = 'block';
@@ -1253,6 +1302,9 @@ function setActiveTab(tabId, opts = {}) {
   document.body.dataset.activeTab = tabId;
   document.querySelectorAll('.tab-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tab === tabId));
+  // Sync bottom (mobile) tab bar
+  document.querySelectorAll('.btb-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === tabId));
   // Mark visible section-frame(s) for CSS show/hide
   document.querySelectorAll('.section-frame').forEach(s => {
     const isMatch = tabId === 'all' || s.dataset.section === tabId;
@@ -1283,7 +1335,7 @@ function getInitialTab() {
   return TABS.find(t => t.id === hash) ? hash : 'flows';
 }
 
-// Build tab buttons with counts + shock badges
+// Build tab buttons with counts + shock badges (desktop · top tab bar)
 const tabBar = document.getElementById('tab-bar');
 TABS.forEach(t => {
   const btn = el('button', {
@@ -1300,6 +1352,38 @@ TABS.forEach(t => {
   }
   tabBar.appendChild(btn);
 });
+
+// A · Bottom tab bar (mobile only · CSS hides on desktop)
+// 5 visible primary tabs · "More" overflow opens a sheet with the rest if needed.
+const TAB_ICONS = {
+  flows:    '⇌',
+  macro:    '%',
+  economy:  '◐',
+  freight:  '⚓',
+  market:   '↗',
+  sectors:  '⊞',
+  all:      '☰'
+};
+const BOTTOM_TABS = ['flows', 'macro', 'economy', 'freight', 'market'];
+const bottomBar = document.getElementById('bottom-tab-bar');
+if (bottomBar) {
+  BOTTOM_TABS.forEach(id => {
+    const tab = TABS.find(t => t.id === id);
+    if (!tab) return;
+    const stats = sectionStats(id);
+    const btn = el('button', {
+      class: 'btb-btn',
+      'data-tab': id,
+      onclick: () => setActiveTab(id)
+    }, [
+      el('span', { class: 'btb-icon' }, TAB_ICONS[id] || '•'),
+      el('span', { class: 'btb-label' }, tab.label.length > 8 ? tab.label.slice(0, 7) + '…' : tab.label),
+      stats.shockCount ? el('span', { class: 'btb-shock-dot' }) : null
+    ].filter(Boolean));
+    bottomBar.appendChild(btn);
+  });
+}
+// Bottom tab bar active sync is now baked into setActiveTab() above
 
 // Initial load · skip hash write (keep URL clean) + skip scroll (don't yank user)
 setActiveTab(getInitialTab(), { skipHash: !location.hash, skipScroll: true });

@@ -281,6 +281,275 @@ table.metric-table tr:hover td { background: rgba(255,255,255,.015); }
   .tb-row { min-height: var(--tap-min); padding: 10px 12px; }
   .cluster-card { min-height: var(--tap-min); }
   .sector-row { min-height: var(--tap-min); }
+  .driver-bar-row { min-height: 48px; padding: 8px 4px; align-items: center; }
+  .metric-table tr { min-height: 56px; }
+  .metric-table td { padding: 14px 8px; }
+  .matrix-cell, .hp-matrix-cell { min-height: var(--tap-min); padding: 14px 16px; }
+  .horizon-card { min-height: 80px; padding: 14px 16px; }
+  .persistence-chip { min-height: var(--tap-min); padding: 10px 14px; }
+}
+
+/* ───── Mobile typography bump (Apple HIG / Material 3 minimums) ───── */
+@media (max-width: 600px) {
+  body { font-size: 15px; }
+  /* Body and primary text */
+  .tb-text, .tb-text b, .narrative-line { font-size: 14.5px; }
+  /* Sub-text minimum 12px floor */
+  .stat-sub, .sm-units, .asof-pill, .src-pill,
+  .matrix-cell .asof, .hp-matrix-cell .asof,
+  .cs-spark + .cs-trends, .gauge-hint,
+  .dtb-sub, .sf-question { font-size: 12px !important; }
+  /* Status labels stay punchy but readable */
+  .stat-label, .label, .matrix-cell .label, .hp-matrix-cell .label,
+  .cc-label, .dtb-label, .gauge-label { font-size: 11px !important; }
+  /* Inline mono numbers */
+  .driver-bar-value, .driver-bar-arrow { font-size: 13px; }
+  .cs-value, .stat-value, .matrix-cell .value, .hp-matrix-cell .value { font-size: 17px; }
+}
+
+/* ────────────────────────────────────────────────────────── */
+/* MOBILE · Tier 1 + 2 mobile redesign                        */
+/* Bottom tab bar · collapsible hero · card metrics           */
+/* ────────────────────────────────────────────────────────── */
+
+/* Default: hide all mobile-only elements */
+.mobile-only { display: none; }
+.bottom-tab-bar { display: none; }
+.hero-collapse-toggle { display: none; }
+
+@media (max-width: 700px) {
+  .mobile-only { display: block; }
+  .desktop-only { display: none !important; }
+
+  /* ─── A · Bottom tab bar ─── */
+  /* Top tab bar hides on mobile · bottom bar takes over */
+  .tab-bar { display: none; }
+
+  .bottom-tab-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10, 13, 18, 0.96);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.3);
+  }
+  .btb-btn {
+    background: transparent;
+    border: none;
+    color: var(--ink-3);
+    padding: 8px 4px 10px;
+    font-family: var(--sans);
+    font-size: 10.5px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 56px;
+    transition: color var(--t-fast);
+    position: relative;
+  }
+  .btb-btn .btb-icon {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .btb-btn .btb-label {
+    font-size: 10.5px;
+    line-height: 1;
+    text-transform: capitalize;
+  }
+  .btb-btn .btb-shock-dot {
+    position: absolute;
+    top: 8px;
+    right: 28%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+  }
+  .btb-btn:hover { color: var(--ink-2); }
+  .btb-btn.active {
+    color: var(--accent);
+  }
+  .btb-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 0 0 2px 2px;
+  }
+
+  /* Body padding to clear bottom tab bar */
+  .page-wrap {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0)) !important;
+  }
+
+  /* Hide any "All" tab references on mobile · it's the default scroll */
+  .btb-btn[data-tab="all"] { display: none; }
+
+  /* ─── B · Collapsible hero ─── */
+  .hero-collapse-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(212, 165, 116, 0.06);
+    border: 1px solid var(--line-2);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    min-height: var(--tap-min);
+  }
+  .hero-collapse-toggle:active { background: rgba(212, 165, 116, 0.12); }
+  .hero-collapse-toggle .arrow { transition: transform var(--t-base); }
+
+  /* When collapsed, hide the secondary content sections */
+  body[data-hero-collapsed="true"] .hero-today,
+  body[data-hero-collapsed="true"] .hero-divider,
+  body[data-hero-collapsed="true"] .driver-bars,
+  body[data-hero-collapsed="true"] .drvhd,
+  body[data-hero-collapsed="true"] .hv-narrative,
+  body[data-hero-collapsed="true"] .hv-attribution,
+  body[data-hero-collapsed="true"] .hero-driver-expansion {
+    display: none;
+  }
+  body[data-hero-collapsed="true"] .hero-collapse-toggle .arrow { transform: rotate(0deg); }
+  body[data-hero-collapsed="false"] .hero-collapse-toggle .arrow { transform: rotate(180deg); }
+
+  /* When collapsed, show single condensed lead line */
+  .hero-condensed-lead { display: none; }
+  body[data-hero-collapsed="true"] .hero-condensed-lead {
+    display: block;
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: var(--ink-3);
+    font-family: var(--mono);
+    line-height: 1.5;
+  }
+
+  /* ─── F · Card-based metrics on mobile ─── */
+  .metric-table { display: block; }
+  .metric-table thead { display: none; } /* hide table header */
+  .metric-table tbody { display: block; }
+  .metric-table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name status"
+      "value status"
+      "trends trends"
+      "spark spark";
+    gap: 6px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--line) !important;
+  }
+  .metric-table tr.tr-shock {
+    background: linear-gradient(180deg, rgba(58,28,28,0.4), var(--surface) 70%);
+    border-left: 3px solid var(--red);
+  }
+  .metric-table td.name {
+    grid-area: name;
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--ink);
+    padding: 0;
+    border: none;
+  }
+  .metric-table td.name small {
+    display: block;
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+  .metric-table td.num {
+    grid-area: value;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: var(--mono);
+    text-align: left;
+    padding: 0;
+    border: none;
+    color: var(--ink);
+  }
+  .metric-table td.trend-cell {
+    grid-area: trends;
+    font-size: 13px;
+    font-family: var(--mono);
+    text-align: left;
+    padding: 0;
+    border: none;
+  }
+  .metric-table td.trend-cell:first-of-type::before {
+    content: 'MoM ';
+    color: var(--ink-3);
+    font-size: 11px;
+    font-weight: 400;
+  }
+  .metric-table td.trend-cell:last-of-type::before {
+    content: ' · YoY ';
+    color: var(--ink-3);
+    font-size: 11px;
+    font-weight: 400;
+    margin-left: 8px;
+  }
+  .metric-table td.trend-cell:last-of-type {
+    display: inline;
+  }
+  .metric-table td.spark-cell {
+    grid-area: spark;
+    padding: 4px 0 0;
+    border: none;
+  }
+  .metric-table td.status-cell {
+    grid-area: status;
+    text-align: right;
+    padding: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .metric-table td.pending-cell {
+    grid-area: trends;
+    font-size: 12px;
+    font-style: italic;
+    color: var(--ink-3);
+    padding: 0;
+    border: none;
+  }
+
+  /* Adjust hero card bottom-padding on mobile so it doesn't hug the tab bar */
+  .hero { padding-bottom: 16px; }
 }
 
 /* Section header · horizontal · title left + question right · single line on web */
@@ -482,8 +751,43 @@ table.heatmap th:first-child { text-align: left; padding-left: 12px; }
   box-shadow: -20px 0 40px rgba(0,0,0,.4);
 }
 .metric-drawer.open { transform: translateX(0); }
+
+/* C · Bottom sheet on mobile · slides up from bottom with drag handle */
 @media (max-width: 700px) {
-  .metric-drawer { width: 100vw; }
+  .metric-drawer {
+    top: auto;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+    max-height: 92vh;
+    border-left: none;
+    border-top: 1px solid var(--line);
+    border-radius: 16px 16px 0 0;
+    transform: translateY(100%);
+    box-shadow: 0 -20px 40px rgba(0,0,0,.5);
+    padding-top: 12px;
+  }
+  .metric-drawer.open { transform: translateY(0); }
+  /* Drag-handle indicator at top */
+  .metric-drawer::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: var(--ink-3);
+    border-radius: 2px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .md-pad { padding: 24px 18px 80px; }
+  .md-close {
+    top: 12px;
+    right: 14px;
+  }
 }
 
 .md-pad { padding: 32px 36px 64px; position: relative; }

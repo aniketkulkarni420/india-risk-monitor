@@ -48,6 +48,38 @@ function ensureMounted() {
     if (e.key === 'Escape' && _open) close();
   });
 
+  // Touch · drag-to-close on mobile (bottom-sheet pattern)
+  // Active only on viewports ≤700px where the drawer opens from bottom.
+  let touchStartY = null;
+  let touchCurrentY = null;
+  let dragging = false;
+  _drawer.addEventListener('touchstart', (e) => {
+    if (window.innerWidth > 700) return;
+    // Only enable drag if touched on top portion (drag-handle / first 60px)
+    const rect = _drawer.getBoundingClientRect();
+    if (e.touches[0].clientY - rect.top > 60) return;
+    touchStartY = e.touches[0].clientY;
+    touchCurrentY = touchStartY;
+    dragging = true;
+    _drawer.style.transition = 'none';
+  }, { passive: true });
+  _drawer.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    touchCurrentY = e.touches[0].clientY;
+    const dy = touchCurrentY - touchStartY;
+    if (dy > 0) {
+      _drawer.style.transform = `translateY(${dy}px)`;
+    }
+  }, { passive: true });
+  _drawer.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    _drawer.style.transition = '';
+    const dy = (touchCurrentY ?? touchStartY) - touchStartY;
+    _drawer.style.transform = '';
+    if (dy > 100) close();
+  });
+
   // React to URL hash changes (deep-linking)
   window.addEventListener('hashchange', syncFromHash);
 }
