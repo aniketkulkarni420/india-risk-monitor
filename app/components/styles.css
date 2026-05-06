@@ -167,10 +167,22 @@ table.metric-table tr:hover td { background: rgba(255,255,255,.015); }
 .section-frame { padding: 64px 0 48px; border-top: 1px solid var(--line); font-family: var(--sans); }
 .section-frame:first-of-type { border-top: none; padding-top: 8px; }
 .section-frame + .section-frame { margin-top: 0; }
-/* Section header · vertical (reverted from horizontal strip · awaiting Aniket screenshot) */
-.sf-header { margin-bottom: 24px; }
-.sf-title { font-size: 24px; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 6px; scroll-margin-top: 80px; }
-.sf-question { color: var(--ink-2); font-size: 14px; margin: 0; max-width: 640px; }
+/* Section header · horizontal · title left + question right · single line on web */
+.sf-header {
+  margin-bottom: 22px;
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 14px;
+}
+.sf-title { font-size: 22px; font-weight: 700; letter-spacing: -0.015em; margin: 0; scroll-margin-top: 80px; flex-shrink: 0; }
+.sf-question { color: var(--ink-2); font-size: 13.5px; margin: 0; flex: 1; min-width: 0; line-height: 1.5; }
+@media (max-width: 600px) {
+  .sf-header { flex-direction: column; align-items: flex-start; gap: 6px; padding-bottom: 12px; }
+  .sf-title { font-size: 19px; }
+}
 
 /* Hero · narrative + sparkline + Today bullet 2-col grid + status icons */
 .hv-narrative { /* attributes set inline in buildHeroNarrative */ }
