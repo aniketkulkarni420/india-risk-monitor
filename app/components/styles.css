@@ -684,9 +684,11 @@ table.heatmap th:first-child { text-align: left; padding-left: 12px; }
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
   display: flex;
+  flex-wrap: nowrap;             /* always single row · no vertical stacking ever */
   gap: 4px;
   padding: 8px 32px;
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   font-family: var(--sans);
   scrollbar-width: none;
