@@ -620,7 +620,11 @@ function renderClusterCards(metrics, opts = {}) {
       trendRows.length ? el('div', { class: 'cc-cell-trends' }, trendRows) : null,
       el('div', { class: 'cc-cell-asof' }, [
         m.as_of ? 'as on ' + shortAsOf(m.as_of) : 'as of —',
-        m.source_primary?.name ? [' · ', el('span', { class: 'src' }, shortSourceName(m.source_primary.name))] : null
+        m.source_primary?.name ? [' · ', el('span', { class: 'src' }, shortSourceName(m.source_primary.name))] : null,
+        m.is_stale ? [' · ', el('span', {
+          class: 'stale-inline',
+          title: `Last updated ${m.age_days}d ago · expected every ${m.cadence_days}d`
+        }, 'STALE')] : null
       ].flat().filter(Boolean))
     ].filter(Boolean));
     grid.appendChild(card);

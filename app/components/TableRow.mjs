@@ -169,10 +169,13 @@ export function renderTableRow(metric, opts = {}) {
       })()
     ]),
     el('td', { class: 'status-cell' }, [
-      // Per-row source pill (Design Audit §12 · trust signal at scan-time)
       sourcePill(metric.source_primary?.name),
-      // Per-row as-of stamp — every metric must show when its data is from
       metric.as_of ? el('span', { class: 'asof-pill', title: 'Data as of ' + new Date(metric.as_of).toString(), style: { fontFamily: 'var(--mono)', fontSize: '10px', color: 'var(--ink-3)', marginRight: '4px' } }, formatAsOf(metric.as_of)) : null,
+      // STALE pill · surfaced when (age - cadence) flags freshness-spec.mjs
+      metric.is_stale ? el('span', {
+        class: 'stale-pill',
+        title: `Last updated ${metric.age_days}d ago · expected refresh every ${metric.cadence_days}d. Source ingest may be lagging or upstream publication delayed.`
+      }, 'STALE ' + metric.age_days + 'd') : null,
       el('span', { class: 'pill ' + statusClass(metric.status) }, state === 'shock' ? 'SHOCK' : metric.status.charAt(0).toUpperCase() + metric.status.slice(1))
     ].filter(Boolean))
   ].filter(Boolean));

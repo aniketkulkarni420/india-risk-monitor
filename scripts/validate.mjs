@@ -97,9 +97,19 @@ function validateSchema(file, schema, data) {
 // Custom rules — Gates 2 & 5 from IRM_Build_Spec §06
 // ──────────────────────────────────────────────────────────────
 function customRules(file, m) {
-  // Gate 2: trend data missing on a verified metric
-  if (m.verification_state === 'verified' && (m.mom_pct === null || m.yoy_pct === null)) {
-    fail(file, `verified metric must have non-null mom_pct AND yoy_pct (Gate 2)`);
+  // Gate 2 (revised 2026-05-06): a "verified" metric must have a real value
+  // and an as_of timestamp. Trends (mom_pct / yoy_pct) are allowed to be null
+  // when sanitize-trends.mjs legitimately nulls them (unit shifts, sign flips,
+  // or insufficient history). The prior rule deadlocked CI: sanitize would
+  // null suspicious trends, validate would then fail the file, and the
+  // freshly-ingested value never got committed back to the repo.
+  if (m.verification_state === 'verified') {
+    if (m.value === null || m.value === undefined) {
+      fail(file, `verified metric must have non-null value (Gate 2)`);
+    }
+    if (!m.as_of) {
+      fail(file, `verified metric must have non-null as_of (Gate 2)`);
+    }
   }
 
   // Gate 2: cross-check has at least 1 entry

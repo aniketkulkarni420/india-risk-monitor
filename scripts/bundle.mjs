@@ -7,6 +7,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { existsSync } from 'node:fs';
+import { freshnessFor } from './freshness-spec.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -124,6 +125,13 @@ for (const file of walk(DATA)) {
     } else if (prev) {
       dodRejected++;
     }
+    // Freshness flag · derived from per-metric expected cadence (freshness-spec.mjs).
+    // is_stale = true when (today - as_of) > cadence_days. UI surfaces a STALE
+    // pill so users can see at scan-time which numbers are past their refresh window.
+    const fr = freshnessFor(data.metric_id, data.as_of);
+    data.is_stale = fr.is_stale;
+    data.age_days = fr.age_days;
+    data.cadence_days = fr.cadence_days;
     metrics[data.metric_id] = data;
   } else if (data.section === 'sectors' && Array.isArray(data.sectors)) {
     sectors = data;

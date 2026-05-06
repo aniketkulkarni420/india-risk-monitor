@@ -1391,6 +1391,37 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
 .cmdk-foot .key { background: var(--bg); padding: 1px 6px; border-radius: 3px; margin: 0 4px; }
 
 /* ─────────────────────────────────────────────────────────────
+   STALE pill · freshness-spec.mjs · 2026-05-06
+   Renders when (age_days > cadence_days) for a metric. Surfaces upstream
+   delays or ingest pipeline lag at scan-time, not buried in tooltips.
+   ───────────────────────────────────────────────────────────── */
+.stale-pill {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(233, 196, 102, 0.12);
+  color: var(--amber);
+  border: 1px solid rgba(233, 196, 102, 0.25);
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.stale-inline {
+  display: inline;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--amber);
+  padding: 0 4px;
+  border-radius: 2px;
+  background: rgba(233, 196, 102, 0.10);
+}
+
+/* ─────────────────────────────────────────────────────────────
    SupportingTier · collapsible Tier-2 expander · 2026-05-06
    ───────────────────────────────────────────────────────────── */
 .supporting-tier {
