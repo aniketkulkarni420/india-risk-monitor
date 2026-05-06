@@ -743,8 +743,10 @@ table.heatmap th:first-child { text-align: left; padding-left: 12px; }
   letter-spacing: .06em;
 }
 
-/* Section visibility · ALWAYS show all sections (tabs are scroll anchors, not filters).
-   The old hide-by-tab CSS is intentionally removed. */
+/* Section-frame visibility · driven by body[data-active-tab]
+   When a specific tab is active, only that section renders. "All" tab shows everything. */
+body[data-active-tab]:not([data-active-tab="all"]) .section-frame { display: none; }
+body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="true"] { display: block; }
 
 @media (max-width: 700px) {
   .tab-bar { padding: 8px 14px; }
