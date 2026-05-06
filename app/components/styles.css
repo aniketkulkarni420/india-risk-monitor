@@ -470,7 +470,8 @@ table.metric-table tr:hover td { background: rgba(255,255,255,.015); }
     row-gap: 8px;
     column-gap: 12px;
   }
-  .hv-score-big { font-size: 48px; }
+  /* Mobile: scale primary anchor to ~72px (still dominant; 96px would crowd at 360px) */
+  .hv-score-big { font-size: 72px; line-height: 0.95; }
   .hv-spark-inline,
   .hv-spark-pending {
     order: 10;
@@ -956,8 +957,11 @@ table.heatmap th:first-child { text-align: left; padding-left: 12px; }
 .hv-score-label { font-size: 11px; color: var(--ink-3); letter-spacing: .1em; text-transform: uppercase; }
 .hv-delta { margin-left: auto; font-size: 11.5px; color: var(--ink-3); }
 .hv-delta b { color: var(--ink-2); font-family: var(--mono); }
-.hv-score-big { font-size: 56px; font-weight: 700; letter-spacing: -0.025em; line-height: 1; font-family: var(--mono); font-feature-settings: "tnum"; }
-.hv-score-sub { color: var(--ink-3); font-size: 13px; }
+/* Hero score · primary visual anchor of the entire dashboard.
+   2026-05-06: bumped 56 -> 96px so it actually IS the headline number
+   instead of competing equally with the H1 + driver bars + sparkline. */
+.hv-score-big { font-size: 96px; font-weight: 800; letter-spacing: -0.035em; line-height: 0.95; font-family: var(--mono); font-feature-settings: "tnum"; }
+.hv-score-sub { color: var(--ink-3); font-size: 18px; font-family: var(--mono); }
 .hv-band-track { position: relative; height: 8px; background: linear-gradient(90deg, #1f3325 0% 35%, #2e2818 35% 65%, #2a1818 65% 100%); border-radius: 4px; margin: 12px 0 6px; }
 .hv-band-marker { position: absolute; top: -3px; width: 3px; height: 14px; background: var(--ink); border-radius: 2px; box-shadow: 0 0 8px rgba(255,255,255,.6); transition: left .3s; }
 .hv-band-zones { display: flex; justify-content: space-between; font-size: 9px; color: var(--ink-3); letter-spacing: .04em; margin-bottom: 18px; }

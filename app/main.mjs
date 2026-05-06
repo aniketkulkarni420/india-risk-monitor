@@ -417,7 +417,59 @@ heroHost.appendChild(vital);
 // ──────────────────────────────────────────────────────────────
 // Today bullet rows (replaces lead paragraph + Today line)
 // ──────────────────────────────────────────────────────────────
-document.getElementById('hero-h1').textContent = 'Stress is high, but activity hasn’t broken.';
+// Hero H1 · dynamic synthesis from live state · 2026-05-06
+// Replaces the prior static "Stress is high, but activity hasn't broken" which
+// read like horoscope copy. Now constructs a 2-clause read from the actual
+// top driver, biggest mover, and risk score direction.
+function buildHeroH1() {
+  const r = risk;
+  if (!r) return 'Loading risk read…';
+
+  // Driver sorted by value (highest stress first)
+  const topDriver = drivers.length ? drivers.slice().sort((a, b) => b.value - a.value)[0] : null;
+  // Brent + Hormuz state
+  const brent = M('brent_crude');
+  const hormuz = M('hormuz_throughput');
+  // Auto retail signal
+  const autoMetrics = ['auto_pv', 'auto_2w', 'auto_cv', 'auto_3w', 'auto_tractor'].map(M).filter(Boolean);
+  const autoMomAvg = autoMetrics.length
+    ? autoMetrics.reduce((s, m) => s + (m.mom_pct || 0), 0) / autoMetrics.length : null;
+  // Flows
+  const fii = M('fii_equity_daily'), abs = M('absorption_ratio');
+
+  const clauses = [];
+
+  // 1: top driver framing
+  if (topDriver) {
+    if (topDriver.value >= 70) clauses.push(`${topDriver.label} pressure elevated (${topDriver.value}/100)`);
+    else if (topDriver.value >= 50) clauses.push(`${topDriver.label} firming (${topDriver.value}/100)`);
+    else clauses.push(`${topDriver.label} contained (${topDriver.value}/100)`);
+  }
+
+  // 2: most concrete signal — try Brent + Hormuz, then auto, then flows
+  let secondary = null;
+  if (brent && hormuz) {
+    if (brent.value >= 95 || hormuz.value < 70) {
+      secondary = `Brent $${brent.value.toFixed(0)} · Hormuz ${hormuz.value} ships/day`;
+    } else if (brent.value < 90) {
+      secondary = `Brent eased to $${brent.value.toFixed(0)}, oil supply stable`;
+    } else {
+      secondary = `Brent $${brent.value.toFixed(0)} · Hormuz holding at ${hormuz.value}/day`;
+    }
+  }
+  if (!secondary && autoMomAvg != null && Math.abs(autoMomAvg) >= 5) {
+    const dir = autoMomAvg < 0 ? 'down' : 'up';
+    secondary = `auto retail ${dir} ${Math.abs(autoMomAvg).toFixed(0)}% MoM across all 5 segments`;
+  }
+  if (!secondary && fii && abs) {
+    const fmt = (v) => (v >= 0 ? '+₹' : '−₹') + Math.abs(v).toLocaleString('en-IN', { maximumFractionDigits: 0 }) + ' Cr';
+    secondary = `FII flow ${fmt(fii.value)} · DII covering ${(abs.value * 100).toFixed(0)}%`;
+  }
+  if (secondary) clauses.push(secondary);
+
+  return clauses.join(' · ') + '.';
+}
+document.getElementById('hero-h1').textContent = buildHeroH1();
 const heroLead = document.getElementById('hero-lead');
 if (heroLead) heroLead.style.display = 'none';
 
