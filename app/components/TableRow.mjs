@@ -96,23 +96,51 @@ export function renderTableRow(metric, opts = {}) {
       : el('td', { class: 'trend-cell ' + trendClass(metric.yoy_pct, dir) }, formatTrend(metric.yoy_pct)),
     el('td', { class: 'spark-cell' }, [
       // Only render the sparkline when there's real history (≥4 unique values).
-      // Otherwise show a tiny "pending" pill to be honest about V1 data depth.
+      // Otherwise show a "data verifying" progress badge to be honest about
+      // V1 data depth + signal that the platform is improving in real time.
       (() => {
         const sl = metric.sparkline_12m || [];
         const uniqueCount = new Set(sl.filter(v => v != null)).size;
         if (uniqueCount >= 4) {
           return renderSparkline({ data: sl, width: 80, height: 22, trend_direction: dir });
         }
+        // Progress badge · X of 12 days collected
+        const target = 12;
+        const filled = Math.min(uniqueCount, target);
+        const ticks = [];
+        for (let i = 0; i < target; i++) {
+          ticks.push(el('span', {
+            style: {
+              width: '4px',
+              height: '8px',
+              borderRadius: '1px',
+              background: i < filled ? 'var(--accent)' : 'var(--line-2)',
+              flexShrink: 0
+            }
+          }));
+        }
         return el('span', {
+          class: 'data-verifying-badge',
+          title: `Historical series accruing. ${filled} of ${target} consistent readings collected. Chart returns when ≥4 unique values present.`,
           style: {
-            fontSize: '9px',
-            color: 'var(--ink-3)',
-            fontFamily: 'var(--mono)',
-            fontStyle: 'italic',
-            opacity: 0.7
-          },
-          title: 'Historical series accruing · returns when 12 unique readings collected'
-        }, 'history pending');
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px'
+          }
+        }, [
+          el('span', {
+            style: { display: 'inline-flex', gap: '1.5px', alignItems: 'center' }
+          }, ticks),
+          el('span', {
+            style: {
+              fontSize: '9px',
+              color: 'var(--ink-3)',
+              fontFamily: 'var(--mono)',
+              fontStyle: 'italic',
+              whiteSpace: 'nowrap'
+            }
+          }, `verifying · ${filled}/${target}`)
+        ]);
       })()
     ]),
     el('td', { class: 'status-cell' }, [

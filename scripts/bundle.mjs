@@ -50,6 +50,32 @@ function previousDayValue(metric_id, currentAsOf) {
   return null;
 }
 
+// Sanitize sparkline_12m at bundle time. If the array contains a unit-shift
+// remnant (max/min ratio > 50), keep only the values that share an order of
+// magnitude with the current value. Catches Phase-1 seed values that hang
+// around when a parser ships with different units.
+function sanitizeSparkline(metric) {
+  if (!Array.isArray(metric.sparkline_12m) || metric.sparkline_12m.length === 0) return;
+  const sl = metric.sparkline_12m.filter(v => typeof v === 'number');
+  if (sl.length === 0) return;
+  const cur = metric.value;
+  if (typeof cur !== 'number' || cur === 0) return;
+  const positives = sl.map(Math.abs).filter(v => v > 0);
+  if (positives.length < 2) return;
+  const max = Math.max(...positives);
+  const min = Math.min(...positives);
+  if (max / min < 50) return;  // sparkline is fine, no shift detected
+
+  // Unit shift detected. Keep only values within 0.3x-3x of current value.
+  const lo = Math.abs(cur) * 0.3;
+  const hi = Math.abs(cur) * 3.0;
+  const clean = metric.sparkline_12m.filter(v =>
+    typeof v === 'number' && Math.abs(v) >= lo && Math.abs(v) <= hi
+  );
+  metric.sparkline_12m = clean;
+  metric._sparkline_sanitized = `dropped ${sl.length - clean.length} unit-shift values`;
+}
+
 // Sanity guard for day-over-day deltas. The history CSV may contain Phase-1
 // mock-seed values from before a parser was registered; when the parser later
 // switched to real data with different units / sign convention, the prev/current
@@ -78,11 +104,15 @@ function dodIsTrustworthy(metric, prev) {
 
 const metrics = {};
 let sectors = null;
-let dodAccepted = 0, dodRejected = 0;
+let dodAccepted = 0, dodRejected = 0, sparklineSanitized = 0;
 
 for (const file of walk(DATA)) {
   const data = JSON.parse(readFileSync(file, 'utf8'));
   if (data.metric_id) {
+    // Sanitize sparkline first (unit-shift detection)
+    sanitizeSparkline(data);
+    if (data._sparkline_sanitized) sparklineSanitized++;
+
     // Compute day-over-day delta + percentage if history allows AND data is trustworthy
     const prev = previousDayValue(data.metric_id, data.as_of);
     if (prev && dodIsTrustworthy(data, prev)) {
@@ -100,6 +130,7 @@ for (const file of walk(DATA)) {
   }
 }
 console.log(`  · dod accepted: ${dodAccepted} · rejected (unit shift / sign flip / mock seed): ${dodRejected}`);
+if (sparklineSanitized > 0) console.log(`  · sparkline sanitized (unit-shift remnants dropped): ${sparklineSanitized}`);
 
 const bundle = {
   generated_at: new Date().toISOString(),
