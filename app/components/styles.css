@@ -729,18 +729,41 @@ table.heatmap th:first-child { text-align: left; padding-left: 12px; }
   background: var(--accent-soft);
   border-color: var(--accent);
 }
+/* Inline mono badges · always center-align to the parent text baseline.
+   Without explicit display:inline-flex + line-height:1, mono digits sit
+   below the sans baseline because of font metric differences. */
 .tab-btn .tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--mono);
   font-size: 10.5px;
   color: var(--ink-3);
   letter-spacing: .04em;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.04);
+  min-width: 18px;
+  text-align: center;
 }
-.tab-btn.active .tab-count { color: var(--accent); }
+.tab-btn.active .tab-count {
+  color: var(--accent);
+  background: rgba(212,165,116,0.18);
+}
 .tab-btn .tab-shock {
-  background: var(--red); color: #1a0808;
-  padding: 1px 6px; border-radius: 3px;
-  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--red);
+  color: #1a0808;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
   letter-spacing: .06em;
+  line-height: 1;
 }
 
 /* Section-frame visibility · driven by body[data-active-tab]
@@ -757,10 +780,12 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
 /* PHASE 5.5 ADDITIONS · trust signals + upgraded TOC + Cmd-K     */
 /* ────────────────────────────────────────────────────────────── */
 
-/* Per-row source pill */
+/* Per-row source pill · inline mono badge next to status pill in TableRow */
 .src-pill {
-  display: inline-block;
-  padding: 1px 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
   background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 3px;
@@ -769,9 +794,25 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
   font-size: 9.5px;
   font-weight: 500;
   letter-spacing: .02em;
+  line-height: 1;
   margin-right: 6px;
   vertical-align: middle;
   white-space: nowrap;
+}
+
+/* Per-row as-of pill (TableRow · sits next to source pill + status pill) */
+.asof-pill {
+  display: inline-flex !important;
+  align-items: center;
+  line-height: 1;
+}
+
+/* Generic .pill (status low/med/high/shock used across panels) needs same treatment */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 /* Dashboard trust band (above footer) — visually grouped with footer */
@@ -796,6 +837,7 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
 .toc-link-upgraded:hover { color: var(--ink-2); }
 .toc-link-upgraded.active { color: var(--accent); font-weight: 600; }
 .toc-link-upgraded .toc-meta {
+  display: inline-flex; align-items: center; line-height: 1;
   font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); letter-spacing: .04em;
 }
 .toc-link-upgraded.active .toc-meta { color: var(--accent); }
