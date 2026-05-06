@@ -10,6 +10,7 @@ import { existsSync } from 'node:fs';
 import { freshnessFor } from './freshness-spec.mjs';
 import { evaluateStatus } from './evaluate-status.mjs';
 import { applyPlausibilityGuard } from './plausibility-guard.mjs';
+import { recomputeComposites } from './composite-recompute.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -185,6 +186,26 @@ for (const file of walk(DATA)) {
 }
 console.log(`  · dod accepted: ${dodAccepted} · rejected (unit shift / sign flip / mock seed): ${dodRejected}`);
 if (sparklineSanitized > 0) console.log(`  · sparkline sanitized (unit-shift remnants dropped): ${sparklineSanitized}`);
+
+// Composite re-derivation pass · drivers + risk score must reflect freshly-recomputed
+// statuses on the underlying metrics. Without this they keep old composite scores from
+// the prior ingest run (e.g. driver_oil_physical stays at 92 even after Brent drops below shock).
+const metricsMap = new Map(Object.entries(metrics));
+const compositeChanges = recomputeComposites(metricsMap);
+// Re-stamp composite status from new score after recompute
+for (const ch of compositeChanges) {
+  const m = metricsMap.get(ch.id);
+  if (!m) continue;
+  const newStatus = evaluateStatus(m);
+  if (newStatus && newStatus !== m.status) {
+    m._status_was_composite = m.status;
+    m.status = newStatus;
+  }
+  metrics[ch.id] = m;  // write-back into the plain object
+}
+if (compositeChanges.length) {
+  console.log(`  · composites re-derived (${compositeChanges.length}): ${compositeChanges.map(c => `${c.id} ${c.old}→${c.new}`).join(', ')}`);
+}
 
 const bundle = {
   generated_at: new Date().toISOString(),
