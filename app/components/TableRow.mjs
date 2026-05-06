@@ -164,7 +164,7 @@ export function renderTableRow(metric, opts = {}) {
               fontStyle: 'italic',
               whiteSpace: 'nowrap'
             }
-          }, `verifying · ${filled}/${target}`)
+          }, `history accruing · ${filled}/${target} months`)
         ]);
       })()
     ]),

@@ -259,9 +259,9 @@ vital.appendChild(el('div', { class: 'hv-band-track' }, [
   el('div', { class: 'hv-band-marker', style: { left: risk.value + '%' } })
 ]));
 vital.appendChild(el('div', { class: 'hv-band-zones' }, [
-  el('span', { style: { color: '#79c79a' } }, 'LOW 0–35'),
-  el('span', { style: { color: '#e9c466' } }, 'MED 35–65'),
-  el('span', { style: { color: '#e88' } }, 'HIGH 65–100')
+  el('span', { style: { color: '#79c79a' }, title: '0–35: stress contained · normal markets' }, 'LOW 0–35 · contained'),
+  el('span', { style: { color: '#e9c466' }, title: '35–65: elevated stress · monitor closely' }, 'MED 35–65 · elevated'),
+  el('span', { style: { color: '#e88' }, title: '65–100: breakdown risk · multiple shocks active' }, 'HIGH 65–100 · breakdown')
 ]));
 
 // Auto-narrative · "Stress is led by Oil & physical 92 and Freight 74..."
@@ -470,6 +470,13 @@ function buildHeroH1() {
   return clauses.join(' · ') + '.';
 }
 document.getElementById('hero-h1').textContent = buildHeroH1();
+
+// Browser tab title · live with current risk score so users with multiple
+// tabs open can scan their bar without switching context.
+if (risk && typeof risk.value === 'number') {
+  const status = (risk.status || '').toUpperCase();
+  document.title = `India Risk ${risk.value}${status ? ' · ' + status : ''} · IRM`;
+}
 const heroLead = document.getElementById('hero-lead');
 if (heroLead) heroLead.style.display = 'none';
 
@@ -1030,8 +1037,7 @@ clusters.forEach(c => {
       el('span', { style: { fontSize: '11.5px', fontWeight: 500, color: 'var(--ink-3)', marginLeft: '5px' } }, cms.length === 1 ? 'metric' : 'metrics')
     ]),
     el('div', { style: { fontFamily: 'var(--mono)', fontSize: '10.5px', color: 'var(--ink-3)', marginTop: '6px' } }, [
-      el('span', { style: { color: 'var(--green)', fontWeight: 600 } }, String(verifiedCount) + ' verified'),
-      ' · latest ' + newestStr
+      'latest ' + newestStr
     ]),
     el('div', { class: 'cc-sub', style: { marginTop: '8px' } }, c.sub)
   ]);
@@ -1044,7 +1050,7 @@ showCluster(clusters[3]); // open Auto by default — most data-rich
 body.appendChild(renderSectionFrame({
   section_id: 'economy',
   title: 'Real economy',
-  question: 'Tap any cluster · tax / movement / production / auto / discretionary.',
+  question: 'Click any cluster to drill in · tax · movement · production · auto · discretionary.',
   sources: buildSectionFooter(['GST', 'FADA', 'GridIndia', 'NPCI', 'IHMCL', 'JPC']),
   children: [econBody]
 }));
@@ -1151,7 +1157,7 @@ freightBody.appendChild(renderSupportingTier(
 body.appendChild(renderSectionFrame({
   section_id: 'freight',
   title: 'Freight & supply chain',
-  question: 'Where the physical economy is breaking. Hormuz, oil, freight, port congestion.',
+  question: 'Oil supply, shipping rates, and port congestion. Where physical-flow shocks originate.',
   sources: buildSectionFooter(['MarineTraffic', 'PPAC', 'Drewry', 'Baltic Exchange']),
   children: [freightBody]
 }));
@@ -1343,7 +1349,7 @@ sectors.forEach(s => {
     max: 10,
     status: s.drivers?.[d] === 'red' ? 'high' : s.drivers?.[d] === 'amber' ? 'med' : s.drivers?.[d] === 'green' ? 'low' : 'med'
   })).sort((a, b) => b.value - a.value);
-  expansion.appendChild(el('div', { class: 'sub-head' }, 'Driver pressure · sorted'));
+  expansion.appendChild(el('div', { class: 'sub-head' }, 'Driver scores · highest first'));
   expansion.appendChild(renderDriverBars(items, { showDelta: false, labelWidth: 110, max: 10 }));
 
   let expanded = false;
