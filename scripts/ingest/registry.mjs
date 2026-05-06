@@ -16,6 +16,7 @@ import * as tradingeconomics_v1 from './parsers/tradingeconomics_v1.mjs';
 import * as drewry_v1 from './parsers/drewry_v1.mjs';
 import * as derived_v1 from './parsers/derived_v1.mjs';
 import * as india_govt_v1 from './parsers/india_govt_v1.mjs';
+import * as nsdl_sectoral_v1 from './parsers/nsdl_sectoral_v1.mjs';
 import * as mock from './parsers/mock.mjs';
 
 // Registered REAL implementations. Anything not in this map uses mock fetcher.
@@ -59,7 +60,7 @@ const REAL = new Map([
   // These often fail from foreign networks but reach from CI / India IPs.
   ['press_release:naukri_v1', india_govt_v1],
   ['csv_download:nsdl_fpi_v1', india_govt_v1],
-  ['html_scrape:nsdl_sectoral_v1', india_govt_v1],
+  ['html_scrape:nsdl_sectoral_v1', nsdl_sectoral_v1],
   ['csv_download:nse_fno_v1', india_govt_v1],
   ['csv_download:nse_blocks_v1', india_govt_v1],
   ['press_release:ppac_v1', india_govt_v1],          // india_crude_basket + pol_demand
