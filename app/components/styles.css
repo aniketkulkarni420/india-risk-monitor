@@ -1391,6 +1391,138 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
 .cmdk-foot .key { background: var(--bg); padding: 1px 6px; border-radius: 3px; margin: 0 4px; }
 
 /* ─────────────────────────────────────────────────────────────
+   SupportingTier · collapsible Tier-2 expander · 2026-05-06
+   ───────────────────────────────────────────────────────────── */
+.supporting-tier {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-top: 14px;
+}
+.st-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--ink-2);
+  padding: 14px 18px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .04em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  min-height: var(--tap-min);
+}
+.st-toggle:hover { color: var(--ink); }
+.st-count {
+  display: inline-block;
+  background: var(--surface-3);
+  color: var(--accent);
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+.st-arrow {
+  color: var(--accent);
+  transition: transform 0.2s;
+  font-size: 11px;
+}
+.supporting-tier.open .st-arrow { transform: rotate(180deg); }
+.st-body { padding: 0 18px 18px; display: none; }
+.supporting-tier.open .st-body { display: block; }
+
+/* The .metric-table inside SupportingTier inherits all existing styles
+   (web rows + mobile card-grid override). No new CSS needed for layout. */
+
+/* ─────────────────────────────────────────────────────────────
+   Real Economy · value-led numbers cards · 2026-05-06
+   Replaces renderSmallMultiples in cluster expansions. Shows real values
+   with only the trends that exist (per ComparisonSpec); never fakes 0.0%.
+   ───────────────────────────────────────────────────────────── */
+.cluster-cards {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+.cluster-cards.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.cluster-cards.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.cluster-cards.cols-5 { grid-template-columns: repeat(5, 1fr); }
+.cluster-card-cell {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 14px;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.cluster-card-cell:hover { border-color: var(--line-2); }
+.cc-cell-label {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: var(--mono);
+  margin-bottom: 8px;
+}
+.cc-cell-value {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--mono);
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.cc-cell-unit {
+  display: inline;
+  font-size: 12px;
+  color: var(--ink-3);
+  font-weight: 500;
+  margin-left: 4px;
+  font-family: var(--mono);
+}
+.cc-cell-trends {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 10px;
+}
+.cc-cell-trend {
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
+.cc-cell-trend .lbl {
+  display: inline-block;
+  min-width: 28px;
+  color: var(--ink-3);
+  font-size: 10px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.cc-cell-asof {
+  margin-top: auto;
+  padding-top: 10px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink-3);
+}
+.cc-cell-asof .src { color: var(--ink-2); }
+
+@media (max-width: 700px) {
+  .cluster-cards.cols-3,
+  .cluster-cards.cols-4,
+  .cluster-cards.cols-5 { grid-template-columns: repeat(2, 1fr); }
+  .cluster-card-cell { min-height: 116px; padding: 12px 12px; }
+  .cc-cell-value { font-size: 19px; }
+}
+
+/* ─────────────────────────────────────────────────────────────
    Mobile gestures · Tier 3 (ticker · pull-refresh · swipe-tabs)
    ───────────────────────────────────────────────────────────── */
 

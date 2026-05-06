@@ -10,6 +10,10 @@
 
 import { el, formatValue, formatTrend, trendClass, statusClass, isHistoryPending, isShock, formatAsOf } from './utils.mjs';
 import { renderSparkline } from './Sparkline.mjs';
+import { getDisplayPeriods } from './ComparisonSpec.mjs';
+
+const PERIOD_FIELDS = { dod: 'dod_pct', mom: 'mom_pct', yoy: 'yoy_pct' };
+const PERIOD_LABELS = { dod: 'DoD', mom: 'MoM', yoy: 'YoY' };
 
 function rowDetectState(metric, override) {
   if (override) return override;
@@ -75,6 +79,32 @@ export function renderTableRow(metric, opts = {}) {
   const dir = metric.trend_direction || 'neutral';
   const klass = state === 'shock' ? 'tr-shock' : '';
 
+  const periods = (opts.periods != null) ? opts.periods : getDisplayPeriods(metric.metric_id);
+  const TREND_SLOTS = 2;
+  const visiblePeriods = periods.slice(0, TREND_SLOTS);
+
+  // Inline the period label after the value so each cell is self-describing
+  // even when different rows in the same table use different periods.
+  const trendCells = state === 'history-pending'
+    ? [el('td', { class: 'pending-cell', colspan: TREND_SLOTS }, 'history pending')]
+    : (() => {
+        const cells = visiblePeriods.map(p => {
+          const val = metric[PERIOD_FIELDS[p]];
+          if (val == null) {
+            return el('td', { class: 'trend-cell', 'data-period': p, style: { color: 'var(--ink-3)' } }, '');
+          }
+          return el('td', { class: 'trend-cell ' + trendClass(val, dir), 'data-period': p }, [
+            formatTrend(val),
+            ' ',
+            el('span', { style: { color: 'var(--ink-3)', fontSize: '10px', marginLeft: '3px' } }, PERIOD_LABELS[p])
+          ]);
+        });
+        while (cells.length < TREND_SLOTS) {
+          cells.push(el('td', { class: 'trend-cell', style: { color: 'var(--ink-3)' } }, ''));
+        }
+        return cells;
+      })();
+
   const tr = el('tr', {
     class: klass,
     'data-metric-id': metric.metric_id,
@@ -88,12 +118,7 @@ export function renderTableRow(metric, opts = {}) {
       metric.display_subtitle ? el('small', {}, metric.display_subtitle) : null
     ]),
     el('td', { class: 'num' }, formatValue(metric.value, metric.value_format, metric.unit)),
-    state === 'history-pending'
-      ? el('td', { class: 'pending-cell', colspan: 2 }, 'history pending')
-      : el('td', { class: 'trend-cell ' + trendClass(metric.mom_pct, dir) }, formatTrend(metric.mom_pct)),
-    state === 'history-pending'
-      ? null
-      : el('td', { class: 'trend-cell ' + trendClass(metric.yoy_pct, dir) }, formatTrend(metric.yoy_pct)),
+    ...trendCells,
     el('td', { class: 'spark-cell' }, [
       // Only render the sparkline when there's real history (≥4 unique values).
       // Otherwise show a "data verifying" progress badge to be honest about

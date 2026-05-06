@@ -4,6 +4,8 @@
 
 import { renderTableRow, renderTableHeader } from './components/TableRow.mjs';
 import { renderSectionFrame } from './components/SectionFrame.mjs';
+import { renderSupportingTier } from './components/SupportingTier.mjs';
+import { COMPARISON_SPEC, getDisplayPeriods } from './components/ComparisonSpec.mjs';
 // StickyTOC removed 2026-05-06 — Tab Bar handles section nav now
 import { wire as wireDrawer, open as openDrawer } from './components/MetricDrawer.mjs';
 import { wireCmdK, openCmdK } from './components/CmdKPalette.mjs';
@@ -554,6 +556,82 @@ function buildTable(ids, opts = {}) {
   return el('div', { class: 'sec-table-frame' }, [t]);
 }
 
+// Value-led numbers card grid · used by Real Economy cluster expansion
+// Replaces renderSmallMultiples for clusters where YoY-as-headline produced
+// "0.0%" fake values. Now: value is the visual anchor; trend lines render
+// only when the underlying field is non-null (per ComparisonSpec).
+const _MO_LBL = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const _PERIOD_LABELS = { dod: 'DoD', mom: 'MoM', yoy: 'YoY' };
+const _PERIOD_FIELDS = { dod: 'dod_pct', mom: 'mom_pct', yoy: 'yoy_pct' };
+
+function shortAsOf(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.getDate() + ' ' + _MO_LBL[d.getMonth()];
+}
+function shortSourceName(name) {
+  if (!name) return '';
+  return name
+    .replace(/\s*\(.*?\)\s*/g, '')
+    .replace(/Indian Railways.*/, 'Railways')
+    .replace(/Min of Ports.*/, 'MoPorts')
+    .replace(/RBI .*/, 'RBI')
+    .replace(/MoSPI .*/, 'MoSPI')
+    .slice(0, 16);
+}
+
+function renderClusterCards(metrics, opts = {}) {
+  const wrap = el('div', { class: 'viz-wrap' });
+  if (opts.title) {
+    wrap.appendChild(el('div', {
+      class: 'viz-title',
+      style: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '8px' }
+    }, [
+      el('span', {}, opts.title),
+      opts.asof ? el('span', {
+        style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 }
+      }, opts.asof) : null
+    ].filter(Boolean)));
+  }
+  const cols = Math.min(5, Math.max(2, metrics.length));
+  const grid = el('div', { class: 'cluster-cards cols-' + cols });
+  metrics.forEach(m => {
+    const periods = getDisplayPeriods(m.metric_id);
+    const trendRows = periods.map(p => {
+      const v = m[_PERIOD_FIELDS[p]];
+      if (v == null) return null;
+      const color = v > 0
+        ? (m.trend_direction === 'bad' ? 'var(--red)' : 'var(--green)')
+        : (m.trend_direction === 'bad' ? 'var(--green)' : 'var(--red)');
+      return el('div', { class: 'cc-cell-trend' }, [
+        el('span', { class: 'lbl' }, _PERIOD_LABELS[p]),
+        ' ',
+        el('span', { style: { color } }, (v > 0 ? '+' : '') + v.toFixed(2) + '%')
+      ]);
+    }).filter(Boolean);
+    const card = el('div', {
+      class: 'cluster-card-cell',
+      onclick: () => openDrawer(m)
+    }, [
+      el('div', { class: 'cc-cell-label' }, m.display_name.replace(/ collection| levels| loading| demand| arrivals| value| Index| traffic| retail registrations| retail| \(.*\)/g, '').slice(0, 22)),
+      el('div', { class: 'cc-cell-value' }, [
+        formatValue(m.value, m.value_format, m.unit)
+      ]),
+      trendRows.length ? el('div', { class: 'cc-cell-trends' }, trendRows) : null,
+      el('div', { class: 'cc-cell-asof' }, [
+        m.as_of ? 'as on ' + shortAsOf(m.as_of) : 'as of —',
+        m.source_primary?.name ? [' · ', el('span', { class: 'src' }, shortSourceName(m.source_primary.name))] : null
+      ].flat().filter(Boolean))
+    ].filter(Boolean));
+    grid.appendChild(card);
+  });
+  wrap.appendChild(grid);
+  if (opts.summary) wrap.appendChild(el('div', { class: 'viz-legend-row' }, [
+    el('span', { style: { color: 'var(--ink-2)' } }, opts.summary)
+  ]));
+  return wrap;
+}
+
 function buildSectionFooter(srcNames) {
   return { count: srcNames.length, names: srcNames, last_verified: new Date().toISOString() };
 }
@@ -643,8 +721,11 @@ flowsBody.appendChild(renderDivergingBars({
 }, { title: 'FII MTD by sector · top sells / top buys' }));
 
 // Supporting table
-flowsBody.appendChild(el('div', { class: 'sub-head' }, 'Supporting metrics'));
-flowsBody.appendChild(buildTable(['fpi_debt_flows', 'fno_oi_buildup', 'block_deals_notional']));
+flowsBody.appendChild(renderSupportingTier(
+  ['fpi_debt_flows', 'fno_oi_buildup', 'block_deals_notional', 'fii_equity_mtd', 'dii_mtd', 'fii_equity_cytd'],
+  M,
+  { sectionId: 'flows', title: 'Supporting metrics' }
+));
 
 body.appendChild(renderSectionFrame({
   section_id: 'flows',
@@ -760,9 +841,13 @@ fiscalLeadingRow.appendChild(gaugeWrap);
 macroBody.appendChild(fiscalLeadingRow);
 
 // Supporting metrics row (the rest)
-macroBody.appendChild(el('div', { class: 'sub-head' }, 'Supporting metrics'));
-macroBody.appendChild(buildTable(['trade_deficit', 'cad_pct_gdp', 'banking_liquidity', 'wacr_repo_spread',
-                                  'repo_rate', 'credit_deposit_growth']));
+macroBody.appendChild(renderSupportingTier(
+  ['trade_deficit', 'cad_pct_gdp', 'banking_liquidity', 'wacr_repo_spread',
+   'repo_rate', 'credit_deposit_growth', 'iip_growth', 'wpi_inflation',
+   'real_10y_yield', 'pmi_combined', 'fiscal_deficit_pct', 'govt_capex_runrate'],
+  M,
+  { sectionId: 'macro', title: 'Supporting metrics' }
+));
 
 body.appendChild(renderSectionFrame({
   section_id: 'macro',
@@ -840,34 +925,21 @@ function showCluster(c) {
   const metrics = c.metrics.map(M).filter(Boolean);
   const newest = metrics.map(m => m.as_of).filter(Boolean).sort().pop();
 
-  if (c.id === 'auto') {
-    // Auto: A only (skip E per design decision — 5 segments already data-dense)
-    expansionMount.appendChild(renderSmallMultiples(
-      metrics
-        .map(m => ({
-          label: m.display_name.replace(' retail registrations', '').replace(' retail', '').replace(' (4W)', ''),
-          deltaPct: m.yoy_pct,
-          color: m.yoy_pct > 0 ? 'var(--green)' : 'var(--red)',
-          valueFormatted: formatValue(m.value, m.value_format, m.unit)
-        }))
-        .sort((a, b) => b.deltaPct - a.deltaPct),
-      { title: 'Auto · YoY % · sorted', asof: newest ? 'as on ' + new Date(newest).getDate() + ' ' + _MO[new Date(newest).getMonth()] + ' ' + new Date(newest).getFullYear() : null, summary: 'All five segments positive YoY. Rural-led (Tractor + 3W) leading urban (PV).' }
-    ));
-  } else {
-    // A — numbers cards
-    const items = metrics.map(m => ({
-      label: m.display_name.replace(' collection', '').replace(' levels', '').replace(' loading', '').replace(' demand', '').replace(' arrivals', '').replace(' value', '').replace(' Index', ''),
-      deltaPct: m.yoy_pct,
-      color: m.yoy_pct > 0 ? 'var(--green)' : 'var(--red)',
-      valueFormatted: formatValue(m.value, m.value_format, m.unit),
-      tooltip: m.why_it_matters || '',
-      asof: m.as_of ? new Date(m.as_of).getDate() + ' ' + _MO[new Date(m.as_of).getMonth()] : null
-    }));
-    expansionMount.appendChild(renderSmallMultiples(items, {
-      title: c.label + ' · YoY % · sorted',
-      asof: newest ? 'latest as on ' + new Date(newest).getDate() + ' ' + _MO[new Date(newest).getMonth()] + ' ' + new Date(newest).getFullYear() : null
-    }));
+  // Value-led numbers cards · all clusters use renderClusterCards now
+  // (was renderSmallMultiples which displayed null yoy as misleading "0.0%" red).
+  // Cards show real value + only the period trends that are non-null per ComparisonSpec.
+  const sortedMetrics = c.id === 'auto'
+    ? metrics.slice().sort((a, b) => (b.mom_pct || 0) - (a.mom_pct || 0))
+    : metrics;
+  const asofLine = newest
+    ? 'latest as on ' + new Date(newest).getDate() + ' ' + _MO[new Date(newest).getMonth()] + ' ' + new Date(newest).getFullYear()
+    : null;
+  expansionMount.appendChild(renderClusterCards(sortedMetrics, {
+    title: c.label + ' · current values',
+    asof: asofLine
+  }));
 
+  if (c.id !== 'auto') {
     // E — seasonality strip on the cluster's most cyclical metric
     if (c.feature) {
       const fm = M(c.feature);
@@ -888,13 +960,24 @@ function showCluster(c) {
 }
 
 clusters.forEach(c => {
-  const isPositive = !c.value.startsWith('-') && !c.value.startsWith('−');
-  const isMissing = c.value === '—';
-  const valColor = isMissing ? 'var(--ink-3)' : isPositive ? 'var(--green)' : 'var(--red)';
+  // Drop the misleading "avg YoY · —" headline (was averaging only 1 of 4 metrics
+  // for most clusters because yoy_pct is null for ~80% of Real Economy metrics).
+  // Show count + freshest as-of instead — every number on the card is real now.
+  const cms = c.metrics.map(M).filter(Boolean);
+  const verifiedCount = cms.filter(m => m.verification_state === 'verified').length;
+  const newestDate = cms.map(m => m.as_of).filter(Boolean).sort().pop();
+  const newestStr = newestDate ? new Date(newestDate).getDate() + ' ' + _MO[new Date(newestDate).getMonth()] : '—';
   const card = el('div', { class: 'cluster-card', 'data-cluster': c.id, onclick: () => showCluster(c) }, [
     el('div', { class: 'cc-label' }, c.label),
-    el('div', { class: 'cc-value', style: { color: valColor } }, c.value),
-    el('div', { class: 'cc-sub' }, c.sub + ' · avg YoY')
+    el('div', { class: 'cc-value', style: { fontSize: '20px', color: 'var(--ink)' } }, [
+      String(cms.length),
+      el('span', { style: { fontSize: '11.5px', fontWeight: 500, color: 'var(--ink-3)', marginLeft: '5px' } }, cms.length === 1 ? 'metric' : 'metrics')
+    ]),
+    el('div', { style: { fontFamily: 'var(--mono)', fontSize: '10.5px', color: 'var(--ink-3)', marginTop: '6px' } }, [
+      el('span', { style: { color: 'var(--green)', fontWeight: 600 } }, String(verifiedCount) + ' verified'),
+      ' · latest ' + newestStr
+    ]),
+    el('div', { class: 'cc-sub', style: { marginTop: '8px' } }, c.sub)
   ]);
   clusterGrid.appendChild(card);
 });
@@ -1003,8 +1086,11 @@ freightBody.appendChild(renderSmallMultiples([
 ], { title: 'Freight indices · MoM %', asof: 'as on 2 May 2026' }));
 
 // Port dwell as supporting row
-freightBody.appendChild(el('div', { class: 'sub-head' }, 'Port stress'));
-freightBody.appendChild(buildTable(['india_port_dwell_time']));
+freightBody.appendChild(renderSupportingTier(
+  ['india_port_dwell_time', 'india_crude_basket', 'baltic_dry_index', 'drewry_wci'],
+  M,
+  { sectionId: 'freight', title: 'Supporting metrics' }
+));
 
 body.appendChild(renderSectionFrame({
   section_id: 'freight',
@@ -1134,8 +1220,11 @@ const sentInf = inferenceLineEl('sentiment');
 if (sentInf) marketBody.appendChild(sentInf);
 
 // Supporting table
-marketBody.appendChild(el('div', { class: 'sub-head' }, 'Supporting metrics'));
-marketBody.appendChild(buildTable(['nifty_50', 'bank_nifty', 'nifty_pe_5y', 'india_vix', 'gold_usd', 'dxy', 'high_yield_credit_spread']));
+marketBody.appendChild(renderSupportingTier(
+  ['ind_us_10y_spread', 'gold_usd', 'dxy', 'high_yield_credit_spread'],
+  M,
+  { sectionId: 'market', title: 'Supporting metrics' }
+));
 
 body.appendChild(renderSectionFrame({
   section_id: 'market',
