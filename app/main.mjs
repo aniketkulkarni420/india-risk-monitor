@@ -702,15 +702,25 @@ function buildSectionFooter(srcNames) {
 // ════════════════════════ FLOWS — 5 LENSES ════════════════════════
 const flowsBody = el('div', { class: 'section-body-stack' });
 
-// Lens 1 · Regime banner
+// Lens 1 · Regime banner · description built dynamically from live ratio
+const _absInit = M('absorption_ratio');
+const _fiiInit = M('fii_equity_daily');
+const _absRatio = _absInit?.value;
+const _absPct = _absRatio != null ? Math.round(_absRatio * 100) : null;
+const _absDesc = (() => {
+  if (_absRatio == null) return 'Absorption ratio not available.';
+  if (_absRatio >= 1.0) return `DII covering ${_absPct}% of FII selling. Net inflow ₹${Math.abs((_absRatio - 1) * Math.abs(_fiiInit?.value ?? 0)).toFixed(0)} Cr.`;
+  const leakage = Math.round((1 - _absRatio) * Math.abs(_fiiInit?.value ?? 0));
+  return `DII covering ${_absPct}% of FII selling. Net outflow ₹${leakage.toLocaleString('en-IN')} Cr.`;
+})();
 flowsBody.appendChild(renderRegimeBanner({
   regime: 'DII Absorption',
-  glossary: 'DII Absorption regime: Domestic Institutional Investors (mutual funds + insurance + pension) are buying enough to offset Foreign Institutional Investor (FII) selling. Absorption ratio = DII net buying ÷ |FII net selling|. >1.0× = full absorption.',
-  description: 'FII selling — DII buying enough to absorb. Regime durable.',
+  glossary: 'Absorption ratio = DII net buying ÷ |FII net selling|. >1.0× means DII buying fully offsets FII selling. <1.0× means net outflow.',
+  description: _absDesc,
   hint: 'Becomes "stress" if FII selling intensifies AND DII slows simultaneously.',
-  status: 'low',
+  status: _absRatio != null && _absRatio >= 1 ? 'low' : 'med',
   persistence: 8,
-  asof: '5 May 2026'
+  asof: _absInit?.as_of ? formatAsOf(_absInit.as_of) : '5 May 2026'
 }));
 
 // Lens 2 · 4 horizon cards — driven from live FII/DII metrics
@@ -975,6 +985,75 @@ function priorFromMetric(m) {
   return m.sparkline_12m.map(v => +(v * factor).toFixed(2));
 }
 
+// Per-cluster auto-narrative · constructs a 1-line read of the cluster's
+// state from its constituent metrics. Highlights the strongest signal
+// (worst declining metric for autos, freshest big mover for movement).
+function buildClusterSynthesis(c, metrics) {
+  if (!metrics.length) return null;
+
+  // AUTO · MoM data is reliable → "all 5 segments down · tractors worst"
+  if (c.id === 'auto') {
+    const withMom = metrics.filter(m => m.mom_pct != null);
+    if (withMom.length === 0) return null;
+    const positive = withMom.filter(m => m.mom_pct > 0).length;
+    const negative = withMom.filter(m => m.mom_pct < 0).length;
+    const worst = withMom.slice().sort((a, b) => a.mom_pct - b.mom_pct)[0];
+    const worstLabel = (worst.display_name || '').replace(/ retail registrations/i, '').replace(/ retail/i, '');
+    if (negative === withMom.length) {
+      return `All ${withMom.length} segments declining MoM. ${worstLabel} worst at ${worst.mom_pct.toFixed(1)}%.`;
+    } else if (positive === withMom.length) {
+      const best = withMom.slice().sort((a, b) => b.mom_pct - a.mom_pct)[0];
+      const bestLabel = (best.display_name || '').replace(/ retail registrations/i, '').replace(/ retail/i, '');
+      return `All ${withMom.length} segments positive MoM. ${bestLabel} leads at +${best.mom_pct.toFixed(1)}%.`;
+    } else {
+      return `${negative} of ${withMom.length} segments declining. ${worstLabel} worst at ${worst.mom_pct.toFixed(1)}%.`;
+    }
+  }
+
+  // PRODUCTION · YoY for power, MoM for cement/steel — pick the worst
+  if (c.id === 'production') {
+    const power = metrics.find(m => m.metric_id === 'power_demand');
+    if (power && power.yoy_pct != null && power.yoy_pct < -5) {
+      return `Power demand down ${Math.abs(power.yoy_pct).toFixed(1)}% YoY · industrial activity easing.`;
+    }
+    if (power && power.dod_pct != null && power.dod_pct < -5) {
+      return `Power demand down ${Math.abs(power.dod_pct).toFixed(1)}% DoD · check load curve.`;
+    }
+    return `${metrics.length} metrics tracked · industrial activity broadly stable.`;
+  }
+
+  // TAX · GST is the anchor; surface its YoY and freshness
+  if (c.id === 'tax') {
+    const gst = metrics.find(m => m.metric_id === 'gst_gross');
+    if (gst) {
+      const dir = (gst.yoy_pct ?? 0) >= 0 ? '+' : '';
+      return `GST tracking ${dir}${(gst.yoy_pct ?? 0).toFixed(1)}% YoY at ₹${(gst.value).toFixed(2)} L Cr · tax base ${(gst.yoy_pct ?? 0) >= 0 ? 'expanding' : 'contracting'}.`;
+    }
+    return `${metrics.length} metrics tracked.`;
+  }
+
+  // MOVEMENT · most metrics have only DoD; pick biggest mover
+  if (c.id === 'movement') {
+    const movers = metrics.filter(m => m.dod_pct != null).slice().sort((a, b) => Math.abs(b.dod_pct) - Math.abs(a.dod_pct));
+    if (movers.length === 0) return `${metrics.length} metrics tracked · DoD trends accruing.`;
+    const top = movers[0];
+    const dir = top.dod_pct > 0 ? '+' : '';
+    const cleanName = (top.display_name || '').replace(/ value$/i, '').replace(/ loading$/i, '').replace(/ traffic$/i, '');
+    return `${cleanName} top mover at ${dir}${top.dod_pct.toFixed(2)}% DoD · ${movers.length} of ${metrics.length} have fresh trends.`;
+  }
+
+  // DISCRETIONARY · Naukri is the leading signal
+  if (c.id === 'discretionary') {
+    const naukri = metrics.find(m => m.metric_id === 'naukri_jobspeak');
+    if (naukri && naukri.dod_pct != null) {
+      return `Naukri JobSpeak ${naukri.dod_pct >= 0 ? '+' : ''}${naukri.dod_pct.toFixed(2)}% DoD at ${naukri.value} · white-collar hiring ${naukri.dod_pct >= 0 ? 'firming' : 'softening'}.`;
+    }
+    return `${metrics.length} discretionary indicators tracked.`;
+  }
+
+  return null;
+}
+
 const clusterGrid = el('div', { class: 'cluster-grid' });
 const expansionMount = el('div', { id: 'cluster-expansion', style: { marginTop: '14px' } });
 
@@ -987,6 +1066,17 @@ function showCluster(c) {
   // Pattern A — numbers cards via small-multiples (every cluster gets this)
   const metrics = c.metrics.map(M).filter(Boolean);
   const newest = metrics.map(m => m.as_of).filter(Boolean).sort().pop();
+
+  // Auto-narrative · 1-line synthesis above the cards. Reads the cluster's
+  // own metrics and constructs a punchy "what's the story" line so the user
+  // gets an inference instead of having to scan 5 tiles and figure it out.
+  const synthesis = buildClusterSynthesis(c, metrics);
+  if (synthesis) {
+    expansionMount.appendChild(el('div', {
+      class: 'cluster-synthesis',
+      style: { fontSize: '13.5px', color: 'var(--ink-2)', lineHeight: '1.55', padding: '12px 16px', marginBottom: '12px', background: 'rgba(212,165,116,0.05)', borderLeft: '2px solid var(--accent)', borderRadius: '0 6px 6px 0' }
+    }, synthesis));
+  }
 
   // Value-led numbers cards · all clusters use renderClusterCards now
   // (was renderSmallMultiples which displayed null yoy as misleading "0.0%" red).
@@ -1309,6 +1399,19 @@ const driverLabels = { oil: 'Oil', freight: 'Freight', fx: 'FX', flows: 'Flows',
 const driverScore = { red: 9, amber: 5, green: 2, neutral: 4, mixed: 5 };
 
 const sectorList = el('div', { class: 'sector-list' });
+// Sector tier badges: top 3 (most-pressured) and bottom 3 (most-stable) get
+// a small badge so users can see extremities at a glance without scanning all 15.
+// Pure client-side derivation (no historical state needed). Better than nothing
+// until we have proper per-sector rank-change tracking from history.
+const TOP_PRESSURE_N = 3;
+const BOTTOM_RELIEF_N = 3;
+sectors.forEach((s, idx) => {
+  s._tierBadge = idx < TOP_PRESSURE_N
+    ? { label: '#' + (idx + 1) + ' MOST PRESSURED', kind: 'high' }
+    : idx >= sectors.length - BOTTOM_RELIEF_N
+      ? { label: '#' + (sectors.length - idx) + ' MOST STABLE', kind: 'low' }
+      : null;
+});
 sectors.forEach(s => {
   const overall = s.drivers?.overall || 'neutral';
   const overallPill = overall === 'red' ? 'p-high' : overall === 'amber' ? 'p-med' : overall === 'green' ? 'p-low' : 'p-med';
@@ -1334,7 +1437,13 @@ sectors.forEach(s => {
   })[s.id] || '';
 
   const row = el('div', { class: 'sector-row', 'data-sector': s.id }, [
-    el('div', { class: 'sr-name' }, s.display_name),
+    el('div', { class: 'sr-name' }, [
+      s.display_name,
+      s._tierBadge ? el('span', {
+        class: 'sr-tier ' + (s._tierBadge.kind === 'high' ? 'sr-tier-high' : 'sr-tier-low'),
+        title: s._tierBadge.kind === 'high' ? 'Among the 3 most-pressured sectors today' : 'Among the 3 most-stable sectors today'
+      }, s._tierBadge.label) : null
+    ].filter(Boolean)),
     el('div', { class: 'sr-status' }, [el('span', { class: 'pill ' + overallPill, style: { fontSize: '9.5px' } }, overallLabel)]),
     el('div', { class: 'sr-num', style: { color: ret > 0 ? 'var(--green)' : ret < 0 ? 'var(--red)' : 'var(--ink-2)' } }, (ret > 0 ? '+' : '') + ret.toFixed(1) + '%'),
     el('div', { class: 'sr-num', style: { color: 'var(--ink-2)' } }, pe.toFixed(1) + '×'),

@@ -1394,6 +1394,30 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
 }
 .cmdk-foot .key { background: var(--bg); padding: 1px 6px; border-radius: 3px; margin: 0 4px; }
 
+/* Sector tier badge · 2026-05-06 · top-3 / bottom-3 indicator */
+.sr-tier {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .05em;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: 8px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.sr-tier-high {
+  background: rgba(232, 136, 136, 0.12);
+  color: var(--red);
+  border: 1px solid rgba(232, 136, 136, 0.25);
+}
+.sr-tier-low {
+  background: rgba(127, 201, 154, 0.10);
+  color: var(--green);
+  border: 1px solid rgba(127, 201, 154, 0.22);
+}
+
 /* ─────────────────────────────────────────────────────────────
    STALE pill · freshness-spec.mjs · 2026-05-06
    Renders when (age_days > cadence_days) for a metric. Surfaces upstream
