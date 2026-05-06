@@ -1173,50 +1173,32 @@ function sectionStats(sectionId) {
 // "All" tab = original full-scroll behavior.
 // URL hash drives state: #flows / #macro / #all etc.
 // ──────────────────────────────────────────────────────────────
+// Tabs are now SCROLL ANCHORS · all sections always visible.
+// Click a tab → smooth-scroll to that section. The active tab highlights
+// as you scroll past sections (IntersectionObserver). No more "All" tab
+// since the page is always full-scroll. No section hiding/filtering.
 const TABS = [
   { id: 'flows',   label: 'Flows' },
   { id: 'macro',   label: 'Macro' },
   { id: 'economy', label: 'Real economy' },
   { id: 'freight', label: 'Freight' },
   { id: 'market',  label: 'Market' },
-  { id: 'sectors', label: 'Sectors' },
-  { id: 'all',     label: 'All' }
+  { id: 'sectors', label: 'Sectors' }
 ];
 
-function setActiveTab(tabId, opts = {}) {
-  if (!TABS.find(t => t.id === tabId)) tabId = 'all';
-  document.body.dataset.activeTab = tabId;
+function scrollToSection(tabId, opts = {}) {
+  const target = document.querySelector(`.section-frame[data-section="${tabId}"]`);
+  if (!target) return;
+  // Highlight the clicked tab immediately (visual feedback)
   document.querySelectorAll('.tab-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tab === tabId));
-  // Mark visible section-frame(s) for CSS show/hide
-  document.querySelectorAll('.section-frame').forEach(s => {
-    const isMatch = tabId === 'all' || s.dataset.section === tabId;
-    s.dataset.active = String(isMatch);
-  });
-  // Update URL only on user-initiated tab clicks. Initial load with no hash
-  // leaves the URL clean (no #all written).
-  if (!opts.skipHash) {
-    const targetHash = tabId === 'all' ? '' : '#' + tabId;
-    if (location.hash !== targetHash) {
-      history.replaceState(null, '', targetHash || location.pathname + location.search);
-    }
+  // Update URL hash without triggering hashchange handler scroll
+  if (!opts.skipHash && location.hash !== '#' + tabId) {
+    history.replaceState(null, '', '#' + tabId);
   }
-  // Scroll to tab bar so user sees the start of the section. Skip scroll on
-  // initial load (user just landed, don't yank the page).
-  if (!opts.skipScroll) {
-    const tb = document.getElementById('tab-bar');
-    if (tb) {
-      const y = tb.getBoundingClientRect().top + window.scrollY - 60;
-      if (Math.abs(window.scrollY - y) > 10) window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-    }
-  }
-}
-
-function getInitialTab() {
-  const hash = location.hash.slice(1);
-  // Bare URL (no hash) → 'all' (full-scroll landing)
-  // Recognised hash → that tab. Anything else → 'all'
-  return TABS.find(t => t.id === hash) ? hash : 'all';
+  // Smooth scroll · offset for sticky tab bar (~60px tall)
+  const y = target.getBoundingClientRect().top + window.scrollY - 70;
+  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
 }
 
 // Build tab buttons with counts + shock badges
@@ -1225,34 +1207,62 @@ TABS.forEach(t => {
   const btn = el('button', {
     class: 'tab-btn',
     'data-tab': t.id,
-    onclick: () => setActiveTab(t.id)
+    onclick: () => scrollToSection(t.id)
   }, [
     el('span', {}, t.label)
   ]);
-  if (t.id !== 'all') {
-    const stats = sectionStats(t.id);
-    if (stats.count) btn.appendChild(el('span', { class: 'tab-count' }, String(stats.count)));
-    if (stats.shockCount) btn.appendChild(el('span', { class: 'tab-shock' }, stats.shockCount + ' SHOCK'));
-  }
+  const stats = sectionStats(t.id);
+  if (stats.count) btn.appendChild(el('span', { class: 'tab-count' }, String(stats.count)));
+  if (stats.shockCount) btn.appendChild(el('span', { class: 'tab-shock' }, stats.shockCount + ' SHOCK'));
   tabBar.appendChild(btn);
 });
 
-// Initial load: skip hash write (keep URL clean) + skip scroll (don't yank user)
-setActiveTab(getInitialTab(), { skipHash: !location.hash, skipScroll: true });
-window.addEventListener('hashchange', () => setActiveTab(getInitialTab()));
+// All sections visible at all times · clear any stale data-active attributes
+// from previous filtering implementations so CSS doesn't hide anything.
+document.querySelectorAll('.section-frame').forEach(s => s.removeAttribute('data-active'));
+document.body.removeAttribute('data-active-tab');
+
+// IntersectionObserver to update the active tab as user scrolls.
+// rootMargin: top 30% / bottom 60% means we activate a section when its
+// header crosses the upper third of the viewport.
+const tabSet = new Set(TABS.map(t => t.id));
+const tabObserver = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (e.isIntersecting) {
+      const id = e.target.dataset.section;
+      if (tabSet.has(id)) {
+        document.querySelectorAll('.tab-btn').forEach(b =>
+          b.classList.toggle('active', b.dataset.tab === id));
+      }
+    }
+  }
+}, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+document.querySelectorAll('.section-frame').forEach(s => tabObserver.observe(s));
+
+// On load · if URL has a hash, jump to that section. Otherwise leave at top.
+if (location.hash) {
+  const initial = location.hash.slice(1);
+  if (tabSet.has(initial)) {
+    setTimeout(() => scrollToSection(initial, { skipHash: true }), 0);
+  }
+}
+window.addEventListener('hashchange', () => {
+  const id = location.hash.slice(1);
+  if (tabSet.has(id)) scrollToSection(id, { skipHash: true });
+});
 
 // ──────────────────────────────────────────────────────────────
 // Cmd-K palette — global navigation
 // Section actions navigate via hash (triggers tab switch)
 // ──────────────────────────────────────────────────────────────
-const cmdkSections = TABS.filter(t => t.id !== 'all').map(t => ({
+const cmdkSections = TABS.map(t => ({
   id: t.id,
   label: t.label,
   ...(t.id !== 'all' ? sectionStats(t.id) : {})
 }));
 wireCmdK({
   metrics: DATA.metrics,
-  sections: cmdkSections.map(s => ({ ...s, action: () => { location.hash = '#' + s.id; } })),
+  sections: cmdkSections.map(s => ({ ...s, action: () => scrollToSection(s.id) })),
   openMetric: openDrawer
 });
 
