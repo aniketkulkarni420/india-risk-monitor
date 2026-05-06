@@ -160,6 +160,20 @@
 </head>
 <body>
 
+<!-- I · Persistent risk-score ticker · mobile-only · slides in when hero scrolls out -->
+<div class="risk-ticker" id="risk-ticker" role="button" tabindex="0" aria-label="Scroll to top">
+  <span class="rt-label">India Risk</span>
+  <span class="rt-score" id="rt-score">–</span>
+  <span class="rt-sep">·</span>
+  <span class="rt-status" id="rt-status">–</span>
+  <span class="rt-sep" id="rt-shocks-sep" style="display:none">·</span>
+  <span class="rt-shocks" id="rt-shocks" style="display:none"></span>
+  <span class="rt-arrow">↑</span>
+</div>
+
+<!-- G · Pull-to-refresh visual · mobile-only -->
+<div class="pull-refresh" id="pull-refresh"><span class="pr-arrow">↓</span></div>
+
 <!-- Topbar — the ONLY nav band before hero (Gate 3) -->
 <header class="topbar">
   <div class="brand">India Risk Monitor</div>
@@ -179,7 +193,13 @@
       <div class="hero-today" id="hero-today" style="display: none;"></div>
       <div class="hero-divider" id="hero-divider" style="display: none;"></div>
       <div class="hero-decks" id="hero-decks">
-        <div class="page-loading" style="padding: 60px 0;">Loading metrics…</div>
+        <div class="hero-skeleton" aria-hidden="true">
+          <div class="skel-line w-40"></div>
+          <div class="skel-line tall w-60"></div>
+          <div class="skel-line w-90"></div>
+          <div class="skel-line w-90"></div>
+          <div class="skel-line w-60"></div>
+        </div>
       </div>
     </div>
   </section>

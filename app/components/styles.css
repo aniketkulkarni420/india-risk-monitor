@@ -2,6 +2,15 @@
    Locked tokens. Used by DisplayTile, TableRow, Sparkline, Band.
    No additional component CSS may be added without retiring an entry. */
 
+/* Global box-sizing reset · 2026-05-06.
+   Without this, every cards/panel with width:100% + padding overflowed its
+   parent by 2× padding. That was the root cause of every mobile right-cut
+   and most desktop overflow warnings. */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* SVG / image / video should never extend past their container. */
+svg, img, video, canvas { max-width: 100%; }
+
 :root {
   --bg: #0a0d12;
   --surface: #0f1319;
@@ -449,6 +458,38 @@ table.metric-table tr:hover td { background: rgba(255,255,255,.015); }
     color: var(--ink-3);
     font-family: var(--mono);
     line-height: 1.5;
+  }
+
+  /* ─── Hero score-row overflow fix · ≤700px ───
+     Inline JS sets alignItems:flex-end + spark margin-left:14px + pill margin-left:auto.
+     On narrow viewports the SVG (140px) + pill push past the 320px hero interior.
+     Wrap the row, drop the spark to its own full-width line, keep score+/100+pill on row 1. */
+  .hv-score-row {
+    flex-wrap: wrap;
+    align-items: center !important;
+    row-gap: 8px;
+    column-gap: 12px;
+  }
+  .hv-score-big { font-size: 48px; }
+  .hv-spark-inline,
+  .hv-spark-pending {
+    order: 10;
+    width: 100% !important;
+    max-width: 100%;
+    height: 36px;
+    margin-left: 0 !important;
+  }
+  .hv-narrative,
+  .hero-condensed-lead {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  .hv-attribution {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   /* ─── F · Card-based metrics on mobile ─── */
@@ -1000,7 +1041,7 @@ table.heatmap th:first-child { text-align: left; padding-left: 12px; }
 .pb-label { font-size: 11px; color: var(--ink-3); letter-spacing: .08em; text-transform: uppercase; }
 .pb-value { font-family: var(--mono); font-size: 16px; font-weight: 600; }
 .pb-track { position: relative; height: 10px; background: var(--surface-3); border-radius: 5px; }
-.pb-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; transition: width .3s; }
+.pb-fill { position: absolute; left: 0; top: 0; bottom: 0; max-width: 100%; border-radius: 5px; transition: width .3s; }
 .pb-target { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--ink); opacity: .5; }
 
 /* Gauge row (leading indicators) */
@@ -1348,3 +1389,111 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
   border-top: 1px solid var(--line); font-size: 11px; color: var(--ink-3); font-family: var(--mono);
 }
 .cmdk-foot .key { background: var(--bg); padding: 1px 6px; border-radius: 3px; margin: 0 4px; }
+
+/* ─────────────────────────────────────────────────────────────
+   Mobile gestures · Tier 3 (ticker · pull-refresh · swipe-tabs)
+   ───────────────────────────────────────────────────────────── */
+
+/* I · Persistent risk-score ticker · sticky 28px bar after hero scrolls out */
+.risk-ticker {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 50;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 14px;
+  background: rgba(10, 13, 18, 0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transform: translateY(-100%);
+  transition: transform 220ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+.risk-ticker.visible { transform: translateY(0); }
+.risk-ticker .rt-score { color: var(--ink); font-weight: 600; }
+.risk-ticker .rt-sep { color: var(--ink-3); }
+.risk-ticker .rt-status { font-weight: 600; letter-spacing: 0.04em; }
+.risk-ticker .rt-status.s-shock,
+.risk-ticker .rt-status.s-high { color: #ec7a7a; }
+.risk-ticker .rt-status.s-elevated { color: #e9c466; }
+.risk-ticker .rt-status.s-normal,
+.risk-ticker .rt-status.s-low { color: #79c79a; }
+.risk-ticker .rt-shocks { color: #ec7a7a; font-weight: 600; }
+.risk-ticker .rt-arrow { margin-left: 4px; color: var(--ink-3); font-size: 11px; }
+
+@media (max-width: 700px) {
+  .risk-ticker { display: flex; }
+  /* When ticker is visible, push the topbar down so it doesn't collide */
+  body.has-ticker .topbar { transform: translateY(32px); transition: transform 220ms ease-out; }
+}
+
+/* G · Pull-to-refresh spinner · only on mobile */
+.pull-refresh {
+  display: none;
+  position: fixed; top: 0; left: 50%;
+  transform: translate(-50%, -100%);
+  z-index: 49;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  align-items: center; justify-content: center;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 16px;
+  pointer-events: none;
+  transition: transform 200ms ease-out, opacity 200ms ease-out;
+  opacity: 0;
+}
+.pull-refresh .pr-arrow { display: inline-block; transition: transform 200ms ease-out; }
+.pull-refresh.armed .pr-arrow { transform: rotate(180deg); }
+.pull-refresh.refreshing .pr-arrow {
+  animation: pr-spin 0.8s linear infinite;
+  border: 2px solid var(--accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  width: 16px; height: 16px;
+  content: '';
+}
+@keyframes pr-spin { to { transform: rotate(360deg); } }
+@media (max-width: 700px) { .pull-refresh { display: flex; } }
+
+.pull-refresh-toast {
+  position: fixed; bottom: calc(80px + env(safe-area-inset-bottom, 0));
+  left: 50%; transform: translateX(-50%);
+  z-index: 200;
+  background: rgba(10, 13, 18, 0.96);
+  border: 1px solid var(--line-2);
+  color: var(--ink);
+  font-family: var(--mono); font-size: 12px;
+  padding: 8px 16px; border-radius: 6px;
+  opacity: 0; transition: opacity 200ms;
+  pointer-events: none;
+}
+.pull-refresh-toast.visible { opacity: 1; }
+
+/* H · Swipe-between-tabs · animate body during gesture */
+#body { transition: transform 220ms ease-out; will-change: transform; }
+body.swiping #body { transition: none; }
+
+/* J · Skeleton shimmer for hero placeholder (uses existing @keyframes shimmer) */
+.hero-skeleton {
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 8px 0;
+}
+.hero-skeleton .skel-line {
+  height: 14px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+}
+.hero-skeleton .skel-line.w-60 { width: 60%; }
+.hero-skeleton .skel-line.w-40 { width: 40%; }
+.hero-skeleton .skel-line.w-90 { width: 90%; }
+.hero-skeleton .skel-line.tall { height: 38px; }

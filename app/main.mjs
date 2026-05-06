@@ -1408,4 +1408,179 @@ wireCmdK({
 const cmdkHint = document.getElementById('cmdk-hint');
 if (cmdkHint) cmdkHint.addEventListener('click', openCmdK);
 
+// ──────────────────────────────────────────────────────────────
+// Mobile gestures · Tier 3
+//   I · Persistent risk-score ticker (slides in when hero scrolls out)
+//   G · Pull-to-refresh (touchmove threshold → location.reload)
+//   H · Swipe between tabs (horizontal pan on body switches tabs)
+// All gated to mobile via CSS display rules + window.matchMedia checks.
+// ──────────────────────────────────────────────────────────────
+const isMobileMQ = window.matchMedia('(max-width: 700px)');
+
+// I · Risk-score ticker
+(function wireRiskTicker() {
+  const ticker = document.getElementById('risk-ticker');
+  const heroCard = document.getElementById('hero-card');
+  if (!ticker || !heroCard || !risk) return;
+
+  const totalShocks = allMetrics.filter(m =>
+    m.status === 'shock' && !m.metric_id.startsWith('driver_') && m.metric_id !== 'india_risk_score'
+  ).length;
+
+  document.getElementById('rt-score').textContent = String(risk.value);
+  const statusEl = document.getElementById('rt-status');
+  statusEl.textContent = (risk.status || '').toUpperCase();
+  statusEl.classList.add('s-' + (risk.status || 'normal'));
+  if (totalShocks > 0) {
+    document.getElementById('rt-shocks-sep').style.display = '';
+    const shocksEl = document.getElementById('rt-shocks');
+    shocksEl.style.display = '';
+    shocksEl.textContent = totalShocks + (totalShocks === 1 ? ' shock' : ' shocks');
+  }
+
+  const observer = new IntersectionObserver(([entry]) => {
+    const heroOut = !entry.isIntersecting;
+    ticker.classList.toggle('visible', heroOut);
+    document.body.classList.toggle('has-ticker', heroOut);
+  }, { rootMargin: '-32px 0px 0px 0px', threshold: 0 });
+  observer.observe(heroCard);
+
+  const goTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  ticker.addEventListener('click', goTop);
+  ticker.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goTop(); } });
+})();
+
+// G · Pull-to-refresh
+(function wirePullRefresh() {
+  const indicator = document.getElementById('pull-refresh');
+  if (!indicator) return;
+  const ARM = 70;        // px pull before "release to refresh"
+  const MAX = 110;       // visual cap
+  let startY = null;
+  let pulling = false;
+  let armed = false;
+
+  function onStart(e) {
+    if (!isMobileMQ.matches) return;
+    if (window.scrollY > 0) return;
+    if (document.body.classList.contains('drawer-open')) return;
+    if (document.querySelector('.cmdk-backdrop.open')) return;
+    startY = e.touches[0].clientY;
+    pulling = false;
+    armed = false;
+  }
+  function onMove(e) {
+    if (startY == null) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy <= 0) { reset(); return; }
+    if (window.scrollY > 0) { reset(); return; }
+    if (!pulling && dy > 8) pulling = true;
+    if (!pulling) return;
+    const damped = Math.min(MAX, dy * 0.55);
+    indicator.style.transform = `translate(-50%, ${damped - 38}px)`;
+    indicator.style.opacity = String(Math.min(1, damped / 50));
+    const nowArmed = damped >= ARM;
+    if (nowArmed !== armed) {
+      armed = nowArmed;
+      indicator.classList.toggle('armed', armed);
+    }
+  }
+  function onEnd() {
+    if (!pulling) { reset(); return; }
+    if (armed) {
+      indicator.classList.add('refreshing');
+      indicator.classList.remove('armed');
+      indicator.style.transform = `translate(-50%, 24px)`;
+      indicator.style.opacity = '1';
+      setTimeout(() => location.reload(), 250);
+      return;
+    }
+    reset();
+  }
+  function reset() {
+    startY = null;
+    pulling = false;
+    armed = false;
+    indicator.classList.remove('armed');
+    indicator.style.transform = '';
+    indicator.style.opacity = '';
+  }
+  document.addEventListener('touchstart', onStart, { passive: true });
+  document.addEventListener('touchmove',  onMove,  { passive: true });
+  document.addEventListener('touchend',   onEnd,   { passive: true });
+  document.addEventListener('touchcancel', reset,  { passive: true });
+})();
+
+// H · Swipe between tabs
+(function wireSwipeTabs() {
+  const body = document.getElementById('body');
+  if (!body) return;
+  const TAB_ORDER = ['flows', 'macro', 'economy', 'freight', 'market', 'sectors'];
+  const H_THRESHOLD = 50;          // min horizontal travel
+  const RATIO = 1.5;               // |dx| must beat |dy| × ratio
+  const MAX_DRAG = 120;
+  let sx = 0, sy = 0;
+  let active = false;
+  let decided = false;
+  let direction = 0;
+
+  function shouldIgnore(target) {
+    if (!isMobileMQ.matches) return true;
+    if (document.body.classList.contains('drawer-open')) return true;
+    if (document.querySelector('.cmdk-backdrop.open')) return true;
+    // Don't hijack horizontal scroll inside cards / matrices
+    let n = target;
+    while (n && n !== document.body) {
+      if (n.scrollWidth > n.clientWidth) {
+        const cs = getComputedStyle(n);
+        if (cs.overflowX === 'auto' || cs.overflowX === 'scroll') return true;
+      }
+      n = n.parentElement;
+    }
+    return false;
+  }
+
+  body.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    if (shouldIgnore(e.target)) { active = false; return; }
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+    active = true;
+    decided = false;
+    direction = 0;
+  }, { passive: true });
+
+  body.addEventListener('touchmove', (e) => {
+    if (!active) return;
+    const dx = e.touches[0].clientX - sx;
+    const dy = e.touches[0].clientY - sy;
+    if (!decided) {
+      if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
+      if (Math.abs(dx) < Math.abs(dy) * RATIO) { active = false; body.style.transform = ''; document.body.classList.remove('swiping'); return; }
+      decided = true;
+      document.body.classList.add('swiping');
+    }
+    direction = dx < 0 ? -1 : 1;
+    const damped = Math.max(-MAX_DRAG, Math.min(MAX_DRAG, dx * 0.4));
+    body.style.transform = `translateX(${damped}px)`;
+  }, { passive: true });
+
+  body.addEventListener('touchend', (e) => {
+    if (!active) return;
+    active = false;
+    document.body.classList.remove('swiping');
+    const dx = (e.changedTouches[0]?.clientX ?? sx) - sx;
+    const dy = (e.changedTouches[0]?.clientY ?? sy) - sy;
+    body.style.transform = '';
+    if (!decided) return;
+    if (Math.abs(dx) < H_THRESHOLD || Math.abs(dx) < Math.abs(dy) * RATIO) return;
+    const current = document.body.dataset.activeTab || 'flows';
+    const idx = TAB_ORDER.indexOf(current);
+    if (idx === -1) return;
+    const nextIdx = dx < 0 ? idx + 1 : idx - 1;
+    if (nextIdx < 0 || nextIdx >= TAB_ORDER.length) return;
+    setActiveTab(TAB_ORDER[nextIdx], { skipScroll: true });
+  }, { passive: true });
+})();
+
 console.log(`[IRM Phase 5.5] mounted ${Object.keys(DATA.metrics).length} metrics + ${DATA.sectors?.sectors.length || 0} sectors`);
