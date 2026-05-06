@@ -1843,4 +1843,45 @@ const isMobileMQ = window.matchMedia('(max-width: 700px)');
   }, { passive: true });
 })();
 
+// First-visit mobile gesture hint · 2026-05-06
+// Three Tier-3 gestures shipped (pull-refresh, swipe tabs, risk ticker) but
+// they're invisible to first-time users. Show a one-time toast on first
+// mobile visit explaining the gestures. Dismissable; persists "shown" in
+// localStorage so it never re-appears.
+(function showMobileGestureHint() {
+  if (!isMobileMQ.matches) return;
+  if (localStorage.getItem('irm.gestureHintShown') === '1') return;
+  // Wait briefly so the page settles + risk ticker positions
+  setTimeout(() => {
+    const toast = el('div', {
+      class: 'mobile-hint-toast',
+      role: 'dialog',
+      'aria-label': 'Gesture tips'
+    }, [
+      el('div', { class: 'mht-row' }, [
+        el('span', { class: 'mht-icon' }, '⇄'),
+        el('span', { class: 'mht-text' }, 'Swipe left/right to switch sections')
+      ]),
+      el('div', { class: 'mht-row' }, [
+        el('span', { class: 'mht-icon' }, '↓'),
+        el('span', { class: 'mht-text' }, 'Pull down at top to refresh')
+      ]),
+      el('div', { class: 'mht-row' }, [
+        el('span', { class: 'mht-icon' }, '◐'),
+        el('span', { class: 'mht-text' }, 'Tap risk score (top bar) to scroll back up')
+      ]),
+      el('button', {
+        class: 'mht-close',
+        onclick: () => {
+          toast.classList.add('mht-closing');
+          setTimeout(() => toast.remove(), 220);
+          localStorage.setItem('irm.gestureHintShown', '1');
+        }
+      }, 'Got it')
+    ]);
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('mht-visible'));
+  }, 1200);
+})();
+
 console.log(`[IRM Phase 5.5] mounted ${Object.keys(DATA.metrics).length} metrics + ${DATA.sectors?.sectors.length || 0} sectors`);
