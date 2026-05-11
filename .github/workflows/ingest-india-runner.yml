@@ -31,7 +31,7 @@ jobs:
 
       - name: Install deps
         run: npm install --no-audit --no-fund
-        shell: pwsh
+        shell: powershell
 
       - name: Run live ingest (India geo)
         env:
@@ -56,12 +56,12 @@ jobs:
               if ($LASTEXITCODE -ne 0) { Write-Host "($m failed, continuing)" }
             }
           }
-        shell: pwsh
+        shell: powershell
         continue-on-error: true
 
       - name: Validate
         run: npm run validate
-        shell: pwsh
+        shell: powershell
 
       - name: Commit data updates if any
         run: |
@@ -74,4 +74,4 @@ jobs:
             git commit -m "ingest(india): scheduled run @ $(Get-Date -Format 'yyyy-MM-ddTHH:mmZ')"
             git push
           }
-        shell: pwsh
+        shell: powershell
