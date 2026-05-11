@@ -75,15 +75,15 @@
       "status": "green"
     },
     "fno_oi_buildup": {
-      "last_failure_at": "2026-05-11T11:46:11.250Z",
+      "last_failure_at": "2026-05-11T11:52:58.788Z",
       "last_failure_reason": "fno_oi_buildup: playwright failed [https://www.nseindia.com/option-chain: page.goto: Timeout 50000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://www.nseindia.com/option-chain\", waiting until \"networkidle\"\u001b[22m\n]",
-      "consecutive_failures": 5,
+      "consecutive_failures": 6,
       "status": "red"
     },
     "block_deals_notional": {
-      "last_failure_at": "2026-05-11T11:47:28.991Z",
+      "last_failure_at": "2026-05-11T11:54:16.668Z",
       "last_failure_reason": "block_deals_notional: playwright failed [https://www.nseindia.com/market-data/large-deals: page.goto: Timeout 45000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://www.nseindia.com/market-data/large-deals\", waiting until \"networkidle\"\u001b",
-      "consecutive_failures": 5,
+      "consecutive_failures": 6,
       "status": "red"
     },
     "nifty_50": {
@@ -111,9 +111,9 @@
       "status": "green"
     },
     "fpi_debt_flows": {
-      "last_failure_at": "2026-05-11T11:48:13.956Z",
+      "last_failure_at": "2026-05-11T11:55:01.513Z",
       "last_failure_reason": "fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: regex no match | https://www.fpi.nsdl.co.in/: regex no match]",
-      "consecutive_failures": 5,
+      "consecutive_failures": 6,
       "status": "red"
     },
     "gsec_curve": {
@@ -137,8 +137,10 @@
     "wacr_repo_spread": {
       "last_failure_at": "2026-05-11T11:44:50.041Z",
       "last_failure_reason": "pib_search: no matching PIB releases for wacr_repo_spread (ministries 14,16) · feed-counts: {\"14\":{\"totalSeen\":0,\"urlUsed\":null},\"16\":{\"totalSeen\":0,\"urlUsed\":null}}",
-      "consecutive_failures": 7,
-      "status": "red"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-11T11:51:36.168Z",
+      "last_success_value": -5
     },
     "inr_usd": {
       "last_success_at": "2026-05-11T05:00:07.189Z",
@@ -167,11 +169,13 @@
     "india_port_dwell_time": {
       "last_failure_at": "2026-05-11T11:48:21.469Z",
       "last_failure_reason": "pib_search: no matching PIB releases for india_port_dwell_time (ministries 63,16) · feed-counts: {\"16\":{\"totalSeen\":0,\"urlUsed\":null},\"63\":{\"totalSeen\":0,\"urlUsed\":null}}",
-      "consecutive_failures": 5,
-      "status": "red"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-11T11:55:12.832Z",
+      "last_success_value": 0.95
     },
     "india_crude_basket": {
-      "last_success_at": "2026-05-11T11:48:36.082Z",
+      "last_success_at": "2026-05-11T11:57:53.035Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green"
@@ -219,13 +223,13 @@
       "last_failure_reason": "upi_value: all sources failed [https://www.npci.org.in/what-we-do/upi/product-statistics: https://www.npci.org.in/what-we-do/upi/product-statistics → 503 | https://pib.gov.in/PressReleasePage.aspx: no match | https://www.business-standard.c",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-11T11:48:34.138Z",
+      "last_success_at": "2026-05-11T11:57:51.242Z",
       "last_success_value": 29.53
     },
     "pol_demand": {
-      "last_failure_at": "2026-05-11T11:48:17.723Z",
-      "last_failure_reason": "pib_search: no matching PIB releases for pol_demand (ministries 43,16) · feed-counts: {\"16\":{\"totalSeen\":0,\"urlUsed\":null},\"43\":{\"totalSeen\":0,\"urlUsed\":null}}",
-      "consecutive_failures": 5,
+      "last_failure_at": "2026-05-11T11:55:04.878Z",
+      "last_failure_reason": "google_news_llm: 17 items, none passed filters",
+      "consecutive_failures": 6,
       "status": "red"
     },
     "air_pax": {
@@ -233,7 +237,7 @@
       "last_failure_reason": "air_pax: all sources failed [https://www.dgca.gov.in/digigov-portal/?nq=qHE4MM%2BFwSPaUnbl0Wqejg%3D%3D: no match | https://pib.gov.in/AllRelease.aspx?MinCode=03: no match]",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-11T11:48:19.280Z",
+      "last_success_at": "2026-05-11T11:55:05.684Z",
       "last_success_value": 132.67
     },
     "iip_growth": {
@@ -255,15 +259,15 @@
       "status": "green"
     },
     "naukri_jobspeak": {
-      "last_success_at": "2026-05-11T11:48:43.399Z",
+      "last_success_at": "2026-05-11T11:58:00.470Z",
       "last_success_value": 2858,
       "consecutive_failures": 0,
       "status": "green"
     },
     "cement_dispatches": {
-      "last_failure_at": "2026-05-11T11:48:32.247Z",
-      "last_failure_reason": "pib_search: no matching PIB releases for cement_dispatches (ministries 66,16) · feed-counts: {\"16\":{\"totalSeen\":0,\"urlUsed\":null},\"66\":{\"totalSeen\":0,\"urlUsed\":null}}",
-      "consecutive_failures": 5,
+      "last_failure_at": "2026-05-11T11:57:47.722Z",
+      "last_failure_reason": "cement_dispatches: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMi_AFBVV95cUxQWWw0MVd: 375 out of band | https://news.google.com/rss/articles/CBMiggFBVV95cUxPNFplNDZ: 3.89 out of band",
+      "consecutive_failures": 6,
       "status": "red"
     },
     "steel_consumption": {
@@ -279,27 +283,27 @@
       "status": "green"
     },
     "eway_bills": {
-      "last_failure_at": "2026-05-11T11:48:23.344Z",
-      "last_failure_reason": "pib_search: no matching PIB releases for eway_bills (ministries 14,16) · feed-counts: {\"14\":{\"totalSeen\":0,\"urlUsed\":null},\"16\":{\"totalSeen\":0,\"urlUsed\":null}}",
-      "consecutive_failures": 5,
+      "last_failure_at": "2026-05-11T11:55:44.356Z",
+      "last_failure_reason": "eway_bills: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMizwFBVV95cUxNSVZrc1h: 1406 out of band | https://news.google.com/rss/articles/CBMiogFBVV95cUxPODVIR0R: 1406 out of band",
+      "consecutive_failures": 6,
       "status": "red"
     },
     "fastag_toll": {
-      "last_failure_at": "2026-05-11T11:48:25.997Z",
-      "last_failure_reason": "pib_search: no matching PIB releases for fastag_toll (ministries 44,14,16) · feed-counts: {\"14\":{\"totalSeen\":0,\"urlUsed\":null},\"16\":{\"totalSeen\":0,\"urlUsed\":null},\"44\":{\"totalSeen\":0,\"urlUsed\":null}}",
-      "consecutive_failures": 5,
+      "last_failure_at": "2026-05-11T11:56:27.288Z",
+      "last_failure_reason": "fastag_toll: 3 candidates, none yielded value · https://news.google.com/rss/articles/CBMi7wFBVV95cUxQdDh3RTZ: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a | https://news.google.com/rss/articles/CBMipgFBVV",
+      "consecutive_failures": 6,
       "status": "red"
     },
     "rail_freight": {
-      "last_failure_at": "2026-05-11T11:48:28.260Z",
-      "last_failure_reason": "pib_search: no matching PIB releases for rail_freight (ministries 10,16) · feed-counts: {\"10\":{\"totalSeen\":0,\"urlUsed\":null},\"16\":{\"totalSeen\":0,\"urlUsed\":null}}",
-      "consecutive_failures": 5,
+      "last_failure_at": "2026-05-11T11:57:15.356Z",
+      "last_failure_reason": "rail_freight: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMinwFBVV95cUxPRnpxNnZ: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a | https://news.google.com/rss/articles/CBMi0wFBV",
+      "consecutive_failures": 6,
       "status": "red"
     },
     "port_cargo": {
-      "last_failure_at": "2026-05-11T11:48:30.092Z",
-      "last_failure_reason": "pib_search: no matching PIB releases for port_cargo (ministries 63,16) · feed-counts: {\"16\":{\"totalSeen\":0,\"urlUsed\":null},\"63\":{\"totalSeen\":0,\"urlUsed\":null}}",
-      "consecutive_failures": 5,
+      "last_failure_at": "2026-05-11T11:57:19.937Z",
+      "last_failure_reason": "google_news_llm: empty feed for \"India major ports cargo million tonnes April 2026 OR May 2026\"",
+      "consecutive_failures": 6,
       "status": "red"
     },
     "fiscal_deficit_pct": {
@@ -340,10 +344,10 @@
     }
   },
   "summary": {
-    "green": 44,
+    "green": 46,
     "amber": 0,
-    "red": 11,
+    "red": 9,
     "total": 55
   },
-  "generated_at": "2026-05-11T11:48:43.399Z"
+  "generated_at": "2026-05-11T11:58:00.470Z"
 }
