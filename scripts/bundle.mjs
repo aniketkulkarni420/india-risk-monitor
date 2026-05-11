@@ -27,7 +27,7 @@ function walk(dir) {
     const p = join(dir, name);
     const s = statSync(p);
     if (s.isDirectory()) out.push(...walk(p));
-    else if (name.endsWith('.json') && name !== 'manifest.json') out.push(p);
+    else if (name.endsWith('.json') && name !== 'manifest.json' && name !== 'parser-health.json') out.push(p);
   }
   return out;
 }
