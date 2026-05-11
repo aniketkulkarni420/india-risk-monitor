@@ -19,7 +19,6 @@ export const SLOTS = {
     metric_ids: [
       'fii_equity_daily', 'fii_equity_mtd', 'fii_equity_cytd',
       'dii_daily', 'dii_mtd', 'absorption_ratio',
-      'fno_oi_buildup', 'block_deals_notional',
       'nifty_50', 'bank_nifty', 'nifty_pe_5y', 'india_vix'
     ]
   },
@@ -27,7 +26,6 @@ export const SLOTS = {
     description: '19:00 IST · post-NSDL update',
     cron: '0 19 * * 1-5',
     metric_ids: [
-      'fpi_debt_flows',
       'gsec_curve', 'real_10y_yield',
       'banking_liquidity', 'wacr_repo_spread',
       'inr_usd', 'ind_us_10y_spread'

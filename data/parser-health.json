@@ -1,32 +1,32 @@
 {
   "parsers": {
     "hormuz_throughput": {
-      "last_success_at": "2026-05-11T12:25:16.149Z",
+      "last_success_at": "2026-05-11T05:05:03.103Z",
       "last_success_value": 84,
       "consecutive_failures": 0,
       "status": "green"
     },
     "baltic_dry_index": {
-      "last_success_at": "2026-05-11T12:25:16.298Z",
+      "last_success_at": "2026-05-11T05:05:03.292Z",
       "last_success_value": 2978,
       "consecutive_failures": 0,
       "status": "green"
     },
     "brent_crude": {
-      "last_success_at": "2026-05-11T12:25:17.633Z",
-      "last_success_value": 97.86,
+      "last_success_at": "2026-05-11T05:05:07.765Z",
+      "last_success_value": 94.82,
       "consecutive_failures": 0,
       "status": "green"
     },
     "gold_usd": {
-      "last_success_at": "2026-05-11T12:25:17.659Z",
-      "last_success_value": 4674.18,
+      "last_success_at": "2026-05-11T05:05:07.789Z",
+      "last_success_value": 4715.85,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dxy": {
-      "last_success_at": "2026-05-11T12:25:17.689Z",
-      "last_success_value": 98.013,
+      "last_success_at": "2026-05-11T05:05:07.806Z",
+      "last_success_value": 97.841,
       "consecutive_failures": 0,
       "status": "green"
     },
@@ -35,7 +35,7 @@
       "last_failure_reason": "fetch failed",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-11T12:25:18.299Z",
+      "last_success_at": "2026-05-11T10:53:58.870Z",
       "last_success_value": 256
     },
     "fii_equity_daily": {
@@ -74,18 +74,6 @@
       "consecutive_failures": 0,
       "status": "green"
     },
-    "fno_oi_buildup": {
-      "last_failure_at": "2026-05-11T12:08:42.882Z",
-      "last_failure_reason": "https://query1.finance.yahoo.com/v7/finance/options/%5ENSEI → 401",
-      "consecutive_failures": 8,
-      "status": "red"
-    },
-    "block_deals_notional": {
-      "last_failure_at": "2026-05-11T12:08:43.797Z",
-      "last_failure_reason": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/%5ENSEI?modules=price,defaultKeyStatistics,summaryDetail → 401",
-      "consecutive_failures": 8,
-      "status": "red"
-    },
     "nifty_50": {
       "last_success_at": "2026-05-11T04:59:57.201Z",
       "last_success_value": 23868.3,
@@ -109,12 +97,6 @@
       "last_success_value": 18.6,
       "consecutive_failures": 0,
       "status": "green"
-    },
-    "fpi_debt_flows": {
-      "last_failure_at": "2026-05-11T12:09:27.267Z",
-      "last_failure_reason": "fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: regex no match | https://www.fpi.nsdl.co.in/: regex no match]",
-      "consecutive_failures": 8,
-      "status": "red"
     },
     "gsec_curve": {
       "last_success_at": "2026-05-11T05:00:04.310Z",
@@ -348,8 +330,8 @@
   "summary": {
     "green": 46,
     "amber": 1,
-    "red": 8,
-    "total": 55
+    "red": 5,
+    "total": 52
   },
-  "generated_at": "2026-05-11T12:25:18.299Z"
+  "generated_at": "2026-05-11T15:07:23.830Z"
 }

@@ -12,9 +12,6 @@ import { spawnSync } from 'node:child_process';
 
 const METRICS = [
   'wacr_repo_spread',
-  'fno_oi_buildup',
-  'block_deals_notional',
-  'fpi_debt_flows',
   'pol_demand',
   'air_pax',
   'india_port_dwell_time',

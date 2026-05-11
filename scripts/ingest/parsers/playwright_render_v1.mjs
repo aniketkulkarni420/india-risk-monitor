@@ -62,48 +62,10 @@ async function getBrowser() {
 //   valueParser?
 //   timeoutMs?: per-page navigation timeout (default 30000)
 const CONFIGS = {
-  // NSDL FPI debt flows — month-to-date INR Cr · SPA page renders table via JS
-  fpi_debt_flows: {
-    urls: [
-      'https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx',
-      'https://www.fpi.nsdl.co.in/'
-    ],
-    waitSelector: 'table',
-    waitMs: 5000,
-    // Looser regex — Debt anywhere, then a value pattern within 800 chars
-    extractRe: /Debt[\s\S]{0,800}?(-?[\d,]+(?:\.\d+)?)\s*(?:Cr|crore)/i,
-    plausible: (v) => Math.abs(v) < 200000,
-    valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
-    timeoutMs: 50000
-  },
-
-  // NSE F&O OI build-up — requires homepage warmup for session cookies
-  fno_oi_buildup: {
-    warmupUrl: 'https://www.nseindia.com/',
-    urls: [
-      'https://www.nseindia.com/option-chain'
-    ],
-    waitSelector: 'table, #optiontable, [data-testid]',
-    waitMs: 6000,
-    extractRe: /(?:OI\s+Build[- ]?up|Net\s+OI)[\s\S]{0,200}?(-?[\d,]+(?:\.\d+)?)/i,
-    plausible: (v) => Math.abs(v) < 100000000,
-    valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
-    timeoutMs: 50000
-  },
-
-  // NSE block deals — requires homepage warmup for session cookies
-  block_deals_notional: {
-    warmupUrl: 'https://www.nseindia.com/',
-    urls: [
-      'https://www.nseindia.com/market-data/large-deals'
-    ],
-    waitSelector: 'table, #blockDealsTable',
-    waitMs: 5000,
-    extractRe: /(?:Block\s+Deals|Total\s+Notional)[\s\S]{0,200}?(?:₹|Rs\.?\s*)?([\d,]+(?:\.\d+)?)\s*(?:crore|Cr)?/i,
-    plausible: (v) => v > 0 && v < 50000,
-    valueParser: (s) => parseFloat(String(s).replace(/,/g, '')),
-    timeoutMs: 45000
-  },
+  // NSE/NSDL configs removed 2026-05-11 — these endpoints actively block all
+  // free-tier scraping vectors (Akamai bot detection, HTTP/2 abort, SPA auth
+  // session requirements). Metrics fno_oi_buildup, block_deals_notional, and
+  // fpi_debt_flows have been retired from the IRM data contract.
 
   // NPCI UPI product statistics — value rendered into a table by JS
   upi_value_pw: {
