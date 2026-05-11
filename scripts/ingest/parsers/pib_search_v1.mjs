@@ -100,15 +100,44 @@ const CONFIGS = {
   }
 };
 
-const PIB_RSS_BASE = 'https://pib.gov.in/Rssfeed.aspx?Mincode=';
+// Multiple URL patterns for PIB RSS (format has changed over the years)
+const PIB_RSS_PATTERNS = [
+  'https://pib.gov.in/Rssfeed.aspx?Mincode=',
+  'https://pib.gov.in/RSS/Rssfeed.aspx?Mincode=',
+  'https://pib.gov.in/eFlexure/RSS.aspx?Mincode=',
+  'https://www.pib.gov.in/Rssfeed.aspx?Mincode='
+];
+
+// Diagnostic: tracks last counts per ministry for debugging via thrown messages
+const _diag = { lastCounts: {} };
 
 async function getCandidatesForMinistry(ministryCode, headlineFilter, maxAgeDays = 60) {
-  const url = `${PIB_RSS_BASE}${ministryCode}`;
-  const res = await fetchResilient(url, { timeoutMs: 20000, retries: 1, wayback: false, browserUa: true });
-  const items = parseRssItems(res.body);
   const cutoff = Date.now() - maxAgeDays * 24 * 3600 * 1000;
+  let bestItems = [];
+  let totalSeen = 0;
+  let urlUsed = null;
+
+  for (const base of PIB_RSS_PATTERNS) {
+    const url = `${base}${ministryCode}`;
+    try {
+      const res = await fetchResilient(url, { timeoutMs: 20000, retries: 1, wayback: false, browserUa: true });
+      const items = parseRssItems(res.body);
+      if (items.length === 0) continue;  // try next URL pattern
+      totalSeen = items.length;
+      urlUsed = url;
+      bestItems = items;
+      break;
+    } catch (e) {
+      // Try next URL pattern
+    }
+  }
+
+  _diag.lastCounts[ministryCode] = { totalSeen, urlUsed };
+
+  if (bestItems.length === 0) return [];
+
   const out = [];
-  for (const it of items) {
+  for (const it of bestItems) {
     if (!it.title || !headlineFilter.test(it.title)) continue;
     const pub = it.pubDate ? new Date(it.pubDate).getTime() : Date.now();
     if (Number.isFinite(pub) && pub < cutoff) continue;
@@ -116,6 +145,8 @@ async function getCandidatesForMinistry(ministryCode, headlineFilter, maxAgeDays
   }
   return out;
 }
+
+export function lastDiagnostics() { return _diag; }
 
 export async function fetchPrimary(metric) {
   const cfg = CONFIGS[metric.metric_id];
@@ -142,7 +173,8 @@ export async function fetchPrimary(metric) {
   candidates = candidates.slice(0, cfg.maxArticles || 4);
 
   if (!candidates.length) {
-    throw new Error(`pib_search: no matching PIB releases for ${metric.metric_id} (ministries ${cfg.ministryCodes.join(',')})`);
+    const diag = JSON.stringify(_diag.lastCounts);
+    throw new Error(`pib_search: no matching PIB releases for ${metric.metric_id} (ministries ${cfg.ministryCodes.join(',')}) · feed-counts: ${diag}`);
   }
 
   const errors = [];

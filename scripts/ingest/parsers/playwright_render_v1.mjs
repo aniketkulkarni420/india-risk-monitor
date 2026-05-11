@@ -36,7 +36,11 @@ async function getBrowser() {
     throw e;
   }
   if (!_browserPromise) {
-    _browserPromise = pw.chromium.launch({ headless: true });
+    // --disable-http2 bypasses NSE's HTTP/2 protocol-error block on bots
+    _browserPromise = pw.chromium.launch({
+      headless: true,
+      args: ['--disable-http2', '--disable-blink-features=AutomationControlled']
+    });
     // Auto-close on process exit
     const close = async () => {
       try { const b = await _browserPromise; await b.close(); } catch {}
