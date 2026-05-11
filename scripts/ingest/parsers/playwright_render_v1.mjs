@@ -65,36 +65,36 @@ const CONFIGS = {
       'https://www.fpi.nsdl.co.in/'
     ],
     waitSelector: 'table',
-    waitMs: 4000,
-    // NSDL renders a "Debt" row with Net Investment column (INR Cr)
-    extractRe: /Debt\b[\s\S]{0,400}?Net\s+Investment[\s\S]{0,80}?(-?[\d,]+(?:\.\d+)?)/i,
+    waitMs: 5000,
+    // Looser regex — Debt anywhere, then a value pattern within 800 chars
+    extractRe: /Debt[\s\S]{0,800}?(-?[\d,]+(?:\.\d+)?)\s*(?:Cr|crore)/i,
     plausible: (v) => Math.abs(v) < 200000,
     valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
     timeoutMs: 50000
   },
 
-  // NSE F&O OI build-up — rendered NSE market data widget
+  // NSE F&O OI build-up — requires homepage warmup for session cookies
   fno_oi_buildup: {
+    warmupUrl: 'https://www.nseindia.com/',
     urls: [
       'https://www.nseindia.com/option-chain'
     ],
     waitSelector: 'table, #optiontable, [data-testid]',
     waitMs: 6000,
-    // OI build-up: looking for net long-short OI change (placeholder — needs page-specific tuning)
     extractRe: /(?:OI\s+Build[- ]?up|Net\s+OI)[\s\S]{0,200}?(-?[\d,]+(?:\.\d+)?)/i,
     plausible: (v) => Math.abs(v) < 100000000,
     valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
     timeoutMs: 50000
   },
 
-  // NSE block deals notional — daily aggregate INR Cr
+  // NSE block deals — requires homepage warmup for session cookies
   block_deals_notional: {
+    warmupUrl: 'https://www.nseindia.com/',
     urls: [
       'https://www.nseindia.com/market-data/large-deals'
     ],
     waitSelector: 'table, #blockDealsTable',
     waitMs: 5000,
-    // Look for "Block Deals" total or aggregate notional row
     extractRe: /(?:Block\s+Deals|Total\s+Notional)[\s\S]{0,200}?(?:₹|Rs\.?\s*)?([\d,]+(?:\.\d+)?)\s*(?:crore|Cr)?/i,
     plausible: (v) => v > 0 && v < 50000,
     valueParser: (s) => parseFloat(String(s).replace(/,/g, '')),
@@ -146,6 +146,16 @@ export async function fetchPrimary(metric) {
 
   const errors = [];
   try {
+    // Optional session warmup (NSE requires a homepage visit first to set cookies)
+    if (cfg.warmupUrl) {
+      const wp = await ctx.newPage();
+      try {
+        await wp.goto(cfg.warmupUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await wp.waitForTimeout(3000);
+      } catch {}
+      finally { await wp.close().catch(() => {}); }
+    }
+
     for (const url of cfg.urls) {
       const page = await ctx.newPage();
       try {

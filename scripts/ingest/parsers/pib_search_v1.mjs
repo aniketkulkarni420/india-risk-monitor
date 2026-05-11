@@ -1,106 +1,118 @@
-// REAL fetcher · PIB India search + article-body LLM extraction
+// REAL fetcher · PIB ministry RSS feeds + article-body LLM extraction
 //
-// PIB (pib.gov.in) is the authoritative source for monthly Indian govt
-// economic data. It blocks foreign IPs but is reachable from the self-hosted
-// India runner. This parser:
+// PIB (pib.gov.in) is the authoritative source for monthly Indian govt data.
+// It blocks foreign IPs but is reachable from the self-hosted India runner.
 //
-//   1) Searches PIB by keyword + date range
-//   2) Pulls first relevant press release URL
-//   3) Fetches the release page (regular HTML, format-stable)
-//   4) Sends body to free LLM for value extraction
+// Strategy:
+//   1) Fetch the ministry-specific RSS feed (stable XML format)
+//      https://pib.gov.in/Rssfeed.aspx?Mincode=<code>
+//   2) Filter recent items by metric keyword
+//   3) Fetch each candidate press release body
+//   4) Send body to free LLM for value extraction
 //
-// PIB search URL format:
-//   https://pib.gov.in/SearchResults.aspx?MenuId=0&Keyword=<query>&Mode=1&Frmdt=&Todt=&Searchby=2&SearchPath=1
-//
-// PIB press release URL pattern (from search results):
-//   https://pib.gov.in/PressReleasePage.aspx?PRID=<id>
+// Ministry codes (Mincode):
+//   10 = Ministry of Railways
+//   14 = Ministry of Finance (GST, e-way bills, FASTag, UPI revenue)
+//   16 = Cabinet (residual)
+//   32 = Ministry of Power
+//   43 = Ministry of Petroleum & Natural Gas
+//   44 = Ministry of Road Transport & Highways (FASTag, NHAI)
+//   63 = Ministry of Ports, Shipping & Waterways
+//   66 = Ministry of Statistics (MoSPI · IIP, cement)
+//   3  = Ministry of Civil Aviation (DGCA)
 
 import { fetchResilient } from '../fetch-resilient.mjs';
+import { parseRssItems } from './pib_rss_v1.mjs';
 import { tryProviders } from './llm_extract_v1.mjs';
 import { stripHtml } from './google_news_llm_v1.mjs';
 import { recordSnapshot } from '../snapshot-store.mjs';
 
 // Per-metric config:
-//   keyword:    PIB search keyword (URL-encoded automatically)
-//   target:     LLM extraction instruction
-//   plausible:  range guard
-//   maxArticles: how many top search results to try (default 3)
-//   valueTransform?: post-extract transform (units etc)
+//   ministryCodes: PIB Mincode(s) to search RSS feeds of
+//   headlineFilter: regex pattern to match relevant release titles
+//   target: LLM extraction instruction
+//   plausible: range guard
+//   maxArticles: how many top matches to try
 const CONFIGS = {
   eway_bills: {
-    keyword: 'E-way bill',
-    target: 'the absolute monthly count of e-way bills generated in India for the most recent month, expressed in crore (units of bills, not value in rupees). Headlines or release titles typically say "X crore e-way bills generated in [Month] [Year]". Return only the absolute count, not percentage change.',
+    ministryCodes: [14, 16],  // Finance + Cabinet
+    headlineFilter: /e[- ]?way\s+bill/i,
+    target: 'the absolute monthly count of e-way bills generated in India in crore (count of bills, not value). Returns absolute number only, not percentage change.',
     plausible: (v) => v > 5 && v < 25,
     valueTransform: (v) => v * 10,  // crore -> million
-    maxArticles: 3
+    maxArticles: 4
   },
 
   fastag_toll: {
-    keyword: 'FASTag toll collection',
-    target: 'the monthly FASTag toll collection in India in INR crore. Returns absolute monthly value, not annual.',
+    ministryCodes: [44, 14, 16],
+    headlineFilter: /(FASTag|toll\s+collection)/i,
+    target: 'the monthly FASTag toll collection in India in INR crore. Absolute monthly value, not annual.',
     plausible: (v) => v > 4000 && v < 12000,
-    maxArticles: 3
+    maxArticles: 4
   },
 
   rail_freight: {
-    keyword: 'Indian Railways freight loading',
-    target: 'the all-India monthly freight loading of Indian Railways in million tonnes (MT) for the most recent month. Exclude single-zone figures (Central/Western/Northern Railway). Exclude full-year FY totals (those are 1500+ MT range). Return only the monthly all-India figure.',
+    ministryCodes: [10, 16],  // Railways
+    headlineFilter: /(freight\s+loading|freight\s+revenue|Indian\s+Railways)/i,
+    target: 'the all-India monthly freight loading of Indian Railways in million tonnes (MT). Exclude zone-specific figures (Central/Western/Northern Railway) and full-year FY totals (1500+ MT range).',
     plausible: (v) => v > 100 && v < 200,
-    maxArticles: 3
+    maxArticles: 4
   },
 
   port_cargo: {
-    keyword: 'Major ports cargo handled',
-    target: 'the monthly all-India major ports total cargo throughput in million tonnes (MT). Exclude single-port figures (JNPA, Mundra). Exclude annual/FY totals (800+ MT range). Return only the monthly all-India figure.',
+    ministryCodes: [63, 16],  // Ports
+    headlineFilter: /(major\s+ports|cargo)/i,
+    target: 'the all-India monthly major ports total cargo throughput in million tonnes (MT). Exclude single-port figures and FY totals (800+ MT).',
     plausible: (v) => v > 50 && v < 100,
-    maxArticles: 3
+    maxArticles: 4
   },
 
   cement_dispatches: {
-    keyword: 'Cement production India',
-    target: 'the monthly all-India cement production or dispatches in million tonnes. Exclude single-company figures (UltraTech, Ambuja). Return all-India total only.',
+    ministryCodes: [66, 16],  // MoSPI
+    headlineFilter: /cement/i,
+    target: 'the monthly all-India cement production or dispatches in million tonnes. Exclude single-company figures.',
     plausible: (v) => v > 25 && v < 60,
-    maxArticles: 3
+    maxArticles: 4
   },
 
   pol_demand: {
-    keyword: 'Petroleum products consumption India',
-    target: 'monthly all-India petroleum products consumption (total POL demand) in million metric tonnes (MMT or Mn tonnes).',
+    ministryCodes: [43, 16],  // Petroleum
+    headlineFilter: /(petroleum|fuel\s+consumption|consumption\s+of\s+petroleum)/i,
+    target: 'monthly all-India petroleum products consumption (total POL demand) in million metric tonnes (MMT).',
     plausible: (v) => v > 15 && v < 30,
-    maxArticles: 3
+    maxArticles: 4
   },
 
   wacr_repo_spread: {
-    // RBI publishes WACR daily via Money Market Operations + monthly bulletin. PIB
-    // sometimes covers significant moves. Spread = (WACR - Repo) * 100 bps.
-    keyword: 'WACR weighted average call rate',
-    target: 'the difference (spread) in basis points between the WACR (Weighted Average Call Rate) and the RBI repo rate, signed. Negative means WACR is below repo, positive means above. If the article gives WACR % and repo %, compute spread as (WACR - repo) * 100 bps. Return only the spread value in basis points (bps).',
+    ministryCodes: [14, 16],  // Finance / RBI mentions
+    headlineFilter: /(WACR|call\s+rate|monetary\s+policy|liquidity)/i,
+    target: 'the difference (spread) in basis points between WACR (Weighted Average Call Rate) and the RBI repo rate. Sign: negative if WACR below repo, positive if above. If article gives WACR % and repo %, compute spread as (WACR - repo) * 100 bps.',
     plausible: (v) => Math.abs(v) <= 200,
     maxArticles: 4
   },
 
   india_port_dwell_time: {
-    // Sagarmala / MoPSW occasionally release port dwell time figures via PIB
-    keyword: 'Major ports dwell time',
-    target: 'average vessel turnaround time or container dwell time at Indian major ports, in days. Returns most recent monthly or quarterly figure.',
+    ministryCodes: [63, 16],
+    headlineFilter: /(dwell|turnaround|port\s+performance)/i,
+    target: 'average vessel turnaround time or container dwell time at Indian major ports in days. Most recent monthly or quarterly figure.',
     plausible: (v) => v > 0.5 && v < 10,
-    maxArticles: 3
+    maxArticles: 4
   }
 };
 
-// Pull first N press-release URLs from a PIB search results page.
-function extractPressReleaseLinks(searchHtml, maxN = 3) {
-  // PIB search results typically contain: <a href="PressReleasePage.aspx?PRID=XXXXX">...</a>
-  const re = /<a[^>]+href="(?:https?:\/\/pib\.gov\.in)?\/?(PressReleasePage\.aspx\?PRID=\d+)"[^>]*>([\s\S]*?)<\/a>/gi;
+const PIB_RSS_BASE = 'https://pib.gov.in/Rssfeed.aspx?Mincode=';
+
+async function getCandidatesForMinistry(ministryCode, headlineFilter, maxAgeDays = 60) {
+  const url = `${PIB_RSS_BASE}${ministryCode}`;
+  const res = await fetchResilient(url, { timeoutMs: 20000, retries: 1, wayback: false, browserUa: true });
+  const items = parseRssItems(res.body);
+  const cutoff = Date.now() - maxAgeDays * 24 * 3600 * 1000;
   const out = [];
-  let m;
-  while ((m = re.exec(searchHtml)) !== null && out.length < maxN * 2) {
-    const url = m[1].startsWith('http') ? m[1] : `https://pib.gov.in/${m[1]}`;
-    const titleText = m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    if (titleText.length < 5) continue;
-    if (out.some(o => o.url === url)) continue;
-    out.push({ url, title: titleText });
-    if (out.length >= maxN) break;
+  for (const it of items) {
+    if (!it.title || !headlineFilter.test(it.title)) continue;
+    const pub = it.pubDate ? new Date(it.pubDate).getTime() : Date.now();
+    if (Number.isFinite(pub) && pub < cutoff) continue;
+    out.push(it);
   }
   return out;
 }
@@ -109,20 +121,34 @@ export async function fetchPrimary(metric) {
   const cfg = CONFIGS[metric.metric_id];
   if (!cfg) throw new Error(`No pib_search config for ${metric.metric_id}`);
 
-  // Step 1: PIB search
-  const searchUrl = `https://pib.gov.in/SearchResults.aspx?MenuId=0&Keyword=${encodeURIComponent(cfg.keyword)}&Mode=1&Frmdt=&Todt=&Searchby=2&SearchPath=1`;
-  const searchRes = await fetchResilient(searchUrl, { timeoutMs: 25000, retries: 1, wayback: false, browserUa: true });
+  // Step 1: gather candidates across all configured ministry RSS feeds
+  let candidates = [];
+  for (const min of cfg.ministryCodes) {
+    try {
+      const items = await getCandidatesForMinistry(min, cfg.headlineFilter, 60);
+      candidates.push(...items);
+    } catch (e) {
+      // continue to next ministry
+    }
+  }
+  // Dedupe by link
+  const seen = new Set();
+  candidates = candidates.filter(it => {
+    if (!it.link || seen.has(it.link)) return false;
+    seen.add(it.link); return true;
+  });
+  // Sort newest first
+  candidates.sort((a, b) => (new Date(b.pubDate).getTime() || 0) - (new Date(a.pubDate).getTime() || 0));
+  candidates = candidates.slice(0, cfg.maxArticles || 4);
 
-  const candidates = extractPressReleaseLinks(searchRes.body, cfg.maxArticles || 3);
   if (!candidates.length) {
-    throw new Error(`pib_search: no press release links found for "${cfg.keyword}"`);
+    throw new Error(`pib_search: no matching PIB releases for ${metric.metric_id} (ministries ${cfg.ministryCodes.join(',')})`);
   }
 
-  // Step 2-4: fetch each, extract via LLM, first plausible wins
   const errors = [];
   for (const article of candidates) {
     try {
-      const articleRes = await fetchResilient(article.url, {
+      const articleRes = await fetchResilient(article.link, {
         timeoutMs: 25000, retries: 1, wayback: false, browserUa: true
       });
       const bodyText = stripHtml(articleRes.body).slice(0, 8000);
@@ -133,24 +159,24 @@ export async function fetchPrimary(metric) {
       const result = await tryProviders(prompt);
 
       if (!result || result.value === null || !Number.isFinite(result.value)) {
-        errors.push(`${article.url}: LLM no value`); continue;
+        errors.push(`${article.link.slice(0,60)}: LLM no value`); continue;
       }
 
       let value = cfg.valueTransform ? cfg.valueTransform(result.value) : result.value;
       if (!cfg.plausible(value)) {
-        errors.push(`${article.url}: ${value} out of band`); continue;
+        errors.push(`${article.link.slice(0,60)}: ${value} out of band`); continue;
       }
 
-      try { recordSnapshot(metric.metric_id, article.url, articleRes.body, value, 'pib_search_v1'); } catch {}
+      try { recordSnapshot(metric.metric_id, article.link, articleRes.body, value, 'pib_search_v1'); } catch {}
 
       return {
         value,
-        as_of: result.as_of ? new Date(result.as_of).toISOString() : new Date().toISOString(),
+        as_of: article.pubDate ? new Date(article.pubDate).toISOString() : new Date().toISOString(),
         parse_meta: {
-          source: 'pib-search-llm',
-          keyword: cfg.keyword,
-          title: article.title.slice(0, 200),
-          url: article.url,
+          source: 'pib-rss-llm',
+          ministries: cfg.ministryCodes,
+          title: article.title.slice(0, 240),
+          link: article.link,
           provider: result.provider,
           source_note: result.source_note
         },
@@ -158,10 +184,10 @@ export async function fetchPrimary(metric) {
       };
     } catch (e) {
       if (e.code === 'LLM_UNAVAILABLE') throw e;
-      errors.push(`${article.url}: ${e.message.slice(0,80)}`);
+      errors.push(`${article.link?.slice(0,60)}: ${e.message.slice(0,80)}`);
     }
   }
-  throw new Error(`${metric.metric_id}: ${candidates.length} PIB articles tried · ${errors.slice(0,2).join(' | ')}`);
+  throw new Error(`${metric.metric_id}: ${candidates.length} PIB candidates · ${errors.slice(0,2).join(' | ')}`);
 }
 
 export async function fetchCrosscheck(metric, idx, primaryValue) {
@@ -169,4 +195,4 @@ export async function fetchCrosscheck(metric, idx, primaryValue) {
   return { value: primaryValue, source_name: cc?.name || 'pib-crosscheck-pending', parse_meta: { source: 'pending' } };
 }
 
-export { extractPressReleaseLinks };
+export { getCandidatesForMinistry };
