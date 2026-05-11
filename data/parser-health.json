@@ -1,0 +1,341 @@
+{
+  "parsers": {
+    "hormuz_throughput": {
+      "last_success_at": "2026-05-11T04:59:42.153Z",
+      "last_success_value": 84,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "baltic_dry_index": {
+      "last_success_at": "2026-05-11T04:59:42.203Z",
+      "last_success_value": 2978,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "brent_crude": {
+      "last_success_at": "2026-05-11T04:59:43.494Z",
+      "last_success_value": 95.42,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "gold_usd": {
+      "last_success_at": "2026-05-11T04:59:43.509Z",
+      "last_success_value": 4715.85,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "dxy": {
+      "last_success_at": "2026-05-11T04:59:43.526Z",
+      "last_success_value": 97.841,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "power_demand": {
+      "last_failure_at": "2026-05-11T04:59:54.480Z",
+      "last_failure_reason": "fetch failed",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "fii_equity_daily": {
+      "last_success_at": "2026-05-11T04:59:54.653Z",
+      "last_success_value": -4110.6,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "fii_equity_mtd": {
+      "last_success_at": "2026-05-11T04:59:54.811Z",
+      "last_success_value": -4110.6,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "fii_equity_cytd": {
+      "last_success_at": "2026-05-11T04:59:54.954Z",
+      "last_success_value": -4110.6,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "dii_daily": {
+      "last_success_at": "2026-05-11T04:59:55.084Z",
+      "last_success_value": 6748.13,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "dii_mtd": {
+      "last_success_at": "2026-05-11T04:59:55.207Z",
+      "last_success_value": 6748.13,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "absorption_ratio": {
+      "last_success_at": "2026-05-11T04:59:55.213Z",
+      "last_success_value": 1.64,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "fno_oi_buildup": {
+      "last_failure_at": "2026-05-11T04:59:55.651Z",
+      "last_failure_reason": "fno_oi_buildup: all sources failed [https://www.nseindia.com/api/marketStatus: no match]",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "block_deals_notional": {
+      "last_failure_at": "2026-05-11T04:59:56.500Z",
+      "last_failure_reason": "block_deals_notional: all sources failed [https://www.nseindia.com/api/historical/block-deals: no match]",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "nifty_50": {
+      "last_success_at": "2026-05-11T04:59:57.201Z",
+      "last_success_value": 23868.3,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "bank_nifty": {
+      "last_success_at": "2026-05-11T04:59:57.614Z",
+      "last_success_value": 54469,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "nifty_pe_5y": {
+      "last_success_at": "2026-05-11T04:59:57.921Z",
+      "last_success_value": 21,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "india_vix": {
+      "last_success_at": "2026-05-11T04:59:58.261Z",
+      "last_success_value": 18.6,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "fpi_debt_flows": {
+      "last_failure_at": "2026-05-11T05:00:04.262Z",
+      "last_failure_reason": "fpi_debt_flows: all sources failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: no match | https://www.fpi.nsdl.co.in/: no match]",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "gsec_curve": {
+      "last_success_at": "2026-05-11T05:00:04.310Z",
+      "last_success_value": 6.96,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "real_10y_yield": {
+      "last_success_at": "2026-05-11T05:00:04.318Z",
+      "last_success_value": 3.35,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "banking_liquidity": {
+      "last_success_at": "2026-05-11T05:00:04.334Z",
+      "last_success_value": 322144.23,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "wacr_repo_spread": {
+      "last_failure_at": "2026-05-11T05:00:04.334Z",
+      "last_failure_reason": "No TE extractor mapped for wacr_repo_spread",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "inr_usd": {
+      "last_success_at": "2026-05-11T05:00:07.189Z",
+      "last_success_value": 94.4365,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "ind_us_10y_spread": {
+      "last_success_at": "2026-05-11T05:00:07.196Z",
+      "last_success_value": 230,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "high_yield_credit_spread": {
+      "last_success_at": "2026-05-11T05:00:07.211Z",
+      "last_success_value": 146,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "drewry_wci": {
+      "last_success_at": "2026-05-11T05:00:08.821Z",
+      "last_success_value": 2286,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "india_port_dwell_time": {
+      "last_failure_at": "2026-05-11T05:00:09.886Z",
+      "last_failure_reason": "india_port_dwell_time: all sources failed [https://jnport.gov.in/: fetch failed]",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "india_crude_basket": {
+      "last_success_at": "2026-05-11T05:00:15.681Z",
+      "last_success_value": 91.7,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "gst_gross": {
+      "last_failure_at": "2026-05-11T05:00:21.341Z",
+      "last_failure_reason": "gst_gross: GSTN xlsx latest sheet \"Feb-26\" is 71d old (>70d threshold). Refusing stale value. PIB fallback needed — see TODO in pib_press_v1.mjs.",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "auto_2w": {
+      "last_success_at": "2026-05-11T05:00:36.690Z",
+      "last_success_value": 1916258,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "auto_3w": {
+      "last_success_at": "2026-05-11T05:00:36.691Z",
+      "last_success_value": 106908,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "auto_pv": {
+      "last_success_at": "2026-05-11T05:00:36.693Z",
+      "last_success_value": 407355,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "auto_cv": {
+      "last_success_at": "2026-05-11T05:00:36.694Z",
+      "last_success_value": 99339,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "auto_tractor": {
+      "last_success_at": "2026-05-11T05:00:36.695Z",
+      "last_success_value": 75109,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "upi_value": {
+      "last_failure_at": "2026-05-11T05:00:47.853Z",
+      "last_failure_reason": "upi_value: all sources failed [https://www.npci.org.in/what-we-do/upi/product-statistics: https://www.npci.org.in/what-we-do/upi/product-statistics → 503 | https://pib.gov.in/PressReleasePage.aspx: no match | https://www.business-standard.c",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "pol_demand": {
+      "last_failure_at": "2026-05-11T05:00:52.206Z",
+      "last_failure_reason": "pol_demand: all sources failed [https://www.ppac.gov.in/consumption/petroleum-products: no match | https://www.ppac.gov.in/: no match]",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "air_pax": {
+      "last_failure_at": "2026-05-11T05:00:58.776Z",
+      "last_failure_reason": "air_pax: all sources failed [https://www.dgca.gov.in/digigov-portal/?nq=qHE4MM%2BFwSPaUnbl0Wqejg%3D%3D: no match | https://pib.gov.in/AllRelease.aspx?MinCode=03: no match]",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "iip_growth": {
+      "last_success_at": "2026-05-11T05:00:58.844Z",
+      "last_success_value": 4.1,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "wpi_inflation": {
+      "last_success_at": "2026-05-11T05:00:58.917Z",
+      "last_success_value": 3.88,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "cpi_inflation": {
+      "last_success_at": "2026-05-11T05:00:58.952Z",
+      "last_success_value": 3.4,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "naukri_jobspeak": {
+      "last_success_at": "2026-05-11T05:01:00.408Z",
+      "last_success_value": 2858,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "cement_dispatches": {
+      "last_failure_at": "2026-05-11T05:01:01.868Z",
+      "last_failure_reason": "cement_dispatches: all sources failed [https://pib.gov.in/: no match]",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "steel_consumption": {
+      "last_success_at": "2026-05-11T05:01:01.903Z",
+      "last_success_value": 15.3,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "pmi_combined": {
+      "last_success_at": "2026-05-11T05:01:01.936Z",
+      "last_success_value": 58.3,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "eway_bills": {
+      "last_failure_at": "2026-05-11T05:01:05.468Z",
+      "last_failure_reason": "eway_bills: all sources failed [https://www.gst.gov.in/download/gststatistics: no match | https://pib.gov.in/PressReleasePage.aspx: no match | https://www.business-standard.com/topic/e-way-bills: no match | https://economictimes.indiatimes.",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "fastag_toll": {
+      "last_failure_at": "2026-05-11T05:01:09.204Z",
+      "last_failure_reason": "fastag_toll: all sources failed [https://nhai.gov.in/: no match | https://pib.gov.in/PressReleasePage.aspx: no match | https://www.business-standard.com/topic/fastag: parsed 4500 implausible | https://economictimes.indiatimes.com/topic/fast",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "rail_freight": {
+      "last_failure_at": "2026-05-11T05:01:21.052Z",
+      "last_failure_reason": "rail_freight: all sources failed [https://pib.gov.in/AllRelease.aspx?MinCode=10: no match | https://pib.gov.in/PressReleasePage.aspx: no match | https://indianrailways.gov.in/: fetch failed | https://www.business-standard.com/topic/indian-r",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "port_cargo": {
+      "last_failure_at": "2026-05-11T05:01:26.603Z",
+      "last_failure_reason": "port_cargo: all sources failed [https://pib.gov.in/AllRelease.aspx?MinCode=63: no match | https://sagarmala.gov.in/: no match]",
+      "consecutive_failures": 1,
+      "status": "red"
+    },
+    "fiscal_deficit_pct": {
+      "last_success_at": "2026-05-11T05:01:26.626Z",
+      "last_success_value": 106.7,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "govt_capex_runrate": {
+      "last_success_at": "2026-05-11T05:01:26.639Z",
+      "last_success_value": 112,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "credit_deposit_growth": {
+      "last_success_at": "2026-05-11T05:01:26.686Z",
+      "last_success_value": 16,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "repo_rate": {
+      "last_success_at": "2026-05-11T05:01:26.697Z",
+      "last_success_value": 5.25,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "cad_pct_gdp": {
+      "last_success_at": "2026-05-11T05:01:26.729Z",
+      "last_success_value": 0.6,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "trade_deficit": {
+      "last_success_at": "2026-05-11T05:01:26.741Z",
+      "last_success_value": -20.67,
+      "consecutive_failures": 0,
+      "status": "green"
+    }
+  },
+  "summary": {
+    "green": 40,
+    "amber": 0,
+    "red": 15,
+    "total": 55
+  },
+  "generated_at": "2026-05-11T05:01:26.741Z"
+}
