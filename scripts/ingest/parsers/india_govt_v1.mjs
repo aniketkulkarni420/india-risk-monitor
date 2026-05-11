@@ -95,47 +95,67 @@ const CONFIGS = {
   },
 
   // GSTN e-way bills — monthly volume in millions
+  // Original docs.ewaybillgst.gov.in URL was returning 404 · replaced with PIB + news fallbacks
+  // Tolerant regex accepts crore OR lakh formats
   eway_bills: {
     urls: [
-      'https://docs.ewaybillgst.gov.in/Documents/PressReleases.html',
-      'https://www.gst.gov.in/download/gststatistics'
+      'https://www.gst.gov.in/download/gststatistics',
+      'https://pib.gov.in/PressReleasePage.aspx',
+      'https://www.business-standard.com/topic/e-way-bills',
+      'https://economictimes.indiatimes.com/topic/e-way-bills'
     ],
-    extractRe: /(\d{2,3}\.\d{1,2})\s+crore\s+e-way\s+bills/i,
+    extractRe: /(\d{1,3}\.?\d{0,2})\s+(?:crore|lakh)\s+e[-\s]?way\s+bills?/i,
     plausible: (v) => v > 50 && v < 250,
-    valueParser: (s) => parseFloat(s) * 10  // crore → million
+    valueParser: (s) => parseFloat(s) * 10,  // crore → million (default; lakh would be /10)
+    timeoutMs: 30000
   },
 
-  // NPCI UPI — monthly value in lakh crore + volume
+  // NPCI UPI — monthly value in lakh crore
+  // NPCI page is slow (frequent timeouts) · multiple fallbacks added
   upi_value: {
     urls: [
       'https://www.npci.org.in/what-we-do/upi/product-statistics',
-      'http://www.npci.org.in/product/upi/product-statistics'
+      'https://pib.gov.in/PressReleasePage.aspx',
+      'https://www.business-standard.com/topic/upi-transactions',
+      'https://economictimes.indiatimes.com/topic/upi-transactions'
     ],
-    extractRe: /([\d,]+\.?\d*)\s+(?:Cr|crore|Crores)\s+(?:total\s+)?(?:value|amount|transaction\s+value)/i,
+    extractRe: /(?:₹\s*)?([\d,]+\.?\d*)\s*(?:lakh\s+crore|trillion|Cr|crore)\s+(?:in\s+)?(?:total\s+)?(?:value|UPI|transaction\s+value)/i,
     plausible: (v) => v > 5 && v < 50,
-    valueParser: (s) => parseFloat(s.replace(/,/g, '')) / 100000  // crore → lakh crore
+    valueParser: (s) => {
+      const n = parseFloat(s.replace(/,/g, ''));
+      return n > 1000 ? n / 100000 : n;  // crore → lakh crore if needed
+    },
+    timeoutMs: 45000  // NPCI is slow
   },
 
   // IHMCL FASTag toll — monthly INR Cr
+  // IHMCL URL returned 404 · DROPPED · NHAI + PIB + news fallbacks
   fastag_toll: {
     urls: [
-      'https://www.ihmcl.com/our-services/electronic-toll-collection-system/',
       'https://nhai.gov.in/',
-      'https://pib.gov.in/'  // PIB monthly road-transport release fallback
+      'https://pib.gov.in/PressReleasePage.aspx',
+      'https://www.business-standard.com/topic/fastag',
+      'https://economictimes.indiatimes.com/topic/fastag-toll-collection'
     ],
-    extractRe: /FASTag[\s\S]{0,200}?(?:toll|collection)[\s\S]{0,80}?₹\s*([\d,]+(?:\.\d+)?)\s*(?:crore|Cr)/i,
+    extractRe: /(?:FASTag|toll\s+collection)[\s\S]{0,300}?₹?\s*([\d,]+(?:\.\d+)?)\s*(?:crore|Cr)/i,
     plausible: (v) => v > 3000 && v < 15000,
-    valueParser: (s) => parseInt(s.replace(/,/g, ''), 10)
+    valueParser: (s) => parseInt(s.replace(/,/g, ''), 10),
+    timeoutMs: 30000
   },
 
-  // Indian Railways freight loading — monthly Mn tonnes via PIB
+  // Indian Railways freight loading — monthly Mn tonnes
+  // PIB primary kept · added news aggregator fallbacks · loosened regex
   rail_freight: {
     urls: [
       'https://pib.gov.in/AllRelease.aspx?MinCode=10',
-      'https://pib.gov.in/'
+      'https://pib.gov.in/PressReleasePage.aspx',
+      'https://indianrailways.gov.in/',
+      'https://www.business-standard.com/topic/indian-railways-freight',
+      'https://economictimes.indiatimes.com/topic/railway-freight'
     ],
-    extractRe: /Indian\s+Railways[\s\S]{0,200}?(?:loaded|freight\s+loading)[\s\S]{0,80}?(\d{2,3}\.\d{1,2})\s*(?:MT|Mn\s+tonnes|million\s+tonnes)/i,
-    plausible: (v) => v > 90 && v < 200
+    extractRe: /(?:Indian\s+Railways|railways?)[\s\S]{0,300}?(?:loaded|freight\s+loading|carried|transported)[\s\S]{0,120}?(\d{2,3}\.?\d{0,2})\s*(?:MT|Mn\s+tonnes|million\s+tonnes|MnT)/i,
+    plausible: (v) => v > 90 && v < 200,
+    timeoutMs: 30000
   },
 
   // Major port cargo — monthly Mn tonnes via PIB / Ministry of Ports
@@ -207,9 +227,10 @@ export async function fetchPrimary(metric) {
   if (!cfg) throw new Error(`No india_govt config for ${metric.metric_id}`);
 
   const errors = [];
+  const timeout = cfg.timeoutMs || 25000;
   for (const url of cfg.urls) {
     try {
-      const html = await fetchHtml(url, 25000, cfg.headers);
+      const html = await fetchHtml(url, timeout, cfg.headers);
       const m = html.match(cfg.extractRe);
       if (!m) { errors.push(`${url}: no match`); continue; }
       const value = cfg.valueParser ? cfg.valueParser(m[1]) : parseFloat(m[1]);

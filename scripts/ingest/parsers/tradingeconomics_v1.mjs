@@ -107,13 +107,14 @@ const EXTRACTORS = {
     valueParser: (s) => parseFloat(s.replace(/,/g, ''))
   },
 
-  // Steel consumption proxy via India steel production (Thousand Tonnes monthly)
+  // Steel consumption proxy via India steel production
+  // TE returns "X.XX Thousand Tonnes" → divide by 1000 for Million Tonnes (canonical unit)
+  // Was producing 15300 Mn tonnes (1000× off) → plausibility guard kept rolling back
   steel_consumption: {
     url: 'https://tradingeconomics.com/india/steel-production',
-    // TE format flexible — match "Steel Production X.XX Thousand Tonnes" anywhere
     extractRe: /(\d[\d,]*\.?\d*)\s*Thousand\s+Tonnes/i,
-    plausible: (v) => v > 4000 && v < 25000,
-    valueParser: (s) => parseInt(s.replace(/,/g, ''), 10)
+    plausible: (v) => v > 8 && v < 30,    // Mn tonnes
+    valueParser: (s) => +(parseInt(s.replace(/,/g, ''), 10) / 1000).toFixed(2)
   },
 
   // gsec_curve: store the 10Y yield as the canonical value (unit: % (10Y)).

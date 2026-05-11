@@ -34,7 +34,7 @@ export const CADENCE_DAYS = {
   wpi_inflation:           20,
   credit_deposit_growth:   20,   // fortnightly
   repo_rate:               90,   // changes quarterly at MPC at most
-  real_10y_yield:           3,   // derived daily
+  real_10y_yield:          30,   // derived from CPI (monthly) — was 3d which falsely flagged stale
 
   // ── Equity / market · daily on weekdays ──
   nifty_50:                 4,
