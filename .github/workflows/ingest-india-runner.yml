@@ -1,8 +1,8 @@
 name: Scheduled ingest (India IP)
 
 # Runs on the self-hosted Windows runner (label: india) to fetch metrics that
-# need an India IP. Uses bash (provided by Git for Windows) to avoid the
-# PowerShell ExecutionPolicy restriction on the runner.
+# need an India IP. Uses cmd shell (always present) + Node scripts for loops
+# to avoid pwsh/powershell/bash availability issues on the runner.
 
 on:
   schedule:
@@ -21,7 +21,7 @@ jobs:
       contents: write
     defaults:
       run:
-        shell: bash
+        shell: cmd
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -31,23 +31,22 @@ jobs:
       - name: Install deps
         run: npm install --no-audit --no-fund
 
-      - name: Run live ingest (India geo)
+      - name: Run live ingest for single metric
+        if: ${{ github.event.inputs.metric != '' }}
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DATAGOVIN_API_KEY: ${{ secrets.DATAGOVIN_API_KEY }}
-        run: |
-          # Metrics that genuinely need an India IP to fetch (NPCI, NSE, NSDL,
-          # DGCA, RBI MMO, PPAC, GSTN, IHMCL etc).
-          INDIA_METRICS="wacr_repo_spread fno_oi_buildup block_deals_notional fpi_debt_flows pol_demand air_pax india_port_dwell_time eway_bills fastag_toll rail_freight port_cargo cement_dispatches upi_value india_crude_basket naukri_jobspeak"
-          if [ -n "${{ github.event.inputs.metric }}" ]; then
-            npm run ingest -- --live --metric=${{ github.event.inputs.metric }} || true
-          else
-            for m in $INDIA_METRICS; do
-              echo "==== Ingesting $m ===="
-              npm run ingest -- --live --metric=$m || echo "($m failed, continuing)"
-            done
-          fi
+        run: npm run ingest -- --live --metric=${{ github.event.inputs.metric }}
+        continue-on-error: true
+
+      - name: Run live ingest loop (all India-IP metrics)
+        if: ${{ github.event.inputs.metric == '' }}
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DATAGOVIN_API_KEY: ${{ secrets.DATAGOVIN_API_KEY }}
+        run: node scripts/ingest-india-loop.mjs
         continue-on-error: true
 
       - name: Validate
@@ -55,12 +54,13 @@ jobs:
 
       - name: Commit data updates if any
         run: |
-          git config user.name 'IRM India Runner'
-          git config user.email 'irm-india@bot.local'
+          git config user.name "IRM India Runner"
+          git config user.email "irm-india@bot.local"
           git add data/
-          if git diff --staged --quiet; then
-            echo "No data changes."
-          else
-            git commit -m "ingest(india): scheduled run @ $(date -u +%Y-%m-%dT%H:%MZ)"
+          git diff --staged --quiet
+          if errorlevel 1 (
+            git commit -m "ingest(india): scheduled run"
             git push
-          fi
+          ) else (
+            echo No data changes.
+          )
