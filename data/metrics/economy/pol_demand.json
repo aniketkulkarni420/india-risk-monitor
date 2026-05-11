@@ -4,16 +4,15 @@
   "display_subtitle": "PPAC · petroleum products · monthly",
   "section": "economy",
   "sub_cluster": "production_energy",
-  "value": 21.4,
+  "value": 19.3,
   "unit": "Mn tonnes",
   "value_format": "decimal_1",
-  "as_of": "2026-04-08T17:30:00+05:30",
+  "as_of": "2026-05-11T15:12:14.484Z",
   "as_of_period": "monthly",
   "mom_pct": null,
   "yoy_pct": null,
   "vs_5y_avg_pct": 12.4,
   "sparkline_12m": [
-    20.4,
     20.6,
     20.8,
     21,
@@ -24,7 +23,8 @@
     21.7,
     21.8,
     21.7,
-    21.4
+    21.4,
+    19.3
   ],
   "status": "med",
   "shock_eligible": false,
@@ -34,7 +34,7 @@
     "url": "https://ppac.gov.in/petroleum-statistics",
     "type": "Official",
     "frequency": "Monthly",
-    "parser": "llm:google_news_llm_v1"
+    "parser": "pdf:ppac_v1"
   },
   "source_crosscheck": [
     {
@@ -44,7 +44,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-04-08T18:30:00+05:30",
+  "last_verified_at": "2026-05-11T15:12:14.484Z",
   "why_it_matters": "Petrol/diesel/ATF demand. Demand destruction begins ~$110/bbl Brent in INR terms — watch for May print.",
   "linked_metrics": [
     "brent_crude",

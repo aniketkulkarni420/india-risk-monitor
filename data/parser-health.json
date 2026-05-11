@@ -211,8 +211,10 @@
     "pol_demand": {
       "last_failure_at": "2026-05-11T12:09:41.277Z",
       "last_failure_reason": "pol_demand: 1 candidates, none yielded value · https://news.google.com/rss/articles/CBMiW0FVX3lxTFBzZ3hYcVF: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a",
-      "consecutive_failures": 8,
-      "status": "red"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-11T15:12:14.490Z",
+      "last_success_value": 19.3
     },
     "air_pax": {
       "last_failure_at": "2026-05-11T05:00:58.776Z",
@@ -328,10 +330,10 @@
     }
   },
   "summary": {
-    "green": 46,
+    "green": 47,
     "amber": 1,
-    "red": 5,
+    "red": 4,
     "total": 52
   },
-  "generated_at": "2026-05-11T15:07:23.830Z"
+  "generated_at": "2026-05-11T15:12:14.490Z"
 }

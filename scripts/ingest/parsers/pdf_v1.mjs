@@ -15,7 +15,8 @@ import { fetchResilient } from '../fetch-resilient.mjs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-const pdfParse = require('pdf-parse');
+// pdf-parse v2 exports PDFParse class (not a callable default)
+const { PDFParse } = require('pdf-parse');
 
 // Try-import tesseract.js. Returns null if not installed.
 let tesseractModule = null;
@@ -70,10 +71,11 @@ async function fetchPdfBuffer(url, timeoutMs = 30000) {
  * empty/garbled text, falls back to Tesseract OCR (if installed).
  */
 export async function extractPdfText(buffer, { maxPages = 50, ocrFallback = true } = {}) {
-  // Stage 1: native pdf-parse
+  // Stage 1: native pdf-parse v2 (PDFParse class API)
   let nativeText = '';
   try {
-    const result = await pdfParse(buffer, { max: maxPages });
+    const parser = new PDFParse({ data: buffer });
+    const result = await parser.getText({ max: maxPages });
     nativeText = (result.text || '').trim();
   } catch (e) {
     // fall through to OCR
