@@ -75,15 +75,15 @@
       "status": "green"
     },
     "fno_oi_buildup": {
-      "last_failure_at": "2026-05-11T11:33:46.071Z",
+      "last_failure_at": "2026-05-11T11:39:17.518Z",
       "last_failure_reason": "fno_oi_buildup: playwright failed [https://www.nseindia.com/option-chain: page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.nseindia.com/option-chain\nCall log:\n\u001b[2m  - navigating to \"https://www.nseindia.com/option-chain\", waiting unt",
-      "consecutive_failures": 3,
+      "consecutive_failures": 4,
       "status": "red"
     },
     "block_deals_notional": {
-      "last_failure_at": "2026-05-11T11:33:48.594Z",
+      "last_failure_at": "2026-05-11T11:39:20.439Z",
       "last_failure_reason": "block_deals_notional: playwright failed [https://www.nseindia.com/market-data/large-deals: page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.nseindia.com/market-data/large-deals\nCall log:\n\u001b[2m  - navigating to \"https://www.nseindia.co",
-      "consecutive_failures": 3,
+      "consecutive_failures": 4,
       "status": "red"
     },
     "nifty_50": {
@@ -111,9 +111,9 @@
       "status": "green"
     },
     "fpi_debt_flows": {
-      "last_failure_at": "2026-05-11T11:34:30.744Z",
+      "last_failure_at": "2026-05-11T11:40:07.314Z",
       "last_failure_reason": "fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: regex no match | https://www.fpi.nsdl.co.in/: regex no match]",
-      "consecutive_failures": 3,
+      "consecutive_failures": 4,
       "status": "red"
     },
     "gsec_curve": {
@@ -135,9 +135,9 @@
       "status": "green"
     },
     "wacr_repo_spread": {
-      "last_failure_at": "2026-05-11T11:33:44.277Z",
-      "last_failure_reason": "pib_search: no press release links found for \"WACR weighted average call rate\"",
-      "consecutive_failures": 5,
+      "last_failure_at": "2026-05-11T11:39:16.190Z",
+      "last_failure_reason": "pib_search: no matching PIB releases for wacr_repo_spread (ministries 14,16)",
+      "consecutive_failures": 6,
       "status": "red"
     },
     "inr_usd": {
@@ -165,13 +165,13 @@
       "status": "green"
     },
     "india_port_dwell_time": {
-      "last_failure_at": "2026-05-11T11:34:36.580Z",
-      "last_failure_reason": "pib_search: no press release links found for \"Major ports dwell time\"",
-      "consecutive_failures": 3,
+      "last_failure_at": "2026-05-11T11:40:12.798Z",
+      "last_failure_reason": "pib_search: no matching PIB releases for india_port_dwell_time (ministries 63,16)",
+      "consecutive_failures": 4,
       "status": "red"
     },
     "india_crude_basket": {
-      "last_success_at": "2026-05-11T11:34:48.273Z",
+      "last_success_at": "2026-05-11T11:40:22.005Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green"
@@ -219,13 +219,13 @@
       "last_failure_reason": "upi_value: all sources failed [https://www.npci.org.in/what-we-do/upi/product-statistics: https://www.npci.org.in/what-we-do/upi/product-statistics → 503 | https://pib.gov.in/PressReleasePage.aspx: no match | https://www.business-standard.c",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-11T11:34:46.453Z",
+      "last_success_at": "2026-05-11T11:40:20.284Z",
       "last_success_value": 29.53
     },
     "pol_demand": {
-      "last_failure_at": "2026-05-11T11:34:34.151Z",
-      "last_failure_reason": "pib_search: no press release links found for \"Petroleum products consumption India\"",
-      "consecutive_failures": 3,
+      "last_failure_at": "2026-05-11T11:40:10.318Z",
+      "last_failure_reason": "pib_search: no matching PIB releases for pol_demand (ministries 43,16)",
+      "consecutive_failures": 4,
       "status": "red"
     },
     "air_pax": {
@@ -233,7 +233,7 @@
       "last_failure_reason": "air_pax: all sources failed [https://www.dgca.gov.in/digigov-portal/?nq=qHE4MM%2BFwSPaUnbl0Wqejg%3D%3D: no match | https://pib.gov.in/AllRelease.aspx?MinCode=03: no match]",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-11T11:34:34.923Z",
+      "last_success_at": "2026-05-11T11:40:11.549Z",
       "last_success_value": 132.67
     },
     "iip_growth": {
@@ -255,15 +255,15 @@
       "status": "green"
     },
     "naukri_jobspeak": {
-      "last_success_at": "2026-05-11T11:34:55.011Z",
+      "last_success_at": "2026-05-11T11:40:28.822Z",
       "last_success_value": 2858,
       "consecutive_failures": 0,
       "status": "green"
     },
     "cement_dispatches": {
-      "last_failure_at": "2026-05-11T11:34:45.080Z",
-      "last_failure_reason": "pib_search: no press release links found for \"Cement production India\"",
-      "consecutive_failures": 3,
+      "last_failure_at": "2026-05-11T11:40:18.630Z",
+      "last_failure_reason": "pib_search: no matching PIB releases for cement_dispatches (ministries 66,16)",
+      "consecutive_failures": 4,
       "status": "red"
     },
     "steel_consumption": {
@@ -279,27 +279,27 @@
       "status": "green"
     },
     "eway_bills": {
-      "last_failure_at": "2026-05-11T11:34:38.111Z",
-      "last_failure_reason": "pib_search: no press release links found for \"E-way bill\"",
-      "consecutive_failures": 3,
+      "last_failure_at": "2026-05-11T11:40:13.916Z",
+      "last_failure_reason": "pib_search: no matching PIB releases for eway_bills (ministries 14,16)",
+      "consecutive_failures": 4,
       "status": "red"
     },
     "fastag_toll": {
-      "last_failure_at": "2026-05-11T11:34:39.929Z",
-      "last_failure_reason": "pib_search: no press release links found for \"FASTag toll collection\"",
-      "consecutive_failures": 3,
+      "last_failure_at": "2026-05-11T11:40:15.253Z",
+      "last_failure_reason": "pib_search: no matching PIB releases for fastag_toll (ministries 44,14,16)",
+      "consecutive_failures": 4,
       "status": "red"
     },
     "rail_freight": {
-      "last_failure_at": "2026-05-11T11:34:41.443Z",
-      "last_failure_reason": "pib_search: no press release links found for \"Indian Railways freight loading\"",
-      "consecutive_failures": 3,
+      "last_failure_at": "2026-05-11T11:40:16.378Z",
+      "last_failure_reason": "pib_search: no matching PIB releases for rail_freight (ministries 10,16)",
+      "consecutive_failures": 4,
       "status": "red"
     },
     "port_cargo": {
-      "last_failure_at": "2026-05-11T11:34:42.981Z",
-      "last_failure_reason": "pib_search: no press release links found for \"Major ports cargo handled\"",
-      "consecutive_failures": 3,
+      "last_failure_at": "2026-05-11T11:40:17.476Z",
+      "last_failure_reason": "pib_search: no matching PIB releases for port_cargo (ministries 63,16)",
+      "consecutive_failures": 4,
       "status": "red"
     },
     "fiscal_deficit_pct": {
@@ -345,5 +345,5 @@
     "red": 11,
     "total": 55
   },
-  "generated_at": "2026-05-11T11:34:55.011Z"
+  "generated_at": "2026-05-11T11:40:28.822Z"
 }
