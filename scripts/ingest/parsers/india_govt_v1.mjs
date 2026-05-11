@@ -138,7 +138,7 @@ const CONFIGS = {
       'https://economictimes.indiatimes.com/topic/fastag-toll-collection'
     ],
     extractRe: /(?:FASTag|toll\s+collection)[\s\S]{0,300}?₹?\s*([\d,]+(?:\.\d+)?)\s*(?:crore|Cr)/i,
-    plausible: (v) => v > 3000 && v < 15000,
+    plausible: (v) => v > 5000 && v < 12000,    // tightened · 2026 monthly toll never below 5000 Cr
     valueParser: (s) => parseInt(s.replace(/,/g, ''), 10),
     timeoutMs: 30000
   },

@@ -11,6 +11,7 @@ import { freshnessFor } from './freshness-spec.mjs';
 import { evaluateStatus } from './evaluate-status.mjs';
 import { applyPlausibilityGuard } from './plausibility-guard.mjs';
 import { recomputeComposites } from './composite-recompute.mjs';
+import { loadHealthSummary } from './parser-health.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -211,7 +212,8 @@ const bundle = {
   generated_at: new Date().toISOString(),
   metric_count: Object.keys(metrics).length,
   metrics,
-  sectors
+  sectors,
+  parser_health: loadHealthSummary()  // X/Y green · red metrics list · for dashboard health badge
 };
 
 writeFileSync(OUT, JSON.stringify(bundle), 'utf8');

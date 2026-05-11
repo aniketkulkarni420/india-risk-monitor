@@ -89,6 +89,21 @@ export function applyPlausibilityGuard(metric, prevValue) {
   if (ref == null) return null;
   const cap = MAX_DOD_PCT[metric.metric_id];
   if (cap == null) return null;
+
+  // CONTAMINATED-HISTORY GUARD · 2026-05-11
+  // When a parser scale fix drops the value 100× (e.g. steel 15300 → 15.3),
+  // the prior CSV value is contaminated by old mis-parsed runs. Don't roll
+  // back the GOOD new value to the BAD old value.
+  // Heuristic: if ratio between current and prior > 20×, treat prior as
+  // contaminated and let the new value pass. (10× is still possible from
+  // legitimate scale events; 20× is structurally impossible for any IRM metric.)
+  const ratio = Math.max(Math.abs(metric.value), Math.abs(ref)) /
+                Math.max(Math.min(Math.abs(metric.value), Math.abs(ref)), 0.0001);
+  if (ratio > 20) {
+    metric._guard_prior_contaminated = `prior=${ref} too far from current=${metric.value} (ratio ${ratio.toFixed(0)}×) · trusted parser`;
+    return null;  // let the new value through; mark for ops visibility
+  }
+
   const dodAbsPct = Math.abs((metric.value - ref) / ref) * 100;
   if (dodAbsPct <= cap) return null;
   // For monthly metrics that fell back to sparkline reference, use that as restoredTo

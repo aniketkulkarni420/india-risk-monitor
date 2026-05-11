@@ -187,6 +187,25 @@ if (freshRatio >= 0.9) {
   asofEl.innerHTML = `<span style="color: var(--ink-2);" title="${tooltip}">Sources: <b style="color:var(--ink)">${verified}</b> verified · ${backfilling} backfilling</span>`;
 }
 
+// Parser-health badge · 2026-05-11 · part of freshness assurance system
+// Shows X/N parsers green · click for "Sources health" detail (sources page)
+const ph = DATA.parser_health;
+if (ph && ph.summary && ph.summary.total > 0) {
+  const { green, amber, red, total } = ph.summary;
+  const dotColor = red > 0 ? 'var(--red)' : (amber > 0 ? 'var(--amber)' : 'var(--green)');
+  const tooltip = red > 0
+    ? `${red} parser(s) failing · ${amber} amber · ${green}/${total} healthy. Click for detail.`
+    : `${green}/${total} parsers healthy${amber ? ' · ' + amber + ' amber' : ''}.`;
+  const badge = document.createElement('a');
+  badge.href = './sources/health.html';
+  badge.title = tooltip;
+  badge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;color:var(--ink-3);text-decoration:none;border-bottom:1px dotted var(--line-2);padding-bottom:1px;margin-left:14px';
+  badge.innerHTML = `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${dotColor}"></span><span>${green}/${total} parsers</span>`;
+  badge.addEventListener('mouseenter', () => badge.style.color = 'var(--accent)');
+  badge.addEventListener('mouseleave', () => badge.style.color = 'var(--ink-3)');
+  asofEl.parentNode.insertBefore(badge, asofEl.nextSibling);
+}
+
 // ──────────────────────────────────────────────────────────────
 // HERO — vital signs panel (replaces 4-tile deck)
 // ──────────────────────────────────────────────────────────────

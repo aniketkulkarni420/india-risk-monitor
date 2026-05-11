@@ -13,6 +13,7 @@
 
 import { readMetric, applyIngest, appendHistory, listMetrics } from './ingest/persistence.mjs';
 import { resolve, listRealParsers } from './ingest/registry.mjs';
+import { recordSuccess, recordFailure } from './parser-health.mjs';
 import { verify } from './ingest/crosscheck.mjs';
 import { SLOTS, ALL_DAILY, ALL_EVERY, COMPOSITES, slotFor } from './ingest/schedule.mjs';
 import { info, warn, error } from './ingest/logger.mjs';
@@ -158,6 +159,9 @@ async function ingestOne(metric_id) {
       written: writeRes.written, history: histRes.appended
     });
 
+    // Health log · success
+    if (!ARGS.dryRun) recordSuccess(metric_id, verdict.value);
+
     return {
       ok: true, metric_id, mode, parser_id,
       value: verdict.value,
@@ -168,6 +172,8 @@ async function ingestOne(metric_id) {
   } catch (e) {
     const took = Date.now() - start;
     error('ingest_fail', { metric_id, err: e.message, took_ms: took });
+    // Health log · failure
+    if (!ARGS.dryRun) recordFailure(metric_id, e.message);
     return { ok: false, metric_id, err: e.message, took_ms: took };
   }
 }
