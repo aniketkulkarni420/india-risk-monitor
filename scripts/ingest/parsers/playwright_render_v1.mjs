@@ -58,6 +58,49 @@ async function getBrowser() {
 //   valueParser?
 //   timeoutMs?: per-page navigation timeout (default 30000)
 const CONFIGS = {
+  // NSDL FPI debt flows — month-to-date INR Cr · SPA page renders table via JS
+  fpi_debt_flows: {
+    urls: [
+      'https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx',
+      'https://www.fpi.nsdl.co.in/'
+    ],
+    waitSelector: 'table',
+    waitMs: 4000,
+    // NSDL renders a "Debt" row with Net Investment column (INR Cr)
+    extractRe: /Debt\b[\s\S]{0,400}?Net\s+Investment[\s\S]{0,80}?(-?[\d,]+(?:\.\d+)?)/i,
+    plausible: (v) => Math.abs(v) < 200000,
+    valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
+    timeoutMs: 50000
+  },
+
+  // NSE F&O OI build-up — rendered NSE market data widget
+  fno_oi_buildup: {
+    urls: [
+      'https://www.nseindia.com/option-chain'
+    ],
+    waitSelector: 'table, #optiontable, [data-testid]',
+    waitMs: 6000,
+    // OI build-up: looking for net long-short OI change (placeholder — needs page-specific tuning)
+    extractRe: /(?:OI\s+Build[- ]?up|Net\s+OI)[\s\S]{0,200}?(-?[\d,]+(?:\.\d+)?)/i,
+    plausible: (v) => Math.abs(v) < 100000000,
+    valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
+    timeoutMs: 50000
+  },
+
+  // NSE block deals notional — daily aggregate INR Cr
+  block_deals_notional: {
+    urls: [
+      'https://www.nseindia.com/market-data/large-deals'
+    ],
+    waitSelector: 'table, #blockDealsTable',
+    waitMs: 5000,
+    // Look for "Block Deals" total or aggregate notional row
+    extractRe: /(?:Block\s+Deals|Total\s+Notional)[\s\S]{0,200}?(?:₹|Rs\.?\s*)?([\d,]+(?:\.\d+)?)\s*(?:crore|Cr)?/i,
+    plausible: (v) => v > 0 && v < 50000,
+    valueParser: (s) => parseFloat(String(s).replace(/,/g, '')),
+    timeoutMs: 45000
+  },
+
   // NPCI UPI product statistics — value rendered into a table by JS
   upi_value_pw: {
     urls: ['https://www.npci.org.in/what-we-do/upi/product-statistics'],

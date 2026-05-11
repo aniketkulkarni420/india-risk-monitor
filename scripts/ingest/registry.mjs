@@ -20,6 +20,7 @@ import * as nsdl_sectoral_v1 from './parsers/nsdl_sectoral_v1.mjs';
 import * as pib_rss_v1 from './parsers/pib_rss_v1.mjs';
 import * as google_news_rss_v1 from './parsers/google_news_rss_v1.mjs';
 import * as google_news_llm_v1 from './parsers/google_news_llm_v1.mjs';
+import * as pib_search_v1 from './parsers/pib_search_v1.mjs';
 import * as dbnomics_v1 from './parsers/dbnomics_v1.mjs';
 import * as datagovin_v1 from './parsers/datagovin_v1.mjs';
 import * as nse_rbi_direct_v1 from './parsers/nse_rbi_direct_v1.mjs';
@@ -88,6 +89,8 @@ const REAL = new Map([
   ['rss:google_news_rss_v1', google_news_rss_v1],
   // Google News + LLM article-body extraction — for metrics whose value isn't in headlines
   ['llm:google_news_llm_v1', google_news_llm_v1],
+  // PIB search + LLM — authoritative source for Indian govt monthly releases (needs India IP)
+  ['llm:pib_search_v1', pib_search_v1],
   // DBnomics free aggregator API (Step 6) — structured JSON, no key
   ['json_api:dbnomics_v1', dbnomics_v1],
   // data.gov.in (Step 7) — CSV mode no key, API mode with optional DATAGOVIN_API_KEY

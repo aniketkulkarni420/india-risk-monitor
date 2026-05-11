@@ -34,7 +34,7 @@
     "url": "https://www.fpi.nsdl.co.in/",
     "type": "Public",
     "frequency": "Daily",
-    "parser": "csv_download:nsdl_fpi_v1"
+    "parser": "html_render:playwright_render_v1"
   },
   "source_crosscheck": [
     {

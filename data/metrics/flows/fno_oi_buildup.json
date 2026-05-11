@@ -34,7 +34,7 @@
     "url": "https://www.nseindia.com/all-reports",
     "type": "Exchange",
     "frequency": "Daily",
-    "parser": "csv_download:nse_fno_v1"
+    "parser": "html_render:playwright_render_v1"
   },
   "source_crosscheck": [
     {
