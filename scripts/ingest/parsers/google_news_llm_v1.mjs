@@ -84,19 +84,19 @@ const CONFIGS = {
     queryFn: () => 'India e-way bills generated crore monthly',
     target: 'The absolute monthly count of e-way bills generated in India for the most recent month. Required units: crore (count of bills, NOT rupees value, NOT cumulative). Typical range: 8-15 crore per month. Example: "10.5 crore e-way bills were generated in April 2026" -> return 10.5. If text only gives percentage change without absolute count, return null. Reject any value above 25 crore (those are likely cumulative annual totals).',
     headlineFilter: (t) => /e[- ]?way\s+bill/i.test(t),
-    plausible: (v) => v > 5 && v < 25,
-    valueTransform: (v) => v * 10,
+    valueTransform: (v) => v * 10,                  // crore -> million
+    plausible: (v) => v > 50 && v < 250,            // post-transform: million bills
     maxArticles: 5,
     maxAgeDays: 60
   },
 
   fastag_toll: {
-    queryFn: () => 'FASTag toll collection crore monthly NHAI India',
+    queryFn: () => 'FASTag toll collection NHAI crore month India',
     target: 'The monthly FASTag toll collection amount for India in INR crore for the most recent month. Required: monthly figure between 5000 and 12000 crore. Example: "Toll collection via FASTag reached Rs 6,500 crore in April 2026" -> return 6500. Reject: annual totals (50000+ crore), pass prices, or any value outside 5000-12000 crore range.',
-    headlineFilter: (t) => /FASTag/i.test(t) && !/Annual\s+Pass|costlier|fee\s+hike|price/i.test(t),
+    headlineFilter: (t) => /(FASTag|toll\s+collection|NHAI)/i.test(t),
     plausible: (v) => v > 4000 && v < 12000,
-    maxArticles: 5,
-    maxAgeDays: 60
+    maxArticles: 6,
+    maxAgeDays: 90
   },
 
   rail_freight: {
@@ -137,12 +137,12 @@ const CONFIGS = {
   },
 
   pol_demand: {
-    queryFn: () => 'India petroleum products fuel consumption MMT monthly PPAC',
+    queryFn: () => 'India fuel consumption diesel petrol monthly demand',
     target: 'The all-India monthly TOTAL petroleum products consumption (sum of diesel + petrol + LPG + ATF + others) in million metric tonnes (MMT). Typical monthly range: 18-25 MMT. STRICT EXCLUSIONS: (1) single-product figures (only diesel, only petrol -- those are 3-9 MMT); (2) annual/FY totals (220-260 MMT range); (3) crude oil throughput at refineries (different metric, 20-23 MMT range but distinct). Return only the monthly aggregate consumption.',
-    headlineFilter: (t) => /(petroleum|fuel\s+demand|petroleum\s+products|POL\s+demand|PPAC)/i.test(t),
+    headlineFilter: (t) => /(petroleum|fuel|diesel|petrol|consumption)/i.test(t),
     plausible: (v) => v > 15 && v < 30,
-    maxArticles: 5,
-    maxAgeDays: 60
+    maxArticles: 6,
+    maxAgeDays: 90
   },
 
   wacr_repo_spread: {
