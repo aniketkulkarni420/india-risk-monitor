@@ -15,13 +15,15 @@ mkdirSync(HISTORY, { recursive: true });
 // ──────────────────────────────────────────────────────────────
 // Build an in-memory map of metric_id → file path, walking data/
 // ──────────────────────────────────────────────────────────────
+const SKIP_DIRS = new Set(['snapshots', 'manual-overrides', 'self-heal-reports', 'history']);
 function walk(dir) {
   const out = [];
   for (const name of readdirSync(dir)) {
+    if (SKIP_DIRS.has(name)) continue;
     const p = join(dir, name);
     const s = statSync(p);
     if (s.isDirectory()) out.push(...walk(p));
-    else if (name.endsWith('.json') && name !== 'manifest.json' && !name.startsWith('sectors')) out.push(p);
+    else if (name.endsWith('.json') && name !== 'manifest.json' && !name.startsWith('sectors') && name !== 'parser-health.json') out.push(p);
   }
   return out;
 }

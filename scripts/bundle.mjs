@@ -21,9 +21,11 @@ const OUT = join(ROOT, 'app', 'dist', 'data.json');
 
 mkdirSync(dirname(OUT), { recursive: true });
 
+const SKIP_DIRS = new Set(['snapshots', 'manual-overrides', 'self-heal-reports']);
 function walk(dir) {
   const out = [];
   for (const name of readdirSync(dir)) {
+    if (SKIP_DIRS.has(name)) continue;
     const p = join(dir, name);
     const s = statSync(p);
     if (s.isDirectory()) out.push(...walk(p));
