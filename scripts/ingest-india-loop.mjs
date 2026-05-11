@@ -38,10 +38,11 @@ for (const m of METRICS) {
   console.log('Ingesting:', m);
   console.log('========================================');
   const t0 = Date.now();
+  // shell:true required on Windows for npm.cmd resolution via PATH
   const r = spawnSync(
-    process.platform === 'win32' ? 'npm.cmd' : 'npm',
+    'npm',
     ['run', 'ingest', '--', '--live', `--metric=${m}`],
-    { stdio: 'inherit', shell: false }
+    { stdio: 'inherit', shell: true }
   );
   const took = ((Date.now() - t0) / 1000).toFixed(1);
   if (r.status === 0) {
