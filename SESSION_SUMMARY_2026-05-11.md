@@ -1,6 +1,6 @@
 # IRM session summary · 2026-05-11
 
-Single-session parser reliability overhaul. Took red-parser count from **15 → 5**, built **12 new parser modules**, set up **India self-hosted runner** with auto-commit, and removed 3 metrics that no free auto-source can fetch (NSE/NSDL behind aggressive bot walls).
+Single-session parser reliability overhaul. Took red-parser count from **15 → 4**, built **13 new parser modules**, set up **India self-hosted runner** with auto-commit, removed 3 metrics that no free auto-source can fetch (NSE/NSDL behind aggressive bot walls), and shipped a working PPAC PDF parser.
 
 ---
 
@@ -95,21 +95,25 @@ Composite formula `driver_institutional_flows` re-weighted: FII (0.30→0.67) + 
 
 ---
 
-## Metrics still red (5)
+## Metrics still red (4)
 
-All 5 are monthly metrics whose absolute figures don't appear in news headlines or general article bodies. LLM correctly returns "not found" rather than hallucinating.
+`pol_demand` shipped via PPAC PDF parser (`pdf:ppac_v1`) · live-verified at 19.3 MMT.
 
-| Metric | Why headline-search fails |
-|---|---|
-| `pol_demand` | News covers % growth, not absolute MMT |
-| `cement_dispatches` | Headlines are about single companies (UltraTech, Ambuja), not all-India |
-| `fastag_toll` | News dominated by pass-pricing stories, not monthly collection |
-| `rail_freight` | News reports FY totals or single-zone figures, not monthly all-India |
-| `port_cargo` | Same pattern · FY totals or single ports |
+Remaining 4 monthly metrics whose absolute figures don't appear in news headlines or general article bodies. LLM correctly returns "not found" rather than hallucinating.
 
-**Fix path for these 5:** source-specific parsers (PPAC CSV download, DPIIT/CMA monthly PDF, Sagarmala monthly bulletin, Indian Railways monthly report). These exist but each needs ~30-60 min source-specific tuning. **Tracks B and C of follow-up.**
+| Metric | Why headline-search fails | Investigated alternatives |
+|---|---|---|
+| `cement_dispatches` | Headlines about single companies (UltraTech, Ambuja). TE page is stale (2021). | DPIIT monthly bulletin PDFs use one-off hashed URLs; CMA portal blocks foreign IPs even via runner |
+| `fastag_toll` | News dominated by pass-pricing stories; no monthly absolute. | NHAI portal reachable but landing page has no figure |
+| `rail_freight` | News reports FY totals or single-zone (NFR/CR/WR) figures. | Indian Railways landing has no monthly table; PIB rail RSS dead |
+| `port_cargo` | Same · FY totals or single ports (JNPA/Mundra). | Sagarmala statistics pages 404; Shipping Ministry monthly bulletin is hashed PDF |
 
-In the meantime, all 5 fall back to last-known-good values with STALE pills when their cadence × 1.5 exceeded. Manual override file (60-sec drop) is the immediate lever.
+**Honest verdict:** these 4 lack a stable machine-readable free source. Realistic options for each going forward (cost in parens):
+1. Manual override (60-sec/month per metric · zero infrastructure) — **recommended**
+2. Build per-metric Wayback-tracker that watches PIB for the specific monthly press release and notifies you when published — `~3h build`, fragile
+3. Subscribe to a paid data feed for these 4 specifically — `~$10-20/mo per provider`
+
+In the meantime, all 4 fall back to last-known-good with STALE pills when cadence × 1.5 exceeded. Manual override (`data/manual-overrides/{metric}.json`) is the immediate lever.
 
 ---
 
@@ -168,11 +172,10 @@ git push
 
 ## Open work (deferred — pick up next session)
 
-1. **B · PPAC CSV parser** for `pol_demand` (~30 min) · PPAC publishes monthly fuel-consumption Excel files. Direct download + xlsx parse.
-2. **C · DPIIT/Sagarmala/Railway monthly parsers** (~1h each) for `cement_dispatches`, `port_cargo`, `rail_freight`. Each ministry has a stable monthly bulletin URL pattern.
-3. **fastag_toll** · NHAI publishes monthly toll figures in their FASTag dashboard. Either Playwright on NHAI page (when reachable from India runner) or LLM on monthly PDF.
-4. **Tesseract OCR install** if any of the above turn out to be image PDFs. `npm install tesseract.js` enables the existing `pdf_v1.mjs` OCR fallback.
-5. **Self-hosted runner phone option** · documented in `docs/SELF_HOSTED_RUNNER.md` Termux alternative — set up old Android phone to free up the PC.
+1. ~~**B · PPAC CSV parser** for `pol_demand`~~ ✅ **SHIPPED** · live 19.3 MMT (April 2026) via `pdf:ppac_v1`
+2. **C · per-metric workflow for the 4 stragglers** · cement / port_cargo / rail_freight / fastag_toll. Honestly explored this session, no viable free source found. Recommended path: manual override workflow OR PIB-release watcher script (`~3h`).
+3. **Tesseract OCR install** if any future PDF turns out image-based. `npm install tesseract.js` enables the existing `pdf_v1.mjs` OCR fallback.
+4. **Self-hosted runner phone option** · documented in `docs/SELF_HOSTED_RUNNER.md` Termux alternative — set up old Android phone to free up the PC.
 
 ---
 
