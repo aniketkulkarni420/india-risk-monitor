@@ -33,8 +33,10 @@
     "power_demand": {
       "last_failure_at": "2026-05-11T05:05:09.467Z",
       "last_failure_reason": "fetch failed",
-      "consecutive_failures": 2,
-      "status": "red"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-11T10:53:58.870Z",
+      "last_success_value": 256
     },
     "fii_equity_daily": {
       "last_success_at": "2026-05-11T04:59:54.653Z",
@@ -133,9 +135,9 @@
       "status": "green"
     },
     "wacr_repo_spread": {
-      "last_failure_at": "2026-05-11T05:00:04.334Z",
-      "last_failure_reason": "No TE extractor mapped for wacr_repo_spread",
-      "consecutive_failures": 1,
+      "last_failure_at": "2026-05-11T10:58:42.443Z",
+      "last_failure_reason": "google_news_rss: 51 items, none matched · tried: ",
+      "consecutive_failures": 3,
       "status": "red"
     },
     "inr_usd": {
@@ -177,8 +179,10 @@
     "gst_gross": {
       "last_failure_at": "2026-05-11T05:00:21.341Z",
       "last_failure_reason": "gst_gross: GSTN xlsx latest sheet \"Feb-26\" is 71d old (>70d threshold). Refusing stale value. PIB fallback needed — see TODO in pib_press_v1.mjs.",
-      "consecutive_failures": 1,
-      "status": "red"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-11T10:51:28.931Z",
+      "last_success_value": 243000
     },
     "auto_2w": {
       "last_success_at": "2026-05-11T05:00:36.690Z",
@@ -213,8 +217,10 @@
     "upi_value": {
       "last_failure_at": "2026-05-11T05:00:47.853Z",
       "last_failure_reason": "upi_value: all sources failed [https://www.npci.org.in/what-we-do/upi/product-statistics: https://www.npci.org.in/what-we-do/upi/product-statistics → 503 | https://pib.gov.in/PressReleasePage.aspx: no match | https://www.business-standard.c",
-      "consecutive_failures": 1,
-      "status": "red"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-11T10:52:22.512Z",
+      "last_success_value": 29.53
     },
     "pol_demand": {
       "last_failure_at": "2026-05-11T05:00:52.206Z",
@@ -332,10 +338,10 @@
     }
   },
   "summary": {
-    "green": 40,
+    "green": 43,
     "amber": 0,
-    "red": 15,
+    "red": 12,
     "total": 55
   },
-  "generated_at": "2026-05-11T05:05:09.467Z"
+  "generated_at": "2026-05-11T10:58:42.443Z"
 }

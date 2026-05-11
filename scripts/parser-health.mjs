@@ -23,6 +23,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CADENCE_DAYS } from './freshness-spec.mjs';
+import { listOverrides } from './ingest/manual-override.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const HEALTH_FILE = join(__dirname, '..', 'data', 'parser-health.json');
@@ -83,6 +84,14 @@ function saveHealth(h) {
 // Read-only · for bundle.mjs to surface in app/dist/data.json
 export function loadHealthSummary() {
   const h = loadHealth();
+  let overrides = [];
+  try {
+    overrides = listOverrides().map(o => ({
+      metric_id: o.metric_id,
+      value: o.value, as_of: o.as_of, source_name: o.source_name,
+      source_url: o.source_url, expires_at: o.expires_at
+    }));
+  } catch {}
   return {
     generated_at: h.generated_at,
     summary: h.summary || { green: 0, amber: 0, red: 0, total: 0 },
@@ -93,6 +102,7 @@ export function loadHealthSummary() {
         consecutive_failures: p.consecutive_failures,
         last_success_at: p.last_success_at,
         last_failure_reason: p.last_failure_reason
-      }))
+      })),
+    manual_overrides: overrides
   };
 }

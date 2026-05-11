@@ -15,11 +15,33 @@ import { readMetric, applyIngest, appendHistory, listMetrics } from './ingest/pe
 import { resolve, listRealParsers } from './ingest/registry.mjs';
 import { recordSuccess, recordFailure } from './parser-health.mjs';
 import { verify } from './ingest/crosscheck.mjs';
+import { lookupOverride } from './ingest/manual-override.mjs';
 import { SLOTS, ALL_DAILY, ALL_EVERY, COMPOSITES, slotFor } from './ingest/schedule.mjs';
 import { info, warn, error } from './ingest/logger.mjs';
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// Tiny .env loader (zero deps) — local development convenience.
+// Pulls KEY=value pairs from .env into process.env. In CI, secrets come from
+// GitHub Actions env: block instead.
+(function loadDotEnv() {
+  try {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const envPath = join(here, '..', '.env');
+    if (!existsSync(envPath)) return;
+    for (const line of readFileSync(envPath, 'utf8').split('\n')) {
+      const t = line.trim();
+      if (!t || t.startsWith('#')) continue;
+      const eq = t.indexOf('=');
+      if (eq < 0) continue;
+      const k = t.slice(0, eq).trim();
+      let v = t.slice(eq + 1).trim();
+      if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) v = v.slice(1, -1);
+      if (k && !(k in process.env)) process.env[k] = v;
+    }
+  } catch {}
+})();
 
 const _SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const HISTORY_DIR = join(_SCRIPT_DIR, '..', 'data', 'history');
@@ -103,6 +125,41 @@ async function ingestOne(metric_id) {
     const { data: metric } = readMetric(metric_id);
     const parser_id = metric.source_primary?.parser;
     if (!parser_id) throw new Error('source_primary.parser missing');
+
+    // Layer 0: manual override · highest priority. If present + valid + not expired,
+    // skip the parser entirely. Health still recorded so we can see when underlying
+    // source recovers.
+    const override = lookupOverride(metric_id);
+    if (override && override.ok) {
+      const cadence = (metric.as_of_period || metric.source_primary?.frequency || '').toLowerCase();
+      const isDailyish = ['live', '24h', 'daily', 'live (15-min)'].some(c => cadence.includes(c));
+      const trends = isDailyish ? computeTrendsFromHistory(metric_id, override.value, override.as_of) : {};
+
+      const result = {
+        value: override.value,
+        as_of: override.as_of,
+        last_verified_at: new Date().toISOString(),
+        verification_state: 'manual_override',
+        ...trends
+      };
+      const writeRes = applyIngest(metric_id, result, { dryRun: ARGS.dryRun });
+      const histRes  = appendHistory(metric_id, override.value, override.as_of, { dryRun: ARGS.dryRun });
+      const took = Date.now() - start;
+      info('ingest_override', {
+        metric_id, parser_id, took_ms: took,
+        source: override.source_name, expires_at: override.expires_at,
+        written: writeRes.written, history: histRes.appended
+      });
+      if (!ARGS.dryRun) recordSuccess(metric_id, override.value);
+      return {
+        ok: true, metric_id, mode: 'override', parser_id,
+        value: override.value, verification_state: 'manual_override',
+        override_source: override.source_name, took_ms: took
+      };
+    }
+    if (override && override.error) {
+      warn('override_invalid', { metric_id, file: override.file, reason: override.error });
+    }
 
     const { mode, parser } = resolve(parser_id, { live: ARGS.live });
 
@@ -196,10 +253,12 @@ for (const metric_id of targets) {
   results.push(res);
   const tag = !res.ok ? RED('✗') :
     res.skipped ? DIM('—') :
+    res.verification_state === 'manual_override' ? YELLOW('⚑') :
     res.verification_state === 'verified' ? GREEN('✓') :
     res.verification_state === 'crosscheck_pending' ? YELLOW('⚠') : DIM('·');
   const meta = !res.ok ? RED(res.err)
     : res.skipped ? DIM(`${res.parser_id} · ${res.reason}`)
+    : res.mode === 'override' ? `${YELLOW('OVERRIDE')} ${DIM(res.override_source)} → value ${BOLD(String(res.value))} · ${res.took_ms}ms`
     : `${DIM(res.mode)} ${DIM(res.parser_id)} → value ${BOLD(String(res.value))} · ${res.verification_state}${res.divergence_pct != null ? ` · div ${res.divergence_pct}%` : ''} · ${res.took_ms}ms`;
   console.log(`  ${tag} ${metric_id.padEnd(30)} ${meta}`);
 }

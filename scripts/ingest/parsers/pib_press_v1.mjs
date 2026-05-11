@@ -15,6 +15,7 @@
 // — same data CBIC press releases announce, but in a stable file we own.
 
 import { createRequire } from 'module';
+import { recordSnapshot } from '../snapshot-store.mjs';
 const require = createRequire(import.meta.url);
 const XLSX = require('xlsx');
 
@@ -158,6 +159,8 @@ export async function fetchPrimary(metric) {
   if (Number.isNaN(value) || !ext.plausible(value)) {
     throw new Error(`${metric.metric_id}: parsed ${value} — implausible, refusing`);
   }
+
+  try { recordSnapshot(metric.metric_id, ext.url, html, value, 'pib_press_v1'); } catch {}
 
   return {
     value,

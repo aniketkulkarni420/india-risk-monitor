@@ -12,6 +12,8 @@
 //   plausible:  range guard against parse glitches
 //   valueParser: optional transform (e.g. unit conversion)
 
+import { recordSnapshot } from '../snapshot-store.mjs';
+
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 IRM-Ingest/1.0';
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -164,6 +166,8 @@ export async function fetchPrimary(metric) {
   if (Number.isNaN(value) || !ext.plausible(value)) {
     throw new Error(`${metric.metric_id}: parsed ${value} outside plausible band`);
   }
+
+  try { recordSnapshot(metric.metric_id, ext.url, html, value, 'tradingeconomics_v1'); } catch {}
 
   return {
     value,

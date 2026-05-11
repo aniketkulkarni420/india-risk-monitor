@@ -6,6 +6,9 @@
 // — the registry will mark these "verified live" only when the next
 // scheduled CI ingest tick succeeds.
 
+import { recordSnapshot } from '../snapshot-store.mjs';
+import { fetchResilient } from '../fetch-resilient.mjs';
+
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 IRM-Ingest/1.0';
 
 // ── Metric configs ──
@@ -98,11 +101,14 @@ const CONFIGS = {
   // Original docs.ewaybillgst.gov.in URL was returning 404 · replaced with PIB + news fallbacks
   // Tolerant regex accepts crore OR lakh formats
   eway_bills: {
+    // Aggregator-first: news + TE before primary govt sources (more reliable IPs)
     urls: [
-      'https://www.gst.gov.in/download/gststatistics',
-      'https://pib.gov.in/PressReleasePage.aspx',
+      'https://tradingeconomics.com/india/indicators',
       'https://www.business-standard.com/topic/e-way-bills',
-      'https://economictimes.indiatimes.com/topic/e-way-bills'
+      'https://economictimes.indiatimes.com/topic/e-way-bills',
+      'https://www.livemint.com/topic/e-way-bill',
+      'https://www.gst.gov.in/download/gststatistics',
+      'https://pib.gov.in/PressReleasePage.aspx'
     ],
     extractRe: /(\d{1,3}\.?\d{0,2})\s+(?:crore|lakh)\s+e[-\s]?way\s+bills?/i,
     plausible: (v) => v > 50 && v < 250,
@@ -113,11 +119,14 @@ const CONFIGS = {
   // NPCI UPI — monthly value in lakh crore
   // NPCI page is slow (frequent timeouts) · multiple fallbacks added
   upi_value: {
+    // Aggregator-first: news / TE before NPCI SPA (which often times out)
     urls: [
-      'https://www.npci.org.in/what-we-do/upi/product-statistics',
-      'https://pib.gov.in/PressReleasePage.aspx',
       'https://www.business-standard.com/topic/upi-transactions',
-      'https://economictimes.indiatimes.com/topic/upi-transactions'
+      'https://economictimes.indiatimes.com/topic/upi-transactions',
+      'https://www.livemint.com/topic/upi',
+      'https://tradingeconomics.com/india/indicators',
+      'https://www.npci.org.in/what-we-do/upi/product-statistics',
+      'https://pib.gov.in/PressReleasePage.aspx'
     ],
     extractRe: /(?:₹\s*)?([\d,]+\.?\d*)\s*(?:lakh\s+crore|trillion|Cr|crore)\s+(?:in\s+)?(?:total\s+)?(?:value|UPI|transaction\s+value)/i,
     plausible: (v) => v > 5 && v < 50,
@@ -131,11 +140,13 @@ const CONFIGS = {
   // IHMCL FASTag toll — monthly INR Cr
   // IHMCL URL returned 404 · DROPPED · NHAI + PIB + news fallbacks
   fastag_toll: {
+    // Aggregator-first: news sites have stable topic pages
     urls: [
-      'https://nhai.gov.in/',
-      'https://pib.gov.in/PressReleasePage.aspx',
       'https://www.business-standard.com/topic/fastag',
-      'https://economictimes.indiatimes.com/topic/fastag-toll-collection'
+      'https://economictimes.indiatimes.com/topic/fastag-toll-collection',
+      'https://www.livemint.com/topic/fastag',
+      'https://nhai.gov.in/',
+      'https://pib.gov.in/PressReleasePage.aspx'
     ],
     extractRe: /(?:FASTag|toll\s+collection)[\s\S]{0,300}?₹?\s*([\d,]+(?:\.\d+)?)\s*(?:crore|Cr)/i,
     plausible: (v) => v > 5000 && v < 12000,    // tightened · 2026 monthly toll never below 5000 Cr
@@ -146,12 +157,14 @@ const CONFIGS = {
   // Indian Railways freight loading — monthly Mn tonnes
   // PIB primary kept · added news aggregator fallbacks · loosened regex
   rail_freight: {
+    // Aggregator-first
     urls: [
+      'https://www.business-standard.com/topic/indian-railways-freight',
+      'https://economictimes.indiatimes.com/topic/railway-freight',
+      'https://www.livemint.com/topic/indian-railways',
       'https://pib.gov.in/AllRelease.aspx?MinCode=10',
       'https://pib.gov.in/PressReleasePage.aspx',
-      'https://indianrailways.gov.in/',
-      'https://www.business-standard.com/topic/indian-railways-freight',
-      'https://economictimes.indiatimes.com/topic/railway-freight'
+      'https://indianrailways.gov.in/'
     ],
     extractRe: /(?:Indian\s+Railways|railways?)[\s\S]{0,300}?(?:loaded|freight\s+loading|carried|transported)[\s\S]{0,120}?(\d{2,3}\.?\d{0,2})\s*(?:MT|Mn\s+tonnes|million\s+tonnes|MnT)/i,
     plausible: (v) => v > 90 && v < 200,
@@ -161,6 +174,8 @@ const CONFIGS = {
   // Major port cargo — monthly Mn tonnes via PIB / Ministry of Ports
   port_cargo: {
     urls: [
+      'https://www.business-standard.com/topic/major-ports-cargo',
+      'https://economictimes.indiatimes.com/topic/major-ports',
       'https://pib.gov.in/AllRelease.aspx?MinCode=63',
       'https://sagarmala.gov.in/'
     ],
@@ -171,7 +186,9 @@ const CONFIGS = {
   // DGCA air passenger traffic — monthly Mn pax (domestic + international)
   air_pax: {
     urls: [
-      'https://www.dgca.gov.in/digigov-portal/?nq=qHE4MM%2BFwSPaUnbl0Wqejg%3D%3D',  // Monthly stats
+      'https://www.business-standard.com/topic/domestic-air-passenger-traffic',
+      'https://economictimes.indiatimes.com/topic/dgca-air-passenger',
+      'https://www.dgca.gov.in/digigov-portal/?nq=qHE4MM%2BFwSPaUnbl0Wqejg%3D%3D',
       'https://pib.gov.in/AllRelease.aspx?MinCode=03'
     ],
     extractRe: /(?:domestic\s+air|passenger\s+traffic)[\s\S]{0,200}?(\d{1,3}\.\d{1,2})\s+(?:lakh|million|Mn)\s+(?:pax|passengers)/i,
@@ -230,7 +247,11 @@ export async function fetchPrimary(metric) {
   const timeout = cfg.timeoutMs || 25000;
   for (const url of cfg.urls) {
     try {
-      const html = await fetchHtml(url, timeout, cfg.headers);
+      const res = await fetchResilient(url, {
+        timeoutMs: timeout, retries: 2, wayback: true,
+        browserUa: true, headers: cfg.headers || {}
+      });
+      const html = res.body;
       const m = html.match(cfg.extractRe);
       if (!m) { errors.push(`${url}: no match`); continue; }
       const value = cfg.valueParser ? cfg.valueParser(m[1]) : parseFloat(m[1]);
@@ -238,6 +259,9 @@ export async function fetchPrimary(metric) {
         errors.push(`${url}: parsed ${value} implausible`);
         continue;
       }
+      // Save snapshot of the page that successfully yielded a value. Used for
+      // future-debug + self-healing diff. Idempotent per-day.
+      try { recordSnapshot(metric.metric_id, url, html, value, 'india_govt_v1'); } catch {}
       return {
         value,
         as_of: new Date().toISOString(),

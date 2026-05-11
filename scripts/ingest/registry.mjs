@@ -17,6 +17,15 @@ import * as drewry_v1 from './parsers/drewry_v1.mjs';
 import * as derived_v1 from './parsers/derived_v1.mjs';
 import * as india_govt_v1 from './parsers/india_govt_v1.mjs';
 import * as nsdl_sectoral_v1 from './parsers/nsdl_sectoral_v1.mjs';
+import * as pib_rss_v1 from './parsers/pib_rss_v1.mjs';
+import * as google_news_rss_v1 from './parsers/google_news_rss_v1.mjs';
+import * as google_news_llm_v1 from './parsers/google_news_llm_v1.mjs';
+import * as dbnomics_v1 from './parsers/dbnomics_v1.mjs';
+import * as datagovin_v1 from './parsers/datagovin_v1.mjs';
+import * as nse_rbi_direct_v1 from './parsers/nse_rbi_direct_v1.mjs';
+import * as pdf_v1 from './parsers/pdf_v1.mjs';
+import * as playwright_render_v1 from './parsers/playwright_render_v1.mjs';
+import * as llm_extract_v1 from './parsers/llm_extract_v1.mjs';
 import * as mock from './parsers/mock.mjs';
 
 // Registered REAL implementations. Anything not in this map uses mock fetcher.
@@ -72,6 +81,26 @@ const REAL = new Map([
   ['press_release:dgca_v1', india_govt_v1],
   ['html_scrape:bse_cement_v1', india_govt_v1],
   ['html_scrape:port_authority_v1', india_govt_v1],
+  ['html_scrape:rbi_wacr_v1', india_govt_v1],  // routes wacr_repo_spread to india_govt config
+  // RSS-based format-stable parsers (Step 5)
+  ['rss:pib_rss_v1', pib_rss_v1],
+  // Google News RSS — searches Indian publishers for monthly-release headlines
+  ['rss:google_news_rss_v1', google_news_rss_v1],
+  // Google News + LLM article-body extraction — for metrics whose value isn't in headlines
+  ['llm:google_news_llm_v1', google_news_llm_v1],
+  // DBnomics free aggregator API (Step 6) — structured JSON, no key
+  ['json_api:dbnomics_v1', dbnomics_v1],
+  // data.gov.in (Step 7) — CSV mode no key, API mode with optional DATAGOVIN_API_KEY
+  ['json_api:datagovin_v1', datagovin_v1],
+  ['csv_download:datagovin_v1', datagovin_v1],
+  // NSE + RBI direct CSV downloads (Step 8) — most reliable Indian data source
+  ['csv_download:nse_rbi_direct_v1', nse_rbi_direct_v1],
+  // PDF parser with optional OCR (Step 9)
+  ['pdf:pdf_v1', pdf_v1],
+  // Playwright SPA renderer (Step 10) — for JS-rendered pages
+  ['html_render:playwright_render_v1', playwright_render_v1],
+  // Free LLM extraction fallback (Step 11) — universal last-resort
+  ['llm:llm_extract_v1', llm_extract_v1],
 ]);
 
 export function resolve(parser_id, { live = false } = {}) {

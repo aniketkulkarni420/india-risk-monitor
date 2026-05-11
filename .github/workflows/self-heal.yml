@@ -1,0 +1,64 @@
+name: Self-heal analysis
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # daily 9am UTC
+  workflow_dispatch:
+    inputs:
+      threshold:
+        description: 'Min consecutive failures to analyze'
+        required: false
+        default: '5'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - name: Run self-heal analysis
+        run: node scripts/self-heal.mjs --threshold=${{ inputs.threshold || 5 }}
+      - name: Find or open parser-health issue
+        id: issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const reports = fs.existsSync('data/self-heal-reports')
+              ? fs.readdirSync('data/self-heal-reports').filter(f => f.endsWith('.md'))
+              : [];
+            if (!reports.length) {
+              console.log('No reports generated — no chronically-failing parsers.');
+              return;
+            }
+            // Find existing parser-health issue (label "parser-health") or create one
+            const search = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'parser-health'
+            });
+            let issueNumber = search.data[0]?.number;
+            if (!issueNumber) {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title: 'Self-heal · parsers stuck red',
+                labels: ['parser-health'],
+                body: 'Automated self-heal reports for chronically-failing parsers. Each report explains likely cause + next-step suggestion.'
+              });
+              issueNumber = created.data.number;
+            }
+            // Post each report as a comment
+            for (const r of reports) {
+              const body = fs.readFileSync(path.join('data/self-heal-reports', r), 'utf8');
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: body.slice(0, 60000)  // GH comment cap
+              });
+            }

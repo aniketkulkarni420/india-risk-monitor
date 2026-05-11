@@ -1,0 +1,77 @@
+name: Scheduled ingest (India IP)
+
+# This workflow targets metrics that need an Indian IP to fetch successfully
+# (NPCI, NSE archive, DGCA portal, RBI internal pages, GST portal). It runs
+# on the self-hosted Windows runner registered with label `india`.
+#
+# Setup: run `scripts/install-self-hosted-runner.ps1` on your PC first.
+# Until that's done this workflow is harmless — GitHub will just queue jobs
+# waiting for a matching runner.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6h
+  workflow_dispatch:
+    inputs:
+      metric:
+        description: 'Single metric_id to ingest (optional)'
+        required: false
+
+jobs:
+  ingest-india:
+    runs-on: [self-hosted, windows, india]
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: npm install --no-audit --no-fund
+        shell: pwsh
+
+      - name: Run live ingest (India geo)
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DATAGOVIN_API_KEY: ${{ secrets.DATAGOVIN_API_KEY }}
+        run: |
+          # Metrics that genuinely need an India IP to fetch successfully.
+          # NPCI, NSE archive, NSDL FPI, DGCA, RBI MMO, PPAC, GSTN, IHMCL etc.
+          $indiaMetrics = @(
+            "wacr_repo_spread","fno_oi_buildup","block_deals_notional","fpi_debt_flows",
+            "pol_demand","air_pax","india_port_dwell_time","eway_bills","fastag_toll",
+            "rail_freight","port_cargo","cement_dispatches","upi_value","fastag_toll",
+            "india_crude_basket","naukri_jobspeak"
+          )
+          if ("${{ github.event.inputs.metric }}" -ne "") {
+            npm run ingest -- --live --metric=${{ github.event.inputs.metric }}
+          } else {
+            foreach ($m in $indiaMetrics) {
+              Write-Host "==== Ingesting $m ===="
+              npm run ingest -- --live --metric=$m
+              if ($LASTEXITCODE -ne 0) { Write-Host "($m failed, continuing)" }
+            }
+          }
+        shell: pwsh
+        continue-on-error: true
+
+      - name: Validate
+        run: npm run validate
+        shell: pwsh
+
+      - name: Commit data updates if any
+        run: |
+          git config user.name 'IRM India Runner'
+          git config user.email 'irm-india@bot.local'
+          git add data/
+          if (git diff --staged --quiet) {
+            Write-Host "No data changes."
+          } else {
+            git commit -m "ingest(india): scheduled run @ $(Get-Date -Format 'yyyy-MM-ddTHH:mmZ')"
+            git push
+          }
+        shell: pwsh
