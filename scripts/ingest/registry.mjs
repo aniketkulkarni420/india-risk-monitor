@@ -21,6 +21,7 @@ import * as pib_rss_v1 from './parsers/pib_rss_v1.mjs';
 import * as google_news_rss_v1 from './parsers/google_news_rss_v1.mjs';
 import * as google_news_llm_v1 from './parsers/google_news_llm_v1.mjs';
 import * as pib_search_v1 from './parsers/pib_search_v1.mjs';
+import * as yahoo_finance_v1 from './parsers/yahoo_finance_v1.mjs';
 import * as dbnomics_v1 from './parsers/dbnomics_v1.mjs';
 import * as datagovin_v1 from './parsers/datagovin_v1.mjs';
 import * as nse_rbi_direct_v1 from './parsers/nse_rbi_direct_v1.mjs';
@@ -91,6 +92,8 @@ const REAL = new Map([
   ['llm:google_news_llm_v1', google_news_llm_v1],
   // PIB search + LLM — authoritative source for Indian govt monthly releases (needs India IP)
   ['llm:pib_search_v1', pib_search_v1],
+  // Yahoo Finance — free JSON endpoints for NSE-blocked F&O/index metrics
+  ['json_api:yahoo_finance_v1', yahoo_finance_v1],
   // DBnomics free aggregator API (Step 6) — structured JSON, no key
   ['json_api:dbnomics_v1', dbnomics_v1],
   // data.gov.in (Step 7) — CSV mode no key, API mode with optional DATAGOVIN_API_KEY

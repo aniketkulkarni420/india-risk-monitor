@@ -81,54 +81,49 @@ async function fetchArticleBody(url, { timeoutMs = 25000 } = {}) {
 //   maxAgeDays: skip items older than this (default 45)
 const CONFIGS = {
   eway_bills: {
-    queryFn: () => 'India e-way bills generated April 2026 OR May 2026',
-    target: 'the absolute monthly count of e-way bills generated in India for the most recent month, in crore (units, not value). Headlines often say "X crore e-way bills" or describe it as "rose Y% to Z crore". Return the absolute count, not percentage.',
+    queryFn: () => 'India e-way bills generated crore monthly',
+    target: 'The absolute monthly count of e-way bills generated in India for the most recent month. Required units: crore (count of bills, NOT rupees value, NOT cumulative). Typical range: 8-15 crore per month. Example: "10.5 crore e-way bills were generated in April 2026" -> return 10.5. If text only gives percentage change without absolute count, return null. Reject any value above 25 crore (those are likely cumulative annual totals).',
     headlineFilter: (t) => /e[- ]?way\s+bill/i.test(t),
-    // sourceWhitelist removed — LLM + plausibility band guard quality
-    plausible: (v) => v > 5 && v < 25,         // in crore (units)
-    valueTransform: (v) => v * 10,             // crore → million (existing unit)
-    maxArticles: 4,
-    maxAgeDays: 45
+    plausible: (v) => v > 5 && v < 25,
+    valueTransform: (v) => v * 10,
+    maxArticles: 5,
+    maxAgeDays: 60
   },
 
   fastag_toll: {
-    queryFn: () => 'FASTag monthly toll collection India crore April 2026 OR May 2026',
-    target: 'the monthly FASTag toll collection amount for India in INR crore. Headlines may mention NHAI or specific months. Return the absolute monthly collection, not annual or pricing.',
-    headlineFilter: (t) => /FASTag/i.test(t) && !/Annual\s+Pass|costlier|price|fee/i.test(t),
-    // sourceWhitelist removed -- LLM + plausibility guards quality
+    queryFn: () => 'FASTag toll collection crore monthly NHAI India',
+    target: 'The monthly FASTag toll collection amount for India in INR crore for the most recent month. Required: monthly figure between 5000 and 12000 crore. Example: "Toll collection via FASTag reached Rs 6,500 crore in April 2026" -> return 6500. Reject: annual totals (50000+ crore), pass prices, or any value outside 5000-12000 crore range.',
+    headlineFilter: (t) => /FASTag/i.test(t) && !/Annual\s+Pass|costlier|fee\s+hike|price/i.test(t),
     plausible: (v) => v > 4000 && v < 12000,
-    maxArticles: 4,
-    maxAgeDays: 45
+    maxArticles: 5,
+    maxAgeDays: 60
   },
 
   rail_freight: {
-    queryFn: () => 'Indian Railways freight loading million tonnes monthly April 2026 OR May 2026',
-    target: 'the all-India monthly freight loading of Indian Railways in million tonnes (MT). Exclude single-zone figures (Central/Western/Northern Railway). Exclude full-year FY totals (those are 1500-1800 MT range). Return only the monthly all-India figure.',
+    queryFn: () => 'Indian Railways freight loading million tonnes month India',
+    target: 'The ALL-INDIA monthly freight loading by Indian Railways in million tonnes (MT). Typical monthly range: 120-160 MT. STRICT EXCLUSIONS: (1) single zone figures (Central/Western/Northern/Southern/Eastern Railway -- those are 5-10 MT range); (2) full FY/year totals (those are 1500-1800 MT range, like "1670 MT in FY26"); (3) freight REVENUE in crore (that is rupees, not tonnes). Return only the absolute monthly all-India tonnage between 100 and 200 MT.',
     headlineFilter: (t) => /Indian\s+Railways|freight\s+loading/i.test(t),
-    // sourceWhitelist removed -- LLM + plausibility guards quality
     plausible: (v) => v > 100 && v < 200,
-    maxArticles: 4,
-    maxAgeDays: 45
+    maxArticles: 5,
+    maxAgeDays: 60
   },
 
   port_cargo: {
-    queryFn: () => 'India major ports cargo million tonnes April 2026 OR May 2026',
-    target: 'the monthly all-India major ports total cargo throughput in million tonnes (MT). Exclude single-port figures (JNPA, Mundra, Chennai) and full-year totals (those are 800-1000 MT). Return only the monthly all-India figure for all major ports combined.',
-    headlineFilter: (t) => /major\s+ports|all[- ]India\s+ports|cargo/i.test(t),
-    // sourceWhitelist removed -- LLM + plausibility guards quality
+    queryFn: () => 'India major ports total cargo million tonnes monthly',
+    target: 'The all-India monthly TOTAL cargo throughput across all 12 major ports combined, in million tonnes (MT). Typical monthly range: 60-90 MT. STRICT EXCLUSIONS: (1) single port figures (JNPA, Mundra, Chennai, Paradip alone -- those are 5-15 MT); (2) annual/FY totals (those are 750-950 MT range like "915 MT in FY26"); (3) container count in TEU (different unit). Return only the monthly aggregate.',
+    headlineFilter: (t) => /major\s+ports|all[- ]India\s+ports/i.test(t),
     plausible: (v) => v > 50 && v < 100,
-    maxArticles: 4,
-    maxAgeDays: 45
+    maxArticles: 5,
+    maxAgeDays: 60
   },
 
   cement_dispatches: {
-    queryFn: () => 'India cement production dispatches million tonnes April 2026 OR May 2026',
-    target: 'the monthly all-India cement production or dispatches in million tonnes. Exclude single-company figures (UltraTech, Ambuja). Return the all-India total.',
-    headlineFilter: (t) => /cement/i.test(t) && !/UltraTech|Ambuja|ACC|Shree|Dalmia|earnings|profit/i.test(t),
-    // sourceWhitelist removed -- LLM + plausibility guards quality
+    queryFn: () => 'India cement production dispatches million tonnes monthly',
+    target: 'The all-India monthly cement production or dispatches in million tonnes (MT). Typical monthly range: 30-45 MT. STRICT EXCLUSIONS: (1) single-company figures (UltraTech, Ambuja, ACC alone -- those are 4-12 MT); (2) annual/FY totals (those are 350-450 MT range); (3) capacity figures (those are 600+ MT range like "200 MTPA capacity"). Return only the monthly all-India production.',
+    headlineFilter: (t) => /cement/i.test(t) && !/UltraTech|Ambuja|ACC|Shree|Dalmia|earnings|profit|capacity|MTPA/i.test(t),
     plausible: (v) => v > 25 && v < 60,
-    maxArticles: 4,
-    maxAgeDays: 45
+    maxArticles: 5,
+    maxAgeDays: 60
   },
 
   air_pax: {
@@ -142,12 +137,12 @@ const CONFIGS = {
   },
 
   pol_demand: {
-    queryFn: () => 'India petroleum products consumption MMT April 2026 OR May 2026 PPAC',
-    target: 'monthly all-India petroleum products consumption (total POL demand) in million metric tonnes (MMT or Mn tonnes). Headlines may mention "petroleum demand" or "fuel consumption" with month figures.',
-    headlineFilter: (t) => /(petroleum|fuel\s+demand|petroleum\s+products|POL|PPAC)/i.test(t),
+    queryFn: () => 'India petroleum products fuel consumption MMT monthly PPAC',
+    target: 'The all-India monthly TOTAL petroleum products consumption (sum of diesel + petrol + LPG + ATF + others) in million metric tonnes (MMT). Typical monthly range: 18-25 MMT. STRICT EXCLUSIONS: (1) single-product figures (only diesel, only petrol -- those are 3-9 MMT); (2) annual/FY totals (220-260 MMT range); (3) crude oil throughput at refineries (different metric, 20-23 MMT range but distinct). Return only the monthly aggregate consumption.',
+    headlineFilter: (t) => /(petroleum|fuel\s+demand|petroleum\s+products|POL\s+demand|PPAC)/i.test(t),
     plausible: (v) => v > 15 && v < 30,
-    maxArticles: 4,
-    maxAgeDays: 45
+    maxArticles: 5,
+    maxAgeDays: 60
   },
 
   wacr_repo_spread: {

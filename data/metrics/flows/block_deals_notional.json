@@ -34,7 +34,7 @@
     "url": "https://www.nseindia.com/market-data/block-deals-watch",
     "type": "Exchange",
     "frequency": "Daily",
-    "parser": "html_render:playwright_render_v1"
+    "parser": "json_api:yahoo_finance_v1"
   },
   "source_crosscheck": [
     {
