@@ -8,7 +8,7 @@
   "unit": "days",
   "value_format": "decimal_1",
   "as_of": "2026-04-25T17:30:00+05:30",
-  "as_of_period": "weekly",
+  "as_of_period": "quarterly",
   "mom_pct": null,
   "yoy_pct": null,
   "vs_5y_avg_pct": -8.4,
@@ -33,8 +33,8 @@
     "name": "JNPT + Mundra port authority weekly bulletins",
     "url": "https://www.jnport.gov.in/",
     "type": "Official",
-    "frequency": "Weekly",
-    "parser": "llm:pib_search_v1"
+    "frequency": "Quarterly",
+    "parser": "llm:google_news_llm_v1"
   },
   "source_crosscheck": [
     {

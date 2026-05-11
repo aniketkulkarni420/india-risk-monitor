@@ -145,10 +145,27 @@ const CONFIGS = {
     queryFn: () => 'India petroleum products consumption MMT April 2026 OR May 2026 PPAC',
     target: 'monthly all-India petroleum products consumption (total POL demand) in million metric tonnes (MMT or Mn tonnes). Headlines may mention "petroleum demand" or "fuel consumption" with month figures.',
     headlineFilter: (t) => /(petroleum|fuel\s+demand|petroleum\s+products|POL|PPAC)/i.test(t),
-    // sourceWhitelist removed -- LLM + plausibility guards quality
     plausible: (v) => v > 15 && v < 30,
     maxArticles: 4,
     maxAgeDays: 45
+  },
+
+  wacr_repo_spread: {
+    queryFn: () => 'WACR weighted average call rate repo bps India May 2026',
+    target: 'the difference (spread) in basis points between WACR (Weighted Average Call Rate) and the RBI repo rate. Sign convention: negative if WACR below repo, positive if above. If the article gives both WACR % and repo %, compute spread as (WACR - repo) * 100. Return only the bps value.',
+    headlineFilter: (t) => /(WACR|call\s+rate|repo|liquidity)/i.test(t),
+    plausible: (v) => Math.abs(v) <= 200,
+    maxArticles: 5,
+    maxAgeDays: 90
+  },
+
+  india_port_dwell_time: {
+    queryFn: () => 'India major ports turnaround time vessel dwell days 2026',
+    target: 'average vessel turnaround time or container dwell time at Indian major ports in days. Most recent monthly or quarterly figure.',
+    headlineFilter: (t) => /(dwell|turnaround|port\s+performance|vessel)/i.test(t),
+    plausible: (v) => v > 0.5 && v < 10,
+    maxArticles: 4,
+    maxAgeDays: 120
   }
 };
 
