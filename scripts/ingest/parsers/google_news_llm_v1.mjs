@@ -161,6 +161,33 @@ const CONFIGS = {
     plausible: (v) => v > 0.5 && v < 10,
     maxArticles: 4,
     maxAgeDays: 120
+  },
+
+  fno_oi_buildup: {
+    queryFn: () => 'Nifty F&O open interest buildup OI change India',
+    target: 'Nifty futures or options Open Interest (OI) build-up percentage change or absolute count. Recent daily/weekly figure. Sign matters: negative = OI declining (short covering or position close), positive = OI building.',
+    headlineFilter: (t) => /(Nifty|OI|open\s+interest|F&O|futures)/i.test(t),
+    plausible: (v) => Math.abs(v) < 1000000,
+    maxArticles: 4,
+    maxAgeDays: 14
+  },
+
+  block_deals_notional: {
+    queryFn: () => 'NSE BSE block deals total notional crore today',
+    target: 'the daily total notional value of all NSE/BSE block deals in INR crore. Most recent trading day aggregate.',
+    headlineFilter: (t) => /(block\s+deal|bulk\s+deal|notional)/i.test(t),
+    plausible: (v) => v > 0 && v < 50000,
+    maxArticles: 4,
+    maxAgeDays: 14
+  },
+
+  fpi_debt_flows: {
+    queryFn: () => 'India FPI FII debt investment month MTD crore',
+    target: 'most recent FPI/FII Debt (bond/G-Sec) net investment for India in INR crore. Can be positive (inflow) or negative (outflow). Return month-to-date (MTD) figure.',
+    headlineFilter: (t) => /(FPI|FII|debt\s+flow|debt\s+investment|bond)/i.test(t),
+    plausible: (v) => Math.abs(v) < 200000,
+    maxArticles: 4,
+    maxAgeDays: 30
   }
 };
 

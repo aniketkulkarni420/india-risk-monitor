@@ -62,10 +62,41 @@ async function getBrowser() {
 //   valueParser?
 //   timeoutMs?: per-page navigation timeout (default 30000)
 const CONFIGS = {
-  // NSE/NSDL configs removed 2026-05-11 — these endpoints actively block all
-  // free-tier scraping vectors (Akamai bot detection, HTTP/2 abort, SPA auth
-  // session requirements). Metrics fno_oi_buildup, block_deals_notional, and
-  // fpi_debt_flows have been retired from the IRM data contract.
+  // NSE/NSDL · re-added 2026-05-12 as last-resort tier in tiered chain.
+  fpi_debt_flows: {
+    warmupUrl: 'https://www.fpi.nsdl.co.in/',
+    urls: [
+      'https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx',
+      'https://www.fpi.nsdl.co.in/web/StaticReport/Yearwise.aspx',
+      'https://www.fpi.nsdl.co.in/'
+    ],
+    waitSelector: 'table, .data-table',
+    waitMs: 6000,
+    extractRe: /Debt[\s\S]{0,1200}?(-?[\d,]+(?:\.\d+)?)\s*(?:Cr|crore)?/i,
+    plausible: (v) => Math.abs(v) < 200000,
+    valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
+    timeoutMs: 60000
+  },
+  fno_oi_buildup: {
+    warmupUrl: 'https://www.nseindia.com/',
+    urls: ['https://www.nseindia.com/option-chain'],
+    waitSelector: 'table',
+    waitMs: 7000,
+    extractRe: /(?:OI\s+Build[- ]?up|Net\s+OI)[\s\S]{0,300}?(-?[\d,]+(?:\.\d+)?)/i,
+    plausible: (v) => Math.abs(v) < 100000000,
+    valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
+    timeoutMs: 60000
+  },
+  block_deals_notional: {
+    warmupUrl: 'https://www.nseindia.com/',
+    urls: ['https://www.nseindia.com/market-data/large-deals'],
+    waitSelector: 'table',
+    waitMs: 6000,
+    extractRe: /(?:Block\s+Deals|Total\s+Notional)[\s\S]{0,400}?(?:₹|Rs\.?\s*)?([\d,]+(?:\.\d+)?)\s*(?:crore|Cr)?/i,
+    plausible: (v) => v > 0 && v < 50000,
+    valueParser: (s) => parseFloat(String(s).replace(/,/g, '')),
+    timeoutMs: 60000
+  },
 
   // NPCI UPI product statistics — value rendered into a table by JS
   upi_value_pw: {

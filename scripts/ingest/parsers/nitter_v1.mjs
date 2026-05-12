@@ -49,19 +49,37 @@ const CONFIGS = {
 };
 
 // Pull tweets from Nitter HTML page (no API needed)
+// Nitter mirror DOM varies slightly between forks/versions. Use multiple
+// approaches to maximize extraction.
 function extractTweets(html) {
-  // Each tweet block typically in <div class="timeline-item"> with text in .tweet-content
   const out = [];
-  const itemRe = /<div\s+class="timeline-item[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi;
+
+  // Approach 1: tweet-content blocks (most common Nitter DOM)
+  const re1 = /<div\s+class="tweet-content[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
   let m;
-  while ((m = itemRe.exec(html)) !== null && out.length < 30) {
-    const block = m[0];
-    const contentMatch = block.match(/<div\s+class="tweet-content[^>]*>([\s\S]*?)<\/div>/i);
-    const dateMatch = block.match(/<span\s+class="tweet-date">[\s\S]*?title="([^"]+)"/i);
-    if (!contentMatch) continue;
-    let text = contentMatch[1].replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
-    out.push({ text, date: dateMatch ? dateMatch[1] : null });
+  while ((m = re1.exec(html)) !== null && out.length < 40) {
+    const cleaned = m[1]
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&nbsp;/g,' ')
+      .replace(/\s+/g,' ').trim();
+    if (cleaned.length > 5) out.push({ text: cleaned, date: null });
   }
+
+  // Approach 2: timeline-item p tags (alternative DOM)
+  if (out.length === 0) {
+    const re2 = /<p\s+class="tweet-text[^"]*"[^>]*>([\s\S]*?)<\/p>/gi;
+    while ((m = re2.exec(html)) !== null && out.length < 40) {
+      const cleaned = m[1].replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+      if (cleaned.length > 5) out.push({ text: cleaned, date: null });
+    }
+  }
+
+  // Approach 3: og:description meta tag (latest pinned/top tweet)
+  if (out.length === 0) {
+    const desc = html.match(/<meta\s+(?:property|name)="og:description"\s+content="([^"]+)"/i);
+    if (desc) out.push({ text: desc[1], date: null });
+  }
+
   return out;
 }
 

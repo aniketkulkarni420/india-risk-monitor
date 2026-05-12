@@ -1,15 +1,12 @@
-// REAL fetcher · Moneycontrol scrape · Playwright-backed.
+// REAL fetcher · Moneycontrol scrape · Playwright + LLM extraction.
 //
-// Moneycontrol blocks plain fetch (403) but Playwright with a real browser UA
-// + cookie + referrer chain usually works. India IP recommended.
-//
-// Pages used:
-//   FII/FPI tracker:           /stocks/marketstats/fii_fpi.php
-//   F&O OI:                    /stocks/marketstats/fno_oi.php
-//   Bulk/block deals:          /stocks/marketstats/bulkblockdeals.php
-//   Sector cement news:        /news/business/markets/cement-prices-and-output
+// Strategy: Playwright renders the page (handles JS), strip to text,
+// send to free LLM with metric-specific extraction target. Far more
+// resilient than regex against an SPA that may restructure.
 
 import { recordSnapshot } from '../snapshot-store.mjs';
+import { tryProviders } from './llm_extract_v1.mjs';
+import { stripHtml } from './google_news_llm_v1.mjs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
@@ -17,7 +14,7 @@ let _bp = null;
 async function getBrowser() {
   if (!_bp) {
     let pw; try { pw = require('playwright'); } catch { return null; }
-    _bp = pw.chromium.launch({ headless: true, args: ['--disable-http2', '--disable-blink-features=AutomationControlled'] });
+    _bp = pw.chromium.launch({ headless: true, args: ['--disable-http2','--disable-blink-features=AutomationControlled'] });
   }
   return _bp;
 }
@@ -27,33 +24,24 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 const CONFIGS = {
   fpi_debt_flows: {
     urls: ['https://www.moneycontrol.com/stocks/marketstats/fii_fpi.php'],
-    waitSelector: 'table, .tbldata14',
-    waitMs: 5000,
-    // Match the "FPI Debt" or "Debt" MTD column
-    extractRe: /Debt[\s\S]{0,400}?(-?[\d,]+(?:\.\d+)?)/i,
+    target: 'the most recent FPI Debt net investment value for India in INR crore. Page shows daily and monthly tables. Return the latest month-to-date (MTD) net Debt investment value (can be negative for outflows).',
     plausible: (v) => Math.abs(v) < 200000,
-    valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
-    timeoutMs: 45000
+    waitMs: 5000
   },
   fno_oi_buildup: {
-    urls: ['https://www.moneycontrol.com/stocks/marketstats/fno_oi.php'],
-    waitSelector: 'table',
-    waitMs: 5000,
-    extractRe: /(?:Long\s+Buildup|Net\s+OI|OI\s+Change)[\s\S]{0,400}?(-?[\d,]+(?:\.\d+)?)/i,
-    plausible: (v) => Math.abs(v) < 100000000,
-    valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
-    timeoutMs: 45000
+    urls: [
+      'https://www.moneycontrol.com/markets/indian-indices/changeinoi.php?optopt=&optype=BUYWRITE',
+      'https://www.moneycontrol.com/stocks/marketstats/fno_oi.php'
+    ],
+    target: 'the most recent Nifty F&O Open Interest build-up percentage change (Long Buildup or Short Buildup count or % change). If the page shows multiple stocks, sum the top long buildups OR return the index-level net OI change percentage. A signed percentage or signed count.',
+    plausible: (v) => Math.abs(v) < 1000000,
+    waitMs: 6000
   },
   block_deals_notional: {
     urls: ['https://www.moneycontrol.com/stocks/marketstats/bulkblockdeals.php'],
-    waitSelector: 'table',
-    waitMs: 5000,
-    // Sum of notional values is hard; fall back to count or first row total.
-    // Page typically shows a "Total Notional" summary cell.
-    extractRe: /(?:Total\s+Notional|Total\s+Value|Block\s+Deals\s+Total)[\s\S]{0,200}?(?:₹|Rs\.?\s*)?([\d,]+(?:\.\d+)?)\s*(?:crore|Cr)?/i,
+    target: 'the most recent daily total notional value of all block deals on NSE/BSE in INR crore. Sum across the visible block deals table for the latest date.',
     plausible: (v) => v > 0 && v < 50000,
-    valueParser: (s) => parseFloat(String(s).replace(/,/g, '')),
-    timeoutMs: 45000
+    waitMs: 5000
   }
 };
 
@@ -69,20 +57,30 @@ export async function fetchPrimary(metric) {
     for (const url of cfg.urls) {
       const page = await ctx.newPage();
       try {
-        await page.goto(url, { waitUntil: 'networkidle', timeout: cfg.timeoutMs || 35000 });
-        if (cfg.waitSelector) { try { await page.waitForSelector(cfg.waitSelector, { timeout: 12000 }); } catch {} }
+        await page.goto(url, { waitUntil: 'networkidle', timeout: 35000 });
         if (cfg.waitMs) await page.waitForTimeout(cfg.waitMs);
         const html = await page.content();
-        const m = html.match(cfg.extractRe);
-        if (!m) { errors.push(`${url}: regex no match`); continue; }
-        const value = cfg.valueParser ? cfg.valueParser(m[1]) : parseFloat(m[1]);
-        if (!Number.isFinite(value) || !cfg.plausible(value)) {
-          errors.push(`${url}: ${value} implausible`); continue;
+        const text = stripHtml(html).slice(0, 12000);
+
+        const prompt = 'Extract: ' + cfg.target + '\n\nPage URL: ' + url + '\n\nPage text:\n\n' + text;
+        const result = await tryProviders(prompt);
+        if (!result || result.value === null || !Number.isFinite(result.value)) {
+          errors.push(`${url}: LLM no value`); continue;
         }
+        const value = result.value;
+        if (!cfg.plausible(value)) { errors.push(`${url}: ${value} out of band`); continue; }
+
         try { recordSnapshot(metric.metric_id, url, html, value, 'moneycontrol_v1'); } catch {}
-        return { value, as_of: new Date().toISOString(), parse_meta: { source: 'moneycontrol', url }, raw: m[0].slice(0,200) };
-      } catch (e) { errors.push(`${url}: ${(e.message||'').slice(0,80)}`); }
-      finally { await page.close().catch(()=>{}); }
+        return {
+          value,
+          as_of: result.as_of ? new Date(result.as_of).toISOString() : new Date().toISOString(),
+          parse_meta: { source: 'moneycontrol-llm', url, provider: result.provider, source_note: result.source_note },
+          raw: `${result.provider}: ${result.value}`
+        };
+      } catch (e) {
+        if (e.code === 'LLM_UNAVAILABLE') throw e;
+        errors.push(`${url}: ${(e.message||'').slice(0,80)}`);
+      } finally { await page.close().catch(()=>{}); }
     }
   } finally { await ctx.close().catch(()=>{}); }
   throw new Error(`moneycontrol_v1: all ${cfg.urls.length} URLs failed · ${errors.slice(0,2).join(' | ')}`);
