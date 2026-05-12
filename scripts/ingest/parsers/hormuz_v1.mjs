@@ -13,9 +13,7 @@ const SNAPSHOT_URLS = [
   // is_static + live_source_count + ais_state_age_sec fields from OIL_KV ais_state
   'https://hormuz-watch-2.pages.dev/api/snapshot',
   // Custom-domain alias if Aniket later moves it
-  'https://hormuz-watch.kamayakya.com/api/snapshot',
-  // Old preview URL · kept as last-resort fallback (returns v1 schema, no is_static)
-  'https://hormuz-watch-2.pages.dev/api/snapshot'
+  'https://hormuz-watch.kamayakya.com/api/snapshot'
 ];
 const MT_FALLBACK = 'https://www.marinetraffic.com/en/ais/home/centerx:56.2/centery:26.5/zoom:8';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 IRM-Ingest/1.0';
