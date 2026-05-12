@@ -105,6 +105,64 @@ svg, img, video, canvas { max-width: 100%; }
 .pill-med   { background: var(--amber-soft); color: #e9c466; }
 .pill-high  { background: var(--red-soft); color: #e88; }
 .pill-shock { background: var(--red); color: #1a0808; font-weight: 700; letter-spacing: .1em; padding: 3px 12px; }
+/* 10B: status pill with directional indicator inside */
+.pill .pill-dir {
+  margin-left: 5px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  opacity: .85;
+  font-weight: 600;
+}
+
+/* 2E Bloomberg-style heatmap cells (applied to MoM/YoY columns only) */
+.heat-neutral        { background: rgba(106,114,128,.06); color: var(--ink-3); }
+.heat-pos-light      { background: rgba(63,178,127,.08); color: var(--green); }
+.heat-pos-mid        { background: rgba(63,178,127,.18); color: var(--green); }
+.heat-pos-strong     { background: rgba(63,178,127,.32); color: var(--green); font-weight: 600; }
+.heat-neg-light      { background: rgba(226,100,100,.08); color: var(--red); }
+.heat-neg-mid        { background: rgba(226,100,100,.18); color: var(--red); }
+.heat-neg-strong     { background: rgba(226,100,100,.32); color: var(--red); font-weight: 600; }
+
+/* 3A Range tick component */
+.range-tick { font-size: 10px; line-height: 1.4; margin-top: 6px; }
+.range-tick-bar {
+  position: relative;
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  margin: 4px 0 3px;
+}
+.range-tick-fill {
+  position: absolute; top: 0; left: 0; height: 100%;
+  background: var(--accent); border-radius: 3px; opacity: .5;
+}
+.range-tick-marker {
+  position: absolute; top: -2px; width: 2px; height: 10px;
+  background: var(--ink); border-radius: 1px;
+}
+.range-tick-row {
+  display: flex; justify-content: space-between;
+  font-family: var(--mono); color: var(--ink-3);
+}
+.range-tick-label {
+  color: var(--accent); font-weight: 600; font-size: 10px;
+}
+
+/* Nuance chips (WPI-CPI gap, VIX zone, streak, etc) */
+.nuance-chip {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 9.5px;
+  font-weight: 600;
+  font-family: var(--mono);
+  letter-spacing: .02em;
+  margin-top: 4px;
+}
+.nuance-chip.amber { background: rgba(226,166,78,.18); color: var(--amber); }
+.nuance-chip.red   { background: rgba(226,100,100,.18); color: var(--red); }
+.nuance-chip.green { background: rgba(63,178,127,.18); color: var(--green); }
+.nuance-chip.accent{ background: rgba(212,165,116,.18); color: var(--accent); }
 
 /* ────────────────────────────────────────────────────────────── */
 /* Trend colour classes                                           */

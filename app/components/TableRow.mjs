@@ -8,7 +8,7 @@
 //   state: 'default' | 'loading' | 'error' | 'history-pending' | 'shock' (auto-detected from metric)
 //   onClick: optional callback (default: open ?metric=metric_id deep-link)
 
-import { el, formatValue, formatTrend, trendClass, statusClass, isHistoryPending, isShock, formatAsOf } from './utils.mjs';
+import { el, formatValue, formatTrend, trendClass, statusClass, isHistoryPending, isShock, formatAsOf, heatmapClass, pillWithDirection } from './utils.mjs';
 import { renderSparkline } from './Sparkline.mjs';
 import { getDisplayPeriods } from './ComparisonSpec.mjs';
 
@@ -93,7 +93,13 @@ export function renderTableRow(metric, opts = {}) {
           if (val == null) {
             return el('td', { class: 'trend-cell', 'data-period': p, style: { color: 'var(--ink-3)' } }, '');
           }
-          return el('td', { class: 'trend-cell ' + trendClass(val, dir), 'data-period': p }, [
+          // 2E heatmap: only on monthly/yearly trend cells (MoM/YoY/1M/1Y)
+          // Daily/weekly trends keep sparse color (12A) since these flap intra-day.
+          const useHeatmap = ['mom_pct', 'yoy_pct'].includes(PERIOD_FIELDS[p]);
+          const cls = useHeatmap
+            ? 'trend-cell ' + heatmapClass(val, dir)
+            : 'trend-cell ' + trendClass(val, dir);
+          return el('td', { class: cls, 'data-period': p }, [
             formatTrend(val),
             ' ',
             el('span', { style: { color: 'var(--ink-3)', fontSize: '10px', marginLeft: '3px' } }, PERIOD_LABELS[p])
@@ -176,7 +182,14 @@ export function renderTableRow(metric, opts = {}) {
         class: 'stale-pill',
         title: `Last updated ${metric.age_days}d ago · expected refresh every ${metric.cadence_days}d. Source ingest may be lagging or upstream publication delayed.`
       }, 'STALE ' + metric.age_days + 'd') : null,
-      el('span', { class: 'pill ' + statusClass(metric.status) }, state === 'shock' ? 'SHOCK' : metric.status.charAt(0).toUpperCase() + metric.status.slice(1))
+      (() => {
+        // 10B: status pill with direction
+        const pd = pillWithDirection(metric);
+        const label = state === 'shock' ? 'SHOCK' : pd.label;
+        const children = [label];
+        if (pd.direction) children.push(el('span', { class: 'pill-dir' }, pd.direction));
+        return el('span', { class: 'pill ' + statusClass(metric.status), title: pd.direction ? `${label} · ${pd.direction.replace('↑','up ').replace('↓','down ').replace('→','flat')}` : label }, children);
+      })()
     ].filter(Boolean))
   ].filter(Boolean));
 
