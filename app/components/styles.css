@@ -164,6 +164,42 @@ svg, img, video, canvas { max-width: 100%; }
 .nuance-chip.green { background: rgba(63,178,127,.18); color: var(--green); }
 .nuance-chip.accent{ background: rgba(212,165,116,.18); color: var(--accent); }
 
+/* Supporting tier composite primitive · 2026-05-12 */
+.st-promoted-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
+.st-promoted {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.st-promoted-high  { background: rgba(232,166,78,.08);  border: 1px solid rgba(232,166,78,.25); }
+.st-promoted-shock { background: rgba(232,100,100,.10); border: 1px solid rgba(232,100,100,.30); }
+.st-promoted:hover { background-color: rgba(212,165,116,.08); }
+.st-promoted[data-metric-id] .st-promoted-tag {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: .05em;
+  padding: 1px 5px;
+  border-radius: 2px;
+  background: rgba(212,165,116,.18);
+  color: var(--accent);
+  font-weight: 700;
+}
+.st-promoted-name { font-weight: 600; flex: 1; }
+.st-promoted-val { font-family: var(--mono); font-size: 10.5px; color: var(--ink-2); }
+.st-promoted-arrow { color: var(--ink-3); font-family: var(--mono); }
+.st-changehint {
+  font-size: 10px;
+  color: var(--ink-3);
+  font-style: italic;
+  padding: 3px 10px 5px;
+}
+.st-summary { color: var(--ink-3); font-size: 11px; font-weight: 400; }
+.st-review-dot { font-size: 10px; padding: 0 2px; }
+
 /* 9D · Inline expand · click row → sibling expand row in-place */
 tr.tr-expanded > td { background: var(--surface-3); border-bottom-color: var(--accent); }
 tr.tr-inline-expand > td {
