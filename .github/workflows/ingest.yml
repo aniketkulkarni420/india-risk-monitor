@@ -2,12 +2,19 @@ name: Scheduled ingest
 
 on:
   schedule:
-    - cron: '30 0 * * *'      # 06:00 IST · daily_06       · Hormuz, BDI, VLCC, Brent, Gold, DXY, Power
-    - cron: '30 11 * * 1-5'   # 17:00 IST · weekday_close  · FII/DII, F&O OI, blocks, Nifty, Bank Nifty, VIX, Nifty PE
-    - cron: '30 13 * * 1-5'   # 19:00 IST · weekday_evening · FPI debt, G-sec, INR, banking liquidity
-    - cron: '30 11 * * 5'     # 17:00 Fri · fri_17         · FX reserves, CRISIL HY, WCI, port dwell, reservoir, India crude
-    - cron: '30 4 1 * *'      # 10:00 1st · monthly_1      · GST, auto block, UPI, POL, air pax
-    - cron: '30 4 5 * *'      # 10:00 5th · monthly_5      · IIP, WPI, CPI, Naukri, cement, steel, PMI, e-way, FASTag, fiscal
+    # daily_06 — fire at 3 different times for GitHub-free-tier redundancy.
+    # Free crons are best-effort. Skip-if-fresh logic in ingest dedups retries.
+    - cron: '30 0 * * *'      # 06:00 IST · daily_06 primary
+    - cron: '15 1 * * *'      # 06:45 IST · daily_06 retry-1
+    - cron: '0 2 * * *'       # 07:30 IST · daily_06 retry-2
+    # Other slots — primary + 1 retry each
+    - cron: '30 11 * * 1-5'   # 17:00 IST · weekday_close primary
+    - cron: '15 12 * * 1-5'   # 17:45 IST · weekday_close retry
+    - cron: '30 13 * * 1-5'   # 19:00 IST · weekday_evening primary
+    - cron: '15 14 * * 1-5'   # 19:45 IST · weekday_evening retry
+    - cron: '30 11 * * 5'     # 17:00 Fri · fri_17 primary
+    - cron: '30 4 1 * *'      # 10:00 1st · monthly_1
+    - cron: '30 4 5 * *'      # 10:00 5th · monthly_5
   workflow_dispatch:
     inputs:
       slot:
@@ -59,9 +66,9 @@ jobs:
             exit 0
           fi
           case "${{ github.event.schedule }}" in
-            "30 0 * * *")     echo "slot=daily_06" >> $GITHUB_OUTPUT ;;
-            "30 11 * * 1-5")  echo "slot=weekday_close" >> $GITHUB_OUTPUT ;;
-            "30 13 * * 1-5")  echo "slot=weekday_evening" >> $GITHUB_OUTPUT ;;
+            "30 0 * * *"|"15 1 * * *"|"0 2 * * *")      echo "slot=daily_06" >> $GITHUB_OUTPUT ;;
+            "30 11 * * 1-5"|"15 12 * * 1-5")            echo "slot=weekday_close" >> $GITHUB_OUTPUT ;;
+            "30 13 * * 1-5"|"15 14 * * 1-5")            echo "slot=weekday_evening" >> $GITHUB_OUTPUT ;;
             "30 11 * * 5")    echo "slot=fri_17" >> $GITHUB_OUTPUT ;;
             "30 4 1 * *")     echo "slot=monthly_1" >> $GITHUB_OUTPUT ;;
             "30 4 5 * *")     echo "slot=monthly_5" >> $GITHUB_OUTPUT ;;

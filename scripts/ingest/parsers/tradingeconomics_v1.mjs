@@ -65,10 +65,15 @@ const EXTRACTORS = {
     extractRe: /Current\s+Account\s+to\s+GDP[^0-9-]*?(-?\d{1,2}\.\d{1,2})/i,
     plausible: (v) => Math.abs(v) < 10
   },
-  // VLCC tanker rates: Baltic Dirty Tanker Index. TE doesn't have a dedicated
-  // BDTI page (URL exists but redirects to Baltic Dry). Will rewire once we
-  // have Aniket's Hormuz tool snapshot endpoint. For now, fall back to mock.
-  // Removed entry intentionally so resolve() returns 'unregistered' for vlcc.
+  // VLCC tanker rates: Baltic Dirty Tanker Index.
+  // 2026-05-12: re-enabled with broader regex · TE has page at /commodity/baltic-dirty-tanker-index
+  // Falls back via tiered chain to news+LLM if extractor breaks.
+  vlcc_tanker_rates: {
+    url: 'https://tradingeconomics.com/commodity/baltic-dirty-tanker-index',
+    extractRe: /(?:Baltic\s+Dirty|Dirty\s+Tanker|BDTI)[^0-9]*?(\d[\d,]*)/i,
+    plausible: (v) => v > 200 && v < 5000,
+    valueParser: (s) => parseInt(s.replace(/,/g, ''), 10)
+  },
 
   // Fiscal deficit % of GDP. TE format: "deficit equal to 4.80 percent of...GDP"
   // or "fiscal deficit to 4.8% of GDP". Both patterns supported.
