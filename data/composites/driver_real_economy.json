@@ -48,7 +48,8 @@
   "verification_state": "verified",
   "last_verified_at": "2026-05-05T15:36:08.268Z",
   "why_it_matters": "Real economy holding up despite the oil shock: GST, e-way bills, FASTag, autos, power demand all positive YoY. Score is INVERSE — low score = strong economy.",
-  "formula": "100 - (0.20 × yoy(gst_gross) + 0.15 × yoy(power_demand) + 0.15 × avg(yoy(auto_*)) + 0.10 × yoy(eway_bills) + 0.10 × yoy(upi_value) + 0.10 × yoy(fastag_toll) + 0.10 × yoy(rail_freight) + 0.10 × yoy(pol_demand)). Capped 0-100.",
+  "formula": "Weighted avg of feeder z-scores (all inverse since real-economy activity is GOOD news; low activity = high risk). Feeders: gst_gross w=3, pmi_combined w=2, iip_growth w=2, steel_consumption w=2, auto_2w w=2, rail_freight w=2. Normalized: 23%/15%/15%/15%/15%/15%. Score interpretation: high = real economy weakening (high risk).",
+  "methodology_version": "v2-2026-05-12",
   "linked_metrics": [
     "gst_gross",
     "power_demand",

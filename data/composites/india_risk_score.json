@@ -49,7 +49,9 @@
   "verification_state": "verified",
   "last_verified_at": "2026-05-05T15:36:10.922Z",
   "why_it_matters": "Single-number summary of India risk across all six drivers. Designed for read-at-a-glance — the higher the number, the more drivers are concurrently elevated. Methodology page explains weights and bands.",
-  "formula": "0.25 × driver_oil_physical + 0.20 × driver_institutional_flows + 0.20 × driver_india_macro + 0.15 × driver_real_economy + 0.12 × driver_freight + 0.08 × driver_sector_breadth",
+  "formula": "Correlation-adjusted weighted avg of 6 drivers · weights w=[oil:3, freight:2, flows:3, macro:3, real_econ:2, sector_breadth:2] (normalized to 20%/13.3%/20%/20%/13.3%/13.3%) · adjustment subtracts pairwise w_i·w_j·ρ_ij·(v_i-50)·(v_j-50)/Σw² when both drivers elevated (ρ from literature: oil↔macro 0.55, oil↔flows 0.40, oil↔freight 0.50, macro↔flows 0.45, macro↔real_econ 0.35, flows↔breadth 0.45) · clipped 0-100.",
+  "methodology_version": "v2-2026-05-12",
+  "methodology_notes": "v2 changes vs v1: (1) status-bucket avg replaced with z-score against sparkline_12m, (2) missing-data penalty returns null when >30% feeders stale, (3) correlation-adjusted top-level avg, (4) triple-jeopardy flag when oil+macro+flows all >=65, (5) regime_score (EWMA) + shock_indicator (point-move >=8 vs 30d baseline) split, (6) manual override layer via data/manual-overrides/india_risk_score.json.",
   "trigger_thresholds": [
     {
       "level": "med",
