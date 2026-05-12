@@ -9,7 +9,7 @@ import { COMPARISON_SPEC, getDisplayPeriods } from './components/ComparisonSpec.
 // StickyTOC removed 2026-05-06 — Tab Bar handles section nav now
 import { wire as wireDrawer, open as openDrawer } from './components/MetricDrawer.mjs';
 import { wireCmdK, openCmdK } from './components/CmdKPalette.mjs';
-import { el, formatValue, formatTrend, formatAsOf, statusClass, rangeTick } from './components/utils.mjs';
+import { el, formatValue, formatTrend, formatAsOf, statusClass, rangeTick, pillWithDirection, heatmapClass } from './components/utils.mjs';
 import {
   renderDriverBars, renderHorizonCard, renderRegimeBanner, renderPersistenceChips,
   renderCumulativeLine, renderDivergingBars, renderYieldCurve, renderInflationBars,
@@ -283,6 +283,62 @@ vital.appendChild(el('div', { class: 'hv-band-zones' }, [
   el('span', { style: { color: '#e9c466' }, title: '35–65: elevated stress · monitor closely' }, 'MED 35–65 · elevated'),
   el('span', { style: { color: '#e88' }, title: '65–100: breakdown risk · multiple shocks active' }, 'HIGH 65–100 · breakdown')
 ]));
+
+// 1A+1B · Vital-sign tile row · 6 always-visible tiles above the fold
+// Pick: Nifty, INR/USD, Brent, VIX, Real 10Y, FII MTD
+const FOLLOWED_KEY = 'irm.followed';
+function readFollowed() { try { return new Set(JSON.parse(localStorage.getItem(FOLLOWED_KEY) || '[]')); } catch { return new Set(); } }
+function vitalTile(metric_id, label, valueFn) {
+  const m = M(metric_id);
+  if (!m) return null;
+  const followed = readFollowed();
+  const isOn = followed.has(metric_id);
+  const pd = pillWithDirection(m);
+  const trend = m.dod_pct ?? m.mom_pct;
+  const trendCls = trend == null ? '' : heatmapClass(trend, m.trend_direction);
+  const trendLabel = m.dod_pct != null ? 'DoD' : 'MoM';
+  const star = el('button', {
+    class: 'star-btn' + (isOn ? ' on' : ''),
+    'data-metric-id': metric_id,
+    'aria-label': isOn ? 'Unfollow ' + metric_id : 'Follow ' + metric_id,
+    onclick: (e) => {
+      e.stopPropagation();
+      const s = readFollowed();
+      if (s.has(metric_id)) { s.delete(metric_id); star.classList.remove('on'); }
+      else { s.add(metric_id); star.classList.add('on'); }
+      try { localStorage.setItem(FOLLOWED_KEY, JSON.stringify(Array.from(s))); } catch {}
+      window.dispatchEvent(new CustomEvent('irm:followed:change', { detail: { metricId: metric_id, isOn: s.has(metric_id), count: s.size } }));
+    }
+  }, isOn ? '★' : '☆');
+  return el('div', {
+    class: 'vital-tile',
+    'data-metric-id': metric_id,
+    onclick: () => openDrawer(metric_id)
+  }, [
+    el('div', { class: 'vital-tile-head' }, [
+      el('span', { class: 'vital-tile-label' }, [star, ' ', label]),
+      el('span', { class: 'pill ' + statusClass(m.status) }, [
+        pd.label,
+        pd.direction ? el('span', { class: 'pill-dir' }, pd.direction) : null
+      ].filter(Boolean))
+    ]),
+    el('div', { class: 'vital-tile-value' + (m.status === 'shock' || m.status === 'high' ? ' is-stress' : '') },
+      valueFn ? valueFn(m) : formatValue(m.value, m.value_format, m.unit)),
+    trend != null
+      ? el('div', { class: 'vital-tile-sub ' + trendCls }, formatTrend(trend) + ' ' + trendLabel)
+      : el('div', { class: 'vital-tile-sub' }, m.as_of ? 'as on ' + formatAsOf(m.as_of) : '—')
+  ]);
+}
+const vitalRow = el('div', { class: 'vital-row' }, [
+  vitalTile('nifty_50',       'Nifty'),
+  vitalTile('inr_usd',        'INR / $'),
+  vitalTile('brent_crude',    'Brent'),
+  vitalTile('india_vix',      'VIX'),
+  vitalTile('real_10y_yield', 'Real 10Y'),
+  vitalTile('fii_equity_mtd', 'FII MTD',
+    m => '−₹' + Math.abs(Math.round(m.value/1000)).toFixed(1) + 'k Cr')
+].filter(Boolean));
+vital.appendChild(vitalRow);
 
 // Auto-narrative · "Stress is led by Oil & physical 92 and Freight 74..."
 const narrativeEl = buildHeroNarrative(drivers, risk);
