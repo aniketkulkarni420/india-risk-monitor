@@ -177,12 +177,12 @@ const CONFIGS = {
   },
 
   vlcc_tanker_rates: {
-    queryFn: () => 'Baltic Dirty Tanker Index crude oil shipping rate',
+    queryFn: () => 'Baltic Dirty Tanker Index BDTI crude shipping',
     target: 'most recent Baltic Dirty Tanker Index (BDTI) value · this is a daily index tracking crude oil tanker shipping rates. Typical range 500-3000. Return the numeric index value, not a percentage change.',
     headlineFilter: null,
     plausible: (v) => v > 200 && v < 5000,
-    maxArticles: 4,
-    maxAgeDays: 14
+    maxArticles: 5,
+    maxAgeDays: 90
   }
 };
 
