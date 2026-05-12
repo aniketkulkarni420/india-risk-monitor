@@ -251,5 +251,13 @@
 </div>
 
 <script type="module" src="main.mjs"></script>
+<script>
+  // Register service worker for offline + stale-while-revalidate
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>

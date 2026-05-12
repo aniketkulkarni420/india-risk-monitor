@@ -3,6 +3,12 @@
   "$id": "https://irm.local/schema/metric.schema.json",
   "title": "IRM Metric",
   "description": "Schema for one metric record. Locked per IRM_Build_Spec.html §04.",
+  "x-schema-version": "1.2.0",
+  "x-schema-changelog": [
+    { "version": "1.0.0", "date": "2026-04-15", "change": "Initial schema · 14 required fields" },
+    { "version": "1.1.0", "date": "2026-05-11", "change": "Parser pattern extended for rss|pdf|html_render|llm|tiered prefixes; tier_chain field added" },
+    { "version": "1.2.0", "date": "2026-05-12", "change": "Email parser kind added; cadence audit-driven tier chains" }
+  ],
   "type": "object",
   "required": [
     "metric_id",
