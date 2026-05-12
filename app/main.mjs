@@ -524,13 +524,16 @@ function buildHeroH1() {
 
   // 2: most concrete signal — try Brent + Hormuz, then auto, then flows
   let secondary = null;
+  // 2026-05-12 · Hormuz value tagged with [PROVISIONAL] when source is static
+  // so the user immediately sees the number isn't live AIS data
+  const hormuzProvSuffix = hormuz?._source_static ? ' [PROVISIONAL]' : '';
   if (brent && hormuz) {
     if (brent.value >= 95 || hormuz.value < 70) {
-      secondary = `Brent $${brent.value.toFixed(0)} · Hormuz ${hormuz.value} ships/day`;
+      secondary = `Brent $${brent.value.toFixed(0)} · Hormuz ${hormuz.value} ships/day${hormuzProvSuffix}`;
     } else if (brent.value < 90) {
       secondary = `Brent eased to $${brent.value.toFixed(0)}, oil supply stable`;
     } else {
-      secondary = `Brent $${brent.value.toFixed(0)} · Hormuz holding at ${hormuz.value}/day`;
+      secondary = `Brent $${brent.value.toFixed(0)} · Hormuz holding at ${hormuz.value}/day${hormuzProvSuffix}`;
     }
   }
   if (!secondary && autoMomAvg != null && Math.abs(autoMomAvg) >= 5) {
@@ -571,7 +574,8 @@ function setupCollapsibleHero() {
   const brent = M('brent_crude');
   const leadParts = [];
   if (hormuz && hormuz.value < (hormuz.baseline_30d || 140)) {
-    leadParts.push(`Hormuz ${hormuz.value} ships/day`);
+    const provTag = hormuz._source_static ? ' [PROVISIONAL]' : '';
+    leadParts.push(`Hormuz ${hormuz.value} ships/day${provTag}`);
   }
   if (brent && brent.value >= 95) {
     leadParts.push(`Brent $${brent.value.toFixed(2)}`);
@@ -625,9 +629,12 @@ function todayBullets() {
   const out = [];
   if (hormuz) {
     const baseline = hormuz.baseline_30d || 140;
+    const provBadge = hormuz._source_static
+      ? ' <span style="font-family:var(--mono);font-size:9.5px;color:var(--amber);background:rgba(233,196,102,.12);border:1px dashed rgba(233,196,102,.4);padding:1px 6px;border-radius:3px;letter-spacing:.04em;">PROVISIONAL</span>'
+      : '';
     out.push({
       icon: hormuz.status === 'shock' ? 'shock' : hormuz.status === 'high' ? 'watch' : 'calm',
-      html: `<b>Hormuz traffic</b> at ${formatValue(hormuz.value, 'integer', 'ships/day')} vs ${baseline} baseline. <i>${((hormuz.value / baseline) * 100).toFixed(1)}% of normal</i>`,
+      html: `<b>Hormuz traffic</b> at ${formatValue(hormuz.value, 'integer', 'ships/day')}${provBadge} vs ${baseline} baseline. <i>${((hormuz.value / baseline) * 100).toFixed(1)}% of normal</i>`,
       drawer_metric_id: 'hormuz_throughput'
     });
   }

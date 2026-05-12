@@ -38,6 +38,7 @@ Rules are append-only. When a rule is replaced or retired, mark it `[SUPERSEDED 
 - 2026-05-07 · Plausibility guard on DoD · sparkline tail trim · unit-shift detection · source: HANDOFF_2026-05-07
 - 2026-05-12 · verification_state is DERIVED at bundle time · stamped value in metric JSON is informational only · forced to source_pending when `_source_static: true` OR `_source_count_actual < 2` (unless whitelisted single-source authoritative) · source: this chat
 - 2026-05-12 · Static-snapshot data sources MUST surface a "PROVISIONAL · static snapshot" pill on the rendered card · MoM/YoY suppressed · expose richer snapshot fields (inbound/outbound/dark_vessels/pct_of_normal) instead · source: this chat
+- 2026-05-12 · PROVISIONAL marker propagates everywhere a static-source value appears in user-facing copy · narrative, condensed lead, today bullets, driver expansion · ensures user never sees a static value rendered as if live · source: this chat
 - 2026-05-12 · Cross-check parsers must hit a DIFFERENT source than primary · re-fetching the same endpoint = fake crosscheck · source: this chat (Hormuz audit revealed this)
 - 2026-05-12 · Schema underscore-prefix metadata fields (`_history_accruing`, `_source_static`, `_snapshot_payload`, `_source_count_actual`, `_verification_state_original`, `_verification_demoted_reason`, `_value_stuck_count`) are bundle/parser-generated · honored by patternProperties in schema · source: this chat
 
