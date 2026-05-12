@@ -2,7 +2,7 @@
 // Extends Sparkline. Pure functions returning DOM/SVG. Used by main.mjs section assembly.
 // Locked vocabulary (per IRM_DataViz_Audit_v2 §08): bottom legends, no inline label collisions.
 
-import { el, formatValue, formatTrend, formatAsOf, statusClass } from './utils.mjs';
+import { el, formatValue, formatTrend, formatAsOf, statusClass, rangeTick } from './utils.mjs';
 import { renderSparkline } from './Sparkline.mjs';
 
 const SVG_NS ='http://www.w3.org/2000/svg';
@@ -394,9 +394,34 @@ export function renderCurrencyStrip(items) {
         item.yoy_pct != null ? el('span', {}, [
           'YoY ', el('b', { style: { color: (item.yoy_pct > 0 && dir === 'bad') || (item.yoy_pct < 0 && dir === 'good') ? 'var(--red)' : 'var(--green)', fontFamily: 'var(--mono)' } }, formatTrend(item.yoy_pct))
         ]) : null
-      ].filter(Boolean))
-    ]);
+      ].filter(Boolean)),
+      item.range ? renderRangeTick(item.range, { compact: true }) : null
+    ].filter(Boolean));
   }));
+}
+
+// ──────────────────────────────────────────────────────────────
+// renderRangeTick · 3A · 12m range bar + marker + qualitative label
+// info comes from utils.rangeTick(metric): { positionPct, label, lo, hi }
+// opts: { compact: bool — hides lo/hi labels under the bar }
+// ──────────────────────────────────────────────────────────────
+export function renderRangeTick(info, opts = {}) {
+  if (!info) return null;
+  const { positionPct, label, lo, hi } = info;
+  const fmt = (v) => Math.abs(v) >= 1000 ? v.toFixed(0)
+                  : Math.abs(v) >= 10   ? v.toFixed(1)
+                  : v.toFixed(2);
+  return el('div', { class: 'range-tick' }, [
+    el('div', { class: 'range-tick-label' }, label),
+    el('div', { class: 'range-tick-bar' }, [
+      el('div', { class: 'range-tick-fill', style: { width: positionPct + '%' } }),
+      el('div', { class: 'range-tick-marker', style: { left: 'calc(' + positionPct + '% - 1px)' } })
+    ]),
+    opts.compact ? null : el('div', { class: 'range-tick-row' }, [
+      el('span', {}, fmt(lo) + ' (12m low)'),
+      el('span', {}, fmt(hi) + ' (12m high)')
+    ])
+  ].filter(Boolean));
 }
 
 // ──────────────────────────────────────────────────────────────

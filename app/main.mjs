@@ -9,11 +9,11 @@ import { COMPARISON_SPEC, getDisplayPeriods } from './components/ComparisonSpec.
 // StickyTOC removed 2026-05-06 — Tab Bar handles section nav now
 import { wire as wireDrawer, open as openDrawer } from './components/MetricDrawer.mjs';
 import { wireCmdK, openCmdK } from './components/CmdKPalette.mjs';
-import { el, formatValue, formatTrend, formatAsOf, statusClass } from './components/utils.mjs';
+import { el, formatValue, formatTrend, formatAsOf, statusClass, rangeTick } from './components/utils.mjs';
 import {
   renderDriverBars, renderHorizonCard, renderRegimeBanner, renderPersistenceChips,
   renderCumulativeLine, renderDivergingBars, renderYieldCurve, renderInflationBars,
-  renderCurrencyStrip, renderProgressBar, renderGaugeRow, renderPairedLine,
+  renderCurrencyStrip, renderProgressBar, renderGaugeRow, renderPairedLine, renderRangeTick,
   renderSmallMultiples, renderIndexedOverlay, renderValuationBand, renderTodayBullets,
   renderSeasonalityStrip, renderHeadlinePanel, renderStatStrip, buildHeroNarrative
 } from './components/charts.mjs';
@@ -877,9 +877,9 @@ const inrM = M('inr_usd');
 const dxyM = M('dxy');
 const fxM = M('fx_reserves');
 currencyWrap.appendChild(renderCurrencyStrip([
-  { label: 'INR / USD', value: inrM ? '₹' + inrM.value.toFixed(2) : '—', tooltip: 'Indian Rupee per US Dollar · RBI reference rate', sparkline: inrM?.sparkline_12m || [], mom_pct: inrM?.mom_pct, yoy_pct: inrM?.yoy_pct, trend_direction: 'bad', asof: inrM?.as_of ? formatAsOf(inrM.as_of) : '' },
-  { label: 'DXY', value: dxyM ? dxyM.value.toFixed(2) : '—', tooltip: 'US Dollar Index — USD vs basket of 6 majors. Above 100 = strong dollar.', sparkline: dxyM?.sparkline_12m || [], mom_pct: dxyM?.mom_pct, yoy_pct: dxyM?.yoy_pct, trend_direction: 'bad', asof: dxyM?.as_of ? formatAsOf(dxyM.as_of) : '' },
-  { label: 'FX reserves', value: fxM ? '$' + fxM.value.toFixed(1) + ' Bn' : '—', tooltip: 'India FX reserves · weekly RBI release', sparkline: fxM?.sparkline_12m?.slice() || [], mom_pct: fxM?.mom_pct, yoy_pct: fxM?.yoy_pct, trend_direction: 'bad', asof: fxM?.as_of ? formatAsOf(fxM.as_of) : '' }
+  { label: 'INR / USD', value: inrM ? '₹' + inrM.value.toFixed(2) : '—', tooltip: 'Indian Rupee per US Dollar · RBI reference rate', sparkline: inrM?.sparkline_12m || [], mom_pct: inrM?.mom_pct, yoy_pct: inrM?.yoy_pct, trend_direction: 'bad', asof: inrM?.as_of ? formatAsOf(inrM.as_of) : '', range: inrM ? rangeTick(inrM) : null },
+  { label: 'DXY', value: dxyM ? dxyM.value.toFixed(2) : '—', tooltip: 'US Dollar Index — USD vs basket of 6 majors. Above 100 = strong dollar.', sparkline: dxyM?.sparkline_12m || [], mom_pct: dxyM?.mom_pct, yoy_pct: dxyM?.yoy_pct, trend_direction: 'bad', asof: dxyM?.as_of ? formatAsOf(dxyM.as_of) : '', range: dxyM ? rangeTick(dxyM) : null },
+  { label: 'FX reserves', value: fxM ? '$' + fxM.value.toFixed(1) + ' Bn' : '—', tooltip: 'India FX reserves · weekly RBI release', sparkline: fxM?.sparkline_12m?.slice() || [], mom_pct: fxM?.mom_pct, yoy_pct: fxM?.yoy_pct, trend_direction: 'bad', asof: fxM?.as_of ? formatAsOf(fxM.as_of) : '', range: fxM ? rangeTick(fxM) : null }
 ]));
 currencyWrap.appendChild(el('div', { class: 'viz-legend-row' }, [
   el('span', { style: { color: 'var(--ink-2)' } }, 'All three weakening together — classic dollar-strength regime.')
@@ -906,25 +906,31 @@ gaugeWrap.appendChild(el('div', { class: 'viz-title' }, 'Leading indicators'));
 const pmiM = M('pmi_combined');
 const iipM = M('iip_growth');
 const r10yM = M('real_10y_yield');
+const pmiRange = pmiM ? rangeTick(pmiM) : null;
+const iipRange = iipM ? rangeTick(iipM) : null;
+const r10yRange = r10yM ? rangeTick(r10yM) : null;
 const gaugeRow = el('div', { class: 'gauge-row' }, [
   el('div', { class: 'gauge-cell calm' }, [
     el('div', { class: 'gauge-label' }, 'PMI COMPOSITE'),
     el('div', { class: 'gauge-value', style: { color: pmiM && pmiM.value >= 50 ? 'var(--green)' : 'var(--red)' } }, pmiM ? pmiM.value.toFixed(1) : '—'),
     el('div', { class: 'gauge-track' }),
-    el('div', { class: 'gauge-hint' }, 'expansion above 50' + (pmiM?.as_of ? ' · ' + formatAsOf(pmiM.as_of) : ''))
-  ]),
+    el('div', { class: 'gauge-hint' }, 'expansion above 50' + (pmiM?.as_of ? ' · ' + formatAsOf(pmiM.as_of) : '')),
+    pmiRange ? renderRangeTick(pmiRange, { compact: true }) : null
+  ].filter(Boolean)),
   el('div', { class: 'gauge-cell warm' }, [
     el('div', { class: 'gauge-label' }, 'IIP YOY'),
     el('div', { class: 'gauge-value', style: { color: iipM && iipM.value >= 0 ? 'var(--green)' : 'var(--red)' } }, iipM ? formatTrend(iipM.value) : '—'),
     el('div', { class: 'gauge-track' }),
-    el('div', { class: 'gauge-hint' }, 'growth above 0%' + (iipM?.as_of ? ' · ' + formatAsOf(iipM.as_of) : ''))
-  ]),
+    el('div', { class: 'gauge-hint' }, 'growth above 0%' + (iipM?.as_of ? ' · ' + formatAsOf(iipM.as_of) : '')),
+    iipRange ? renderRangeTick(iipRange, { compact: true }) : null
+  ].filter(Boolean)),
   el('div', { class: 'gauge-cell warm' }, [
     el('div', { class: 'gauge-label' }, 'REAL 10Y'),
     el('div', { class: 'gauge-value', style: { color: r10yM && r10yM.value > 0 ? 'var(--green)' : 'var(--red)' } }, r10yM ? formatTrend(r10yM.value) : '—'),
     el('div', { class: 'gauge-track' }),
-    el('div', { class: 'gauge-hint' }, 'positive carry' + (r10yM?.as_of ? ' · ' + formatAsOf(r10yM.as_of) : ''))
-  ])
+    el('div', { class: 'gauge-hint' }, 'positive carry' + (r10yM?.as_of ? ' · ' + formatAsOf(r10yM.as_of) : '')),
+    r10yRange ? renderRangeTick(r10yRange, { compact: true }) : null
+  ].filter(Boolean))
 ]);
 gaugeWrap.appendChild(gaugeRow);
 const fiscalLeadingRow = el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' } });
