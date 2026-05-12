@@ -15,13 +15,17 @@
 import { el, formatAsOf } from './utils.mjs';
 
 export function renderSectionFrame(props) {
-  const { section_id, title, question, lens_row, sources, onLensClick, children } = props;
+  const { section_id, title, question, lens_row, sources, onLensClick, children, timeline } = props;
 
   // Header
   const header = el('div', { class: 'sf-header' }, [
     el('h2', { class: 'sf-title', id: section_id }, title),
     question ? el('p', { class: 'sf-question' }, question) : null
   ].filter(Boolean));
+
+  // 5C · Optional timeline strip rendered above header
+  let timelineEl = null;
+  if (timeline) timelineEl = timeline;
 
   // Lens row (optional)
   let lensRowEl = null;
@@ -56,7 +60,7 @@ export function renderSectionFrame(props) {
   }
 
   return el('section', { class: 'section-frame', 'data-section': section_id },
-    [header, lensRowEl, body, footer].filter(Boolean));
+    [timelineEl, header, lensRowEl, body, footer].filter(Boolean));
 }
 
 // Convenience header-only renderer for cases without footer

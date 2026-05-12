@@ -13,7 +13,7 @@ import { el, formatValue, formatTrend, formatAsOf, statusClass, rangeTick } from
 import {
   renderDriverBars, renderHorizonCard, renderRegimeBanner, renderPersistenceChips,
   renderCumulativeLine, renderDivergingBars, renderYieldCurve, renderInflationBars,
-  renderCurrencyStrip, renderProgressBar, renderGaugeRow, renderPairedLine, renderRangeTick,
+  renderCurrencyStrip, renderProgressBar, renderGaugeRow, renderPairedLine, renderRangeTick, renderTimelineStrip,
   renderSmallMultiples, renderIndexedOverlay, renderValuationBand, renderTodayBullets,
   renderSeasonalityStrip, renderHeadlinePanel, renderStatStrip, buildHeroNarrative
 } from './components/charts.mjs';
@@ -823,6 +823,13 @@ body.appendChild(renderSectionFrame({
   section_id: 'flows',
   title: 'Institutional flows',
   question: 'Who is buying, who is selling, and where the money is rotating.',
+  timeline: renderTimelineStrip([
+    { date: '2026-04-22', severity: 'med',   label: 'FII swing day' },
+    { date: '2026-04-28', severity: 'low',   label: 'DII covering' },
+    { date: '2026-05-04', severity: 'high',  label: 'Blocks ₹8.5k' },
+    { date: '2026-05-08', severity: 'high',  label: 'F&O OI build' },
+    { date: '2026-05-11', severity: 'med',   label: 'FII MTD −8.4k' }
+  ]),
   sources: buildSectionFooter(['NSE', 'SEBI', 'NSDL', 'AMFI']),
   children: [flowsBody]
 }));
@@ -951,6 +958,13 @@ body.appendChild(renderSectionFrame({
   section_id: 'macro',
   title: 'India macro',
   question: 'FX, rates, inflation, fiscal, liquidity — the structural backdrop.',
+  timeline: renderTimelineStrip([
+    { date: '2026-04-09', severity: 'med',   label: 'MPC pause 5.25%' },
+    { date: '2026-04-24', severity: 'high',  label: 'INR breach 95' },
+    { date: '2026-04-25', severity: 'med',   label: 'FXR $692Bn' },
+    { date: '2026-05-01', severity: 'low',   label: 'CPI 3.40%' },
+    { date: '2026-05-11', severity: 'low',   label: 'Real 10Y +3.35%' }
+  ]),
   sources: buildSectionFooter(['RBI', 'MoSPI', 'CCIL', 'CGA', 'S&P PMI']),
   children: [macroBody]
 }));
@@ -1166,6 +1180,13 @@ body.appendChild(renderSectionFrame({
   section_id: 'economy',
   title: 'Real economy',
   question: 'Click any cluster to drill in · tax · movement · production · auto · discretionary.',
+  timeline: renderTimelineStrip([
+    { date: '2026-04-25', severity: 'low',   label: 'Reservoir 47.2%' },
+    { date: '2026-04-30', severity: 'high',  label: 'FADA Tractor −16%' },
+    { date: '2026-05-01', severity: 'med',   label: 'GST −5.3% MoM' },
+    { date: '2026-05-11', severity: 'low',   label: 'UPI +18.7% DoD' },
+    { date: '2026-05-12', severity: 'med',   label: 'POL 19.3 MT' }
+  ]),
   sources: buildSectionFooter(['GST', 'FADA', 'GridIndia', 'NPCI', 'IHMCL', 'JPC']),
   children: [econBody]
 }));
@@ -1273,6 +1294,13 @@ body.appendChild(renderSectionFrame({
   section_id: 'freight',
   title: 'Freight & supply chain',
   question: 'Oil supply, shipping rates, and port congestion. Where physical-flow shocks originate.',
+  timeline: renderTimelineStrip([
+    { date: '2026-04-18', severity: 'high',  label: 'Hormuz drops to 92' },
+    { date: '2026-04-24', severity: 'high',  label: 'VLCC +120% wk' },
+    { date: '2026-05-04', severity: 'shock', label: 'VLCC +220%' },
+    { date: '2026-05-07', severity: 'low',   label: 'WCI −19% DoD' },
+    { date: '2026-05-12', severity: 'shock', label: 'Brent $99' }
+  ]),
   sources: buildSectionFooter(['MarineTraffic', 'PPAC', 'Drewry', 'Baltic Exchange']),
   children: [freightBody]
 }));
@@ -1407,6 +1435,13 @@ body.appendChild(renderSectionFrame({
   section_id: 'market',
   title: 'Market context',
   question: 'Equity benchmarks, valuation, sentiment, global linkages.',
+  timeline: renderTimelineStrip([
+    { date: '2026-04-15', severity: 'med',   label: 'PE 24× rich' },
+    { date: '2026-04-25', severity: 'low',   label: 'Bank Nifty break' },
+    { date: '2026-05-04', severity: 'high',  label: 'VIX spike 22' },
+    { date: '2026-05-11', severity: 'low',   label: 'PE 20.7× cheap' },
+    { date: '2026-05-11', severity: 'low',   label: 'BNF +7.9pp lead' }
+  ]),
   sources: buildSectionFooter(['NSE', 'CRISIL', 'FRED', 'Reuters']),
   children: [marketBody]
 }));
@@ -1502,6 +1537,13 @@ body.appendChild(renderSectionFrame({
   section_id: 'sectors',
   title: 'Sectors',
   question: 'Sorted by overall pressure. Tap any row to see the 6-driver pressure bars.',
+  timeline: renderTimelineStrip([
+    { date: '2026-04-18', severity: 'low',   label: 'Shipping +28%' },
+    { date: '2026-04-25', severity: 'med',   label: 'Road EPC rerate' },
+    { date: '2026-05-04', severity: 'high',  label: 'OMC −8% Brent' },
+    { date: '2026-05-08', severity: 'med',   label: 'Cap goods rerate' },
+    { date: '2026-05-11', severity: 'low',   label: 'Autos +18.6 YTD' }
+  ]),
   sources: buildSectionFooter(['NSE', 'Trendlyne', 'Screener']),
   children: [sectorsBody]
 }));

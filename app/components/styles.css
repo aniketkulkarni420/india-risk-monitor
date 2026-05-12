@@ -164,6 +164,75 @@ svg, img, video, canvas { max-width: 100%; }
 .nuance-chip.green { background: rgba(63,178,127,.18); color: var(--green); }
 .nuance-chip.accent{ background: rgba(212,165,116,.18); color: var(--accent); }
 
+/* 5C · Timeline strip · 30-day event marker rail at top of each section */
+.timeline-strip {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 0 0 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 9px;
+}
+.timeline-strip.compact { padding: 5px 10px; margin-bottom: 8px; }
+.timeline-strip > .timeline-strip-label {
+  color: var(--ink-3);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.timeline-strip-rail {
+  position: relative;
+  flex: 1;
+  height: 28px;
+}
+.timeline-strip-rail::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--line-2);
+}
+.timeline-strip-ev {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.timeline-strip-ev .timeline-strip-label {
+  color: var(--ink-3);
+  font-size: 8px;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.timeline-strip-ev:hover .timeline-strip-label { color: var(--ink-2); }
+.timeline-strip-ev.is-now { z-index: 2; }
+.timeline-strip-ev .timeline-strip-label.is-now { color: var(--accent); font-weight: 700; }
+.timeline-strip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 2px solid var(--ink-3);
+}
+.timeline-strip-dot-low   { background: var(--green); border-color: var(--green); }
+.timeline-strip-dot-med   { background: var(--amber); border-color: var(--amber); }
+.timeline-strip-dot-high  { background: var(--red);   border-color: var(--red); }
+.timeline-strip-dot-shock { background: var(--red);   border-color: #fff; box-shadow: 0 0 0 2px rgba(232,100,100,.3); }
+.timeline-strip-dot-now   { background: var(--accent); border-color: var(--accent); width: 11px; height: 11px; box-shadow: 0 0 0 3px rgba(212,165,116,.25); }
+
 /* ────────────────────────────────────────────────────────────── */
 /* Trend colour classes                                           */
 /* ────────────────────────────────────────────────────────────── */

@@ -401,6 +401,47 @@ export function renderCurrencyStrip(items) {
 }
 
 // ──────────────────────────────────────────────────────────────
+// renderTimelineStrip · 5C · 30-day event timeline above section header
+// events = [{ date: ISO, severity: 'low'|'med'|'high'|'shock'|'now', label, metricId? }]
+// Renders horizontally with dots positioned by date · click → optional handler
+// opts: { onClick, days = 30, compact }
+// ──────────────────────────────────────────────────────────────
+export function renderTimelineStrip(events, opts = {}) {
+  if (!events || !events.length) return null;
+  const days = opts.days || 30;
+  const now = Date.now();
+  const start = now - days * 24 * 3600 * 1000;
+  // Always include "NOW" marker at the right edge
+  const items = events.filter(e => {
+    const t = new Date(e.date).getTime();
+    return t >= start && t <= now;
+  });
+  items.push({ date: new Date(now).toISOString(), severity: 'now', label: 'NOW' });
+
+  return el('div', { class: 'timeline-strip' + (opts.compact ? ' compact' : '') }, [
+    el('span', { class: 'timeline-strip-label' }, '30d events'),
+    el('div', { class: 'timeline-strip-rail' },
+      items.map(ev => {
+        const t = new Date(ev.date).getTime();
+        const pct = Math.max(0, Math.min(100, ((t - start) / (now - start)) * 100));
+        const sev = ev.severity || 'med';
+        const dotCls = 'timeline-strip-dot timeline-strip-dot-' + sev;
+        const isNow = sev === 'now';
+        return el('div', {
+          class: 'timeline-strip-ev' + (isNow ? ' is-now' : ''),
+          style: { left: pct + '%' },
+          title: ev.label + ' · ' + ev.date.split('T')[0],
+          onclick: () => { if (opts.onClick && !isNow) opts.onClick(ev); }
+        }, [
+          el('span', { class: dotCls }),
+          el('span', { class: 'timeline-strip-label' + (isNow ? ' is-now' : '') }, isNow ? 'NOW' : ev.label)
+        ]);
+      })
+    )
+  ]);
+}
+
+// ──────────────────────────────────────────────────────────────
 // renderRangeTick · 3A · 12m range bar + marker + qualitative label
 // info comes from utils.rangeTick(metric): { positionPct, label, lo, hi }
 // opts: { compact: bool — hides lo/hi labels under the bar }
