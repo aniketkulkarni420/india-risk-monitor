@@ -174,6 +174,15 @@ const CONFIGS = {
     plausible: (v) => Math.abs(v) < 200000,
     maxArticles: 4,
     maxAgeDays: 30
+  },
+
+  vlcc_tanker_rates: {
+    queryFn: () => 'Baltic Dirty Tanker Index crude oil shipping rate',
+    target: 'most recent Baltic Dirty Tanker Index (BDTI) value · this is a daily index tracking crude oil tanker shipping rates. Typical range 500-3000. Return the numeric index value, not a percentage change.',
+    headlineFilter: null,
+    plausible: (v) => v > 200 && v < 5000,
+    maxArticles: 4,
+    maxAgeDays: 14
   }
 };
 
