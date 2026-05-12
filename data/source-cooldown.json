@@ -30,12 +30,12 @@
     "last_success_at": "2026-05-12T10:14:30.990Z"
   },
   "wacr_repo_spread:html_scrape:rbi_mmo_daily_v1": {
-    "consecutive_failures": 1,
-    "last_failure_at": "2026-05-12T13:27:40.188Z"
+    "consecutive_failures": 2,
+    "last_failure_at": "2026-05-12T19:23:52.880Z"
   },
   "wacr_repo_spread:llm:google_news_llm_v1": {
-    "consecutive_failures": 1,
-    "last_failure_at": "2026-05-12T13:27:50.906Z"
+    "consecutive_failures": 2,
+    "last_failure_at": "2026-05-12T19:23:53.475Z"
   },
   "air_pax:press_release:dgca_v1": {
     "consecutive_failures": 0,
@@ -133,20 +133,20 @@
     "cooled_until": "2026-05-13T00:26:56.482Z"
   },
   "fpi_debt_flows:html_render:moneycontrol_v1": {
-    "consecutive_failures": 1,
-    "last_failure_at": "2026-05-12T13:30:16.126Z"
+    "consecutive_failures": 2,
+    "last_failure_at": "2026-05-12T19:23:48.623Z"
   },
   "fpi_debt_flows:html_render:bse_v1": {
-    "consecutive_failures": 1,
-    "last_failure_at": "2026-05-12T13:30:16.127Z"
+    "consecutive_failures": 2,
+    "last_failure_at": "2026-05-12T19:23:48.623Z"
   },
   "fpi_debt_flows:html_render:playwright_render_v1": {
-    "consecutive_failures": 1,
-    "last_failure_at": "2026-05-12T13:30:17.922Z"
+    "consecutive_failures": 2,
+    "last_failure_at": "2026-05-12T19:23:48.842Z"
   },
   "fpi_debt_flows:llm:google_news_llm_v1": {
-    "consecutive_failures": 1,
-    "last_failure_at": "2026-05-12T13:30:19.247Z"
+    "consecutive_failures": 2,
+    "last_failure_at": "2026-05-12T19:23:49.323Z"
   },
   "fii_equity_daily:csv_download:nse_fii_dii_v1": {
     "consecutive_failures": 0,
@@ -183,5 +183,17 @@
   "india_vix:csv_download:nse_vix_v1": {
     "consecutive_failures": 0,
     "last_success_at": "2026-05-12T18:26:58.527Z"
+  },
+  "gsec_curve:json_api:ccil_v1": {
+    "consecutive_failures": 0,
+    "last_success_at": "2026-05-12T19:23:49.570Z"
+  },
+  "banking_liquidity:json_api:rbi_mmo_v1": {
+    "consecutive_failures": 0,
+    "last_success_at": "2026-05-12T19:23:49.962Z"
+  },
+  "inr_usd:html_scrape:te_inr_v1": {
+    "consecutive_failures": 0,
+    "last_success_at": "2026-05-12T19:23:53.698Z"
   }
 }
