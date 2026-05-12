@@ -49,7 +49,8 @@
   "verification_state": "verified",
   "last_verified_at": "2026-05-05T15:36:07.532Z",
   "why_it_matters": "Freight driver dominated by Hormuz collapse + VLCC tanker rate spike (+220%). WCI elevated. Port congestion building.",
-  "formula": "0.30 × normalize_inverse(hormuz_throughput) + 0.20 × normalize(vlcc_tanker_rates) + 0.20 × normalize(drewry_wci) + 0.15 × normalize(baltic_dry_index) + 0.15 × normalize(india_port_dwell_time)",
+  "formula": "Weighted avg of feeder z-scores. Feeders: drewry_wci w=3, baltic_dry_index w=2, vlcc_tanker_rates w=3, india_port_dwell_time w=2. Normalized weights: 30%/20%/30%/20%. Hormuz contribution flows through driver_oil_physical (correlation handled at top level, not double-counted here).",
+  "methodology_version": "v2-2026-05-12",
   "trigger_thresholds": [
     {
       "level": "med",

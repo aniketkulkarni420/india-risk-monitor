@@ -121,6 +121,28 @@
     },
     "linked_metrics": { "type": "array", "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" } },
     "watch_next": { "type": "array", "items": { "type": "string" } },
-    "notes": { "type": ["string", "null"] }
+    "notes": { "type": ["string", "null"] },
+    "methodology_version": { "type": "string" },
+    "methodology_notes": { "type": "string" },
+    "score_state": { "type": ["string", "null"], "enum": ["fresh", "partial", "insufficient_data", null] },
+    "score_state_reason": { "type": ["string", "null"] },
+    "regime_score": { "type": ["number", "null"] },
+    "point_move_30d": { "type": ["number", "null"] },
+    "shock_indicator": { "type": ["boolean", "null"] },
+    "shock_direction": { "type": ["string", "null"], "enum": ["up", "down", null] },
+    "triple_jeopardy": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    },
+    "reference_events": {
+      "type": ["array", "null"],
+      "items": { "type": "object", "additionalProperties": true }
+    },
+    "raw_weighted_avg": { "type": ["number", "null"] },
+    "correlation_adjustment": { "type": ["number", "null"] },
+    "driver_inputs": { "type": ["array", "null"] },
+    "feeder_breakdown": { "type": ["array", "null"] },
+    "missing_feeders": { "type": ["array", "null"] },
+    "manual_override": { "type": ["object", "null"], "additionalProperties": true }
   }
 }

@@ -48,7 +48,9 @@
   "verification_state": "verified",
   "last_verified_at": "2026-05-05T15:36:10.329Z",
   "why_it_matters": "Counts how many of 15 sectors are in red/amber overall vs green. High score = narrow market (few sectors holding up). Currently 6 red + 7 amber + 2 green — breadth narrowing.",
-  "formula": "(red_sector_count × 1.0 + amber_sector_count × 0.5) / 15 × 100. Inverse: low score = broad/healthy.",
+  "formula": "(red_sector_count × 1.0 + amber_sector_count × 0.5) / 15 × 100. Inverse: low score = broad/healthy. Computed in derived_v1.mjs from sectors heatmap, NOT z-score-based like the other 5 drivers. Mixed-units caveat documented in methodology v2.",
+  "methodology_version": "v2-2026-05-12",
+  "methodology_notes": "Sector breadth uses a raw count-based formula (not z-score) because it aggregates discrete sector statuses, not continuous metrics. Treated identically to other drivers at top-level aggregation but with awareness that units differ.",
   "linked_metrics": [
     "nifty_50",
     "bank_nifty"

@@ -1,150 +1,162 @@
-// REAL fetcher · Gmail-API email pipeline.
+// REAL fetcher · Gmail IMAP email pipeline.
 //
 // India govt agencies (PIB, MoSPI, RBI, NHAI, etc) offer email subscription
-// to press releases. Forward those emails to a designated Gmail label and
-// this parser reads them via Gmail API.
+// to press releases. This parser reads them via IMAP using a Gmail app password
+// (simpler than the prior OAuth path — no Google Cloud Console setup needed).
 //
 // Setup (one-time, ~10 min):
-//   1) Subscribe Aniket's Gmail to PIB at pib.gov.in/EmailSubscription
+//   1) Subscribe Aniket's Gmail at pib.gov.in/SubscribeRelease/SubscribeReleaseForm.aspx
 //      (and equivalent for MoSPI/RBI/NHAI subscription pages)
-//   2) Create a Gmail label "IRM-Source" and a filter that routes
-//      matching emails to it
-//   3) Generate a Google OAuth 2.0 Refresh Token for Gmail API readonly:
-//      https://developers.google.com/gmail/api/quickstart/nodejs
-//      ~5 min walkthrough
-//   4) Set GitHub secret:
-//        GMAIL_REFRESH_TOKEN  (the refresh token)
-//        GMAIL_CLIENT_ID      (from your Google Cloud project)
-//        GMAIL_CLIENT_SECRET  (from your Google Cloud project)
+//   2) Enable 2FA on the Gmail account
+//   3) Generate a Gmail app password at https://myaccount.google.com/apppasswords
+//   4) Set GitHub secrets:
+//        GMAIL_ADDRESS        (the subscribed Gmail address)
+//        GMAIL_APP_PASSWORD   (the 16-char app password)
 //
-// Once setup:
-//   - Subscribed emails arrive in Gmail tagged IRM-Source
-//   - This parser pulls latest matching emails, extracts numeric values
-//     via LLM, writes the metric value
-//
-// Until setup: parser throws GMAIL_UNAVAILABLE which the tiered orchestrator
-// treats as a soft-skip (next tier tries).
+// Until first PIB email arrives, parser throws GMAIL_NO_EMAILS which the
+// tiered orchestrator treats as a soft-skip (next tier tries).
 
+import { ImapFlow } from 'imapflow';
 import { recordSnapshot } from '../snapshot-store.mjs';
 import { tryProviders } from './llm_extract_v1.mjs';
 
-const REFRESH_TOKEN = process.env.GMAIL_REFRESH_TOKEN;
-const CLIENT_ID = process.env.GMAIL_CLIENT_ID;
-const CLIENT_SECRET = process.env.GMAIL_CLIENT_SECRET;
+const GMAIL_ADDRESS = process.env.GMAIL_ADDRESS;
+const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 
 function isAvailable() {
-  return !!(REFRESH_TOKEN && CLIENT_ID && CLIENT_SECRET);
+  return !!(GMAIL_ADDRESS && GMAIL_APP_PASSWORD);
 }
 
-async function getAccessToken() {
-  const res = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      refresh_token: REFRESH_TOKEN,
-      grant_type: 'refresh_token'
-    })
-  });
-  if (!res.ok) throw new Error(`Gmail OAuth refresh failed: ${res.status}`);
-  const j = await res.json();
-  return j.access_token;
-}
-
-async function gmailFetch(path, accessToken) {
-  const res = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me${path}`, {
-    headers: { Authorization: `Bearer ${accessToken}` }
-  });
-  if (!res.ok) throw new Error(`Gmail API ${path}: ${res.status}`);
-  return res.json();
-}
-
-// Per-metric: query → Gmail search query (e.g. label + subject keyword)
+// Per-metric: imapQuery → IMAP SEARCH criteria object
 //             extractTarget → instruction for LLM extraction from email body
+//             plausible → numeric sanity guardrail
 const CONFIGS = {
   gst_gross: {
-    query: 'label:IRM-Source from:pib.gov.in subject:GST newer_than:60d',
+    imapQuery: { from: 'pib.gov.in', subject: 'GST', since: daysAgo(60) },
     extractTarget: 'Monthly gross GST collection in INR crore from the PIB press release email body.',
     plausible: (v) => v > 100000 && v < 500000
   },
   cement_dispatches: {
-    query: 'label:IRM-Source from:pib.gov.in (subject:cement OR subject:IECI) newer_than:60d',
+    imapQuery: { from: 'pib.gov.in', subject: 'cement', since: daysAgo(60) },
     extractTarget: 'All-India monthly cement production or dispatches in million tonnes from the IECI / DPIIT email.',
     plausible: (v) => v > 25 && v < 60
   },
   rail_freight: {
-    query: 'label:IRM-Source from:pib.gov.in subject:railway newer_than:60d',
+    imapQuery: { from: 'pib.gov.in', subject: 'rail', since: daysAgo(60) },
     extractTarget: 'Monthly all-India freight loading by Indian Railways in million tonnes (MT) from the MoR email.',
     plausible: (v) => v > 100 && v < 200
   },
   fastag_toll: {
-    query: 'label:IRM-Source from:pib.gov.in (subject:FASTag OR subject:toll) newer_than:60d',
+    imapQuery: { from: 'pib.gov.in', subject: 'toll', since: daysAgo(60) },
     extractTarget: 'Monthly FASTag toll collection in India in INR crore from the MoRTH/NHAI email.',
     plausible: (v) => v > 4000 && v < 12000
+  },
+  iip_index: {
+    imapQuery: { from: 'pib.gov.in', subject: 'IIP', since: daysAgo(90) },
+    extractTarget: 'Index of Industrial Production (IIP) headline index value or YoY growth in percent from the MoSPI email.',
+    plausible: (v) => Math.abs(v) < 500
+  },
+  cpi_yoy: {
+    imapQuery: { from: 'pib.gov.in', subject: 'CPI', since: daysAgo(60) },
+    extractTarget: 'Headline CPI inflation YoY percent from the MoSPI release email.',
+    plausible: (v) => v > -2 && v < 20
+  },
+  wpi_yoy: {
+    imapQuery: { from: 'pib.gov.in', subject: 'WPI', since: daysAgo(60) },
+    extractTarget: 'WPI inflation YoY percent from the eaindustry / Commerce Ministry email.',
+    plausible: (v) => v > -5 && v < 25
+  },
+  port_cargo: {
+    imapQuery: { from: 'pib.gov.in', subject: 'port', since: daysAgo(60) },
+    extractTarget: 'Monthly major ports cargo traffic in million tonnes from the Ministry of Ports email.',
+    plausible: (v) => v > 40 && v < 120
+  },
+  pol_demand: {
+    imapQuery: { from: 'pib.gov.in', subject: 'petroleum', since: daysAgo(60) },
+    extractTarget: 'Monthly all-India petroleum products consumption in MMT from the PPAC / Petroleum Ministry email.',
+    plausible: (v) => v > 12 && v < 30
   }
 };
+
+function daysAgo(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d;
+}
+
+async function withClient(fn) {
+  const client = new ImapFlow({
+    host: 'imap.gmail.com', port: 993, secure: true,
+    auth: { user: GMAIL_ADDRESS, pass: GMAIL_APP_PASSWORD },
+    logger: false
+  });
+  await client.connect();
+  const lock = await client.getMailboxLock('INBOX');
+  try {
+    return await fn(client);
+  } finally {
+    lock.release();
+    await client.logout().catch(() => {});
+  }
+}
+
+async function fetchLatestMatching(client, imapQuery, limit = 5) {
+  const results = [];
+  for await (const msg of client.fetch(imapQuery, { envelope: true, source: true, internalDate: true })) {
+    let body = '';
+    try { body = msg.source ? msg.source.toString('utf8') : ''; } catch { body = ''; }
+    body = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 8000);
+    results.push({
+      uid: msg.uid,
+      subject: msg.envelope?.subject || '',
+      date: msg.internalDate || msg.envelope?.date || new Date(),
+      body
+    });
+  }
+  results.sort((a, b) => new Date(b.date) - new Date(a.date));
+  return results.slice(0, limit);
+}
 
 export async function fetchPrimary(metric) {
   const cfg = CONFIGS[metric.metric_id];
   if (!cfg) throw new Error(`No email_pipeline_v1 config for ${metric.metric_id}`);
   if (!isAvailable()) {
-    const e = new Error('Gmail API not configured · set GMAIL_REFRESH_TOKEN + CLIENT_ID + CLIENT_SECRET');
+    const e = new Error('Gmail IMAP not configured · set GMAIL_ADDRESS + GMAIL_APP_PASSWORD');
     e.code = 'GMAIL_UNAVAILABLE';
     throw e;
   }
 
-  const accessToken = await getAccessToken();
+  const emails = await withClient((c) => fetchLatestMatching(c, cfg.imapQuery, 5));
+  if (!emails.length) {
+    const e = new Error(`email_pipeline: no matching emails for ${metric.metric_id} (subscription may not have delivered yet)`);
+    e.code = 'GMAIL_NO_EMAILS';
+    throw e;
+  }
 
-  // 1. Search for recent matching emails
-  const search = await gmailFetch(`/messages?q=${encodeURIComponent(cfg.query)}&maxResults=5`, accessToken);
-  const ids = (search.messages || []).map(m => m.id);
-  if (!ids.length) throw new Error(`email_pipeline: no matching emails for "${cfg.query}"`);
-
-  // 2. Fetch latest message body
   const errors = [];
-  for (const id of ids) {
+  for (const em of emails) {
+    if (em.body.length < 100) { errors.push(`uid${em.uid}: empty body`); continue; }
+    const prompt = 'Extract: ' + cfg.extractTarget +
+      `\n\nEmail subject: ${em.subject}\nEmail date: ${em.date}\n\nEmail text:\n\n${em.body}`;
     try {
-      const msg = await gmailFetch(`/messages/${id}?format=full`, accessToken);
-      const headers = (msg.payload?.headers || []);
-      const subject = headers.find(h => h.name === 'Subject')?.value || '';
-      const date = headers.find(h => h.name === 'Date')?.value || '';
-
-      // Decode body (could be in payload.body.data or in payload.parts[].body.data)
-      let bodyText = '';
-      function walkPayload(p) {
-        if (!p) return;
-        if (p.body?.data) {
-          try { bodyText += Buffer.from(p.body.data, 'base64').toString('utf8') + '\n'; } catch {}
-        }
-        if (Array.isArray(p.parts)) for (const sub of p.parts) walkPayload(sub);
-      }
-      walkPayload(msg.payload);
-      bodyText = bodyText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 8000);
-
-      if (bodyText.length < 100) { errors.push(`${id}: empty body`); continue; }
-
-      const prompt = 'Extract: ' + cfg.extractTarget +
-        `\n\nEmail subject: ${subject}\nEmail date: ${date}\n\nEmail text:\n\n${bodyText}`;
       const r = await tryProviders(prompt);
       if (!r || r.value === null || !Number.isFinite(r.value)) {
-        errors.push(`${id}: LLM no value`); continue;
+        errors.push(`uid${em.uid}: LLM no value`); continue;
       }
-      if (!cfg.plausible(r.value)) { errors.push(`${id}: ${r.value} out of band`); continue; }
-
-      try { recordSnapshot(metric.metric_id, `gmail:${id}`, bodyText, r.value, 'email_pipeline_v1'); } catch {}
+      if (!cfg.plausible(r.value)) { errors.push(`uid${em.uid}: ${r.value} out of band`); continue; }
+      try { recordSnapshot(metric.metric_id, `gmail:${em.uid}`, em.body, r.value, 'email_pipeline_v1'); } catch {}
       return {
         value: r.value,
-        as_of: date ? new Date(date).toISOString() : new Date().toISOString(),
-        parse_meta: { source: 'gmail', message_id: id, subject: subject.slice(0, 200), provider: r.provider },
-        raw: `Email: "${subject.slice(0, 100)}" → ${r.value}`
+        as_of: new Date(em.date).toISOString(),
+        parse_meta: { source: 'gmail-imap', uid: em.uid, subject: em.subject.slice(0, 200), provider: r.provider },
+        raw: `Email: "${em.subject.slice(0, 100)}" → ${r.value}`
       };
     } catch (e) {
       if (e.code === 'LLM_UNAVAILABLE') throw e;
-      errors.push(`${id}: ${(e.message || '').slice(0, 80)}`);
+      errors.push(`uid${em.uid}: ${(e.message || '').slice(0, 80)}`);
     }
   }
-  throw new Error(`email_pipeline_v1: ${ids.length} emails tried · ${errors.slice(0,2).join(' | ')}`);
+  throw new Error(`email_pipeline_v1: ${emails.length} emails tried · ${errors.slice(0, 2).join(' | ')}`);
 }
 
 export async function fetchCrosscheck(metric, idx, primaryValue) {
