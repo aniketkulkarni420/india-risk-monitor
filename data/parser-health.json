@@ -99,39 +99,39 @@
       "status": "green"
     },
     "gsec_curve": {
-      "last_success_at": "2026-05-12T19:23:49.582Z",
+      "last_success_at": "2026-05-12T20:20:00.413Z",
       "last_success_value": 7.05,
       "consecutive_failures": 0,
       "status": "green"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-05-12T19:23:49.592Z",
+      "last_success_at": "2026-05-12T20:20:00.424Z",
       "last_success_value": 3.35,
       "consecutive_failures": 0,
       "status": "green"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-05-12T19:23:49.965Z",
+      "last_success_at": "2026-05-12T20:20:00.606Z",
       "last_success_value": 322144.23,
       "consecutive_failures": 0,
       "status": "green"
     },
     "wacr_repo_spread": {
-      "last_failure_at": "2026-05-12T19:23:53.475Z",
+      "last_failure_at": "2026-05-12T20:20:02.760Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 1 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx: WACR n | llm:google_news_llm_v1: wacr_repo_spread: 5 candidates, none yielded value · h",
-      "consecutive_failures": 2,
-      "status": "amber",
+      "consecutive_failures": 3,
+      "status": "red",
       "last_success_at": "2026-05-12T01:24:27.459Z",
       "last_success_value": -5
     },
     "inr_usd": {
-      "last_success_at": "2026-05-12T19:23:53.700Z",
-      "last_success_value": 95.589,
+      "last_success_at": "2026-05-12T20:20:02.865Z",
+      "last_success_value": 95.577,
       "consecutive_failures": 0,
       "status": "green"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-05-12T19:23:53.707Z",
+      "last_success_at": "2026-05-12T20:20:02.874Z",
       "last_success_value": 230,
       "consecutive_failures": 0,
       "status": "green"
@@ -347,10 +347,10 @@
       "status": "red"
     },
     "fpi_debt_flows": {
-      "last_failure_at": "2026-05-12T19:23:49.324Z",
+      "last_failure_at": "2026-05-12T20:20:00.260Z",
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: getSharedBrowser is not defined | html_render:bse_v1: getSharedBrowser is not defined | html_render:playwright_render_v1: browserType.launch: Executable doesn't exist at /home/runner",
-      "consecutive_failures": 2,
-      "status": "amber",
+      "consecutive_failures": 3,
+      "status": "red",
       "last_success_at": "2026-05-12T01:32:10.433Z",
       "last_success_value": 1
     },
@@ -363,9 +363,9 @@
   },
   "summary": {
     "green": 47,
-    "amber": 4,
-    "red": 5,
+    "amber": 2,
+    "red": 7,
     "total": 56
   },
-  "generated_at": "2026-05-12T19:23:53.707Z"
+  "generated_at": "2026-05-12T20:20:02.874Z"
 }
