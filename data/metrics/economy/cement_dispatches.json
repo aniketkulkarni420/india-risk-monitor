@@ -36,6 +36,7 @@
     "frequency": "Monthly",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
+      "email:email_pipeline_v1",
       "pdf:eaindustry_ieci_v1",
       "rss:publisher_rss_v1",
       "llm:google_news_llm_v1"

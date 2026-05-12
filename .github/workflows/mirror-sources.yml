@@ -1,0 +1,48 @@
+name: Daily content mirror
+
+# Resilience layer: snapshots every critical source URL daily into git.
+# Combined with cache-fallback in fetchResilient(), this ensures the
+# dashboard keeps working even when PIB/NHAI/etc are temporarily down.
+#
+# Runs from the self-hosted India runner so PIB/NHAI/etc are reachable.
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # 03:00 UTC daily (~08:30 IST · before most ingest cycles)
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: [self-hosted, windows, india]
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm install --no-audit --no-fund --prefer-offline
+
+      - name: Run mirror
+        run: node scripts/mirror-sources.mjs
+        continue-on-error: true
+
+      - name: Commit cache updates if any
+        run: |
+          git config user.name "IRM Mirror Bot"
+          git config user.email "irm-mirror@bot.local"
+          git add data/source-cache
+          git diff --staged --quiet
+          if errorlevel 1 (
+            git commit -m "chore: daily source mirror"
+            git push
+          ) else (
+            echo No cache changes.
+          )

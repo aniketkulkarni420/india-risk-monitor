@@ -30,6 +30,7 @@ import * as eaindustry_ieci_v1 from './parsers/eaindustry_ieci_v1.mjs';
 import * as web_llm_v1 from './parsers/web_llm_v1.mjs';
 import * as publisher_rss_v1 from './parsers/publisher_rss_v1.mjs';
 import * as rbi_mmo_daily_v1 from './parsers/rbi_mmo_daily_v1.mjs';
+import * as email_pipeline_v1 from './parsers/email_pipeline_v1.mjs';
 import * as tiered_v1 from './parsers/tiered_v1.mjs';
 import * as dbnomics_v1 from './parsers/dbnomics_v1.mjs';
 import * as datagovin_v1 from './parsers/datagovin_v1.mjs';
@@ -130,6 +131,8 @@ const REAL = new Map([
   ['rss:publisher_rss_v1', publisher_rss_v1],
   // RBI MMO daily release (Phase 2 · WACR daily fix · 2026-05-12)
   ['html_scrape:rbi_mmo_daily_v1', rbi_mmo_daily_v1],
+  // Email pipeline (PIB / MoSPI / RBI subscriptions) · resilience layer
+  ['email:email_pipeline_v1', email_pipeline_v1],
   // Tiered orchestrator -- tries multiple sub-parsers in priority order
   ['tiered:tiered_v1', tiered_v1],
 ]);

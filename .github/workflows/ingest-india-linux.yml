@@ -1,12 +1,14 @@
-name: Scheduled ingest (India IP)
+name: Scheduled ingest (India Linux runner · Termux/VPS)
 
-# Runs on the self-hosted Windows runner (label: india) to fetch metrics that
-# need an India IP. Uses cmd shell (always present) + Node scripts for loops
-# to avoid pwsh/powershell/bash availability issues on the runner.
+# Twin of ingest-india-runner.yml but targets Linux self-hosted runners
+# (Termux on Android, or VPS in Mumbai region). Distributes load when both
+# are registered. Same metrics list, same secrets.
+#
+# Register a runner with labels: self-hosted, linux, india
 
 on:
   schedule:
-    - cron: '0 */6 * * *'   # every 6h
+    - cron: '30 */6 * * *'   # offset 30min from Windows runner
   workflow_dispatch:
     inputs:
       metric:
@@ -14,17 +16,14 @@ on:
         required: false
 
 jobs:
-  ingest-india:
-    # Auto-distributed: register additional runners (Termux/VPS) with label
-    # 'india' and GitHub will pick whichever is idle. No workflow changes
-    # needed — same label = same pool.
-    runs-on: [self-hosted, windows, india]
+  ingest-india-linux:
+    runs-on: [self-hosted, linux, india]
     timeout-minutes: 40
     permissions:
       contents: write
     defaults:
       run:
-        shell: cmd
+        shell: bash
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -58,13 +57,12 @@ jobs:
 
       - name: Commit data updates if any
         run: |
-          git config user.name "IRM India Runner"
-          git config user.email "irm-india@bot.local"
+          git config user.name "IRM India Linux Runner"
+          git config user.email "irm-india-linux@bot.local"
           git add data/
-          git diff --staged --quiet
-          if errorlevel 1 (
-            git commit -m "ingest(india): scheduled run"
+          if git diff --staged --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "ingest(india-linux): scheduled run"
             git push
-          ) else (
-            echo No data changes.
-          )
+          fi

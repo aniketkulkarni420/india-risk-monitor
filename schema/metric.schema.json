@@ -73,7 +73,7 @@
         "url": { "type": "string", "format": "uri" },
         "type": { "type": "string", "enum": ["Official", "Exchange", "Regulator", "Public", "Filing", "Rating agency", "Reputable media", "Aggregator", "Manual estimate"] },
         "frequency": { "type": "string", "enum": ["Live", "Daily", "Weekly", "Fortnightly", "Monthly", "Quarterly", "Per release"] },
-        "parser": { "type": "string", "pattern": "^(csv_download|html_scrape|press_release|json_api|manual|rss|pdf|html_render|llm|tiered)(:[a-z0-9_]+)?$" },
+        "parser": { "type": "string", "pattern": "^(csv_download|html_scrape|press_release|json_api|manual|rss|pdf|html_render|llm|tiered|email)(:[a-z0-9_]+)?$" },
         "tier_chain": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
       }
     },

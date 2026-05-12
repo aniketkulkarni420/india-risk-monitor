@@ -1,0 +1,10 @@
+name = "irm-india-proxy"
+main = "worker.js"
+compatibility_date = "2026-05-01"
+
+# WORKER_TOKEN is set via wrangler secret · NOT in this file
+[vars]
+# (none — runtime vars come from secrets)
+
+[observability]
+enabled = true

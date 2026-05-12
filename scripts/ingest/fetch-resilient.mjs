@@ -59,7 +59,8 @@ export async function fetchResilient(url, opts = {}) {
     wayback = true,
     googleCache = false,
     browserUa = false,
-    headers = {}
+    headers = {},
+    useCache = true
   } = opts;
 
   let lastErr;
@@ -68,6 +69,12 @@ export async function fetchResilient(url, opts = {}) {
     try {
       const res = await rawFetch(url, { timeoutMs, headers, browserUa });
       if (res.ok && res.body && res.body.length > 0) {
+        if (useCache) {
+          try {
+            const { writeCache } = await import('./source-cache.mjs');
+            writeCache(url, res.body);
+          } catch {}
+        }
         return { ...res, source: 'primary', attempt };
       }
       // 4xx → break out for fallbacks (don't waste retries on 404)
@@ -98,6 +105,23 @@ export async function fetchResilient(url, opts = {}) {
     }
   }
 
+  // Fallback CF proxy: route through our Cloudflare Worker in India region
+  // when configured. Bypasses geo-blocks for govt sites from cloud runners.
+  try {
+    const { fetchViaProxy, isProxyAvailable } = await import('./cf-proxy.mjs');
+    if (isProxyAvailable()) {
+      const res = await fetchViaProxy(url, { timeoutMs });
+      if (res.ok && res.body && res.body.length > 100) {
+        if (useCache) {
+          try { const { writeCache } = await import('./source-cache.mjs'); writeCache(url, res.body); } catch {}
+        }
+        return { ...res, url, source: 'cf-proxy' };
+      }
+    }
+  } catch (e) {
+    if (e.code !== 'PROXY_UNAVAILABLE') lastErr = e;
+  }
+
   // Fallback 2: Google webcache (often killed but free to try)
   if (googleCache) {
     try {
@@ -107,6 +131,19 @@ export async function fetchResilient(url, opts = {}) {
     } catch (e) {
       lastErr = e;
     }
+  }
+
+  // Fallback 3 (Tier B · 2026-05-12): local content cache.
+  // If our daily mirror or a recent successful fetch cached this URL,
+  // serve that. Avoids "metric goes red because PIB is briefly down".
+  if (useCache) {
+    try {
+      const { readLatestCache } = await import('./source-cache.mjs');
+      const cached = readLatestCache(url);
+      if (cached && cached.body && cached.body.length > 100) {
+        return { ok: true, status: 200, body: cached.body, url, source: 'local_cache', cache_age_days: cached.ageDays };
+      }
+    } catch {}
   }
 
   throw lastErr || new Error(`${url}: all attempts + fallbacks failed`);

@@ -1,0 +1,44 @@
+name: Deploy Cloudflare Worker
+
+# Deploys irm-india-proxy worker whenever cloudflare-worker/ changes on main.
+# Requires GitHub Secrets:
+#   CLOUDFLARE_API_TOKEN  · Workers Deploy scope · from dash.cloudflare.com/profile/api-tokens
+#   CLOUDFLARE_ACCOUNT_ID · from CF dashboard URL (already set as CF_ACCOUNT_ID earlier)
+#   WORKER_TOKEN          · shared secret for runner-to-worker auth
+#                          (generate any random string, set in BOTH this secret
+#                           AND have parsers send it in X-Worker-Token header)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare-worker/**'
+      - '.github/workflows/deploy-cf-worker.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install wrangler
+        run: npm install -g wrangler@latest
+
+      - name: Set WORKER_TOKEN secret in worker
+        working-directory: cloudflare-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          echo "${{ secrets.WORKER_TOKEN }}" | wrangler secret put WORKER_TOKEN
+
+      - name: Deploy worker
+        working-directory: cloudflare-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: wrangler deploy
