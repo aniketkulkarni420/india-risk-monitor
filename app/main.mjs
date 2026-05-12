@@ -14,6 +14,7 @@ import {
   renderDriverBars, renderHorizonCard, renderRegimeBanner, renderPersistenceChips,
   renderCumulativeLine, renderDivergingBars, renderYieldCurve, renderInflationBars,
   renderCurrencyStrip, renderProgressBar, renderGaugeRow, renderPairedLine, renderRangeTick, renderTimelineStrip,
+  renderLensRow, renderCardsAsTabs, renderFlowsFocused, renderPersistenceBar, renderAbsorptionGauge,
   renderSmallMultiples, renderIndexedOverlay, renderValuationBand, renderTodayBullets,
   renderSeasonalityStrip, renderHeadlinePanel, renderStatStrip, buildHeroNarrative
 } from './components/charts.mjs';
@@ -718,101 +719,125 @@ function buildSectionFooter(srcNames) {
   return { count: srcNames.length, names: srcNames, last_verified: new Date().toISOString() };
 }
 
-// ════════════════════════ FLOWS — 5 LENSES ════════════════════════
+// ════════════════════════ FLOWS — V60 HYBRID (2026-05-12) ════════════════════════
+// Layout: 4-lens regime strip → cards-as-tabs period strip → focused 3-cell + bar trio + narrative
+// → F&O persistence bar → cumulative chart (de-emphasized) → supporting composite
 const flowsBody = el('div', { class: 'section-body-stack' });
 
-// Lens 1 · Regime banner · description built dynamically from live ratio
-const _absInit = M('absorption_ratio');
-const _fiiInit = M('fii_equity_daily');
-const _absRatio = _absInit?.value;
-const _absPct = _absRatio != null ? Math.round(_absRatio * 100) : null;
-const _absDesc = (() => {
-  if (_absRatio == null) return 'Absorption ratio not available.';
-  if (_absRatio >= 1.0) return `DII covering ${_absPct}% of FII selling. Net inflow ₹${Math.abs((_absRatio - 1) * Math.abs(_fiiInit?.value ?? 0)).toFixed(0)} Cr.`;
-  const leakage = Math.round((1 - _absRatio) * Math.abs(_fiiInit?.value ?? 0));
-  return `DII covering ${_absPct}% of FII selling. Net outflow ₹${leakage.toLocaleString('en-IN')} Cr.`;
-})();
-flowsBody.appendChild(renderRegimeBanner({
-  regime: 'DII Absorption',
-  glossary: 'Absorption ratio = DII net buying ÷ |FII net selling|. >1.0× means DII buying fully offsets FII selling. <1.0× means net outflow.',
-  description: _absDesc,
-  hint: 'Becomes "stress" if FII selling intensifies AND DII slows simultaneously.',
-  status: _absRatio != null && _absRatio >= 1 ? 'low' : 'med',
-  persistence: 8,
-  asof: _absInit?.as_of ? formatAsOf(_absInit.as_of) : '5 May 2026'
-}));
-
-// Lens 2 · 4 horizon cards — driven from live FII/DII metrics
-// Pull all flow metrics once at the top of the section so subsequent lenses
-// (3, 4) can reuse without redeclaration / TDZ issues.
+// Pull all flow metrics once
 const fiiDay = M('fii_equity_daily');
 const fiiMtd = M('fii_equity_mtd');
 const fiiCytdH = M('fii_equity_cytd');
 const diiDay = M('dii_daily');
 const diiMtdH = M('dii_mtd');
 const absorpM = M('absorption_ratio');
+const fnoOi = M('fno_oi_buildup');
+const blockDeals = M('block_deals_notional');
+const _absRatio = absorpM?.value;
+const _absPct = _absRatio != null ? Math.round(_absRatio * 100) : null;
 const fiiVal = (m, fb) => (m && typeof m.value === 'number') ? Math.round(m.value) : fb;
-const diiCytdH = diiMtdH ? Math.round((diiMtdH.value || 0) * 4) : 95000;  // approx until cytd metric exists
+const diiCytdH = diiMtdH ? Math.round((diiMtdH.value || 0) * 4) : 95000;
 const fiiCytd = fiiCytdH?.value ?? -42180;
 const diiCytd = diiCytdH;
 const netCytd = diiCytd + fiiCytd;
-const todayAsOf = fiiDay?.as_of ? formatAsOf(fiiDay.as_of) : '5 May 2026';
-const hzGrid = el('div', { class: 'horizon-grid' });
-hzGrid.appendChild(renderHorizonCard('Today', fiiVal(fiiDay, -392) + fiiVal(diiDay, 1712), 'net ₹ Cr', fiiVal(fiiDay, -2103), fiiVal(diiDay, 1712), { suffix: 'Cr', asof: todayAsOf }));
-hzGrid.appendChild(renderHorizonCard('MTD', fiiVal(fiiMtd, -14305) + fiiVal(diiMtdH, 18596), 'net ₹ Cr' + (absorpM ? ` · absorption ${absorpM.value.toFixed(2)}×` : ''), fiiVal(fiiMtd, -14305), fiiVal(diiMtdH, 18596), { suffix: 'Cr', asof: fiiMtd?.as_of ? 'MTD · as on ' + formatAsOf(fiiMtd.as_of) : todayAsOf }));
-hzGrid.appendChild(renderHorizonCard('CYTD', fiiVal(fiiCytdH, -42180) + diiCytdH, 'net ₹ Cr', fiiVal(fiiCytdH, -42180), diiCytdH, { suffix: 'Cr', asof: '1 Jan – ' + todayAsOf }));
-hzGrid.appendChild(renderHorizonCard('Last 5 sessions', 4291, 'net ₹ Cr · 5-day avg', -12400, 16691, { suffix: 'Cr', asof: '5 sessions ending ' + todayAsOf }));
-flowsBody.appendChild(hzGrid);
+const inrFmt = (v) => (v < 0 ? '−' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(v))) + ' Cr';
+const shortFmt = (v) => (v < 0 ? '−' : '+') + '₹' + (Math.abs(v) >= 1000 ? (Math.abs(v)/1000).toFixed(1) + 'k' : Math.round(Math.abs(v)));
 
-// Lens 3 · Persistence chips — driven from live where possible
-flowsBody.appendChild(renderPersistenceChips([
-  { label: 'FII MTD', value: fiiMtd ? (fiiMtd.value < 0 ? '−' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(fiiMtd.value))) + ' Cr' : '8 sessions', color: (fiiMtd?.value ?? -1) < 0 ? 'var(--red)' : 'var(--green)' },
-  { label: 'DII MTD', value: diiMtdH ? '+₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(diiMtdH.value))) + ' Cr' : '11 sessions', color: 'var(--green)' },
-  { label: 'Absorption ratio', value: absorpM ? absorpM.value.toFixed(2) + '×' : '1.35×', color: 'var(--ink)' },
-  { label: 'Net market YTD', value: (netCytd < 0 ? '−' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(netCytd)) + ' Cr', color: netCytd >= 0 ? 'var(--green)' : 'var(--red)' }
+// V60 Lens 1 · 4-lens regime strip
+flowsBody.appendChild(renderLensRow([
+  {
+    label: 'DII Absorb',
+    value: _absRatio != null ? _absRatio.toFixed(2) + '×' : '—',
+    pill: _absRatio != null ? { text: 'REGIME · 8d', klass: _absRatio >= 1 ? 'green' : 'amber' } : null,
+    read: _absRatio != null ? `DII covering ${_absPct}% of FII selling` : 'Ratio pending'
+  },
+  {
+    label: 'FII MTD',
+    value: fiiMtd ? shortFmt(fiiMtd.value) : '—',
+    valueClass: (fiiMtd?.value ?? 0) < 0 ? 'neg' : 'pos',
+    pill: { text: (fiiMtd?.value ?? 0) < -15000 ? 'STRESS' : (fiiMtd?.value ?? 0) < 0 ? 'SOFT' : 'INFLOW', klass: (fiiMtd?.value ?? 0) < -15000 ? 'red' : 'amber' },
+    read: 'cumulative this month'
+  },
+  {
+    label: 'F&O OI',
+    value: fnoOi ? formatTrend(fnoOi.value) : '—',
+    valueClass: (fnoOi?.value ?? 0) > 0 ? 'pos' : 'neg',
+    pill: { text: fnoOi?.status === 'high' || fnoOi?.status === 'shock' ? 'HIGH' : 'NORMAL', klass: fnoOi?.status === 'high' ? 'red' : 'amber' },
+    read: (fnoOi?.value ?? 0) < 0 ? 'positioning unwinding' : 'longs building'
+  },
+  {
+    label: 'Block deals',
+    value: blockDeals ? '₹' + new Intl.NumberFormat('en-IN').format(Math.round(blockDeals.value/1000)) + 'k' : '—',
+    pill: { text: (blockDeals?.value ?? 0) > 5000 ? 'NOTABLE' : 'NORMAL', klass: (blockDeals?.value ?? 0) > 5000 ? 'amber' : 'blue' },
+    read: '5d avg notional'
+  }
 ]));
 
-// Lens 4 · Cumulative chart
-const cytdMonths = ['Jan','Feb','Mar','Apr'];
+// V60 Lens 2 · cards-as-tabs period strip
+const todayNet = fiiVal(fiiDay, -2103) + fiiVal(diiDay, 1712);
+const mtdNet   = fiiVal(fiiMtd, -14305) + fiiVal(diiMtdH, 18596);
+const cytdNet  = fiiVal(fiiCytdH, -42180) + diiCytdH;
+const last5Net = 4291;
+const periods = ['today', '5sess', 'mtd', 'cytd'];
+let activePeriod = 'mtd';
+const periodData = {
+  today: { label: 'Today', net: todayNet, fii: fiiVal(fiiDay, -2103), dii: fiiVal(diiDay, 1712), sub: 'net ₹ Cr · 1 session', narrative: 'Single-session read · use period tabs above for cumulative picture.' },
+  '5sess': { label: 'Last 5 sessions', net: last5Net, fii: -12400, dii: 16691, sub: 'net ₹ Cr · 5d avg', narrative: 'Short-window absorption pattern · 5-day net positive despite FII selling.' },
+  mtd: { label: 'MTD · ' + (fiiMtd?.as_of ? formatAsOf(fiiMtd.as_of) : 'May 2026'), net: mtdNet, fii: fiiVal(fiiMtd, -14305), dii: fiiVal(diiMtdH, 18596), sub: 'net ₹ Cr · absorption ' + (absorpM ? absorpM.value.toFixed(2) + '×' : '—'), narrative: _absRatio != null && _absRatio >= 1 ? `DII covering ${_absPct}% of FII selling. Stable regime · becomes stress if FII intensifies AND DII slows.` : `DII covering ${_absPct ?? '—'}% of FII outflow. Becomes "stress" if FII selling intensifies AND DII slows simultaneously.` },
+  cytd: { label: 'CYTD · ' + new Date().getFullYear(), net: cytdNet, fii: fiiVal(fiiCytdH, -42180), dii: diiCytdH, sub: 'net ₹ Cr · year-to-date', narrative: 'Calendar-year cumulative · structural pattern. Net positive YTD on DII strength.' }
+};
+
+const periodTabsHost = el('div', {});
+const focusedHost = el('div', {});
+flowsBody.appendChild(periodTabsHost);
+flowsBody.appendChild(focusedHost);
+
+function renderFlowsActive() {
+  const p = periodData[activePeriod];
+  periodTabsHost.innerHTML = '';
+  periodTabsHost.appendChild(renderCardsAsTabs(periods.map(id => ({
+    id, label: periodData[id].label, net: shortFmt(periodData[id].net), sub: periodData[id].sub.split(' · ')[1] || '',
+    netClass: periodData[id].net >= 0 ? 'pos' : 'neg',
+    active: id === activePeriod
+  })), (id) => { activePeriod = id; renderFlowsActive(); }));
+  focusedHost.innerHTML = '';
+  focusedHost.appendChild(renderFlowsFocused({
+    period_label: p.label,
+    period_sub: _absRatio != null ? `Absorption ${_absRatio.toFixed(2)}× · 8 sessions` : '',
+    fii: { value: p.fii, formatted: inrFmt(p.fii), sub: 'NSE FII bhavcopy' },
+    dii: { value: p.dii, formatted: inrFmt(p.dii), sub: 'AMFI MF flows' },
+    net: { value: p.net, formatted: inrFmt(p.net), sub: p.sub.split(' · ')[1] || '' },
+    narrative_lead: _absRatio != null && _absRatio >= 1 ? `DII Absorption regime · 8 sessions:` : `DII Absorption · 8 sessions:`,
+    narrative: p.narrative,
+    absorption: activePeriod === 'mtd' ? _absRatio : null
+  }));
+}
+renderFlowsActive();
+
+// F&O OI 5-session persistence bar (chip #3)
+// Build a 5-session approximation from sparkline_12m + sign-based color
+if (fnoOi && fnoOi.sparkline_12m) {
+  const last5 = fnoOi.sparkline_12m.slice(-5).map((v, i, a) => i === 0 ? 0 : (v - a[i-1]));
+  flowsBody.appendChild(renderPersistenceBar(last5));
+}
+
+// Cumulative chart kept · de-emphasized · could be hidden via "Show more" in future
 const diiCumPoints = [
-  { label: 'Jan 1', value: 0 }, { label: 'Jan 15', value: 14000 }, { label: 'Feb 1', value: 28000 },
-  { label: 'Feb 15', value: 42000 }, { label: 'Mar 1', value: 58000 }, { label: 'Mar 15', value: 72000 },
-  { label: 'Apr 1', value: 84000 }, { label: 'Apr 15', value: 92000 }, { label: 'Apr 28', value: 95000 }
+  { label: 'Jan 1', value: 0 }, { label: 'Feb 1', value: 28000 }, { label: 'Mar 1', value: 58000 },
+  { label: 'Apr 1', value: 84000 }, { label: 'Apr 28', value: 95000 }
 ];
 const fiiCumPoints = [
-  { label: 'Jan 1', value: 0 }, { label: 'Jan 15', value: -4000 }, { label: 'Feb 1', value: -10000 },
-  { label: 'Feb 15', value: -16000 }, { label: 'Mar 1', value: -22000 }, { label: 'Mar 15', value: -28000 },
-  { label: 'Apr 1', value: -32000 }, { label: 'Apr 15', value: -38000 }, { label: 'Apr 28', value: -42180 }
+  { label: 'Jan 1', value: 0 }, { label: 'Feb 1', value: -10000 }, { label: 'Mar 1', value: -22000 },
+  { label: 'Apr 1', value: -32000 }, { label: 'Apr 28', value: -42180 }
 ];
-// Lens 4 · Cumulative chart with Option A stat strip — uses live values declared in Lens 2 block
-const fiiCumStrip = renderStatStrip([
-  { label: 'DII cumulative YTD', value: '+₹' + new Intl.NumberFormat('en-IN').format(Math.abs(diiCytd)) + ' Cr', sub: 'AMFI MF flows', color: 'var(--green)' },
-  { label: 'FII cumulative YTD', value: (fiiCytd < 0 ? '−₹' : '+₹') + new Intl.NumberFormat('en-IN').format(Math.abs(fiiCytd)) + ' Cr', sub: 'NSE FII bhavcopy', color: fiiCytd < 0 ? 'var(--red)' : 'var(--green)' },
-  { label: 'Net market YTD', value: (netCytd < 0 ? '−₹' : '+₹') + new Intl.NumberFormat('en-IN').format(Math.abs(netCytd)) + ' Cr', sub: absorpM ? `absorption ${absorpM.value.toFixed(2)}×` : 'absorption pending', color: netCytd >= 0 ? 'var(--green)' : 'var(--red)' },
-  { label: 'FII MTD', value: fiiMtd ? (fiiMtd.value < 0 ? '−' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(fiiMtd.value)) + ' Cr' : '—', sub: fiiMtd?.as_of ? 'as on ' + formatAsOf(fiiMtd.as_of) : '', color: (fiiMtd?.value ?? 0) < 0 ? 'var(--red)' : 'var(--green)' },
-  { label: 'DII MTD', value: diiMtdH ? '+₹' + new Intl.NumberFormat('en-IN').format(Math.abs(diiMtdH.value)) + ' Cr' : '—', sub: diiMtdH?.as_of ? 'as on ' + formatAsOf(diiMtdH.as_of) : '', color: 'var(--green)' }
-]);
-flowsBody.appendChild(fiiCumStrip);
 flowsBody.appendChild(renderCumulativeLine([
   { name: 'DII cumulative', color: 'var(--green)', points: diiCumPoints, current: '+95,000 Cr' },
   { name: 'FII cumulative', color: 'var(--red)', points: fiiCumPoints, current: '−42,180 Cr' }
-], { title: 'FII vs DII · cumulative ₹ Cr · 2026 YTD', summary: 'Net market: +52,820 Cr · DII pulling away', asof: '1 Jan – 5 May 2026' }));
+], { title: 'FII vs DII · cumulative ₹ Cr · 2026 YTD', summary: 'Net market: ' + inrFmt(netCytd) + ' · DII pulling away', asof: '1 Jan – 5 May 2026' }));
 
-// Lens 5 · Sectoral rotation
-flowsBody.appendChild(renderDivergingBars({
-  sells: [
-    { name: 'IT', value: -4820 },
-    { name: 'Banks', value: -3750 },
-    { name: 'Auto', value: -2410 }
-  ],
-  buys: [
-    { name: 'Energy', value: 3210 },
-    { name: 'Pharma', value: 2010 },
-    { name: 'Metals', value: 1180 }
-  ]
-}, { title: 'FII MTD by sector · top sells / top buys' }));
+// Sectoral diverging bars REMOVED per Aniket 2026-05-12 decision · was mock data, no NSDL parser yet.
 
-// Supporting table
+// Supporting composite (auto-promote anomalies + summary + change hint built-in)
 flowsBody.appendChild(renderSupportingTier(
   ['fpi_debt_flows', 'fno_oi_buildup', 'block_deals_notional', 'fii_equity_mtd', 'dii_mtd', 'fii_equity_cytd'],
   M,

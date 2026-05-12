@@ -442,6 +442,133 @@ export function renderTimelineStrip(events, opts = {}) {
 }
 
 // ──────────────────────────────────────────────────────────────
+// renderLensRow · V60 Flows · 4-lens regime strip
+// lenses = [{ label, value, pill: {text, klass}, read }]
+// ──────────────────────────────────────────────────────────────
+export function renderLensRow(lenses) {
+  return el('div', { class: 'lens-row' }, lenses.map(l => el('div', { class: 'lens-cell' }, [
+    el('div', { class: 'lens-head' }, [
+      el('span', { class: 'lens-name' }, l.label),
+      l.pill ? el('span', { class: 'lens-pill ' + (l.pill.klass || '') }, l.pill.text) : null
+    ].filter(Boolean)),
+    el('div', { class: 'lens-value ' + (l.valueClass || '') }, l.value),
+    l.read ? el('div', { class: 'lens-read' }, l.read) : null
+  ].filter(Boolean))));
+}
+
+// renderCardsAsTabs · V60 Flows · period selector with headline net in each tab
+// items = [{ id, label, net, sub, active }]
+// onChange(id) called on click
+export function renderCardsAsTabs(items, onChange) {
+  return el('div', { class: 'cat-strip', role: 'tablist' }, items.map(item =>
+    el('button', {
+      class: 'cat-tab' + (item.active ? ' active' : ''),
+      role: 'tab',
+      'aria-selected': item.active ? 'true' : 'false',
+      'data-tab-id': item.id,
+      onclick: () => onChange && onChange(item.id)
+    }, [
+      el('div', { class: 'ct-label' }, item.label),
+      el('div', { class: 'ct-net ' + (item.netClass || '') }, item.net),
+      item.sub ? el('div', { class: 'ct-sub' }, item.sub) : null
+    ].filter(Boolean))
+  ));
+}
+
+// renderFlowsFocused · V60 Flows · 3-cell value grid + bar trio + narrative
+// data = { period_label, period_sub, fii, dii, net, narrative, asof, absorption }
+// fii/dii/net = { value: raw number, formatted: string }
+export function renderFlowsFocused(data) {
+  const max = Math.max(Math.abs(data.fii.value), Math.abs(data.dii.value), Math.abs(data.net.value));
+  const pct = (v) => max ? Math.round(Math.abs(v) / max * 100) : 0;
+  return el('div', { class: 'flows-focused' }, [
+    el('div', { class: 'flows-focused-head' }, [
+      el('div', { class: 'ff-title' }, data.period_label),
+      data.period_sub ? el('div', { class: 'ff-meta' }, data.period_sub) : null
+    ].filter(Boolean)),
+    // 3-cell grid
+    el('div', { class: 'flow-grid' }, [
+      el('div', { class: 'flow-cell' }, [
+        el('div', { class: 'flow-cell-label' }, 'FII equity'),
+        el('div', { class: 'flow-cell-value neg' }, data.fii.formatted),
+        data.fii.sub ? el('div', { class: 'flow-cell-sub' }, data.fii.sub) : null
+      ].filter(Boolean)),
+      el('div', { class: 'flow-cell' }, [
+        el('div', { class: 'flow-cell-label' }, 'DII equity'),
+        el('div', { class: 'flow-cell-value pos' }, data.dii.formatted),
+        data.dii.sub ? el('div', { class: 'flow-cell-sub' }, data.dii.sub) : null
+      ].filter(Boolean)),
+      el('div', { class: 'flow-cell' }, [
+        el('div', { class: 'flow-cell-label' }, 'Net'),
+        el('div', { class: 'flow-cell-value ' + (data.net.value >= 0 ? 'pos' : 'neg') }, data.net.formatted),
+        data.net.sub ? el('div', { class: 'flow-cell-sub' }, data.net.sub) : null
+      ].filter(Boolean))
+    ]),
+    // ★ Bar trio · the chart Aniket loved
+    el('div', { class: 'bar-trio' }, [
+      el('div', { class: 'bar-row' }, [
+        el('span', { class: 'bar-label' }, 'FII'),
+        el('div', { class: 'bar-track' }, [el('div', { class: 'bar-fill bf-red', style: { width: pct(data.fii.value) + '%' } })]),
+        el('span', { class: 'bar-num neg' }, formatNumberShort(data.fii.value))
+      ]),
+      el('div', { class: 'bar-row' }, [
+        el('span', { class: 'bar-label' }, 'DII'),
+        el('div', { class: 'bar-track' }, [el('div', { class: 'bar-fill bf-green', style: { width: pct(data.dii.value) + '%' } })]),
+        el('span', { class: 'bar-num pos' }, formatNumberShort(data.dii.value))
+      ]),
+      el('div', { class: 'bar-row' }, [
+        el('span', { class: 'bar-label' }, 'Net'),
+        el('div', { class: 'bar-track' }, [el('div', { class: 'bar-fill ' + (data.net.value >= 0 ? 'bf-green' : 'bf-red'), style: { width: pct(data.net.value) + '%' } })]),
+        el('span', { class: 'bar-num ' + (data.net.value >= 0 ? 'pos' : 'neg') }, formatNumberShort(data.net.value))
+      ])
+    ]),
+    // Magnitude band hint chip
+    el('div', { class: 'flow-bands' }, '±2k normal · ±5k notable · ±15k stress'),
+    // Absorption gauge (0 → 1.5× scale)
+    data.absorption != null ? renderAbsorptionGauge(data.absorption) : null,
+    // Narrative
+    data.narrative ? el('div', { class: 'flow-narrative' }, [el('b', {}, data.narrative_lead || ''), ' ', data.narrative]) : null
+  ].filter(Boolean));
+}
+
+function formatNumberShort(v) {
+  if (v == null) return '—';
+  const sign = v < 0 ? '−' : '+';
+  const a = Math.abs(v);
+  return sign + Math.round(a).toLocaleString('en-IN');
+}
+
+export function renderAbsorptionGauge(ratio) {
+  // Clamp to 0–1.5× for display
+  const v = Math.max(0, Math.min(1.5, ratio));
+  const pct = (v / 1.5) * 100;
+  return el('div', { class: 'absorb-gauge-wrap' }, [
+    el('div', { class: 'absorb-gauge-label' }, 'Absorption ratio · ' + ratio.toFixed(2) + '×'),
+    el('div', { class: 'absorb-gauge' }, [
+      el('div', { class: 'absorb-gauge-marker', style: { left: pct + '%' } })
+    ]),
+    el('div', { class: 'absorb-gauge-row' }, [
+      el('span', {}, '0×'), el('span', {}, '0.5×'), el('span', {}, '1.0× full'), el('span', {}, '1.5×')
+    ])
+  ]);
+}
+
+// F&O OI 5-session persistence bar
+// sessions = array of numbers (last 5 values · negative = unwinding · positive = building)
+export function renderPersistenceBar(sessions) {
+  if (!sessions || !sessions.length) return null;
+  const last5 = sessions.slice(-5);
+  return el('div', { class: 'persistence-bar-wrap' }, [
+    el('div', { class: 'persistence-bar-label' }, 'F&O OI · last 5 sessions'),
+    el('div', { class: 'persistence-bar' }, last5.map(v => {
+      const cls = v > 0 ? 'pb-pos' : v < 0 ? 'pb-neg' : 'pb-flat';
+      const op = v === 0 ? 0.3 : Math.min(1, 0.4 + Math.abs(v) / 20);
+      return el('span', { class: 'persistence-bar-cell ' + cls, style: { opacity: op } });
+    }))
+  ]);
+}
+
+// ──────────────────────────────────────────────────────────────
 // renderRangeTick · 3A · 12m range bar + marker + qualitative label
 // info comes from utils.rangeTick(metric): { positionPct, label, lo, hi }
 // opts: { compact: bool — hides lo/hi labels under the bar }
