@@ -8,9 +8,61 @@
 //   state: 'default' | 'loading' | 'error' | 'history-pending' | 'shock' (auto-detected from metric)
 //   onClick: optional callback (default: open ?metric=metric_id deep-link)
 
-import { el, formatValue, formatTrend, trendClass, statusClass, isHistoryPending, isShock, formatAsOf, heatmapClass, pillWithDirection } from './utils.mjs';
+import { el, formatValue, formatTrend, trendClass, statusClass, isHistoryPending, isShock, formatAsOf, heatmapClass, pillWithDirection, rangeTick } from './utils.mjs';
 import { renderSparkline } from './Sparkline.mjs';
 import { getDisplayPeriods } from './ComparisonSpec.mjs';
+
+// 9D · Inline expand. Click any row → expand sibling row in-place with chart + thresholds + drawer link.
+// Tracks one open row at a time per <tbody>.
+function toggleInlineExpand(rowEl, metric) {
+  if (!rowEl || !rowEl.parentNode) return;
+  const tbody = rowEl.parentNode;
+  // Close any other open expand in the same table
+  Array.from(tbody.querySelectorAll('tr.tr-inline-expand')).forEach(x => {
+    if (x.previousElementSibling !== rowEl) x.remove();
+  });
+  // Toggle self
+  const nx = rowEl.nextElementSibling;
+  if (nx && nx.classList.contains('tr-inline-expand')) {
+    nx.remove();
+    rowEl.classList.remove('tr-expanded');
+    return;
+  }
+  const expandRow = renderInlineExpand(metric);
+  rowEl.classList.add('tr-expanded');
+  tbody.insertBefore(expandRow, rowEl.nextSibling);
+}
+
+function renderInlineExpand(metric) {
+  const dir = metric.trend_direction || 'neutral';
+  const spark = metric.sparkline_12m || [];
+  const range = rangeTick(metric);
+  const thresholds = metric.threshold_context || metric.triggers || null;
+  const why = metric.why_it_matters || metric.inference || '';
+  const td = el('td', { colspan: 6 }, [
+    el('div', { class: 'inline-expand-grid' }, [
+      // Sparkline / range tick column
+      el('div', { class: 'inline-expand-col' }, [
+        el('div', { class: 'inline-expand-label' }, '12m sparkline + range'),
+        renderSparkline({ data: spark, width: 220, height: 44, trend_direction: dir, fill: true }),
+        range ? el('div', { class: 'inline-expand-rangelabel' }, range.label + ' · ' + range.lo + '–' + range.hi) : null
+      ].filter(Boolean)),
+      // Thresholds / why column
+      el('div', { class: 'inline-expand-col' }, [
+        el('div', { class: 'inline-expand-label' }, 'Why it matters'),
+        el('div', { class: 'inline-expand-why' }, why || 'No inference text yet.'),
+        thresholds ? el('div', { class: 'inline-expand-label', style: { marginTop: '6px' } }, 'Thresholds') : null,
+        thresholds ? el('div', { class: 'inline-expand-thresh' }, thresholds) : null
+      ].filter(Boolean))
+    ]),
+    el('a', {
+      class: 'inline-expand-deep',
+      href: `#metric=${metric.metric_id}`,
+      onclick: (e) => { e.stopPropagation(); window.location.hash = `metric=${metric.metric_id}`; }
+    }, 'Full detail →')
+  ]);
+  return el('tr', { class: 'tr-inline-expand' }, [td]);
+}
 
 const PERIOD_FIELDS = { dod: 'dod_pct', mom: 'mom_pct', yoy: 'yoy_pct' };
 const PERIOD_LABELS = { dod: 'DoD', mom: 'MoM', yoy: 'YoY' };
@@ -114,9 +166,13 @@ export function renderTableRow(metric, opts = {}) {
   const tr = el('tr', {
     class: klass,
     'data-metric-id': metric.metric_id,
-    onclick: () => {
-      if (opts.onClick) opts.onClick(metric);
-      else window.location.hash = `metric=${metric.metric_id}`;
+    onclick: (e) => {
+      // 9D · inline expand pattern. Click → expands sibling row inline.
+      // "Full detail →" link inside opens the existing drawer (9A backup).
+      if (opts.onClick) { opts.onClick(metric); return; }
+      const t = e.target;
+      if (t && t.closest && t.closest('a, button')) return; // ignore inner controls
+      toggleInlineExpand(tr, metric);
     }
   }, [
     el('td', { class: 'name' }, [
