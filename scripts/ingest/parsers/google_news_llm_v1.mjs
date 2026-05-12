@@ -91,30 +91,30 @@ const CONFIGS = {
   },
 
   fastag_toll: {
-    queryFn: () => 'FASTag toll collection NHAI crore month India',
+    queryFn: () => 'FASTag',  // simpler query gets more results
     target: 'The monthly FASTag toll collection amount for India in INR crore for the most recent month. Required: monthly figure between 5000 and 12000 crore. Example: "Toll collection via FASTag reached Rs 6,500 crore in April 2026" -> return 6500. Reject: annual totals (50000+ crore), pass prices, or any value outside 5000-12000 crore range.',
-    headlineFilter: (t) => /(FASTag|toll\s+collection|NHAI)/i.test(t),
+    headlineFilter: null,  // let LLM judge from body
     plausible: (v) => v > 4000 && v < 12000,
     maxArticles: 6,
-    maxAgeDays: 90
+    maxAgeDays: 120
   },
 
   rail_freight: {
-    queryFn: () => 'Indian Railways freight loading million tonnes month India',
+    queryFn: () => 'Indian Railways freight',
     target: 'The ALL-INDIA monthly freight loading by Indian Railways in million tonnes (MT). Typical monthly range: 120-160 MT. STRICT EXCLUSIONS: (1) single zone figures (Central/Western/Northern/Southern/Eastern Railway -- those are 5-10 MT range); (2) full FY/year totals (those are 1500-1800 MT range, like "1670 MT in FY26"); (3) freight REVENUE in crore (that is rupees, not tonnes). Return only the absolute monthly all-India tonnage between 100 and 200 MT.',
-    headlineFilter: (t) => /Indian\s+Railways|freight\s+loading/i.test(t),
+    headlineFilter: null,
     plausible: (v) => v > 100 && v < 200,
-    maxArticles: 5,
-    maxAgeDays: 60
+    maxArticles: 6,
+    maxAgeDays: 120
   },
 
   port_cargo: {
-    queryFn: () => 'India major ports total cargo million tonnes monthly',
+    queryFn: () => 'India major ports cargo',
     target: 'The all-India monthly TOTAL cargo throughput across all 12 major ports combined, in million tonnes (MT). Typical monthly range: 60-90 MT. STRICT EXCLUSIONS: (1) single port figures (JNPA, Mundra, Chennai, Paradip alone -- those are 5-15 MT); (2) annual/FY totals (those are 750-950 MT range like "915 MT in FY26"); (3) container count in TEU (different unit). Return only the monthly aggregate.',
-    headlineFilter: (t) => /major\s+ports|all[- ]India\s+ports/i.test(t),
+    headlineFilter: null,
     plausible: (v) => v > 50 && v < 100,
-    maxArticles: 5,
-    maxAgeDays: 60
+    maxArticles: 6,
+    maxAgeDays: 120
   },
 
   cement_dispatches: {
@@ -164,21 +164,21 @@ const CONFIGS = {
   },
 
   fno_oi_buildup: {
-    queryFn: () => 'Nifty F&O open interest buildup OI change India',
-    target: 'Nifty futures or options Open Interest (OI) build-up percentage change or absolute count. Recent daily/weekly figure. Sign matters: negative = OI declining (short covering or position close), positive = OI building.',
-    headlineFilter: (t) => /(Nifty|OI|open\s+interest|F&O|futures)/i.test(t),
+    queryFn: () => 'Nifty open interest',
+    target: 'Nifty futures/options Open Interest (OI) build-up percentage change or absolute count for recent trading days. Sign matters: negative = OI declining, positive = OI building. Prefer % change figure if both available.',
+    headlineFilter: null,
     plausible: (v) => Math.abs(v) < 1000000,
-    maxArticles: 4,
-    maxAgeDays: 14
+    maxArticles: 5,
+    maxAgeDays: 30
   },
 
   block_deals_notional: {
-    queryFn: () => 'NSE BSE block deals total notional crore today',
-    target: 'the daily total notional value of all NSE/BSE block deals in INR crore. Most recent trading day aggregate.',
-    headlineFilter: (t) => /(block\s+deal|bulk\s+deal|notional)/i.test(t),
+    queryFn: () => 'NSE block deals',
+    target: 'the daily total notional value of all NSE/BSE block deals in INR crore for most recent trading day.',
+    headlineFilter: null,
     plausible: (v) => v > 0 && v < 50000,
-    maxArticles: 4,
-    maxAgeDays: 14
+    maxArticles: 5,
+    maxAgeDays: 30
   },
 
   fpi_debt_flows: {
@@ -226,8 +226,7 @@ export async function fetchPrimary(metric) {
   const candidates = [];
   for (const it of items) {
     if (!it.title) continue;
-    if (cfg.headlineFilter && !cfg.headlineFilter(it.title)) continue;
-    // Note: sourceWhitelist applies POST-fetch (since Google News rewrites links via news.google.com).
+    if (cfg.headlineFilter !== null && cfg.headlineFilter && !cfg.headlineFilter(it.title)) continue;
     const pub = it.pubDate ? new Date(it.pubDate).getTime() : Date.now();
     if (Number.isFinite(pub) && pub < cutoff) continue;
     candidates.push(it);
