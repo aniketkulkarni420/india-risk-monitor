@@ -39,61 +39,61 @@
       "last_success_value": 256
     },
     "fii_equity_daily": {
-      "last_success_at": "2026-05-12T18:24:21.890Z",
+      "last_success_at": "2026-05-12T18:26:54.794Z",
       "last_success_value": -1959.39,
       "consecutive_failures": 0,
       "status": "green"
     },
     "fii_equity_mtd": {
-      "last_success_at": "2026-05-12T18:24:22.012Z",
+      "last_success_at": "2026-05-12T18:26:54.889Z",
       "last_success_value": -1959.39,
       "consecutive_failures": 0,
       "status": "green"
     },
     "fii_equity_cytd": {
-      "last_success_at": "2026-05-12T18:24:22.093Z",
+      "last_success_at": "2026-05-12T18:26:54.949Z",
       "last_success_value": -1959.39,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dii_daily": {
-      "last_success_at": "2026-05-12T18:24:22.183Z",
+      "last_success_at": "2026-05-12T18:26:55.170Z",
       "last_success_value": 7990.32,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dii_mtd": {
-      "last_success_at": "2026-05-12T18:24:22.280Z",
+      "last_success_at": "2026-05-12T18:26:55.254Z",
       "last_success_value": 7990.32,
       "consecutive_failures": 0,
       "status": "green"
     },
     "absorption_ratio": {
-      "last_success_at": "2026-05-12T18:24:22.286Z",
+      "last_success_at": "2026-05-12T18:26:55.260Z",
       "last_success_value": 4.08,
       "consecutive_failures": 0,
       "status": "green"
     },
     "nifty_50": {
-      "last_success_at": "2026-05-12T18:24:24.551Z",
+      "last_success_at": "2026-05-12T18:26:57.199Z",
       "last_success_value": 23379.55,
       "consecutive_failures": 0,
       "status": "green"
     },
     "bank_nifty": {
-      "last_success_at": "2026-05-12T18:24:25.186Z",
+      "last_success_at": "2026-05-12T18:26:57.633Z",
       "last_success_value": 53555.2,
       "consecutive_failures": 0,
       "status": "green"
     },
     "nifty_pe_5y": {
-      "last_success_at": "2026-05-12T18:24:25.589Z",
+      "last_success_at": "2026-05-12T18:26:58.044Z",
       "last_success_value": 20.3,
       "consecutive_failures": 0,
       "status": "green"
     },
     "india_vix": {
-      "last_success_at": "2026-05-12T18:24:26.048Z",
+      "last_success_at": "2026-05-12T18:26:58.531Z",
       "last_success_value": 19.28,
       "consecutive_failures": 0,
       "status": "green"
@@ -333,17 +333,17 @@
       "status": "green"
     },
     "fno_oi_buildup": {
-      "last_failure_at": "2026-05-12T18:24:23.121Z",
+      "last_failure_at": "2026-05-12T18:26:56.087Z",
       "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: getSharedBrowser is not defined | html_render:playwright_render_v1: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_ | llm:google_",
-      "consecutive_failures": 2,
-      "status": "amber",
+      "consecutive_failures": 3,
+      "status": "red",
       "last_success_at": "2026-05-12T01:29:52.123Z",
       "last_success_value": 9.38
     },
     "block_deals_notional": {
-      "last_failure_at": "2026-05-12T18:24:23.657Z",
+      "last_failure_at": "2026-05-12T18:26:56.483Z",
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:web_llm_v1: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_ | html_render:bse_v1: getSharedBrowser is not defined | html_render:moneycontrol_v1: g",
-      "consecutive_failures": 5,
+      "consecutive_failures": 6,
       "status": "red"
     },
     "fpi_debt_flows": {
@@ -363,9 +363,9 @@
   },
   "summary": {
     "green": 47,
-    "amber": 5,
-    "red": 4,
+    "amber": 4,
+    "red": 5,
     "total": 56
   },
-  "generated_at": "2026-05-12T18:24:26.048Z"
+  "generated_at": "2026-05-12T18:26:58.531Z"
 }
