@@ -34,7 +34,12 @@
     "url": "https://www.jpcindiansteel.nic.in/",
     "type": "Official",
     "frequency": "Monthly",
-    "parser": "press_release:jpc_steel_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:jpc_steel_v1",
+      "pdf:eaindustry_ieci_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

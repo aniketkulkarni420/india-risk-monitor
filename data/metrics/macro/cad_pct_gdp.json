@@ -35,7 +35,12 @@
     "url": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx",
     "type": "Official",
     "frequency": "Quarterly",
-    "parser": "press_release:rbi_bop_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:rbi_bop_v1",
+      "json_api:dbnomics_v1",
+      "html_scrape:tradingeconomics_v1"
+    ]
   },
   "source_crosscheck": [
     {

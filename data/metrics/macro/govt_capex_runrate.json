@@ -34,7 +34,11 @@
     "url": "https://cga.nic.in/MonthlyReport.aspx",
     "type": "Official",
     "frequency": "Monthly",
-    "parser": "press_release:cga_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:cga_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

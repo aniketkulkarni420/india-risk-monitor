@@ -34,7 +34,11 @@
     "url": "https://www.dgca.gov.in/digigov-portal/?page=jsp/dgca/InventoryList/headerblock/aircraftRegistration/airTraffic.jsp",
     "type": "Official",
     "frequency": "Monthly",
-    "parser": "press_release:dgca_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:dgca_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

@@ -34,7 +34,11 @@
     "url": "https://tradingeconomics.com/commodity/baltic",
     "type": "Aggregator",
     "frequency": "Daily",
-    "parser": "html_scrape:tradingeconomics_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "html_scrape:tradingeconomics_v1",
+      "json_api:dbnomics_v1"
+    ]
   },
   "source_crosscheck": [
     {

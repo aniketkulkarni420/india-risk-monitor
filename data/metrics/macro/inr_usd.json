@@ -36,8 +36,12 @@
     "name": "RBI reference rate",
     "url": "https://www.rbi.org.in/scripts/ReferenceRateArchive.aspx",
     "type": "Official",
-    "frequency": "Daily",
-    "parser": "json_api:rbi_refrate_v1"
+    "frequency": "Live",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "html_scrape:te_inr_v1",
+      "json_api:rbi_refrate_v1"
+    ]
   },
   "source_crosscheck": [
     {

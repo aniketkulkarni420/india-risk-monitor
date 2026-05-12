@@ -37,7 +37,12 @@
     "url": "https://www.eia.gov/petroleum/data.php",
     "type": "Official",
     "frequency": "Live",
-    "parser": "json_api:public_oil_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "json_api:public_oil_v1",
+      "json_api:dbnomics_v1",
+      "html_scrape:tradingeconomics_v1"
+    ]
   },
   "source_crosscheck": [
     {

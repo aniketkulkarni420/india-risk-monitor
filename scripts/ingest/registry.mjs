@@ -29,6 +29,7 @@ import * as nitter_v1 from './parsers/nitter_v1.mjs';
 import * as eaindustry_ieci_v1 from './parsers/eaindustry_ieci_v1.mjs';
 import * as web_llm_v1 from './parsers/web_llm_v1.mjs';
 import * as publisher_rss_v1 from './parsers/publisher_rss_v1.mjs';
+import * as rbi_mmo_daily_v1 from './parsers/rbi_mmo_daily_v1.mjs';
 import * as tiered_v1 from './parsers/tiered_v1.mjs';
 import * as dbnomics_v1 from './parsers/dbnomics_v1.mjs';
 import * as datagovin_v1 from './parsers/datagovin_v1.mjs';
@@ -59,6 +60,7 @@ const REAL = new Map([
   ['json_api:public_gold_v1', tradingeconomics_v1],
   ['json_api:public_dxy_v1', tradingeconomics_v1],
   ['html_scrape:tradingeconomics_v1', tradingeconomics_v1],   // baltic_dry_index
+  ['html_scrape:te_inr_v1', tradingeconomics_v1],             // inr_usd live
   ['press_release:sp_pmi_india_v1', tradingeconomics_v1],     // pmi_combined
   ['press_release:rbi_policy_v1', tradingeconomics_v1],       // repo_rate
   ['press_release:dgcis_v1', tradingeconomics_v1],            // trade_deficit
@@ -126,6 +128,8 @@ const REAL = new Map([
   ['html_render:web_llm_v1', web_llm_v1],
   // Publisher-direct topic RSS + LLM for industry trade pubs (added 2026-05-12)
   ['rss:publisher_rss_v1', publisher_rss_v1],
+  // RBI MMO daily release (Phase 2 · WACR daily fix · 2026-05-12)
+  ['html_scrape:rbi_mmo_daily_v1', rbi_mmo_daily_v1],
   // Tiered orchestrator -- tries multiple sub-parsers in priority order
   ['tiered:tiered_v1', tiered_v1],
 ]);

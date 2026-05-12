@@ -34,7 +34,12 @@
     "url": "https://www.rbi.org.in/Scripts/Money_Market.aspx",
     "type": "Official",
     "frequency": "Daily",
-    "parser": "json_api:rbi_mmo_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "json_api:rbi_mmo_v1",
+      "json_api:dbnomics_v1",
+      "html_scrape:tradingeconomics_v1"
+    ]
   },
   "source_crosscheck": [
     {

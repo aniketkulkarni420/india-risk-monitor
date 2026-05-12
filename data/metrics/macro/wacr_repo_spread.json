@@ -34,7 +34,11 @@
     "url": "https://www.fbil.org.in/",
     "type": "Official",
     "frequency": "Daily",
-    "parser": "llm:google_news_llm_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "html_scrape:rbi_mmo_daily_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

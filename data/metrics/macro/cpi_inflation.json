@@ -35,7 +35,12 @@
     "url": "https://www.mospi.gov.in/cpi",
     "type": "Official",
     "frequency": "Monthly",
-    "parser": "press_release:mospi_cpi_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:mospi_cpi_v1",
+      "json_api:dbnomics_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

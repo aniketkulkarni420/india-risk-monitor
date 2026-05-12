@@ -37,7 +37,12 @@
     "url": "https://www.balticexchange.com/en/data-services/market-information0/baltic-route-data.html",
     "type": "Public",
     "frequency": "Daily",
-    "parser": "press_release:baltic_dirty_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:baltic_dirty_v1",
+      "html_scrape:tradingeconomics_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

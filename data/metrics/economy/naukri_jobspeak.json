@@ -34,7 +34,11 @@
     "url": "https://www.naukri.com/jobspeak",
     "type": "Public",
     "frequency": "Monthly",
-    "parser": "press_release:naukri_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:naukri_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

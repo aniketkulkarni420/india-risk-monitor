@@ -35,6 +35,7 @@ const CONFIGS = {
   },
 
   fastag_toll: {
+    // 2026-05-12: dropped IRB (quarterly cadence mismatch). Replaced with NHAI + PIB MoRTH monthly sources.
     sources: [
       {
         url: 'https://en.wikipedia.org/wiki/FASTag',
@@ -42,28 +43,62 @@ const CONFIGS = {
         waitMs: 3000
       },
       {
-        url: 'https://www.irb.co.in/investor/financial-information.html',
-        target: 'most recent monthly national FASTag toll collection figure in INR crore, often quoted in IRB investor presentations as industry context. Return the absolute monthly value, not a percentage or growth rate.',
-        waitMs: 6000
+        url: 'https://nhai.gov.in/nhai/en/major-achievements',
+        target: 'most recent monthly FASTag toll collection figure for India in INR crore from NHAI page. Return absolute monthly value, not annual.',
+        waitMs: 5000
+      },
+      {
+        url: 'https://pib.gov.in/PressReleseDetailm.aspx?Mincode=44',
+        target: 'most recent monthly FASTag toll collection figure from PIB MoRTH press releases. Return absolute monthly value in INR crore.',
+        waitMs: 4000
       }
     ],
     plausible: (v) => v > 4000 && v < 12000
   },
 
   rail_freight: {
+    // 2026-05-12: dropped CONCOR (quarterly cadence). Replaced with PIB Railway + IR official stat page.
     sources: [
       {
         url: 'https://en.wikipedia.org/wiki/Indian_Railways',
-        target: 'most recent monthly freight loading of Indian Railways in million tonnes (MT). All-India figure, NOT a zone-specific subset. Typical range 120-160 MT/month. Reject FY totals (1500-1800 MT range) and zone-specific numbers.',
+        target: 'most recent monthly freight loading of Indian Railways in million tonnes (MT). All-India figure, NOT zone-specific. Typical 120-160 MT/month. Reject FY totals (1500-1800 MT) and zone-specific.',
         waitMs: 3000
       },
       {
-        url: 'https://www.concorindia.co.in/financial-information.aspx',
-        target: 'in CONCOR investor presentation, the system-wide Indian Railways monthly freight loading figure in million tonnes (MT). Return the absolute monthly value.',
-        waitMs: 6000
+        url: 'https://pib.gov.in/PressReleseDetailm.aspx?Mincode=10',
+        target: 'most recent monthly all-India freight loading by Indian Railways in MT from PIB Ministry of Railways press release. Absolute monthly value only.',
+        waitMs: 4000
+      },
+      {
+        url: 'https://www.indianrailways.gov.in/railwayboard/uploads/directorate/stat_econ/Outlook/Index_Statistics.html',
+        target: 'monthly all-India freight loading figure in million tonnes from IR Statistical Economics page. Latest month only.',
+        waitMs: 4000
       }
     ],
     plausible: (v) => v > 100 && v < 200
+  },
+
+  port_cargo: {
+    // Phase 1 addition (2026-05-12): port_cargo now in web_llm_v1.
+    // Dropped CONCOR (quarterly). Added Adani Ports (monthly BSE disclosure) + PIB Ports.
+    sources: [
+      {
+        url: 'https://www.adaniports.com/Investors/Investor-Information',
+        target: 'most recent monthly cargo volume disclosure from Adani Ports in million metric tonnes (MMT). Adani operates ~30% of India major port volume — a strong proxy. Return absolute monthly Adani Ports cargo volume.',
+        waitMs: 6000
+      },
+      {
+        url: 'https://en.wikipedia.org/wiki/Major_ports_of_India',
+        target: 'most recent monthly TOTAL cargo throughput across all 12 major ports of India in million tonnes (MT). Typical 60-90 MT/month. Reject single-port figures and FY totals.',
+        waitMs: 3000
+      },
+      {
+        url: 'https://pib.gov.in/PressReleseDetailm.aspx?Mincode=63',
+        target: 'most recent monthly all-India major ports total cargo throughput from PIB Ministry of Ports press release. Absolute monthly value, not FY totals.',
+        waitMs: 4000
+      }
+    ],
+    plausible: (v) => v > 50 && v < 100
   }
 };
 

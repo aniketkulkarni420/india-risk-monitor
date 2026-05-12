@@ -47,7 +47,11 @@
     "url": "https://www.nseindia.com/products-services/indices-banknifty",
     "type": "Exchange",
     "frequency": "Live",
-    "parser": "csv_download:nse_indices_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "csv_download:nse_indices_v1",
+      "html_scrape:tradingeconomics_v1"
+    ]
   },
   "source_crosscheck": [
     {

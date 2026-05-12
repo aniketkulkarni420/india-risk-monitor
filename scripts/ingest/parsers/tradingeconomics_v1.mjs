@@ -30,6 +30,12 @@ const EXTRACTORS = {
     extractRe: /(?:DXY|Dollar Index|USD)[^0-9]*?(\d{2,3}\.\d{1,3})/i,
     plausible: (v) => v > 70 && v < 130
   },
+  inr_usd: {
+    // Live USD/INR ~15-min delay via TE India currency page
+    url: 'https://tradingeconomics.com/india/currency',
+    extractRe: /(?:Indian Rupee|USDINR|INR)[^0-9]*?(\d{2,3}\.\d{1,4})/i,
+    plausible: (v) => v > 60 && v < 120
+  },
   baltic_dry_index: {
     url: 'https://tradingeconomics.com/commodity/baltic',
     extractRe: /Baltic\s+(?:Dry|Exchange)[^0-9]*?(\d[\d,]*)/i,

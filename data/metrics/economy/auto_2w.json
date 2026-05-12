@@ -31,7 +31,11 @@
     "url": "https://fada.in/index.php/research-publication.php",
     "type": "Public",
     "frequency": "Monthly",
-    "parser": "press_release:fada_monthly_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:fada_monthly_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

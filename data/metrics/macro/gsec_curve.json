@@ -34,7 +34,12 @@
     "url": "https://www.fbil.org.in/",
     "type": "Official",
     "frequency": "Daily",
-    "parser": "json_api:ccil_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "json_api:ccil_v1",
+      "json_api:dbnomics_v1",
+      "html_scrape:tradingeconomics_v1"
+    ]
   },
   "source_crosscheck": [
     {

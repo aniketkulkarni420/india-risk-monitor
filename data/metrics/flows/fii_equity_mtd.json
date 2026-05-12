@@ -35,7 +35,12 @@
     "url": "https://www.nseindia.com/reports/fii-dii",
     "type": "Exchange",
     "frequency": "Daily",
-    "parser": "csv_download:nse_fii_dii_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "csv_download:nse_fii_dii_v1",
+      "html_render:moneycontrol_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

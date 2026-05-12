@@ -34,7 +34,11 @@
     "url": "https://www.drewry.co.uk/supply-chain-advisors/supply-chain-expertise/world-container-index-assessed-by-drewry",
     "type": "Public",
     "frequency": "Weekly",
-    "parser": "html_scrape:drewry_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "html_scrape:drewry_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

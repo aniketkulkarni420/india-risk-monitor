@@ -34,7 +34,12 @@
     "url": "https://www.lbma.org.uk/prices-and-data/precious-metal-prices",
     "type": "Public",
     "frequency": "Daily",
-    "parser": "json_api:public_gold_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "json_api:public_gold_v1",
+      "json_api:dbnomics_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

@@ -35,7 +35,11 @@
     "url": "https://www.rbi.org.in/Scripts/WSSView.aspx",
     "type": "Official",
     "frequency": "Weekly",
-    "parser": "json_api:rbi_wss_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "json_api:rbi_wss_v1",
+      "json_api:dbnomics_v1"
+    ]
   },
   "source_crosscheck": [
     {

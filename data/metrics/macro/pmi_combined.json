@@ -37,7 +37,12 @@
     "url": "https://www.spglobal.com/marketintelligence/en/mi/products/india-pmi.html",
     "type": "Public",
     "frequency": "Monthly",
-    "parser": "press_release:sp_pmi_india_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:sp_pmi_india_v1",
+      "html_scrape:tradingeconomics_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

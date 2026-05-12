@@ -37,7 +37,11 @@
     "url": "https://ppac.gov.in/prices/international-prices-of-crude-oil",
     "type": "Official",
     "frequency": "Daily",
-    "parser": "press_release:ppac_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:ppac_v1",
+      "html_scrape:tradingeconomics_v1"
+    ]
   },
   "source_crosscheck": [
     {

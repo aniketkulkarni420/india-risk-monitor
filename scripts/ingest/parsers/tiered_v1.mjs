@@ -10,6 +10,7 @@
 
 import { resolve as resolveParser } from '../registry.mjs';
 import { isInCooldown, recordSourceOutcome, checkAnomaly } from '../observability.mjs';
+import { chainDiversity, classOfParser } from '../source-origin.mjs';
 
 export async function fetchPrimary(metric) {
   const chain = metric?.source_primary?.tier_chain;
@@ -21,6 +22,9 @@ export async function fetchPrimary(metric) {
   const errors = [];
   let primaryResult = null;
   let primaryTier = null;
+
+  // Independence diversity check (Phase 4)
+  const diversity = chainDiversity(chain);
 
   for (let i = 0; i < chain.length; i++) {
     const parser_id = chain[i];
@@ -38,7 +42,17 @@ export async function fetchPrimary(metric) {
       const r = await parser.fetchPrimary(metric);
       if (r && typeof r.value === 'number' && Number.isFinite(r.value)) {
         try { recordSourceOutcome(cooldownKey, true); } catch {}
-        primaryResult = { ...r, parse_meta: { ...(r.parse_meta || {}), tier_used: parser_id, tier_index: i } };
+        primaryResult = {
+          ...r,
+          parse_meta: {
+            ...(r.parse_meta || {}),
+            tier_used: parser_id,
+            tier_index: i,
+            tier_origin_class: classOfParser(parser_id),
+            chain_diversity_distinct: diversity.distinct,
+            chain_all_same_class: diversity.allSameClass
+          }
+        };
         primaryTier = i;
         break;
       }

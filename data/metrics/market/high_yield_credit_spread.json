@@ -35,7 +35,11 @@
     "url": "https://www.crisil.com/en/home/our-businesses/research/data-and-analytics.html",
     "type": "Rating agency",
     "frequency": "Weekly",
-    "parser": "html_scrape:crisil_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "html_scrape:crisil_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

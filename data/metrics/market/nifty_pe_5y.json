@@ -34,7 +34,11 @@
     "url": "https://www.nseindia.com/products-services/indices-overview",
     "type": "Exchange",
     "frequency": "Daily",
-    "parser": "csv_download:nse_pe_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "csv_download:nse_pe_v1",
+      "html_scrape:tradingeconomics_v1"
+    ]
   },
   "source_crosscheck": [
     {

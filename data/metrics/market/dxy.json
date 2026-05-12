@@ -34,7 +34,11 @@
     "url": "https://finance.yahoo.com/quote/DX-Y.NYB",
     "type": "Aggregator",
     "frequency": "Live",
-    "parser": "json_api:public_dxy_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "json_api:public_dxy_v1",
+      "json_api:dbnomics_v1"
+    ]
   },
   "source_crosscheck": [
     {

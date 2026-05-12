@@ -35,7 +35,11 @@
     "url": "https://cwc.gov.in/en/reservoir-storage-content",
     "type": "Official",
     "frequency": "Weekly",
-    "parser": "json_api:cwc_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "json_api:cwc_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

@@ -35,7 +35,12 @@
     "url": "https://www.mospi.gov.in/iip",
     "type": "Official",
     "frequency": "Monthly",
-    "parser": "press_release:mospi_iip_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "press_release:mospi_iip_v1",
+      "pdf:eaindustry_ieci_v1",
+      "json_api:dbnomics_v1"
+    ]
   },
   "source_crosscheck": [
     {
