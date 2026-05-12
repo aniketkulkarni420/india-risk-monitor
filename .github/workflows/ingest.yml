@@ -84,6 +84,15 @@ jobs:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           # data.gov.in resource API (Step 7) — used for CPI / petroleum / structured datasets
           DATAGOVIN_API_KEY: ${{ secrets.DATAGOVIN_API_KEY }}
+          # CF Worker proxy — fallback for India-IP-restricted sources from cloud runners
+          CF_WORKER_URL: ${{ secrets.CF_WORKER_URL }}
+          CF_WORKER_TOKEN: ${{ secrets.WORKER_TOKEN }}
+          # Gmail IMAP — PIB / MoSPI / RBI email pipeline
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          # Telegram alerting (parser-health + anomalies)
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           if [ "${{ steps.slot.outputs.slot }}" = "all" ]; then
             npm run ingest -- --live --slot=all
