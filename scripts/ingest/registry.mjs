@@ -27,6 +27,7 @@ import * as moneycontrol_v1 from './parsers/moneycontrol_v1.mjs';
 import * as bse_v1 from './parsers/bse_v1.mjs';
 import * as nitter_v1 from './parsers/nitter_v1.mjs';
 import * as eaindustry_ieci_v1 from './parsers/eaindustry_ieci_v1.mjs';
+import * as web_llm_v1 from './parsers/web_llm_v1.mjs';
 import * as tiered_v1 from './parsers/tiered_v1.mjs';
 import * as dbnomics_v1 from './parsers/dbnomics_v1.mjs';
 import * as datagovin_v1 from './parsers/datagovin_v1.mjs';
@@ -120,6 +121,8 @@ const REAL = new Map([
   ['html_render:bse_v1', bse_v1],
   ['rss:nitter_v1', nitter_v1],
   ['pdf:eaindustry_ieci_v1', eaindustry_ieci_v1],
+  // Generic Playwright + LLM for any aggregator/broker site (added 2026-05-12)
+  ['html_render:web_llm_v1', web_llm_v1],
   // Tiered orchestrator -- tries multiple sub-parsers in priority order
   ['tiered:tiered_v1', tiered_v1],
 ]);

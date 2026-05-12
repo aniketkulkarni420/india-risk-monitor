@@ -36,6 +36,7 @@
     "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
+      "html_render:web_llm_v1",
       "html_render:bse_v1",
       "html_render:moneycontrol_v1",
       "llm:google_news_llm_v1"
