@@ -286,8 +286,20 @@ svg, img, video, canvas { max-width: 100%; }
 .bar-num { font-family: var(--mono); font-size: 13px; font-weight: 700; text-align: right; }
 .bar-num.pos { color: var(--green); }
 .bar-num.neg { color: var(--red); }
-/* Flow bands hint */
-.flow-bands { font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); margin: 2px 0 8px; font-style: italic; }
+/* Flow bands legend · sit under the shaded bar trio, tick markers indicate the zone boundaries */
+.flow-bands {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-3);
+  margin: 4px 32px 8px 38px;
+  letter-spacing: .02em;
+}
+.flow-band-tick { padding: 0 4px; }
+.flow-band-normal  { color: var(--green); }
+.flow-band-notable { color: var(--amber); }
+.flow-band-stress  { color: var(--red); }
 /* Absorption gauge */
 .absorb-gauge-wrap { margin: 8px 0 12px; }
 .absorb-gauge-label { font-family: var(--mono); font-size: 10px; color: var(--ink-3); margin-bottom: 4px; }
@@ -482,17 +494,40 @@ tr.tr-inline-expand > td {
   cursor: pointer;
   white-space: nowrap;
 }
+/* Labels: hidden by default to avoid overlap when events cluster.
+   Visible on hover/focus, and always for the "NOW" marker. */
 .timeline-strip-ev .timeline-strip-label {
   color: var(--ink-3);
   font-size: 8px;
   position: absolute;
-  top: 12px;
+  top: 14px;
   left: 50%;
   transform: translateX(-50%);
+  background: var(--surface-2);
+  padding: 2px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s;
+  z-index: 3;
 }
-.timeline-strip-ev:hover .timeline-strip-label { color: var(--ink-2); }
-.timeline-strip-ev.is-now { z-index: 2; }
-.timeline-strip-ev .timeline-strip-label.is-now { color: var(--accent); font-weight: 700; }
+.timeline-strip-ev:hover .timeline-strip-label,
+.timeline-strip-ev:focus-within .timeline-strip-label {
+  opacity: 1;
+  color: var(--ink);
+}
+.timeline-strip-ev.is-now { z-index: 4; }
+.timeline-strip-ev .timeline-strip-label.is-now {
+  opacity: 1; color: var(--accent); font-weight: 700; border-color: var(--accent);
+}
+/* Larger hover target for dots */
+.timeline-strip-ev::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  pointer-events: auto;
+}
 .timeline-strip-dot {
   width: 8px;
   height: 8px;
@@ -1888,6 +1923,61 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
   background: rgba(233, 196, 102, 0.12);
   color: var(--amber);
   border: 1px solid rgba(233, 196, 102, 0.25);
+  margin-right: 4px;
+  white-space: nowrap;
+}
+/* Collapsed cumulative chart in Flows · V60 "lower priority" */
+.flows-cumulative-collapse {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin: 8px 0;
+}
+.flows-cumulative-collapse > summary {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+  letter-spacing: .04em;
+  padding: 10px 14px;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.flows-cumulative-collapse > summary::before { content: "▸ "; color: var(--ink-3); margin-right: 6px; }
+.flows-cumulative-collapse[open] > summary::before { content: "▾ "; color: var(--accent); }
+.flows-cumulative-collapse[open] { padding-bottom: 14px; }
+.flows-cumulative-collapse > svg,
+.flows-cumulative-collapse > .viz-wrap { margin: 0 14px; }
+
+/* Cumulative line · thin-history placeholder */
+.cl-thin {
+  background: var(--surface-2);
+  border: 1px dashed var(--line-2);
+  border-radius: 6px;
+  padding: 16px 18px;
+  margin: 8px 0;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.cl-thin .cl-title { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 8px; }
+.cl-thin .cl-thin-msg { font-style: italic; }
+
+.stuck-pill {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(139, 183, 216, 0.12);
+  color: var(--blue);
+  border: 1px solid rgba(139, 183, 216, 0.25);
   margin-right: 4px;
   white-space: nowrap;
 }

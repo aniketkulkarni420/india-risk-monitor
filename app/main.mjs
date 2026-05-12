@@ -746,7 +746,7 @@ function renderClusterCards(metrics, opts = {}) {
     }).filter(Boolean);
     const card = el('div', {
       class: 'cluster-card-cell',
-      onclick: () => openDrawer(m)
+      onclick: () => openDrawer(m.metric_id)
     }, [
       el('div', { class: 'cc-cell-label' }, m.display_name.replace(/ collection| levels| loading| demand| arrivals| value| Index| traffic| retail registrations| retail| \(.*\)/g, '').slice(0, 22)),
       el('div', { class: 'cc-cell-value' }, [
@@ -837,10 +837,10 @@ const last5Net = 4291;
 const periods = ['today', '5sess', 'mtd', 'cytd'];
 let activePeriod = 'mtd';
 const periodData = {
-  today: { label: 'Today', net: todayNet, fii: fiiVal(fiiDay, -2103), dii: fiiVal(diiDay, 1712), sub: 'net ₹ Cr · 1 session', narrative: 'Single-session read · use period tabs above for cumulative picture.' },
-  '5sess': { label: 'Last 5 sessions', net: last5Net, fii: -12400, dii: 16691, sub: 'net ₹ Cr · 5d avg', narrative: 'Short-window absorption pattern · 5-day net positive despite FII selling.' },
-  mtd: { label: 'MTD · ' + (fiiMtd?.as_of ? formatAsOf(fiiMtd.as_of) : 'May 2026'), net: mtdNet, fii: fiiVal(fiiMtd, -14305), dii: fiiVal(diiMtdH, 18596), sub: 'net ₹ Cr · absorption ' + (absorpM ? absorpM.value.toFixed(2) + '×' : '—'), narrative: _absRatio != null && _absRatio >= 1 ? `DII covering ${_absPct}% of FII selling. Stable regime · becomes stress if FII intensifies AND DII slows.` : `DII covering ${_absPct ?? '—'}% of FII outflow. Becomes "stress" if FII selling intensifies AND DII slows simultaneously.` },
-  cytd: { label: 'CYTD · ' + new Date().getFullYear(), net: cytdNet, fii: fiiVal(fiiCytdH, -42180), dii: diiCytdH, sub: 'net ₹ Cr · year-to-date', narrative: 'Calendar-year cumulative · structural pattern. Net positive YTD on DII strength.' }
+  today: { label: 'Today', net: todayNet, fii: fiiVal(fiiDay, -2103), dii: fiiVal(diiDay, 1712), sub: 'net ₹ Cr · 1 session', focusedHeader: 'Today · ' + (fiiDay?.as_of ? formatAsOf(fiiDay.as_of) : ''), narrative: 'Single-session read · use period tabs above for cumulative picture.' },
+  '5sess': { label: 'Weekly', net: last5Net, fii: -12400, dii: 16691, sub: 'net ₹ Cr · 5d avg', focusedHeader: 'Weekly · last 5 sessions', narrative: 'Short-window absorption pattern · 5-day net positive despite FII selling.' },
+  mtd: { label: 'MTD', net: mtdNet, fii: fiiVal(fiiMtd, -14305), dii: fiiVal(diiMtdH, 18596), sub: 'net ₹ Cr · absorption ' + (absorpM ? absorpM.value.toFixed(2) + '×' : '—'), focusedHeader: 'MTD · ' + (fiiMtd?.as_of ? formatAsOf(fiiMtd.as_of) : 'May 2026'), narrative: _absRatio != null && _absRatio >= 1 ? `DII covering ${_absPct}% of FII selling. Stable regime · becomes stress if FII intensifies AND DII slows.` : `DII covering ${_absPct ?? '—'}% of FII outflow. Becomes "stress" if FII selling intensifies AND DII slows simultaneously.` },
+  cytd: { label: 'CYTD', net: cytdNet, fii: fiiVal(fiiCytdH, -42180), dii: diiCytdH, sub: 'net ₹ Cr · year-to-date', focusedHeader: 'CYTD · ' + new Date().getFullYear(), narrative: 'Calendar-year cumulative · structural pattern. Net positive YTD on DII strength.' }
 };
 
 const periodTabsHost = el('div', {});
@@ -858,7 +858,7 @@ function renderFlowsActive() {
   })), (id) => { activePeriod = id; renderFlowsActive(); }));
   focusedHost.innerHTML = '';
   focusedHost.appendChild(renderFlowsFocused({
-    period_label: p.label,
+    period_label: p.focusedHeader || p.label,
     period_sub: _absRatio != null ? `Absorption ${_absRatio.toFixed(2)}× · 8 sessions` : '',
     fii: { value: p.fii, formatted: inrFmt(p.fii), sub: 'NSE FII bhavcopy' },
     dii: { value: p.dii, formatted: inrFmt(p.dii), sub: 'AMFI MF flows' },
@@ -877,7 +877,7 @@ if (fnoOi && fnoOi.sparkline_12m) {
   flowsBody.appendChild(renderPersistenceBar(last5));
 }
 
-// Cumulative chart kept · de-emphasized · could be hidden via "Show more" in future
+// Cumulative chart · V60 says "kept · lower priority" · collapsed by default
 const diiCumPoints = [
   { label: 'Jan 1', value: 0 }, { label: 'Feb 1', value: 28000 }, { label: 'Mar 1', value: 58000 },
   { label: 'Apr 1', value: 84000 }, { label: 'Apr 28', value: 95000 }
@@ -886,10 +886,14 @@ const fiiCumPoints = [
   { label: 'Jan 1', value: 0 }, { label: 'Feb 1', value: -10000 }, { label: 'Mar 1', value: -22000 },
   { label: 'Apr 1', value: -32000 }, { label: 'Apr 28', value: -42180 }
 ];
-flowsBody.appendChild(renderCumulativeLine([
-  { name: 'DII cumulative', color: 'var(--green)', points: diiCumPoints, current: '+95,000 Cr' },
-  { name: 'FII cumulative', color: 'var(--red)', points: fiiCumPoints, current: '−42,180 Cr' }
-], { title: 'FII vs DII · cumulative ₹ Cr · 2026 YTD', summary: 'Net market: ' + inrFmt(netCytd) + ' · DII pulling away', asof: '1 Jan – 5 May 2026' }));
+const cumDetails = el('details', { class: 'flows-cumulative-collapse' }, [
+  el('summary', {}, 'Cumulative chart · 2026 YTD · ' + inrFmt(netCytd) + ' net market'),
+  renderCumulativeLine([
+    { name: 'DII cumulative', color: 'var(--green)', points: diiCumPoints, current: '+95,000 Cr' },
+    { name: 'FII cumulative', color: 'var(--red)', points: fiiCumPoints, current: '−42,180 Cr' }
+  ], { title: 'FII vs DII · cumulative ₹ Cr · 2026 YTD', summary: 'Net market: ' + inrFmt(netCytd) + ' · DII pulling away', asof: '1 Jan – 5 May 2026' })
+]);
+flowsBody.appendChild(cumDetails);
 
 // Sectoral diverging bars REMOVED per Aniket 2026-05-12 decision · was mock data, no NSDL parser yet.
 
@@ -1276,10 +1280,23 @@ body.appendChild(renderSectionFrame({
 const freightBody = el('div', { class: 'section-body-stack' });
 
 // Hormuz cliff (kept from prior)
+// Plausibility guard · suppress MoM/YoY display when sparkline has < 4 unique
+// values AND |trend| > 200% — math is correct but semantically meaningless.
+// Show "history accruing" instead.
+function trendIsTrustworthy(m, trendValue) {
+  if (trendValue == null) return false;
+  if (Math.abs(trendValue) <= 200) return true;
+  const sl = m.sparkline_12m || [];
+  const uniq = new Set(sl.filter(v => typeof v === 'number')).size;
+  return uniq >= 4;
+}
+
 function buildHormuzPrimary() {
   const m = M('hormuz_throughput');
   if (!m) return null;
   const wrap = el('div', { class: 'hormuz-primary', onclick: () => openDrawer('hormuz_throughput') });
+  const showMom = trendIsTrustworthy(m, m.mom_pct);
+  const showYoy = trendIsTrustworthy(m, m.yoy_pct);
   wrap.appendChild(el('div', { class: 'hp-head' }, [
     el('div', {}, [
       el('div', { class: 'hp-eyebrow' }, '⚠ Shock · Strait of Hormuz throughput'),
@@ -1290,11 +1307,15 @@ function buildHormuzPrimary() {
           ['Normal baseline: ', el('b', {}, m.baseline_30d || '—')])
       ]),
       el('div', { class: 'hp-trends' }, [
-        el('span', {}, ['MoM ', el('b', {}, formatTrend(m.mom_pct))]),
-        el('span', {}, ['YoY ', el('b', {}, formatTrend(m.yoy_pct))]),
+        showMom
+          ? el('span', {}, ['MoM ', el('b', {}, formatTrend(m.mom_pct))])
+          : el('span', { style: { color: 'var(--ink-3)', fontStyle: 'italic' }, title: 'Sparkline has <4 unique values · MoM math unreliable' }, 'history accruing'),
+        showYoy
+          ? el('span', {}, ['YoY ', el('b', {}, formatTrend(m.yoy_pct))])
+          : null,
         el('span', {}, ['% of normal ',
           el('b', {}, ((m.value / (m.baseline_30d || 1)) * 100).toFixed(1) + '%')])
-      ])
+      ].filter(Boolean))
     ]),
     el('div', { style: { textAlign: 'right' } }, [
       el('span', { class: 'pill pill-shock' }, 'SHOCK'),

@@ -128,6 +128,24 @@ export function renderPersistenceChips(chips) {
 // ──────────────────────────────────────────────────────────────
 export function renderCumulativeLine(series, opts = {}) {
   const { width = 600, height = 200, padTop = 20, padBottom = 30, padLeft = 50, padRight = 20, title } = opts;
+  // Guard · if every series has <4 unique values, the chart will render a flat
+  // line that fakes a trend. Show "history accruing" placeholder instead.
+  const allThin = series.every(s => {
+    const pts = (s.points || []).map(p => p.value).filter(v => typeof v === 'number');
+    return new Set(pts).size < 4;
+  });
+  if (allThin) {
+    const wrap = el('div', { class: 'cl-thin' }, [
+      title ? el('div', { class: 'cl-title' }, title) : null,
+      el('div', { class: 'cl-thin-msg' }, [
+        el('div', { style: { fontSize: '12px', color: 'var(--ink-2)' } }, 'history accruing'),
+        el('div', { style: { fontSize: '10.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '4px' } },
+          'Need ≥4 unique values to render trend · ' + series.map(s => s.name + ': ' + (s.current || '—')).join(' · ')),
+        opts.summary ? el('div', { style: { fontSize: '11px', color: 'var(--ink-3)', marginTop: '6px' } }, opts.summary) : null
+      ].filter(Boolean))
+    ].filter(Boolean));
+    return wrap;
+  }
   const innerW = width - padLeft - padRight;
   const innerH = height - padTop - padBottom;
 
@@ -504,26 +522,48 @@ export function renderFlowsFocused(data) {
         data.net.sub ? el('div', { class: 'flow-cell-sub' }, data.net.sub) : null
       ].filter(Boolean))
     ]),
-    // ★ Bar trio · the chart Aniket loved
-    el('div', { class: 'bar-trio' }, [
-      el('div', { class: 'bar-row' }, [
-        el('span', { class: 'bar-label' }, 'FII'),
-        el('div', { class: 'bar-track' }, [el('div', { class: 'bar-fill bf-red', style: { width: pct(data.fii.value) + '%' } })]),
-        el('span', { class: 'bar-num neg' }, formatNumberShort(data.fii.value))
-      ]),
-      el('div', { class: 'bar-row' }, [
-        el('span', { class: 'bar-label' }, 'DII'),
-        el('div', { class: 'bar-track' }, [el('div', { class: 'bar-fill bf-green', style: { width: pct(data.dii.value) + '%' } })]),
-        el('span', { class: 'bar-num pos' }, formatNumberShort(data.dii.value))
-      ]),
-      el('div', { class: 'bar-row' }, [
-        el('span', { class: 'bar-label' }, 'Net'),
-        el('div', { class: 'bar-track' }, [el('div', { class: 'bar-fill ' + (data.net.value >= 0 ? 'bf-green' : 'bf-red'), style: { width: pct(data.net.value) + '%' } })]),
-        el('span', { class: 'bar-num ' + (data.net.value >= 0 ? 'pos' : 'neg') }, formatNumberShort(data.net.value))
-      ])
+    // ★ Bar trio with magnitude band shaded zones BEHIND the track
+    // Zones are computed relative to the largest bar (max) and the absolute thresholds
+    // ±2k normal · ±5k notable · ±15k stress. Renders as 3 background tints.
+    (() => {
+      const pct2k  = max ? Math.min(100, (2000  / max) * 100) : 13;
+      const pct5k  = max ? Math.min(100, (5000  / max) * 100) : 33;
+      const pct15k = max ? Math.min(100, (15000 / max) * 100) : 100;
+      const trackBg = `linear-gradient(90deg,
+        rgba(127,201,154,.08) 0%, rgba(127,201,154,.08) ${pct2k}%,
+        rgba(233,196,102,.08) ${pct2k}%, rgba(233,196,102,.08) ${pct5k}%,
+        rgba(232,136,136,.10) ${pct5k}%, rgba(232,136,136,.10) ${pct15k}%,
+        rgba(232,136,136,.20) ${pct15k}%, rgba(232,136,136,.20) 100%)`;
+      return el('div', { class: 'bar-trio' }, [
+        el('div', { class: 'bar-row' }, [
+          el('span', { class: 'bar-label' }, 'FII'),
+          el('div', { class: 'bar-track', style: { background: trackBg } }, [
+            el('div', { class: 'bar-fill bf-red', style: { width: pct(data.fii.value) + '%' } })
+          ]),
+          el('span', { class: 'bar-num neg' }, formatNumberShort(data.fii.value))
+        ]),
+        el('div', { class: 'bar-row' }, [
+          el('span', { class: 'bar-label' }, 'DII'),
+          el('div', { class: 'bar-track', style: { background: trackBg } }, [
+            el('div', { class: 'bar-fill bf-green', style: { width: pct(data.dii.value) + '%' } })
+          ]),
+          el('span', { class: 'bar-num pos' }, formatNumberShort(data.dii.value))
+        ]),
+        el('div', { class: 'bar-row' }, [
+          el('span', { class: 'bar-label' }, 'Net'),
+          el('div', { class: 'bar-track', style: { background: trackBg } }, [
+            el('div', { class: 'bar-fill ' + (data.net.value >= 0 ? 'bf-green' : 'bf-red'), style: { width: pct(data.net.value) + '%' } })
+          ]),
+          el('span', { class: 'bar-num ' + (data.net.value >= 0 ? 'pos' : 'neg') }, formatNumberShort(data.net.value))
+        ])
+      ]);
+    })(),
+    // Band legend · tiny tick labels under the bar trio
+    el('div', { class: 'flow-bands' }, [
+      el('span', { class: 'flow-band-tick flow-band-normal' }, '±2k normal'),
+      el('span', { class: 'flow-band-tick flow-band-notable' }, '±5k notable'),
+      el('span', { class: 'flow-band-tick flow-band-stress' }, '±15k stress')
     ]),
-    // Magnitude band hint chip
-    el('div', { class: 'flow-bands' }, '±2k normal · ±5k notable · ±15k stress'),
     // Absorption gauge (0 → 1.5× scale)
     data.absorption != null ? renderAbsorptionGauge(data.absorption) : null,
     // Narrative

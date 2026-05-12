@@ -147,6 +147,44 @@ for (const file of walk(DATA)) {
     trimFlatTail(data);
     if (data._sparkline_sanitized || data._sparkline_tail_trimmed) sparklineSanitized++;
 
+    // 2026-05-12 · Plausibility · when sparkline has <4 unique values, MoM/YoY
+    // math is technically valid but semantically meaningless (e.g. Hormuz [2, 84]
+    // → +4117% MoM). Drop trend percentages so renderer shows "history accruing".
+    {
+      const sl = data.sparkline_12m || [];
+      const uniq = new Set(sl.filter(v => typeof v === 'number')).size;
+      const trendCap = 200; // any |trend| above this with thin history is suspect
+      if (uniq < 4) {
+        if (typeof data.mom_pct === 'number' && Math.abs(data.mom_pct) > trendCap) {
+          data._mom_pct_suppressed = data.mom_pct;
+          data.mom_pct = null;
+        }
+        if (typeof data.yoy_pct === 'number' && Math.abs(data.yoy_pct) > trendCap) {
+          data._yoy_pct_suppressed = data.yoy_pct;
+          data.yoy_pct = null;
+        }
+        if (data._mom_pct_suppressed || data._yoy_pct_suppressed) {
+          data._history_accruing = true;
+        }
+      }
+    }
+
+    // 2026-05-12 · Value-stuck detector · when the metric's most-recent N history
+    // entries all match the current value AND it's not a slow-moving metric, flag.
+    // The freshness rule (is_stale) checks age vs cadence but misses parsers that
+    // re-publish the same number every cycle.
+    if (Array.isArray(data.sparkline_12m) && data.sparkline_12m.length >= 3) {
+      const slowMoving = ['repo_rate', 'cad_pct_gdp', 'fiscal_deficit_pct', 'cpi_inflation', 'wpi_inflation', 'iip_growth', 'pmi_combined'];
+      if (!slowMoving.includes(data.metric_id)) {
+        const tail = data.sparkline_12m.slice(-7).filter(v => typeof v === 'number');
+        const allSame = tail.length >= 3 && tail.every(v => v === data.value);
+        if (allSame) {
+          data.is_value_stuck = true;
+          data._value_stuck_count = tail.length;
+        }
+      }
+    }
+
     // Plausibility guard · runs BEFORE dod compute. If today's value is wildly
     // off from yesterday's (e.g. INR/USD jumping 14% in a day), roll back to
     // yesterday's value to avoid showing a screenshot-bait number on the live site.

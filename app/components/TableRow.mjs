@@ -152,6 +152,7 @@ function errorRow(metric_id, msg = 'fetch error') {
 
 export function renderTableRow(metric, opts = {}) {
   const state = rowDetectState(metric, opts.state);
+  const hideSpark = !!opts.hideSpark;
 
   if (state === 'loading') return rowSkeleton();
   if (state === 'error')   return errorRow(metric?.metric_id, opts.errorMessage);
@@ -210,7 +211,7 @@ export function renderTableRow(metric, opts = {}) {
     ]),
     el('td', { class: 'num' }, formatValue(metric.value, metric.value_format, metric.unit)),
     ...trendCells,
-    el('td', { class: 'spark-cell' }, [
+    hideSpark ? null : el('td', { class: 'spark-cell' }, [
       // Only render the sparkline when there's real history (≥4 unique values).
       // Otherwise show a "data verifying" progress badge to be honest about
       // V1 data depth + signal that the platform is improving in real time.
@@ -267,6 +268,11 @@ export function renderTableRow(metric, opts = {}) {
         class: 'stale-pill',
         title: `Last updated ${metric.age_days}d ago · expected refresh every ${metric.cadence_days}d. Source ingest may be lagging or upstream publication delayed.`
       }, 'STALE ' + metric.age_days + 'd') : null,
+      // STUCK pill · value hasn't changed for N readings (parser republishing same number)
+      metric.is_value_stuck ? el('span', {
+        class: 'stuck-pill',
+        title: `Value unchanged for last ${metric._value_stuck_count || 'N'} readings. Parser may be re-publishing cached value · upstream may be paused · or this metric genuinely hasn't moved.`
+      }, 'STUCK') : null,
       (() => {
         // 10B: status pill with direction
         const pd = pillWithDirection(metric);
@@ -283,13 +289,17 @@ export function renderTableRow(metric, opts = {}) {
 
 // Helper for header row
 export function renderTableHeader(opts = {}) {
-  const labels = opts.labels || ['Metric', 'Current', 'MoM', 'YoY', '12m', 'Status'];
+  const hideSpark = !!opts.hideSpark;
+  const defaults = hideSpark
+    ? ['Metric', 'Current', 'MoM', 'YoY', 'Status']
+    : ['Metric', 'Current', 'MoM', 'YoY', '12m', 'Status'];
+  const labels = opts.labels || defaults;
   return el('tr', {}, [
     el('th', {}, labels[0]),
     el('th', { style: { textAlign: 'right' } }, labels[1]),
     el('th', { style: { textAlign: 'right' } }, labels[2]),
     el('th', { style: { textAlign: 'right' } }, labels[3]),
     el('th', { style: { textAlign: 'right' } }, labels[4]),
-    el('th', { style: { textAlign: 'right' } }, labels[5])
-  ]);
+    labels[5] ? el('th', { style: { textAlign: 'right' } }, labels[5]) : null
+  ].filter(Boolean));
 }

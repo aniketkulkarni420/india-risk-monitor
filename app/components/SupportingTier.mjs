@@ -128,11 +128,13 @@ export function renderSupportingTier(metricIds, M, opts = {}) {
 
   const body = el('div', { class: 'st-body' });
   const table = el('table', { class: 'metric-table' });
+  // 2026-05-12 · Aniket rule · no sparkline column in supporting tier · click row → 9D inline expand reveals sparkline
   const thead = el('thead', {}, [renderTableHeader({
-    labels: ['Metric', 'Current', 'Trend', 'Trend', '12m', 'Status']
+    labels: ['Metric', 'Current', 'Trend', 'Trend', 'Status'],
+    hideSpark: true
   })]);
   const tbody = el('tbody');
-  allMetrics.forEach(m => tbody.appendChild(renderTableRow(m)));
+  allMetrics.forEach(m => tbody.appendChild(renderTableRow(m, { hideSpark: true })));
   table.appendChild(thead);
   table.appendChild(tbody);
   body.appendChild(table);
