@@ -121,7 +121,7 @@
       "last_failure_reason": "pib_search: no matching PIB releases for wacr_repo_spread (ministries 14,16) · feed-counts: {\"14\":{\"totalSeen\":0,\"urlUsed\":null},\"16\":{\"totalSeen\":0,\"urlUsed\":null}}",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-12T01:13:43.958Z",
+      "last_success_at": "2026-05-12T01:24:27.459Z",
       "last_success_value": -5
     },
     "inr_usd": {
@@ -153,11 +153,11 @@
       "last_failure_reason": "pib_search: no matching PIB releases for india_port_dwell_time (ministries 63,16) · feed-counts: {\"16\":{\"totalSeen\":0,\"urlUsed\":null},\"63\":{\"totalSeen\":0,\"urlUsed\":null}}",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-12T01:14:01.166Z",
+      "last_success_at": "2026-05-12T01:24:43.738Z",
       "last_success_value": 0.94
     },
     "india_crude_basket": {
-      "last_success_at": "2026-05-12T01:15:03.128Z",
+      "last_success_at": "2026-05-12T01:27:44.647Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green"
@@ -205,7 +205,7 @@
       "last_failure_reason": "google_news_rss: empty feed for \"UPI transactions value lakh crore May 2026 OR April 2026\"",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-12T01:15:00.448Z",
+      "last_success_at": "2026-05-12T01:27:41.899Z",
       "last_success_value": 29.53
     },
     "pol_demand": {
@@ -213,7 +213,7 @@
       "last_failure_reason": "pol_demand: 1 candidates, none yielded value · https://news.google.com/rss/articles/CBMiW0FVX3lxTFBzZ3hYcVF: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-12T01:13:49.367Z",
+      "last_success_at": "2026-05-12T01:24:32.880Z",
       "last_success_value": 19.3
     },
     "air_pax": {
@@ -221,7 +221,7 @@
       "last_failure_reason": "air_pax: all sources failed [https://www.dgca.gov.in/digigov-portal/?nq=qHE4MM%2BFwSPaUnbl0Wqejg%3D%3D: no match | https://pib.gov.in/AllRelease.aspx?MinCode=03: no match]",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-12T01:13:51.076Z",
+      "last_success_at": "2026-05-12T01:24:34.730Z",
       "last_success_value": 132.67
     },
     "iip_growth": {
@@ -243,7 +243,7 @@
       "status": "green"
     },
     "naukri_jobspeak": {
-      "last_success_at": "2026-05-12T01:15:14.560Z",
+      "last_success_at": "2026-05-12T01:27:52.736Z",
       "last_success_value": 2858,
       "consecutive_failures": 0,
       "status": "green"
@@ -253,7 +253,7 @@
       "last_failure_reason": "cement_dispatches: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMiggFBVV95cUxPNFplNDZ: 3.89 out of band | https://news.google.com/rss/articles/CBMimAFBVV95cUxPOXA0S2l: All LLM providers failed: groq: returned no",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-12T01:14:57.589Z",
+      "last_success_at": "2026-05-12T01:27:39.250Z",
       "last_success_value": 40.4
     },
     "steel_consumption": {
@@ -273,26 +273,28 @@
       "last_failure_reason": "eway_bills: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMihgFBVV95cUxQWXk5WDZ: 90 out of band | https://news.google.com/rss/articles/CBMixwFBVV95cUxQQnZoRHF: 133.3 out of band",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-12T01:14:16.977Z",
+      "last_success_at": "2026-05-12T01:25:00.871Z",
       "last_success_value": 90
     },
     "fastag_toll": {
-      "last_failure_at": "2026-05-12T01:14:28.048Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · rss:nitter_v1: nitter_v1: all 6 mirrors failed for @nitin_gadkari · https://nitter.tiekoetter.com: no tweets parsed | llm:google_news_llm_v1: google_news_llm: 49 items, none passed filters",
-      "consecutive_failures": 10,
+      "last_failure_at": "2026-05-12T01:26:08.461Z",
+      "last_failure_reason": "tiered: all 1 tiers failed · llm:google_news_llm_v1: fastag_toll: 6 candidates, none yielded value · https://news.google.com/rss/articles/CBMivgFBVV95cUx",
+      "consecutive_failures": 11,
       "status": "red"
     },
     "rail_freight": {
-      "last_failure_at": "2026-05-12T01:14:37.429Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · rss:nitter_v1: nitter_v1: all 6 mirrors failed for @AshwiniVaishnaw · https://nitter.tiekoetter.com: no tweets pars | llm:google_news_llm_v1: google_news_llm: 52 items, none passed filters",
-      "consecutive_failures": 10,
+      "last_failure_at": "2026-05-12T01:27:14.487Z",
+      "last_failure_reason": "tiered: all 1 tiers failed · llm:google_news_llm_v1: rail_freight: 6 candidates, none yielded value · https://news.google.com/rss/articles/CBMisAFBVV95cU",
+      "consecutive_failures": 11,
       "status": "red"
     },
     "port_cargo": {
       "last_failure_at": "2026-05-12T01:14:53.283Z",
       "last_failure_reason": "tiered: all 2 tiers failed · rss:nitter_v1: nitter_v1: all 6 mirrors failed for @sarbananda_sonowal · https://nitter.tiekoetter.com: no tweets p | llm:google_news_llm_v1: port_cargo: 1 candidates, none yielded value · https://news.google.co",
-      "consecutive_failures": 10,
-      "status": "red"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-12T01:27:32.927Z",
+      "last_success_value": 62.11
     },
     "fiscal_deficit_pct": {
       "last_success_at": "2026-05-11T05:01:26.626Z",
@@ -333,13 +335,15 @@
     "fno_oi_buildup": {
       "last_failure_at": "2026-05-12T01:17:03.019Z",
       "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: moneycontrol_v1: all 2 URLs failed · https://www.moneycontrol.com/markets/indian-indices/changeinoi. | html_render:playwright_render_v1: fno_oi_buildup: playwright failed [https://ww",
-      "consecutive_failures": 2,
-      "status": "red"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-12T01:29:52.123Z",
+      "last_success_value": 9.38
     },
     "block_deals_notional": {
-      "last_failure_at": "2026-05-12T01:17:31.704Z",
+      "last_failure_at": "2026-05-12T01:30:39.231Z",
       "last_failure_reason": "tiered: all 3 tiers failed · html_render:bse_v1: bse_v1: all 2 URLs failed · https://www.bseindia.com/markets/equity/EQReports/BlockDeals.aspx: All L | html_render:moneycontrol_v1: moneycontrol_v1: all 1 URLs failed · https://www.moneycontr",
-      "consecutive_failures": 2,
+      "consecutive_failures": 3,
       "status": "red"
     },
     "fpi_debt_flows": {
@@ -347,15 +351,15 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: moneycontrol_v1: all 1 URLs failed · https://www.moneycontrol.com/stocks/marketstats/fii_fpi.php: re | html_render:bse_v1: bse_v1: all 1 URLs failed · https://www.bseindia.com/market",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-12T01:19:00.050Z",
+      "last_success_at": "2026-05-12T01:32:10.433Z",
       "last_success_value": 1
     }
   },
   "summary": {
-    "green": 50,
+    "green": 52,
     "amber": 0,
-    "red": 5,
+    "red": 3,
     "total": 55
   },
-  "generated_at": "2026-05-12T01:19:00.050Z"
+  "generated_at": "2026-05-12T01:32:10.433Z"
 }
