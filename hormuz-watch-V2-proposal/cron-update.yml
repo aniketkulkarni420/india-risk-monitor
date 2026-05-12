@@ -1,0 +1,47 @@
+name: Hormuz · hourly snapshot refresh
+
+# Calls /api/cron-update on the deployed CF Pages site every hour.
+# That function fetches EIA + GFW + AISHub in parallel and writes a fresh
+# snapshot to CF KV. /api/snapshot reads from KV.
+#
+# Required GitHub repo secret:
+#   CRON_SECRET · matches the CRON_SECRET env var in CF Pages project settings
+#
+# Free-tier note: GitHub Actions free minutes are 2000/month for public repos
+# (unlimited for private repos that aren't private). This workflow uses ~1
+# minute per run × 24 runs/day × 30 days = 720 min/month · well within free.
+
+on:
+  schedule:
+    # Every hour at minute 7 · offset to avoid the top-of-hour rush
+    - cron: '7 * * * *'
+  workflow_dispatch:
+    # Manual trigger for testing
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Trigger /api/cron-update on hormuz-watch
+        run: |
+          STATUS=$(curl -sS -o /tmp/cron-out.json -w "%{http_code}" \
+            -X POST \
+            -H "X-Cron-Secret: ${{ secrets.CRON_SECRET }}" \
+            "https://hormuz-watch-7cd.pages.dev/api/cron-update")
+
+          echo "HTTP $STATUS"
+          cat /tmp/cron-out.json
+
+          if [ "$STATUS" != "200" ]; then
+            echo "::error::cron-update returned $STATUS"
+            exit 1
+          fi
+
+          # Surface live source count to logs
+          LIVE_COUNT=$(jq -r '.live_source_count // "?"' /tmp/cron-out.json)
+          IS_STATIC=$(jq -r '.is_static // "?"' /tmp/cron-out.json)
+          echo "live_source_count=$LIVE_COUNT  is_static=$IS_STATIC"
+
+          # Fail loudly if STILL static after 24h of cron — but don't fail single runs
+          # (one bad fetch is OK · sustained staticness gets surfaced via dashboard pill)

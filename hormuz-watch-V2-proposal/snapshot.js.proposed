@@ -1,0 +1,111 @@
+// Cloudflare Pages Function — Hormuz state snapshot for downstream consumers.
+//
+// V2 patch · 2026-05-12 · Adds KV-first read for the snapshot payload while
+// preserving the existing OIL_KV BDTI lookup. When the cron has populated
+// OIL_KV key `hormuz:snapshot:latest`, this returns the cron-cached values.
+// Otherwise falls back to env-var-overridable hardcoded values (V1 behavior).
+//
+// India Risk Monitor polls this endpoint hourly. The `is_static` + `source`
+// fields are how IRM detects whether to show the PROVISIONAL pill on Hero.
+
+const SNAPSHOT_KV_KEY = "hormuz:snapshot:latest";
+
+export async function onRequestGet({ request, env }) {
+  const url = new URL(request.url);
+  const debug = url.searchParams.get("debug") === "1";
+
+  // V2 · try reading the cron-written snapshot first
+  if (env.OIL_KV) {
+    try {
+      const raw = await env.OIL_KV.get(SNAPSHOT_KV_KEY);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        if (cached && typeof cached.daily_transit_estimate === "number") {
+          const ageMin = cached.fetched_at
+            ? Math.round((Date.now() - new Date(cached.fetched_at).getTime()) / 60000)
+            : null;
+          return json({
+            ...cached,
+            as_of: new Date().toISOString(),
+            cache_age_minutes: ageMin,
+            source: cached.is_static
+              ? "hormuz-watch · V2 cron · static fallback (no live sources)"
+              : (cached.source || "hormuz-watch · V2 cron")
+          });
+        }
+      }
+    } catch { /* fall through to V1 */ }
+  }
+
+  // V1 fallback · env-var overrides + hardcoded values + BDTI from KV
+  const transits24h = numFromEnv(env.HORMUZ_TRANSITS_24H, 84);
+  const baseline = numFromEnv(env.HORMUZ_BASELINE_30D, 140);
+  const inbound = numFromEnv(env.HORMUZ_INBOUND, 38);
+  const outbound = numFromEnv(env.HORMUZ_OUTBOUND, 42);
+  const dark = numFromEnv(env.HORMUZ_DARK, 947);
+
+  // BDTI: existing OIL_KV lookup · preserved as-is
+  let bdti = numFromEnv(env.HORMUZ_BDTI, 14);
+  let bdti_as_of = null;
+  let bdti_stale = false;
+  if (env.OIL_KV) {
+    try {
+      const raw = await env.OIL_KV.get("bdti_latest");
+      if (raw) {
+        const kv = JSON.parse(raw);
+        if (kv && kv.value) {
+          bdti = kv.value;
+          bdti_as_of = kv.asOf || null;
+          const ageDays = Math.floor((Date.now() - (kv.ts || 0) * 1000) / 86400000);
+          bdti_stale = ageDays > 9;
+        }
+      }
+    } catch { /* fall back to env default */ }
+  }
+
+  const totalActive = inbound + outbound;
+  const pctOfNormal = +((transits24h / baseline) * 100).toFixed(1);
+
+  const payload = {
+    as_of: new Date().toISOString(),
+    daily_transit_estimate: transits24h,
+    transits_per_day: transits24h,
+    vessel_count_inbound: inbound,
+    vessel_count_outbound: outbound,
+    total_active: totalActive,
+    baseline_30d: baseline,
+    pct_of_normal: pctOfNormal,
+    dark_vessels: dark,
+    bdti: bdti,
+    bdti_as_of: bdti_as_of,
+    bdti_stale: bdti_stale,
+    oil_transit_value_usd_per_day: 1120000000,
+    incidents_30d: 58,
+    india_import_dependency_pct: 58.0,
+    is_static: true,
+    live_source_count: 0,
+    source: "hormuz-watch · static snapshot · v1 (KV cron not yet populated)",
+    upgrade_note: debug
+      ? "V2 cron writes OIL_KV key 'hormuz:snapshot:latest' every hour via /api/cron-update. Configure GH Actions cron + CRON_SECRET to populate."
+      : undefined
+  };
+
+  return json(payload, 200);
+}
+
+function numFromEnv(envVar, fallback) {
+  if (envVar == null || envVar === "") return fallback;
+  const n = Number(envVar);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function json(obj, status = 200) {
+  return new Response(JSON.stringify(obj, null, 2), {
+    status,
+    headers: {
+      "content-type": "application/json",
+      "cache-control": "public, max-age=300, s-maxage=300",
+      "access-control-allow-origin": "*"
+    }
+  });
+}
