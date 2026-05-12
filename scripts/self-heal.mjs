@@ -117,6 +117,36 @@ async function analyzeMetric(metric_id, health_entry) {
   const a = summarize(lastSnap.html);
   const b = summarize(current);
 
+  // Tier C addition (2026-05-12): ask LLM to compare last-good vs current.
+  // Output a concrete actionable diagnosis (e.g. "regex needs update from X to Y").
+  let llmDiagnosis = null;
+  if (ARGS.useLlm || process.env.SELFHEAL_LLM === '1') {
+    try {
+      const { tryProviders } = await import('./ingest/parsers/llm_extract_v1.mjs');
+      const prompt = `You are debugging a web scraper. The page used to yield value ${lastSnap.meta?.extracted_value} but now the parser fails.
+
+LAST-GOOD SNAPSHOT (${snaps[0].date}, ${Math.round(a.length/1024)}KB):
+Title: ${a.title}
+Has table: ${a.has_table} · scripts: ${a.script_count}
+
+CURRENT FETCH (${Math.round(b.length/1024)}KB):
+Title: ${b.title}
+Has table: ${b.has_table} · scripts: ${b.script_count}
+
+Last-good text sample (first 1500 chars):
+${(lastSnap.html || '').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').slice(0, 1500)}
+
+Current text sample (first 1500 chars):
+${(current || '').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').slice(0, 1500)}
+
+Return JSON: { "value": null, "diagnosis": "<one-sentence root cause>", "fix_suggestion": "<concrete action: 'switch parser to X', 'update regex to Y', 'use Wayback', 'manual override'>" }`;
+      const r = await tryProviders(prompt);
+      if (r && (r.diagnosis || r.fix_suggestion || r.source_note)) {
+        llmDiagnosis = { diagnosis: r.diagnosis || r.source_note, fix: r.fix_suggestion };
+      }
+    } catch {}
+  }
+
   // Key-phrase delta — what disappeared, what appeared
   const pA = new Set(keyPhrases(lastSnap.html, 25).map(s => s.split(' (')[0]));
   const pB = new Set(keyPhrases(current, 25).map(s => s.split(' (')[0]));
@@ -135,7 +165,8 @@ async function analyzeMetric(metric_id, health_entry) {
     summary_now: b,
     key_phrases_disappeared: disappeared.slice(0, 10),
     key_phrases_appeared: appeared.slice(0, 10),
-    likely_cause: inferCause(a, b)
+    likely_cause: inferCause(a, b),
+    llm_diagnosis: llmDiagnosis  // null if --llm flag not set or LLM unavailable
   };
 }
 
@@ -171,6 +202,13 @@ function renderReport(analysis) {
   lines.push(`## Likely cause`);
   lines.push('');
   lines.push(`**${analysis.likely_cause}**`);
+  lines.push('');
+  if (analysis.llm_diagnosis) {
+    lines.push('## LLM diagnosis');
+    lines.push('');
+    if (analysis.llm_diagnosis.diagnosis) lines.push(`- **Root cause:** ${analysis.llm_diagnosis.diagnosis}`);
+    if (analysis.llm_diagnosis.fix) lines.push(`- **Suggested fix:** ${analysis.llm_diagnosis.fix}`);
+  }
   lines.push('');
   lines.push(`## Page summary diff`);
   lines.push('');

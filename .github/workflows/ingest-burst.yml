@@ -1,0 +1,67 @@
+name: Burst ingest (release-window targeted)
+
+# Many Indian govt metrics release on predictable days of the month:
+#   1st-5th    : Auto sales (FADA), eway bills, fastag, rail freight, port cargo
+#   10th-15th  : CPI / WPI / IIP (MoSPI)
+#   25th-30th  : DPIIT Index of Eight Core Industries
+#
+# Generic 6h cron misses the release window if everyone's slow. This workflow
+# bursts ingest on known release days to catch fresh data sooner.
+
+on:
+  schedule:
+    # 1st-5th of month at 11:00 IST · auto + monthly govt releases
+    - cron: '30 5 1-5 * *'
+    # 10th-15th of month at 13:00 IST · CPI/WPI/IIP
+    - cron: '30 7 10-15 * *'
+    # 25th-30th at 12:00 IST · IECI / Eight Core Industries
+    - cron: '30 6 25-30 * *'
+  workflow_dispatch:
+
+jobs:
+  burst:
+    runs-on: [self-hosted, windows, india]
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm install --no-audit --no-fund --prefer-offline
+
+      - name: Run burst ingest (force, ignores skip-if-fresh)
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DATAGOVIN_API_KEY: ${{ secrets.DATAGOVIN_API_KEY }}
+          CF_WORKER_URL: ${{ secrets.CF_WORKER_URL }}
+          CF_WORKER_TOKEN: ${{ secrets.WORKER_TOKEN }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+        run: node scripts/ingest-india-loop.mjs --force
+        continue-on-error: true
+
+      - name: Validate
+        run: npm run validate
+
+      - name: Commit if changes
+        run: |
+          git config user.name "IRM Burst Runner"
+          git config user.email "irm-burst@bot.local"
+          git add data/
+          git diff --staged --quiet
+          if errorlevel 1 (
+            git commit -m "ingest(burst): release-window run"
+            git push
+          ) else (
+            echo No data changes.
+          )

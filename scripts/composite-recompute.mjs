@@ -103,5 +103,27 @@ export function recomputeComposites(metrics) {
       changes.push({ id: 'india_risk_score', old: irs.value, new: newVal });
     }
   }
+
+  // Composite anomaly check (Tier C · 2026-05-12): drivers + IRS should be
+  // bounded. Sudden jumps (e.g. due to a feeder going stale-then-fresh) get
+  // a 'composite_anomaly' flag so the dashboard can warn rather than mislead.
+  const ALL_COMPOSITES = [...DRIVER_DEFS.map(d => d.id), 'india_risk_score', 'driver_sector_breadth'];
+  for (const id of ALL_COMPOSITES) {
+    const m = metrics.get(id);
+    if (!m || typeof m.value !== 'number') continue;
+    const spark = Array.isArray(m.sparkline_12m) ? m.sparkline_12m : [];
+    const nums = spark.filter(v => typeof v === 'number' && Number.isFinite(v));
+    if (nums.length < 5) continue;
+    const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
+    const variance = nums.reduce((a, b) => a + (b - mean) ** 2, 0) / nums.length;
+    const stddev = Math.sqrt(variance) || 1e-9;
+    const z = Math.abs((m.value - mean) / stddev);
+    if (z > 3) {
+      m.composite_anomaly = { z: +z.toFixed(2), mean: +mean.toFixed(1), stddev: +stddev.toFixed(1) };
+    } else {
+      delete m.composite_anomaly;
+    }
+  }
+
   return changes;
 }

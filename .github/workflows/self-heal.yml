@@ -22,8 +22,11 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
-      - name: Run self-heal analysis
-        run: node scripts/self-heal.mjs --threshold=${{ inputs.threshold || 5 }}
+      - name: Run self-heal analysis (with LLM-on-snapshot diff)
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/self-heal.mjs --threshold=${{ inputs.threshold || 5 }} --llm
       - name: Find or open parser-health issue
         id: issue
         uses: actions/github-script@v7
