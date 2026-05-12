@@ -1,0 +1,61 @@
+{
+  "metric_id": "fpi_debt_flows",
+  "display_name": "FPI debt flows",
+  "display_subtitle": "Net cash flow into Indian debt · MTD",
+  "section": "flows",
+  "sub_cluster": "debt",
+  "value": 3460,
+  "unit": "₹ Cr",
+  "value_format": "currency_inr_cr",
+  "as_of": "2026-05-04T14:10:40.390Z",
+  "as_of_period": "monthly",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    7400,
+    6800,
+    5200,
+    4100,
+    3800,
+    5600,
+    7200,
+    8400,
+    6100,
+    5900,
+    3420,
+    3460
+  ],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "source_primary": {
+    "name": "NSDL FPI portal",
+    "url": "https://www.fpi.nsdl.co.in/",
+    "type": "Public",
+    "frequency": "Daily",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "html_render:moneycontrol_v1",
+      "html_render:bse_v1",
+      "html_render:playwright_render_v1",
+      "llm:google_news_llm_v1"
+    ]
+  },
+  "source_crosscheck": [
+    {
+      "name": "CCIL bond participation",
+      "url": "https://www.ccilindia.com/",
+      "type": "Public"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.390Z",
+  "why_it_matters": "Debt FPI is structurally distinct from equity — driven by carry (IND-US 10Y spread) and JP Morgan EM index inclusion. Slowdown despite spread widening is a stress signal.",
+  "linked_metrics": [
+    "fii_equity_mtd",
+    "ind_us_10y_spread",
+    "gsec_curve",
+    "inr_usd"
+  ]
+}

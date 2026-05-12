@@ -1,0 +1,60 @@
+{
+  "metric_id": "fno_oi_buildup",
+  "display_name": "F&O OI build-up",
+  "display_subtitle": "Nifty + Bank Nifty · weekly change",
+  "section": "flows",
+  "sub_cluster": "structure",
+  "value": -8.52,
+  "unit": "%",
+  "value_format": "percent",
+  "as_of": "2026-05-04T14:10:40.369Z",
+  "as_of_period": "weekly",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    6.1,
+    3.8,
+    5.2,
+    2.4,
+    1.8,
+    4.5,
+    2.1,
+    -1.4,
+    -3.2,
+    -5.6,
+    -8.4,
+    -8.52
+  ],
+  "status": "high",
+  "shock_eligible": false,
+  "trend_direction": "bad",
+  "source_primary": {
+    "name": "NSE F&O bhavcopy",
+    "url": "https://www.nseindia.com/all-reports",
+    "type": "Exchange",
+    "frequency": "Daily",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "html_render:moneycontrol_v1",
+      "html_render:playwright_render_v1",
+      "llm:google_news_llm_v1"
+    ]
+  },
+  "source_crosscheck": [
+    {
+      "name": "SEBI weekly derivative report",
+      "url": "https://www.sebi.gov.in/statistics/securities-market-data.html",
+      "type": "Regulator"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-05-04T14:10:40.369Z",
+  "why_it_matters": "OI unwind precedes cash flow. Negative OI build-up alongside FII selling = synchronised positioning shift. Leading indicator that cash flows lag.",
+  "linked_metrics": [
+    "fii_equity_mtd",
+    "nifty_50",
+    "bank_nifty",
+    "india_vix"
+  ]
+}

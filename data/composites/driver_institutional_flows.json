@@ -48,8 +48,8 @@
   ],
   "verification_state": "verified",
   "last_verified_at": "2026-05-05T15:36:09.677Z",
-  "why_it_matters": "Aggregates FII equity flows and absorption ratio into one driver. Currently elevated on heavy MTD FII selling cushioned by DII absorption; reads as 'cautious' rather than 'shock'.",
-  "formula": "0.67 × normalize_inverse(fii_equity_mtd) + 0.33 × normalize_inverse(absorption_ratio_inverse)",
+  "why_it_matters": "Aggregates FII equity, FPI debt, DII, F&O OI, and block deals into one driver. Currently elevated on heavy MTD FII selling cushioned by DII absorption; reads as 'cautious' rather than 'shock'.",
+  "formula": "0.30 × normalize_inverse(fii_equity_mtd) + 0.20 × normalize_inverse(fpi_debt_flows) + 0.15 × normalize_inverse(absorption_ratio_inverse) + 0.20 × normalize(fno_oi_buildup) + 0.15 × normalize(block_deals_notional)",
   "trigger_thresholds": [
     {
       "level": "med",
@@ -66,6 +66,9 @@
   ],
   "linked_metrics": [
     "fii_equity_mtd",
-    "absorption_ratio"
+    "fpi_debt_flows",
+    "absorption_ratio",
+    "fno_oi_buildup",
+    "block_deals_notional"
   ]
 }

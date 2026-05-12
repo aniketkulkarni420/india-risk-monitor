@@ -22,7 +22,11 @@ const METRICS = [
   'cement_dispatches',
   'upi_value',
   'india_crude_basket',
-  'naukri_jobspeak'
+  'naukri_jobspeak',
+  // Restored 2026-05-12 with tiered fallback chains
+  'fno_oi_buildup',
+  'block_deals_notional',
+  'fpi_debt_flows'
 ];
 
 let succeeded = 0;

@@ -34,7 +34,11 @@
     "url": "https://indianrailways.gov.in/railwayboard/view_section.jsp?lang=0&id=0,1,304,366,531,1010",
     "type": "Official",
     "frequency": "Monthly",
-    "parser": "llm:google_news_llm_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "rss:nitter_v1",
+      "llm:google_news_llm_v1"
+    ]
   },
   "source_crosscheck": [
     {

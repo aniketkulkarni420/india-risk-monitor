@@ -23,6 +23,11 @@ import * as google_news_llm_v1 from './parsers/google_news_llm_v1.mjs';
 import * as pib_search_v1 from './parsers/pib_search_v1.mjs';
 import * as yahoo_finance_v1 from './parsers/yahoo_finance_v1.mjs';
 import * as ppac_v1 from './parsers/ppac_v1.mjs';
+import * as moneycontrol_v1 from './parsers/moneycontrol_v1.mjs';
+import * as bse_v1 from './parsers/bse_v1.mjs';
+import * as nitter_v1 from './parsers/nitter_v1.mjs';
+import * as eaindustry_ieci_v1 from './parsers/eaindustry_ieci_v1.mjs';
+import * as tiered_v1 from './parsers/tiered_v1.mjs';
 import * as dbnomics_v1 from './parsers/dbnomics_v1.mjs';
 import * as datagovin_v1 from './parsers/datagovin_v1.mjs';
 import * as nse_rbi_direct_v1 from './parsers/nse_rbi_direct_v1.mjs';
@@ -110,6 +115,13 @@ const REAL = new Map([
   ['html_render:playwright_render_v1', playwright_render_v1],
   // Free LLM extraction fallback (Step 11) — universal last-resort
   ['llm:llm_extract_v1', llm_extract_v1],
+  // Tier-A alternative scrapers (added 2026-05-12)
+  ['html_render:moneycontrol_v1', moneycontrol_v1],
+  ['html_render:bse_v1', bse_v1],
+  ['rss:nitter_v1', nitter_v1],
+  ['pdf:eaindustry_ieci_v1', eaindustry_ieci_v1],
+  // Tiered orchestrator -- tries multiple sub-parsers in priority order
+  ['tiered:tiered_v1', tiered_v1],
 ]);
 
 export function resolve(parser_id, { live = false } = {}) {
