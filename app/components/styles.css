@@ -1981,6 +1981,22 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
   margin-right: 4px;
   white-space: nowrap;
 }
+/* PROVISIONAL pill · single-source data, not verified by cross-check */
+.hp-provisional, .provisional-pill {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .06em;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: rgba(233, 196, 102, 0.16);
+  color: var(--amber);
+  border: 1px dashed rgba(233, 196, 102, 0.5);
+  margin-left: 10px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
 .stale-inline {
   display: inline;
   font-family: var(--mono);

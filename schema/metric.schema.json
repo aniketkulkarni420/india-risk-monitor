@@ -32,6 +32,9 @@
     "why_it_matters"
   ],
   "additionalProperties": false,
+  "patternProperties": {
+    "^_": { "description": "Bundle/parser-generated metadata · underscore-prefixed · validator ignores" }
+  },
   "properties": {
     "metric_id": {
       "type": "string",

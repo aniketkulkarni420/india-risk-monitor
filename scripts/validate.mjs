@@ -60,10 +60,13 @@ function validateSchema(file, schema, data) {
   for (const req of (schema.required || [])) {
     if (!(req in data)) { fail(file, `missing required field: ${req}`); continue; }
   }
-  // additionalProperties
+  // additionalProperties · honors patternProperties for "^_" metadata fields
   if (schema.additionalProperties === false) {
+    const patterns = Object.keys(schema.patternProperties || {}).map(p => new RegExp(p));
     for (const k of Object.keys(data)) {
-      if (!(k in (schema.properties || {}))) fail(file, `unknown field: ${k}`);
+      if (k in (schema.properties || {})) continue;
+      if (patterns.some(rx => rx.test(k))) continue;  // allow patternProperties matches
+      fail(file, `unknown field: ${k}`);
     }
   }
   // properties

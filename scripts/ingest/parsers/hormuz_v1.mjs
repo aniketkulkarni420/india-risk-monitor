@@ -67,13 +67,33 @@ export async function fetchPrimary(metric) {
         ?? j.total_active
         ?? null;
       if (typeof value === 'number' && value >= 0 && value < 500) {
+        // Detect static snapshot · the v1 endpoint self-identifies as such
+        const sourceField = String(j.source || '').toLowerCase();
+        const isStatic = sourceField.includes('static') || sourceField.includes('placeholder') || sourceField.includes('snapshot · v1');
         return {
           value,
           as_of: j.as_of || new Date().toISOString(),
+          // Expose the richer snapshot payload to the renderer so the Hormuz card
+          // can show inbound/outbound split + dark vessels + pct_of_normal directly
+          // from the snapshot internal-consistent fields. Surface static-source flag.
+          extra: {
+            _snapshot_payload: {
+              vessel_count_inbound: j.vessel_count_inbound,
+              vessel_count_outbound: j.vessel_count_outbound,
+              total_active: j.total_active,
+              dark_vessels: j.dark_vessels,
+              bdti: j.bdti,
+              pct_of_normal: j.pct_of_normal,
+              incidents_30d: j.incidents_30d,
+              source: j.source
+            },
+            _source_static: isStatic
+          },
           parse_meta: {
-            source: 'hormuz-watch /api/snapshot',
+            source: 'hormuz-watch /api/snapshot' + (isStatic ? ' (static)' : ''),
             endpoint: url,
-            payload_keys: Object.keys(j).join(',')
+            payload_keys: Object.keys(j).join(','),
+            is_static: isStatic
           },
           raw: JSON.stringify(j).slice(0, 200)
         };

@@ -1297,9 +1297,21 @@ function buildHormuzPrimary() {
   const wrap = el('div', { class: 'hormuz-primary', onclick: () => openDrawer('hormuz_throughput') });
   const showMom = trendIsTrustworthy(m, m.mom_pct);
   const showYoy = trendIsTrustworthy(m, m.yoy_pct);
+  // Read provenance from snapshot · expose richer detail when available
+  const snap = m._snapshot_payload || {};
+  const isStatic = m._source_static === true || (snap.source || '').toLowerCase().includes('static snapshot');
+  const inbound  = snap.vessel_count_inbound;
+  const outbound = snap.vessel_count_outbound;
+  const darkVessels = snap.dark_vessels;
   wrap.appendChild(el('div', { class: 'hp-head' }, [
     el('div', {}, [
-      el('div', { class: 'hp-eyebrow' }, '⚠ Shock · Strait of Hormuz throughput'),
+      el('div', { class: 'hp-eyebrow' }, [
+        '⚠ Shock · Strait of Hormuz throughput',
+        isStatic ? el('span', {
+          class: 'hp-provisional',
+          title: 'hormuz-watch /api/snapshot returns a static placeholder value · live AIS counts not yet wired'
+        }, 'PROVISIONAL · static snapshot') : null
+      ].filter(Boolean)),
       el('div', { class: 'hp-value' }, formatValue(m.value, 'integer')),
       el('div', { class: 'hp-meta' }, [
         m.unit + ' · 24h average',
@@ -1307,14 +1319,21 @@ function buildHormuzPrimary() {
           ['Normal baseline: ', el('b', {}, m.baseline_30d || '—')])
       ]),
       el('div', { class: 'hp-trends' }, [
-        showMom
+        // When source is static, the meaningful read is pct_of_normal + inbound/outbound split — NOT MoM/YoY
+        showMom && !isStatic
           ? el('span', {}, ['MoM ', el('b', {}, formatTrend(m.mom_pct))])
-          : el('span', { style: { color: 'var(--ink-3)', fontStyle: 'italic' }, title: 'Sparkline has <4 unique values · MoM math unreliable' }, 'history accruing'),
-        showYoy
+          : el('span', { style: { color: 'var(--ink-3)', fontStyle: 'italic' }, title: 'Source is static · MoM math meaningless · awaiting live AIS' }, 'history accruing'),
+        showYoy && !isStatic
           ? el('span', {}, ['YoY ', el('b', {}, formatTrend(m.yoy_pct))])
           : null,
         el('span', {}, ['% of normal ',
-          el('b', {}, ((m.value / (m.baseline_30d || 1)) * 100).toFixed(1) + '%')])
+          el('b', {}, ((m.value / (m.baseline_30d || 1)) * 100).toFixed(1) + '%')]),
+        (inbound != null && outbound != null) ? el('span', { title: 'Snapshot internal split · inbound + outbound' }, [
+          'inbound ', el('b', {}, String(inbound)), ' · outbound ', el('b', {}, String(outbound))
+        ]) : null,
+        darkVessels != null ? el('span', { title: 'Vessels with disabled AIS transponders inside polygon' }, [
+          'dark vessels ', el('b', { style: { color: 'var(--amber)' } }, String(darkVessels))
+        ]) : null
       ].filter(Boolean))
     ]),
     el('div', { style: { textAlign: 'right' } }, [

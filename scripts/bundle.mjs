@@ -185,6 +185,29 @@ for (const file of walk(DATA)) {
       }
     }
 
+    // 2026-05-12 · Verification state DERIVATION (Tier 5)
+    // verification_state stamped at metric-JSON-authoring time can lie. Override
+    // at bundle-time based on observable facts:
+    //   • Static-source flag → force "source_pending"
+    //   • _source_count_actual < 2 → force "source_pending" (no real cross-check ran)
+    //   • Otherwise leave as-stamped
+    if (data._source_static === true) {
+      if (data.verification_state !== 'source_pending') {
+        data._verification_state_original = data.verification_state;
+        data.verification_state = 'source_pending';
+        data._verification_demoted_reason = 'static_source';
+      }
+    } else if (typeof data._source_count_actual === 'number' && data._source_count_actual < 2 && data.verification_state === 'verified') {
+      // Authoritative single-source metrics that genuinely have only one canonical source
+      // are exempted by inclusion in this whitelist.
+      const singleSourceAuthoritative = ['repo_rate', 'cpi_inflation', 'wpi_inflation', 'india_risk_score'];
+      if (!singleSourceAuthoritative.includes(data.metric_id)) {
+        data._verification_state_original = data.verification_state;
+        data.verification_state = 'source_pending';
+        data._verification_demoted_reason = 'single_source';
+      }
+    }
+
     // Plausibility guard · runs BEFORE dod compute. If today's value is wildly
     // off from yesterday's (e.g. INR/USD jumping 14% in a day), roll back to
     // yesterday's value to avoid showing a screenshot-bait number on the live site.
