@@ -15,7 +15,7 @@ const SNAPSHOT_URLS = [
   // Custom-domain alias if Aniket later moves it
   'https://hormuz-watch.kamayakya.com/api/snapshot',
   // Old preview URL · kept as last-resort fallback (returns v1 schema, no is_static)
-  'https://preview-conclusions.hormuz-watch-7cd.pages.dev/api/snapshot'
+  'https://hormuz-watch-2.pages.dev/api/snapshot'
 ];
 const MT_FALLBACK = 'https://www.marinetraffic.com/en/ais/home/centerx:56.2/centery:26.5/zoom:8';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 IRM-Ingest/1.0';

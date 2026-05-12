@@ -11,7 +11,7 @@
 // (see hormuz_v1.mjs). For Hormuz, real fix requires either fixing the
 // hormuz-watch backend or wiring TankerTrackers/AISStream directly.
 
-const HW_BASE = 'https://preview-conclusions.hormuz-watch-7cd.pages.dev';
+const HW_BASE = 'https://hormuz-watch-2.pages.dev';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 IRM-Ingest/1.0';
 
 async function fetchJson(url, timeoutMs = 12000) {
