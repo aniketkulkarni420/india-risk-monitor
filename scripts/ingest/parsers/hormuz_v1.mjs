@@ -9,10 +9,13 @@
 // so the metric stays in source_pending state honestly.
 
 const SNAPSHOT_URLS = [
-  // Primary: Aniket's tool snapshot (when he adds /api/snapshot)
-  'https://preview-conclusions.hormuz-watch-7cd.pages.dev/api/snapshot',
-  // Custom-domain alias if user later moves it to /api/snapshot on his domain
-  'https://hormuz-watch.kamayakya.com/api/snapshot'
+  // Primary · NEW CF Pages project (2026-05-12) · serves snapshot.js V2 with
+  // is_static + live_source_count + ais_state_age_sec fields from OIL_KV ais_state
+  'https://hormuz-watch-2.pages.dev/api/snapshot',
+  // Custom-domain alias if Aniket later moves it
+  'https://hormuz-watch.kamayakya.com/api/snapshot',
+  // Old preview URL · kept as last-resort fallback (returns v1 schema, no is_static)
+  'https://preview-conclusions.hormuz-watch-7cd.pages.dev/api/snapshot'
 ];
 const MT_FALLBACK = 'https://www.marinetraffic.com/en/ais/home/centerx:56.2/centery:26.5/zoom:8';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 IRM-Ingest/1.0';
