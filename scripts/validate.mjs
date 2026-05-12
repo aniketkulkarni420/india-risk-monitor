@@ -112,6 +112,23 @@ function customRules(file, m) {
     }
   }
 
+  // Gate 6 (Tier B · 2026-05-12): anomaly check vs sparkline.
+  // If the current value is >4 sigma from the metric's own historical
+  // distribution, WARN (don't block bundle). Catches silent corruption
+  // that passed plausibility band but is statistically odd.
+  if (typeof m.value === 'number' && Array.isArray(m.sparkline_12m) && m.sparkline_12m.length >= 5) {
+    const nums = m.sparkline_12m.filter(v => typeof v === 'number' && Number.isFinite(v));
+    if (nums.length >= 5) {
+      const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
+      const variance = nums.reduce((a, b) => a + (b - mean) ** 2, 0) / nums.length;
+      const stddev = Math.sqrt(variance) || 1e-9;
+      const z = Math.abs((m.value - mean) / stddev);
+      if (z > 4) {
+        warn(file, `value ${m.value} is ${z.toFixed(1)}σ from sparkline mean ${mean.toFixed(2)} ± ${stddev.toFixed(2)} (Gate 6: anomaly check)`);
+      }
+    }
+  }
+
   // Gate 2: cross-check has at least 1 entry
   if (!Array.isArray(m.source_crosscheck) || m.source_crosscheck.length < 1) {
     fail(file, `source_crosscheck must have ≥ 1 entry (Gate 2)`);

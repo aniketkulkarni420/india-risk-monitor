@@ -1,0 +1,66 @@
+name: Telegram alerts for parser health
+
+# Sends a Telegram message when red parser count crosses thresholds.
+# Faster than GitHub issues for time-sensitive data outages.
+#
+# One-time setup:
+#   1. Talk to @BotFather on Telegram, create a new bot, get the BOT_TOKEN
+#   2. Get your chat ID from @userinfobot
+#   3. Add GitHub secrets:
+#        TELEGRAM_BOT_TOKEN
+#        TELEGRAM_CHAT_ID
+#
+# Until set up: workflow is harmless (curl fails silently).
+
+on:
+  workflow_run:
+    workflows: ['Scheduled ingest', 'Scheduled ingest (India IP)', 'Scheduled ingest (India Linux runner · Termux/VPS)']
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read parser health and decide alert
+        id: health
+        run: |
+          if [ ! -f data/parser-health.json ]; then
+            echo "alert=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          RED=$(jq -r '.summary.red' data/parser-health.json)
+          TOTAL=$(jq -r '.summary.total' data/parser-health.json)
+          PCT=$(awk "BEGIN {printf \"%.0f\", ($RED / $TOTAL) * 100}")
+          echo "red=$RED" >> $GITHUB_OUTPUT
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "pct=$PCT" >> $GITHUB_OUTPUT
+          # Alert if red% >= 10% (configurable threshold)
+          if [ "$PCT" -ge 10 ]; then
+            echo "alert=true" >> $GITHUB_OUTPUT
+          else
+            echo "alert=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build red metric list
+        if: steps.health.outputs.alert == 'true'
+        id: redlist
+        run: |
+          LIST=$(jq -r '[.parsers | to_entries[] | select(.value.status=="red") | .key] | join(", ")' data/parser-health.json)
+          echo "list<<EOF" >> $GITHUB_OUTPUT
+          echo "$LIST" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send Telegram message
+        if: steps.health.outputs.alert == 'true' && env.TG_TOKEN != ''
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          MSG="🔴 IRM Parser Health Alert%0A%0A${{ steps.health.outputs.red }} of ${{ steps.health.outputs.total }} parsers RED (${{ steps.health.outputs.pct }}%25)%0A%0ARed metrics:%0A${{ steps.redlist.outputs.list }}%0A%0ARepo: https://github.com/aniketkulkarni420/india-risk-monitor/actions"
+          curl -sS "https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_CHAT}&text=${MSG}&parse_mode=Markdown" \
+            -o /dev/null -w "Telegram API: %{http_code}\n"
