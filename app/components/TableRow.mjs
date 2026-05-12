@@ -12,6 +12,34 @@ import { el, formatValue, formatTrend, trendClass, statusClass, isHistoryPending
 import { renderSparkline } from './Sparkline.mjs';
 import { getDisplayPeriods } from './ComparisonSpec.mjs';
 
+// 6A · Star button · follow/unfollow a metric. Stored in localStorage.
+const FOLLOWED_KEY = 'irm.followed';
+function loadFollowed() {
+  try { return new Set(JSON.parse(localStorage.getItem(FOLLOWED_KEY) || '[]')); } catch { return new Set(); }
+}
+function saveFollowed(set) {
+  try { localStorage.setItem(FOLLOWED_KEY, JSON.stringify(Array.from(set))); } catch {}
+}
+function renderStarButton(metricId) {
+  const followed = loadFollowed();
+  const isOn = followed.has(metricId);
+  const btn = el('button', {
+    class: 'star-btn' + (isOn ? ' on' : ''),
+    'data-metric-id': metricId,
+    'aria-label': isOn ? 'Unfollow ' + metricId : 'Follow ' + metricId,
+    onclick: (e) => {
+      e.stopPropagation();
+      const set = loadFollowed();
+      if (set.has(metricId)) { set.delete(metricId); btn.classList.remove('on'); btn.setAttribute('aria-label', 'Follow ' + metricId); }
+      else                   { set.add(metricId);    btn.classList.add('on');    btn.setAttribute('aria-label', 'Unfollow ' + metricId); }
+      saveFollowed(set);
+      // Notify any listeners (e.g. topbar count)
+      window.dispatchEvent(new CustomEvent('irm:followed:change', { detail: { metricId, isOn: set.has(metricId), count: set.size } }));
+    }
+  }, isOn ? '★' : '☆');
+  return btn;
+}
+
 // 9D · Inline expand. Click any row → expand sibling row in-place with chart + thresholds + drawer link.
 // Tracks one open row at a time per <tbody>.
 function toggleInlineExpand(rowEl, metric) {
@@ -176,6 +204,7 @@ export function renderTableRow(metric, opts = {}) {
     }
   }, [
     el('td', { class: 'name' }, [
+      renderStarButton(metric.metric_id),
       metric.display_name,
       metric.display_subtitle ? el('small', {}, metric.display_subtitle) : null
     ]),

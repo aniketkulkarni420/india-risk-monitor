@@ -164,6 +164,38 @@ svg, img, video, canvas { max-width: 100%; }
 .nuance-chip.green { background: rgba(63,178,127,.18); color: var(--green); }
 .nuance-chip.accent{ background: rgba(212,165,116,.18); color: var(--accent); }
 
+/* 6A · Star button · follow metric · localStorage-backed */
+.star-btn {
+  appearance: none;
+  background: none;
+  border: none;
+  color: var(--ink-3);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0 6px 0 0;
+  opacity: 0.5;
+  vertical-align: middle;
+  line-height: 1;
+}
+.star-btn:hover { opacity: 1; color: var(--amber); }
+.star-btn.on { color: var(--amber); opacity: 1; }
+
+/* Topbar followed-count pill (updated by 'irm:followed:change' event) */
+.topbar-followed {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+.topbar-followed .topbar-followed-star { color: var(--amber); }
+.topbar-followed.has-followed { color: var(--ink); }
+
 /* Supporting tier composite primitive · 2026-05-12 */
 .st-promoted-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
 .st-promoted {
