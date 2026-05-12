@@ -40,6 +40,25 @@ const DRIVER_DEFS = [
 const RISK_DRIVERS = ['driver_oil_physical','driver_freight','driver_institutional_flows','driver_india_macro','driver_real_economy','driver_sector_breadth'];
 const RISK_WEIGHTS = [3,2,3,3,2,2];
 
+// Freshness propagation · Tier B addition 2026-05-12
+// Composite should know how many of its feeders are stale. If >50% are
+// stale, mark the composite "partial" so the UI can show a degraded badge.
+function feederFreshness(map, ids) {
+  let total = 0, stale = 0;
+  const now = Date.now();
+  for (const id of ids) {
+    const m = map.get(id);
+    if (!m) continue;
+    total++;
+    const lv = m.last_verified_at;
+    if (!lv) { stale++; continue; }
+    const ageDays = (now - new Date(lv).getTime()) / 86400000;
+    // Heuristic: any feeder unverified >7 days is stale for composite purposes
+    if (ageDays > 7) stale++;
+  }
+  return { total, stale, fresh_pct: total ? +(100 * (total - stale) / total).toFixed(1) : null };
+}
+
 // Recompute composite scores from current peer status. Mutates `metrics` map.
 // Returns array of {id, oldValue, newValue} for ones that actually changed.
 export function recomputeComposites(metrics) {
@@ -54,6 +73,14 @@ export function recomputeComposites(metrics) {
       dm._composite_was = oldVal;
       dm.value = newVal;
       changes.push({ id: d.id, old: oldVal, new: newVal });
+    }
+    // Propagate freshness signal
+    const f = feederFreshness(metrics, d.ids);
+    dm.feeder_freshness = f;
+    if (f.total > 0 && f.stale / f.total > 0.5) {
+      dm.freshness_state = 'partial';
+    } else {
+      dm.freshness_state = 'fresh';
     }
   }
   // 2 · Sector breadth (uses VIX + PE values, not statuses — leave as-is unless

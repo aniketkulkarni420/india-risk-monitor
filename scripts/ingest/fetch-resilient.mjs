@@ -133,3 +133,94 @@ async function resolveWayback(url, timeoutMs = 15000) {
 }
 
 export { resolveWayback };
+
+// ──────────────────────────────────────────────────────────────
+// TWO-STAGE FETCH (Tier A optimization · added 2026-05-12)
+// ──────────────────────────────────────────────────────────────
+//
+// fetchSmart() tries cheap plain fetch first; if the response body
+// looks JS-rendered (small body, no real content), escalates to
+// Playwright. Avoids Playwright cold-start on static pages.
+
+const JS_SHELL_INDICATORS = [
+  /<div\s+id=["'](?:root|app|__next)/i,
+  /please\s+enable\s+JavaScript/i,
+  /This\s+page\s+requires\s+JavaScript/i,
+  /window\.location\s*=/i
+];
+
+function looksJsRendered(body) {
+  if (!body || body.length < 500) return true;            // tiny = likely shell
+  if (body.length < 3000) {
+    return JS_SHELL_INDICATORS.some(re => re.test(body));
+  }
+  // Count visible-ish content tokens. Pages with very low body-text-to-html
+  // ratio are likely SPAs that need rendering.
+  const textLen = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().length;
+  if (textLen < 200) return true;
+  return false;
+}
+
+/**
+ * Try cheap fetch first, escalate to Playwright if the response looks
+ * JS-rendered. Returns { body, finalUrl, source }.
+ *
+ * Pass `forcePlaywright: true` to skip the cheap stage (when caller knows
+ * the page is definitively SPA).
+ */
+export async function fetchSmart(url, opts = {}) {
+  const {
+    timeoutMs = 25000,
+    forcePlaywright = false,
+    waitMs = 3000,
+    waitSelector = null,
+    browserUa = true
+  } = opts;
+
+  // Stage 1: cheap plain fetch
+  if (!forcePlaywright) {
+    try {
+      const res = await fetchResilient(url, { timeoutMs, retries: 1, wayback: false, browserUa });
+      if (res.body && !looksJsRendered(res.body)) {
+        return { body: res.body, finalUrl: res.url, source: 'fetch' };
+      }
+    } catch (e) {
+      // Fall through to Playwright on fetch failure
+    }
+  }
+
+  // Stage 2: Playwright render
+  try {
+    const { getSharedBrowser } = await import('./browser-pool.mjs');
+    const browser = await getSharedBrowser();
+    if (!browser) {
+      // Playwright unavailable — return whatever plain fetch gave us (best effort)
+      const res = await fetchResilient(url, { timeoutMs, retries: 1, wayback: false, browserUa });
+      return { body: res.body, finalUrl: res.url, source: 'fetch-fallback' };
+    }
+    const ctx = await browser.newContext({
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      locale: 'en-IN', viewport: { width: 1280, height: 800 }
+    });
+    const page = await ctx.newPage();
+    try {
+      await page.goto(url, { waitUntil: 'networkidle', timeout: timeoutMs });
+      if (waitSelector) { try { await page.waitForSelector(waitSelector, { timeout: 12000 }); } catch {} }
+      if (waitMs) await page.waitForTimeout(waitMs);
+      const body = await page.content();
+      const finalUrl = page.url();
+      return { body, finalUrl, source: 'playwright' };
+    } finally {
+      await page.close().catch(() => {});
+      await ctx.close().catch(() => {});
+    }
+  } catch (e) {
+    // If Playwright fails too, return best-effort plain fetch
+    try {
+      const res = await fetchResilient(url, { timeoutMs, retries: 0, wayback: false, browserUa });
+      return { body: res.body, finalUrl: res.url, source: 'fetch-fallback' };
+    } catch {
+      throw e;
+    }
+  }
+}

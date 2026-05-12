@@ -215,7 +215,18 @@ const bundle = {
   metric_count: Object.keys(metrics).length,
   metrics,
   sectors,
-  parser_health: loadHealthSummary()  // X/Y green · red metrics list · for dashboard health badge
+  parser_health: loadHealthSummary(),  // X/Y green · red metrics list · for dashboard health badge
+  // System staleness banner (Tier B addition · 2026-05-12)
+  // Dashboard renders a warning ribbon if too many parsers are red.
+  system_state: (() => {
+    const ph = loadHealthSummary();
+    const sum = ph?.summary || { green: 0, amber: 0, red: 0, total: 0 };
+    const total = sum.total || 1;
+    const redPct = (sum.red / total) * 100;
+    if (redPct >= 25) return { level: 'degraded', message: `${sum.red} of ${total} parsers are red — data may be stale`, red_pct: +redPct.toFixed(1) };
+    if (redPct >= 10) return { level: 'partial', message: `${sum.red} of ${total} parsers are red`, red_pct: +redPct.toFixed(1) };
+    return { level: 'healthy', red_pct: +redPct.toFixed(1) };
+  })()
 };
 
 writeFileSync(OUT, JSON.stringify(bundle), 'utf8');

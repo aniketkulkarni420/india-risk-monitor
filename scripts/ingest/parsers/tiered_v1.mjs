@@ -1,46 +1,90 @@
 // REAL fetcher · TIERED ORCHESTRATOR · tries multiple sub-parsers in priority order.
 //
+// Tier A enhancements (2026-05-12):
+//   - Source cooldown: if a tier has failed N runs in a row, skip for K hours
+//   - Anomaly detection: post-extraction, check z-score vs sparkline_12m;
+//     if suspicious, run the NEXT tier and compare (shadow verification)
+//
 // Configure metric.source_primary.parser = "tiered:tiered_v1" plus a sibling
-// field `tier_chain` in the metric JSON listing parser_ids to try in sequence:
-//
-//   "source_primary": {
-//     "parser": "tiered:tiered_v1",
-//     "tier_chain": [
-//       "html_render:moneycontrol_v1",
-//       "html_render:bse_v1",
-//       "rss:nitter_v1",
-//       "llm:google_news_llm_v1"
-//     ]
-//   }
-//
-// Each tier is tried in order. First one that returns a plausible value wins.
-// On failure, falls through to next tier. Final failure throws with summary.
-//
-// Manual override layer in ingest.mjs runs BEFORE tiered, so user-pasted JSON
-// always wins. After all tiers fail, ingest falls back to last-known-good.
+// field `tier_chain` in the metric JSON listing parser_ids to try in sequence.
 
 import { resolve as resolveParser } from '../registry.mjs';
+import { isInCooldown, recordSourceOutcome, checkAnomaly } from '../observability.mjs';
 
 export async function fetchPrimary(metric) {
   const chain = metric?.source_primary?.tier_chain;
   if (!Array.isArray(chain) || chain.length === 0) {
     throw new Error(`tiered_v1: metric ${metric.metric_id} missing tier_chain`);
   }
+
+  const sparkline = Array.isArray(metric?.sparkline_12m) ? metric.sparkline_12m : [];
   const errors = [];
-  for (const parser_id of chain) {
+  let primaryResult = null;
+  let primaryTier = null;
+
+  for (let i = 0; i < chain.length; i++) {
+    const parser_id = chain[i];
+    const cooldownKey = `${metric.metric_id}:${parser_id}`;
+
+    // Skip if this metric+tier combo is in cooldown
+    if (isInCooldown(cooldownKey)) {
+      errors.push(`${parser_id}: in cooldown`); continue;
+    }
+
     try {
       const { mode, parser } = resolveParser(parser_id, { live: true });
       if (mode !== 'live' || !parser) { errors.push(`${parser_id}: not registered`); continue; }
+
       const r = await parser.fetchPrimary(metric);
       if (r && typeof r.value === 'number' && Number.isFinite(r.value)) {
-        return { ...r, parse_meta: { ...(r.parse_meta || {}), tier_used: parser_id, tier_index: chain.indexOf(parser_id) } };
+        try { recordSourceOutcome(cooldownKey, true); } catch {}
+        primaryResult = { ...r, parse_meta: { ...(r.parse_meta || {}), tier_used: parser_id, tier_index: i } };
+        primaryTier = i;
+        break;
       }
+      try { recordSourceOutcome(cooldownKey, false); } catch {}
       errors.push(`${parser_id}: no value`);
     } catch (e) {
+      try { recordSourceOutcome(cooldownKey, false); } catch {}
       errors.push(`${parser_id}: ${(e.message || '').slice(0, 100)}`);
     }
   }
-  throw new Error(`tiered: all ${chain.length} tiers failed · ${errors.slice(0,3).join(' | ')}`);
+
+  if (!primaryResult) {
+    throw new Error(`tiered: all ${chain.length} tiers failed · ${errors.slice(0,3).join(' | ')}`);
+  }
+
+  // Anomaly check vs metric's own history
+  const anomaly = checkAnomaly(primaryResult.value, sparkline);
+  if (anomaly.suspicious && primaryTier !== null && primaryTier < chain.length - 1) {
+    // Shadow verify with next tier
+    const shadowParserId = chain[primaryTier + 1];
+    try {
+      const { mode, parser } = resolveParser(shadowParserId, { live: true });
+      if (mode === 'live' && parser) {
+        const sr = await parser.fetchPrimary(metric);
+        if (sr && Number.isFinite(sr.value)) {
+          const divergencePct = Math.abs((sr.value - primaryResult.value) / primaryResult.value) * 100;
+          primaryResult.parse_meta = {
+            ...primaryResult.parse_meta,
+            anomaly: anomaly,
+            shadow_tier: shadowParserId,
+            shadow_value: sr.value,
+            shadow_divergence_pct: +divergencePct.toFixed(2)
+          };
+          // If divergence >10%, prefer shadow (less likely to be a transient corruption)
+          if (divergencePct > 10) {
+            primaryResult.value = sr.value;
+            primaryResult.parse_meta.tier_used = shadowParserId + ' (shadow override)';
+          }
+        }
+      }
+    } catch {}
+  } else if (sparkline.length >= 5) {
+    primaryResult.parse_meta = { ...primaryResult.parse_meta, anomaly_check: 'passed' };
+  }
+
+  return primaryResult;
 }
 
 export async function fetchCrosscheck(metric, idx, primaryValue) {

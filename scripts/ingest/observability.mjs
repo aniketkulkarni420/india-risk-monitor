@@ -1,0 +1,131 @@
+// Observability helpers: source cooldown, LLM telemetry, anomaly detection.
+// Added 2026-05-12 as part of Tier A reliability batch.
+
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(__dirname, '..', '..');
+const COOLDOWN_FILE = join(ROOT, 'data', 'source-cooldown.json');
+const LLM_TELEMETRY_FILE = join(ROOT, 'data', 'llm-telemetry.json');
+
+// ──────────────────────────────────────────────────────────────
+// Source cooldown
+// ──────────────────────────────────────────────────────────────
+// When a source (URL host) fails N times in a row across runs, mark it
+// "cooled-down" for K hours. Tier orchestrator will skip cooled sources.
+
+const COOLDOWN_THRESHOLD = 3;     // 3 consecutive failures
+const COOLDOWN_HOURS = 6;          // skip for next 6 hours
+
+function loadCooldown() {
+  if (!existsSync(COOLDOWN_FILE)) return {};
+  try { return JSON.parse(readFileSync(COOLDOWN_FILE, 'utf8')); } catch { return {}; }
+}
+
+function saveCooldown(state) {
+  try { writeFileSync(COOLDOWN_FILE, JSON.stringify(state, null, 2)); } catch {}
+}
+
+function hostOf(url) {
+  try { return new URL(url).host; } catch { return url.slice(0, 60); }
+}
+
+/**
+ * Should we skip this source for now? Returns true if it's in cooldown.
+ */
+export function isInCooldown(url) {
+  const state = loadCooldown();
+  const entry = state[hostOf(url)];
+  if (!entry || !entry.cooled_until) return false;
+  return Date.now() < new Date(entry.cooled_until).getTime();
+}
+
+/**
+ * Record outcome of a source fetch. After N consecutive failures, enter cooldown.
+ */
+export function recordSourceOutcome(url, success) {
+  const host = hostOf(url);
+  const state = loadCooldown();
+  const entry = state[host] || { consecutive_failures: 0 };
+  if (success) {
+    entry.consecutive_failures = 0;
+    entry.last_success_at = new Date().toISOString();
+    delete entry.cooled_until;
+  } else {
+    entry.consecutive_failures = (entry.consecutive_failures || 0) + 1;
+    entry.last_failure_at = new Date().toISOString();
+    if (entry.consecutive_failures >= COOLDOWN_THRESHOLD) {
+      entry.cooled_until = new Date(Date.now() + COOLDOWN_HOURS * 3600 * 1000).toISOString();
+    }
+  }
+  state[host] = entry;
+  saveCooldown(state);
+}
+
+// ──────────────────────────────────────────────────────────────
+// LLM telemetry — track per-provider call count + success rate
+// ──────────────────────────────────────────────────────────────
+
+const DAILY_LIMITS = {
+  groq:        14400,    // requests/day, very generous
+  gemini:      1500,     // requests/day (Gemini Flash free tier)
+  cloudflare:  10000     // neurons/day
+};
+
+function loadTelemetry() {
+  if (!existsSync(LLM_TELEMETRY_FILE)) return { day: null, providers: {} };
+  try { return JSON.parse(readFileSync(LLM_TELEMETRY_FILE, 'utf8')); } catch { return { day: null, providers: {} }; }
+}
+
+function saveTelemetry(t) {
+  try { writeFileSync(LLM_TELEMETRY_FILE, JSON.stringify(t, null, 2)); } catch {}
+}
+
+export function recordLlmCall(provider, success) {
+  const today = new Date().toISOString().slice(0, 10);
+  const t = loadTelemetry();
+  if (t.day !== today) { t.day = today; t.providers = {}; }
+  const p = t.providers[provider] || { calls: 0, successes: 0, failures: 0 };
+  p.calls++;
+  if (success) p.successes++; else p.failures++;
+  p.success_rate = +(p.successes / p.calls).toFixed(3);
+  p.daily_limit = DAILY_LIMITS[provider] || null;
+  p.headroom_pct = p.daily_limit ? +(100 * (1 - p.calls / p.daily_limit)).toFixed(1) : null;
+  t.providers[provider] = p;
+  saveTelemetry(t);
+}
+
+export function getLlmTelemetry() { return loadTelemetry(); }
+
+// ──────────────────────────────────────────────────────────────
+// Anomaly detection — compare new value to historical sparkline
+// ──────────────────────────────────────────────────────────────
+// Catches "plausible but anomalous" values that pass static plausibility
+// bands but are statistically outliers vs the metric's own history.
+
+const Z_SCORE_THRESHOLD = 4;  // > 4 sigma = suspicious
+
+/**
+ * Given a new value and an array of historical values, return:
+ *   { suspicious: bool, z: number, reason: string }
+ *
+ * Returns suspicious=false if there's insufficient history (< 5 points).
+ */
+export function checkAnomaly(value, history) {
+  if (!Array.isArray(history) || history.length < 5) {
+    return { suspicious: false, reason: 'insufficient history' };
+  }
+  const nums = history.filter(v => typeof v === 'number' && Number.isFinite(v));
+  if (nums.length < 5) return { suspicious: false, reason: 'insufficient numeric history' };
+
+  const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
+  const variance = nums.reduce((a, b) => a + (b - mean) ** 2, 0) / nums.length;
+  const stddev = Math.sqrt(variance) || 1e-9;
+  const z = Math.abs((value - mean) / stddev);
+  if (z > Z_SCORE_THRESHOLD) {
+    return { suspicious: true, z: +z.toFixed(2), reason: `z=${z.toFixed(2)} (>${Z_SCORE_THRESHOLD})`, mean: +mean.toFixed(2), stddev: +stddev.toFixed(2) };
+  }
+  return { suspicious: false, z: +z.toFixed(2) };
+}

@@ -37,6 +37,7 @@
     "parser": "tiered:tiered_v1",
     "tier_chain": [
       "html_render:web_llm_v1",
+      "rss:publisher_rss_v1",
       "llm:google_news_llm_v1"
     ]
   },

@@ -48,7 +48,7 @@ const CONFIGS = {
 export async function fetchPrimary(metric) {
   const cfg = CONFIGS[metric.metric_id];
   if (!cfg) throw new Error(`No moneycontrol_v1 config for ${metric.metric_id}`);
-  const browser = await getBrowser();
+  const browser = await getSharedBrowser();
   if (!browser) throw new Error('moneycontrol_v1: playwright not installed');
   const b = await browser;
   const ctx = await b.newContext({ userAgent: UA, locale: 'en-IN', viewport: { width: 1280, height: 800 } });

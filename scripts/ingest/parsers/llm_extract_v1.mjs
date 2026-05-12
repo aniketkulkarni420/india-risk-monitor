@@ -18,6 +18,7 @@
 // that the ingest pipeline catches and reports honestly.
 
 import { fetchResilient } from '../fetch-resilient.mjs';
+import { recordLlmCall } from '../observability.mjs';
 
 const PROVIDERS = {
   groq: {
@@ -161,9 +162,14 @@ async function tryProviders(prompt) {
       const r = await callProvider(provider, prompt);
       if (r === null) continue;  // env key missing — skip
       const parsed = parseLlmJson(r.text);
-      if (parsed && Number.isFinite(parsed.value)) return { ...parsed, provider: r.provider };
+      if (parsed && Number.isFinite(parsed.value)) {
+        try { recordLlmCall(provider, true); } catch {}
+        return { ...parsed, provider: r.provider };
+      }
+      try { recordLlmCall(provider, false); } catch {}
       errors.push(`${provider}: returned no value (raw: ${r.text.slice(0,120)})`);
     } catch (e) {
+      try { recordLlmCall(provider, false); } catch {}
       errors.push(`${provider}: ${e.message}`);
     }
   }

@@ -16,7 +16,7 @@ on:
 jobs:
   ingest-india:
     runs-on: [self-hosted, windows, india]
-    timeout-minutes: 20
+    timeout-minutes: 40
     permissions:
       contents: write
     defaults:
@@ -27,9 +27,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install deps
-        run: npm install --no-audit --no-fund
+        run: npm install --no-audit --no-fund --prefer-offline
 
       - name: Run live ingest for single metric
         if: ${{ github.event.inputs.metric != '' }}

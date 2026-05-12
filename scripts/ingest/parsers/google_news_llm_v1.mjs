@@ -16,22 +16,8 @@ import { fetchResilient } from '../fetch-resilient.mjs';
 import { parseRssItems } from './pib_rss_v1.mjs';
 import { tryProviders } from './llm_extract_v1.mjs';
 import { recordSnapshot } from '../snapshot-store.mjs';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
-// Shared Playwright browser, lazy-loaded
-let _pwBrowserPromise = null;
-async function getBrowser() {
-  if (!_pwBrowserPromise) {
-    let pw;
-    try { pw = require('playwright'); } catch { return null; }
-    _pwBrowserPromise = pw.chromium.launch({ headless: true });
-    const close = async () => { try { const b = await _pwBrowserPromise; await b.close(); } catch {} };
-    process.once('SIGINT', close);
-    process.once('SIGTERM', close);
-  }
-  return _pwBrowserPromise;
-}
+import { getSharedBrowser } from '../browser-pool.mjs';
+const getBrowser = getSharedBrowser;
 
 /**
  * Fetch a Google News article URL. Google News uses encoded redirects that
@@ -234,19 +220,19 @@ export async function fetchPrimary(metric) {
   }
   if (!candidates.length) throw new Error(`google_news_llm: ${items.length} items, none passed filters`);
 
-  // Step 3+4: fetch each article body, extract via LLM. First plausible wins.
+  // Step 3+4: fetch each article body + extract via LLM IN PARALLEL.
+  // Tier A optimization: ~5x faster than sequential when 4+ candidates.
   const errors = [];
-  const fetchedArticles = [];  // collect for multi-doc fallback
+  const fetchedArticles = [];
 
-  for (const article of candidates) {
+  async function processArticle(article) {
     try {
       const articleRes = await fetchArticleBody(article.link, { timeoutMs: 25000 });
       if (cfg.sourceWhitelist && !inWhitelist(articleRes.finalUrl, cfg.sourceWhitelist)) {
-        errors.push(`${(articleRes.finalUrl||'?').slice(0,60)}: not in source whitelist`);
-        continue;
+        return { failed: true, reason: `not in whitelist: ${(articleRes.finalUrl||'?').slice(0,60)}` };
       }
       const bodyText = stripHtml(articleRes.body).slice(0, cfg.maxBodyChars || 6000);
-      fetchedArticles.push({ headline: article.title, body: bodyText, link: articleRes.finalUrl || article.link, pubDate: article.pubDate });
+      const captured = { headline: article.title, body: bodyText, link: articleRes.finalUrl || article.link, pubDate: article.pubDate };
 
       const prompt = 'Extract: ' + cfg.target +
         '\n\nArticle headline: ' + article.title +
@@ -254,32 +240,49 @@ export async function fetchPrimary(metric) {
       const result = await tryProviders(prompt);
 
       if (!result || result.value === null || !Number.isFinite(result.value)) {
-        errors.push(`${article.link.slice(0,60)}: LLM no value`); continue;
+        return { failed: true, captured, reason: `${article.link.slice(0,60)}: LLM no value` };
       }
-
       let value = cfg.valueTransform ? cfg.valueTransform(result.value) : result.value;
       if (!cfg.plausible(value)) {
-        errors.push(`${article.link.slice(0,60)}: ${value} out of band`); continue;
+        return { failed: true, captured, reason: `${article.link.slice(0,60)}: ${value} out of band` };
       }
-
       try { recordSnapshot(metric.metric_id, articleRes.finalUrl || article.link, articleRes.body, value, 'google_news_llm_v1'); } catch {}
-
       return {
-        value,
-        as_of: article.pubDate ? new Date(article.pubDate).toISOString() : new Date().toISOString(),
-        parse_meta: {
-          source: 'google-news-llm',
-          headline: article.title.slice(0, 240),
-          link: article.link,
-          final_url: articleRes.finalUrl,
-          provider: result.provider,
-          source_note: result.source_note
-        },
-        raw: `${result.provider}: ${result.value} from "${article.title.slice(0,100)}"`
+        success: true,
+        captured,
+        result: {
+          value,
+          as_of: article.pubDate ? new Date(article.pubDate).toISOString() : new Date().toISOString(),
+          parse_meta: {
+            source: 'google-news-llm',
+            headline: article.title.slice(0, 240),
+            link: article.link,
+            final_url: articleRes.finalUrl,
+            provider: result.provider,
+            source_note: result.source_note
+          },
+          raw: `${result.provider}: ${result.value} from "${article.title.slice(0,100)}"`
+        }
       };
     } catch (e) {
       if (e.code === 'LLM_UNAVAILABLE') throw e;
-      errors.push(`${article.link?.slice(0,60)}: ${e.message.slice(0,80)}`);
+      return { failed: true, reason: `${article.link?.slice(0,60)}: ${e.message.slice(0,80)}` };
+    }
+  }
+
+  // Fire all candidate-article extractions in parallel
+  const settled = await Promise.allSettled(candidates.map(processArticle));
+  for (const s of settled) {
+    if (s.status === 'fulfilled') {
+      const r = s.value;
+      if (r.captured) fetchedArticles.push(r.captured);
+      if (r.success) {
+        return r.result;
+      }
+      if (r.reason) errors.push(r.reason);
+    } else {
+      if (s.reason?.code === 'LLM_UNAVAILABLE') throw s.reason;
+      errors.push(String(s.reason).slice(0, 120));
     }
   }
 

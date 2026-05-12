@@ -1,0 +1,37 @@
+name: Prune snapshots monthly
+
+# Tier B (2026-05-12): bounded snapshot retention to prevent repo bloat.
+# Each parser keeps the last 14 snapshots per metric, but git history still
+# retains every snapshot ever committed. This workflow rewrites the snapshot
+# directory monthly to keep repo size in check.
+
+on:
+  schedule:
+    - cron: '0 4 1 * *'   # 1st of month, 04:00 UTC
+  workflow_dispatch:
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prune snapshot files older than 30 days
+        run: |
+          find data/snapshots -type f \( -name '*.html.gz' -o -name '*.json' \) -mtime +30 -print -delete || true
+          # Remove empty directories
+          find data/snapshots -type d -empty -delete || true
+
+      - name: Commit + push pruned tree
+        run: |
+          git config user.name 'IRM Snapshot Pruner'
+          git config user.email 'irm-pruner@bot.local'
+          git add -A data/snapshots
+          if git diff --staged --quiet; then
+            echo "Nothing to prune."
+          else
+            git commit -m "chore: monthly snapshot pruning (drop files >30 days)"
+            git push
+          fi

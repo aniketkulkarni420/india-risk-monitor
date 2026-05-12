@@ -27,29 +27,17 @@ function getPlaywright() {
   return playwright;
 }
 
-let _browserPromise = null;
+// Use shared browser pool (saves ~2-3s cold-start per parser invocation)
+import { getSharedBrowser } from '../browser-pool.mjs';
+
 async function getBrowser() {
-  const pw = getPlaywright();
-  if (!pw) {
+  const b = await getSharedBrowser();
+  if (!b) {
     const e = new Error('playwright not installed. Run `npm install playwright && npx playwright install chromium`.');
     e.code = 'PLAYWRIGHT_UNAVAILABLE';
     throw e;
   }
-  if (!_browserPromise) {
-    // --disable-http2 bypasses NSE's HTTP/2 protocol-error block on bots
-    _browserPromise = pw.chromium.launch({
-      headless: true,
-      args: ['--disable-http2', '--disable-blink-features=AutomationControlled']
-    });
-    // Auto-close on process exit
-    const close = async () => {
-      try { const b = await _browserPromise; await b.close(); } catch {}
-    };
-    process.once('exit', () => { /* sync only */ });
-    process.once('SIGINT', close);
-    process.once('SIGTERM', close);
-  }
-  return _browserPromise;
+  return b;
 }
 
 // Per-metric config:
