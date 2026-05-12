@@ -174,6 +174,9 @@ function customRules(file, m) {
 // Subdirs that contain non-metric JSON files validate should skip
 const SKIP_DIRS = new Set(['snapshots', 'manual-overrides', 'self-heal-reports']);
 
+// Files that live in data/ but aren't metric/composite JSONs (skip from validate).
+const SKIP_FILES = new Set(['manifest.json', 'parser-health.json', 'source-cooldown.json', 'llm-telemetry.json']);
+
 function walk(dir) {
   const out = [];
   for (const name of readdirSync(dir)) {
@@ -181,7 +184,7 @@ function walk(dir) {
     const p = join(dir, name);
     const s = statSync(p);
     if (s.isDirectory()) out.push(...walk(p));
-    else if (name.endsWith('.json') && name !== 'manifest.json' && !name.startsWith('sectors') && name !== 'parser-health.json') out.push(p);
+    else if (name.endsWith('.json') && !SKIP_FILES.has(name) && !name.startsWith('sectors')) out.push(p);
   }
   return out;
 }
