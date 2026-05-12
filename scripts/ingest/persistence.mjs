@@ -66,17 +66,21 @@ function historyFile(metric_id) {
   return join(HISTORY, `${metric_id}.csv`);
 }
 
-export function appendHistory(metric_id, value, as_of, { dryRun = false } = {}) {
+export function appendHistory(metric_id, value, as_of, { dryRun = false, source = '', parser_id = '' } = {}) {
   const file = historyFile(metric_id);
   const dateKey = as_of.slice(0, 10);
+  // Sanitize source for CSV (no commas, no newlines)
+  const sourceCol = String(source || '').replace(/[,\n\r]/g, ' ').slice(0, 200);
+  const parserCol = String(parser_id || '').replace(/[,\n\r]/g, ' ').slice(0, 80);
   if (existsSync(file)) {
     const last = readFileSync(file, 'utf8').trim().split('\n').slice(-1)[0];
     if (last && last.startsWith(dateKey + ',')) return { appended: false, reason: 'already_present' };
   } else if (!dryRun) {
-    writeFileSync(file, 'date,value\n', 'utf8');
+    // Extended schema (backward-compatible · old rows just have 2 cols)
+    writeFileSync(file, 'date,value,source,parser\n', 'utf8');
   }
   if (dryRun) return { appended: false, reason: 'dry_run' };
-  appendFileSync(file, `${dateKey},${value}\n`, 'utf8');
+  appendFileSync(file, `${dateKey},${value},${sourceCol},${parserCol}\n`, 'utf8');
   return { appended: true, file };
 }
 

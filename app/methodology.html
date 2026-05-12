@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Methodology · India Risk Monitor</title>
+<meta name="description" content="How IRM data is sourced, validated, scored, and refreshed. SEBI RA-built. Free, public.">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="components/styles.css">
+<style>
+  body{max-width:780px;margin:0 auto;padding:40px 24px 80px;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65}
+  h1{font-size:28px;margin:0 0 4px}
+  h2{margin-top:40px;color:var(--accent);font-size:18px;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h3{font-size:14px;color:var(--ink-2);margin-top:24px;text-transform:uppercase;letter-spacing:.06em}
+  .lede{color:var(--ink-2);font-size:15px;margin:8px 0 28px}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+  th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--ink-3);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+  code{font-family:var(--mono);background:#161b24;padding:1px 6px;border-radius:3px;font-size:12px;color:var(--accent)}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  nav{margin-bottom:24px}
+  nav a{margin-right:14px}
+  ul{padding-left:24px}
+  ul li{margin:4px 0}
+</style>
+</head>
+<body>
+<nav><a href="/">← Dashboard</a> <a href="/privacy.html">Privacy</a> <a href="/api/v1/index.json">API</a></nav>
+
+<h1>Methodology</h1>
+<p class="lede">How India Risk Monitor sources, validates, scores, and refreshes its 60 metrics. Plain English.</p>
+
+<h2>Data sources</h2>
+<p>IRM pulls data from <b>~30 distinct sources</b> in three categories:</p>
+<ul>
+  <li><b>Government direct:</b> RBI (rates, FX, reserves) · MoSPI (CPI, IIP, WPI) · PIB ministry releases · DPIIT · PPAC (petroleum) · eaindustry.nic.in (Eight Core Industries)</li>
+  <li><b>Exchange / regulator:</b> NSE (indices, F&amp;O, FII/DII flows) · BSE · NSDL · SEBI</li>
+  <li><b>Industry / aggregator:</b> FADA (auto sales) · CRISIL (credit spread) · JPC Steel · Drewry (WCI) · Baltic Exchange · Trading Economics · DBnomics · data.gov.in</li>
+</ul>
+
+<h2>Refresh cadence</h2>
+<p>Each metric has its own natural cadence. IRM refreshes when source publishes:</p>
+<table>
+  <tr><th>Cadence</th><th>Count</th><th>Examples</th></tr>
+  <tr><td>Live (~15 min)</td><td>7</td><td>Nifty, Bank Nifty, VIX, Brent, Gold, DXY, INR/USD</td></tr>
+  <tr><td>Daily</td><td>20</td><td>FII/DII flows, banking liquidity, G-sec yield, WACR spread</td></tr>
+  <tr><td>Weekly</td><td>4</td><td>FX reserves, reservoir levels, Drewry WCI, credit spread</td></tr>
+  <tr><td>Fortnightly</td><td>1</td><td>Credit-deposit growth</td></tr>
+  <tr><td>Monthly</td><td>25</td><td>CPI, WPI, IIP, GST, UPI, auto sales, PMI, trade deficit</td></tr>
+  <tr><td>Quarterly</td><td>2</td><td>CAD %GDP, port dwell time</td></tr>
+</table>
+
+<h2>How "stale" is shown</h2>
+<p>When a metric isn't refreshed within its expected window, a <b>STALE pill</b> appears next to it on the dashboard. The badge shows the age (e.g. <code>STALE 5d</code>) and the source's expected cadence. No silent staleness.</p>
+
+<h2>Resilience · why data keeps flowing</h2>
+<p>Each metric has a <b>tier_chain</b> of fallback sources tried in priority order:</p>
+<ol>
+  <li><b>Manual override</b> · drop a JSON file to instantly fix any stuck metric</li>
+  <li><b>Primary source</b> · government or exchange direct</li>
+  <li><b>Tier B/C backup</b> · DBnomics, news aggregators, Wikipedia, industry RSS</li>
+  <li><b>LLM extraction</b> · free Groq/Gemini parse article body if source format changed</li>
+  <li><b>Local content cache</b> · 14-day gzipped HTML mirror falls back if upstream is down</li>
+  <li><b>Wayback Machine</b> · archive.org snapshot as ultimate net</li>
+</ol>
+<p>Plus: India self-hosted runner for IP-restricted government sites; Cloudflare Worker proxy as failover; daily content mirror; cross-source verification.</p>
+
+<h2>Data integrity checks</h2>
+<ul>
+  <li><b>Plausibility bands</b> per metric (e.g. Brent must be $30-$200/bbl) · rejects out-of-band parses</li>
+  <li><b>Anomaly detection (z-score)</b> · flags values &gt;4σ from 12-month sparkline</li>
+  <li><b>Shadow verification</b> · suspicious values get cross-checked with secondary tier</li>
+  <li><b>Source attribution</b> · every history row has its source URL stored</li>
+  <li><b>Snapshot store</b> · 14-day archive of every successful fetch's raw HTML for audit</li>
+</ul>
+
+<h2>India Risk Score</h2>
+<p>The headline score (0-100) is a weighted average of 6 driver composites:</p>
+<table>
+  <tr><th>Driver</th><th>Weight</th><th>Feeders</th></tr>
+  <tr><td>Oil physical</td><td>3</td><td>Brent · India basket · Hormuz throughput · VLCC tanker rates</td></tr>
+  <tr><td>Freight</td><td>2</td><td>WCI · BDI · VLCC · port dwell</td></tr>
+  <tr><td>Institutional flows</td><td>3</td><td>FII equity · FPI debt · DII · absorption · F&amp;O OI · blocks</td></tr>
+  <tr><td>India macro</td><td>3</td><td>INR · CPI · WPI · IIP · fiscal · CAD</td></tr>
+  <tr><td>Real economy</td><td>2</td><td>GST · PMI · IIP · steel · auto · rail freight</td></tr>
+  <tr><td>Sector breadth</td><td>2</td><td>VIX · PE · sector tier counts</td></tr>
+</table>
+<p>Scoring scale: <b>0-40 calm · 40-60 neutral · 60-75 elevated · 75-85 high · &gt;85 shock</b>.</p>
+
+<h2>What this is NOT</h2>
+<ul>
+  <li><b>NOT trading advice.</b> No buy/sell signals. Analytical tool for research, not execution.</li>
+  <li><b>NOT real-time tick data.</b> Live metrics refresh roughly every 15 min, not millisecond.</li>
+  <li><b>NOT individual stock data.</b> IRM is macro + flows. For stock screens use Screener.in.</li>
+  <li><b>NOT comprehensive.</b> 60 metrics cover the broad picture but miss niche signals (commodity futures spreads, options Greeks, etc).</li>
+</ul>
+
+<h2>License + attribution</h2>
+<p>IRM data outputs (CSVs and JSON in <code>/data/</code>) are released under <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a>. The dashboard code is private but the data and methodology are open. Attribute as: "Source: India Risk Monitor (india-risk-monitor.pages.dev), aggregated from RBI/MoSPI/NSE/etc."</p>
+
+<h2>Built by</h2>
+<p>Aniket Kulkarni · <b>SEBI Registered Research Analyst INH000009843</b> · Pune. Independent. No conflicts. No paywall. No data sale.</p>
+
+<p style="margin-top:48px;color:var(--ink-3);font-size:12px">Last updated 2026-05-12.</p>
+</body>
+</html>

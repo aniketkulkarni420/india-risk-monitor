@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sources health · India Risk Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../components/styles.css">
+<style>
+  body{max-width:1100px;margin:0 auto;padding:40px 24px 80px;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+  h1{font-size:28px;margin:0 0 4px}
+  .lede{color:var(--ink-2);font-size:15px;margin:8px 0 28px;line-height:1.6}
+  nav{margin-bottom:24px}
+  nav a{color:var(--accent);margin-right:14px;text-decoration:none;border-bottom:1px dotted var(--accent)}
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+  .card .num{font-family:var(--mono);font-size:32px;font-weight:600}
+  .card .lbl{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+  .green{color:var(--green)}.red{color:var(--red)}.amber{color:var(--amber)}.blue{color:var(--blue)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--ink-3);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;text-align:left}
+  td{font-family:var(--mono)}
+  td.sans{font-family:var(--sans)}
+  .pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;letter-spacing:.04em}
+  .pill.green{background:rgba(63,178,127,.15);color:var(--green);border:1px solid rgba(63,178,127,.3)}
+  .pill.amber{background:rgba(226,166,78,.15);color:var(--amber);border:1px solid rgba(226,166,78,.3)}
+  .pill.red{background:rgba(226,100,100,.15);color:var(--red);border:1px solid rgba(226,100,100,.3)}
+  #last-update{color:var(--ink-3);font-family:var(--mono);font-size:11px}
+</style>
+</head>
+<body>
+<nav><a href="/">← Dashboard</a> <a href="/methodology.html">Methodology</a> <a href="/api/v1/health.json">API · health JSON</a></nav>
+
+<h1>Sources health</h1>
+<p class="lede">Per-parser status of all 60 metrics. Updated every 6 hours by the India self-hosted runner. Last update: <span id="last-update">loading…</span></p>
+
+<div class="summary" id="summary"></div>
+
+<h2 style="margin-top:32px;font-size:18px;color:var(--accent)">Red parsers (chronically failing)</h2>
+<table id="red-table"><thead><tr><th>Metric</th><th>Consecutive failures</th><th>Last success</th><th>Failure reason</th></tr></thead><tbody></tbody></table>
+
+<h2 style="margin-top:32px;font-size:18px;color:var(--accent)">All parsers</h2>
+<table id="all-table"><thead><tr><th>Metric</th><th>Status</th><th>Last success value</th><th>Last success</th></tr></thead><tbody></tbody></table>
+
+<h2 style="margin-top:32px;font-size:18px;color:var(--accent)">Manual overrides currently active</h2>
+<table id="overrides-table"><thead><tr><th>Metric</th><th>Value</th><th>As of</th><th>Expires</th><th>Source</th></tr></thead><tbody></tbody></table>
+
+<script>
+async function load() {
+  const res = await fetch('/api/v1/health.json');
+  const data = await res.json();
+  const ph = await (await fetch('/dist/data.json')).json().then(d => d.parser_health || {});
+
+  document.getElementById('last-update').textContent = new Date(data.generated_at).toLocaleString();
+
+  // Summary
+  const s = data.summary || ph.summary || { green: 0, amber: 0, red: 0, total: 0 };
+  document.getElementById('summary').innerHTML = `
+    <div class="card"><div class="lbl">Green</div><div class="num green">${s.green}</div></div>
+    <div class="card"><div class="lbl">Amber</div><div class="num amber">${s.amber}</div></div>
+    <div class="card"><div class="lbl">Red</div><div class="num red">${s.red}</div></div>
+    <div class="card"><div class="lbl">Total tracked</div><div class="num">${s.total}</div></div>
+  `;
+
+  // Red metrics detail
+  const redBody = document.querySelector('#red-table tbody');
+  for (const m of (ph.red_metrics || [])) {
+    redBody.insertAdjacentHTML('beforeend', `
+      <tr><td class="sans">${m.id}</td><td>${m.consecutive_failures}</td><td>${m.last_success_at ? new Date(m.last_success_at).toISOString().slice(0,10) : '-'}</td><td style="color:var(--red);font-size:11px;max-width:400px">${(m.last_failure_reason || '').slice(0, 200)}</td></tr>
+    `);
+  }
+  if (!redBody.children.length) redBody.innerHTML = '<tr><td colspan="4" style="color:var(--green)">No red parsers · all healthy</td></tr>';
+
+  // All parsers
+  const allBody = document.querySelector('#all-table tbody');
+  const parsers = ph.parsers || {};
+  // If we don't have full parsers data, skip
+  if (!Object.keys(parsers).length) {
+    allBody.innerHTML = '<tr><td colspan="4" style="color:var(--ink-3)">Detailed parser data not yet exposed in API · check data/parser-health.json on GitHub</td></tr>';
+  }
+
+  // Manual overrides
+  const ovBody = document.querySelector('#overrides-table tbody');
+  for (const ov of (ph.manual_overrides || [])) {
+    ovBody.insertAdjacentHTML('beforeend', `
+      <tr><td class="sans">${ov.metric_id}</td><td>${ov.value}</td><td>${ov.as_of?.slice(0,10) || '-'}</td><td>${ov.expires_at?.slice(0,10) || '-'}</td><td style="font-size:11px"><a href="${ov.source_url}" target="_blank" style="color:var(--accent)">${ov.source_name || 'link'}</a></td></tr>
+    `);
+  }
+  if (!ovBody.children.length) ovBody.innerHTML = '<tr><td colspan="5" style="color:var(--ink-3)">No active manual overrides</td></tr>';
+}
+load().catch(e => {
+  document.getElementById('summary').innerHTML = `<div class="card"><div class="lbl">Error</div><div style="color:var(--red);font-size:12px">${e.message}</div></div>`;
+});
+</script>
+</body>
+</html>

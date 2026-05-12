@@ -43,7 +43,7 @@ function previousDayValue(metric_id, currentAsOf) {
   try {
     rows = readFileSync(file, 'utf8').trim().split('\n').slice(1)
       .map(l => l.split(','))
-      .filter(r => r.length === 2 && !Number.isNaN(parseFloat(r[1])))
+      .filter(r => r.length >= 2 && !Number.isNaN(parseFloat(r[1])))
       .map(r => ({ date: r[0], value: parseFloat(r[1]) }))
       .sort((a, b) => a.date.localeCompare(b.date));
   } catch { return null; }

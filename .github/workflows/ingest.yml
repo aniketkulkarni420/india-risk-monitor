@@ -47,6 +47,10 @@ jobs:
       - name: Security audit (warn only)
         run: npm audit --audit-level=high || true
 
+      - name: Generate SBOM (Software Bill of Materials)
+        run: npm sbom --omit=dev --sbom-format=cyclonedx > /tmp/sbom.json 2>/dev/null || echo "{}" > /tmp/sbom.json
+        continue-on-error: true
+
       - name: Determine slot from cron schedule
         id: slot
         run: |

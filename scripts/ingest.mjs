@@ -57,7 +57,7 @@ function computeTrendsFromHistory(metric_id, currentValue, currentAsOfIso) {
   try {
     rows = readFileSync(file, 'utf8').trim().split('\n').slice(1)
       .map(l => l.split(','))
-      .filter(r => r.length === 2 && !Number.isNaN(parseFloat(r[1])))
+      .filter(r => r.length >= 2 && !Number.isNaN(parseFloat(r[1])))
       .map(r => ({ date: new Date(r[0] + 'T00:00:00Z'), value: parseFloat(r[1]) }))
       .sort((a, b) => a.date - b.date);
   } catch { return {}; }
@@ -143,7 +143,7 @@ async function ingestOne(metric_id) {
         ...trends
       };
       const writeRes = applyIngest(metric_id, result, { dryRun: ARGS.dryRun });
-      const histRes  = appendHistory(metric_id, override.value, override.as_of, { dryRun: ARGS.dryRun });
+      const histRes  = appendHistory(metric_id, override.value, override.as_of, { dryRun: ARGS.dryRun, source: 'manual-override', parser_id: 'manual:override' });
       const took = Date.now() - start;
       info('ingest_override', {
         metric_id, parser_id, took_ms: took,
@@ -206,7 +206,7 @@ async function ingestOne(metric_id) {
 
     // Persist + history
     const writeRes = applyIngest(metric_id, result, { dryRun: ARGS.dryRun });
-    const histRes  = appendHistory(metric_id, verdict.value, primary.as_of, { dryRun: ARGS.dryRun });
+    const histRes  = appendHistory(metric_id, verdict.value, primary.as_of, { dryRun: ARGS.dryRun, source: (primary.parse_meta?.source || primary.parse_meta?.url || ''), parser_id });
 
     const took = Date.now() - start;
     info('ingest_ok', {

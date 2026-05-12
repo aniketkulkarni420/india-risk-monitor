@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy · India Risk Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="components/styles.css">
+<style>
+  body{max-width:780px;margin:0 auto;padding:40px 24px 80px;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65}
+  h1{font-size:28px;margin:0 0 4px}
+  h2{margin-top:32px;color:var(--accent);font-size:18px;border-bottom:1px solid var(--line);padding-bottom:8px}
+  .lede{color:var(--ink-2);font-size:15px;margin:8px 0 28px}
+  nav{margin-bottom:24px}
+  nav a{color:var(--accent);margin-right:14px;text-decoration:none;border-bottom:1px dotted var(--accent)}
+  ul li{margin:4px 0}
+</style>
+</head>
+<body>
+<nav><a href="/">← Dashboard</a> <a href="/methodology.html">Methodology</a></nav>
+
+<h1>Privacy</h1>
+<p class="lede">What IRM collects, stores, and shares about you. Very little.</p>
+
+<h2>What we collect from visitors</h2>
+<ul>
+  <li><b>Nothing personally identifying.</b> No name, email, phone, address.</li>
+  <li><b>No cookies.</b> We set none. Browser storage is used only for your service-worker cache of dashboard data (purely client-side, never sent anywhere).</li>
+  <li><b>No login, no signup, no tracking pixels.</b></li>
+  <li><b>No analytics.</b> No Google Analytics, no Mixpanel, no Plausible. We do not know who you are or how often you visit.</li>
+</ul>
+
+<h2>What Cloudflare logs (hosting layer)</h2>
+<p>The site is hosted on Cloudflare Pages, which logs standard CDN traffic data (IP address, user agent, request URL, timestamp). These logs are accessible to Cloudflare but are not shared with us beyond aggregate stats. <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare privacy policy</a>.</p>
+
+<h2>What we publish</h2>
+<p>Everything in this repo's <code>data/</code> directory is publicly visible on GitHub. That data is sourced from public government/exchange/aggregator releases. No personal data is in those files.</p>
+
+<h2>External requests</h2>
+<p>The dashboard does not make any client-side API calls to third parties (no embedded Twitter/Facebook/etc widgets). It fetches one file: <code>/dist/data.json</code> from our own domain.</p>
+
+<h2>Data subject rights</h2>
+<p>Since we don't collect anything personally identifying, there's no personal data to access, correct, or delete. If Cloudflare's CDN logs identify you and you want them deleted, contact Cloudflare directly.</p>
+
+<h2>Compliance</h2>
+<ul>
+  <li>SEBI Research Analyst regulations · INH000009843</li>
+  <li>This site does not offer trading advice. It is an analytical dashboard of public data.</li>
+</ul>
+
+<h2>Changes</h2>
+<p>If this policy changes, the date below will update. There's no email subscription so check this page periodically if it matters to you.</p>
+
+<p style="margin-top:48px;color:var(--ink-3);font-size:12px">Last updated 2026-05-12.</p>
+</body>
+</html>
