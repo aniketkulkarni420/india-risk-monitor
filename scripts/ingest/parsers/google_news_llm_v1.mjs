@@ -236,15 +236,18 @@ export async function fetchPrimary(metric) {
 
   // Step 3+4: fetch each article body, extract via LLM. First plausible wins.
   const errors = [];
+  const fetchedArticles = [];  // collect for multi-doc fallback
+
   for (const article of candidates) {
     try {
       const articleRes = await fetchArticleBody(article.link, { timeoutMs: 25000 });
-      // Apply optional sourceWhitelist now that we have the resolved publisher URL
       if (cfg.sourceWhitelist && !inWhitelist(articleRes.finalUrl, cfg.sourceWhitelist)) {
         errors.push(`${(articleRes.finalUrl||'?').slice(0,60)}: not in source whitelist`);
         continue;
       }
       const bodyText = stripHtml(articleRes.body).slice(0, cfg.maxBodyChars || 6000);
+      fetchedArticles.push({ headline: article.title, body: bodyText, link: articleRes.finalUrl || article.link, pubDate: article.pubDate });
+
       const prompt = 'Extract: ' + cfg.target +
         '\n\nArticle headline: ' + article.title +
         '\n\nArticle text:\n\n' + bodyText;
@@ -279,7 +282,42 @@ export async function fetchPrimary(metric) {
       errors.push(`${article.link?.slice(0,60)}: ${e.message.slice(0,80)}`);
     }
   }
-  throw new Error(`${metric.metric_id}: ${candidates.length} candidates, none yielded value · ${errors.slice(0,2).join(' | ')}`);
+
+  // Fallback: concatenate all fetched articles and ask LLM to pick the right one
+  if (fetchedArticles.length >= 2) {
+    try {
+      const combined = fetchedArticles.map((a, i) =>
+        `--- Article ${i+1} ---\nHeadline: ${a.headline}\nText: ${a.body.slice(0, 3000)}`
+      ).join('\n\n');
+      const prompt = 'Extract: ' + cfg.target +
+        `\n\nBelow are ${fetchedArticles.length} candidate articles. ONE of them likely contains the value. Find the article that explicitly mentions the absolute monthly value (not percentage change, not annual total). If NONE of the articles contains the absolute monthly value, return { "value": null, ... }.\n\n` +
+        combined;
+      const r = await tryProviders(prompt);
+      if (r && r.value !== null && Number.isFinite(r.value)) {
+        let value = cfg.valueTransform ? cfg.valueTransform(r.value) : r.value;
+        if (cfg.plausible(value)) {
+          return {
+            value,
+            as_of: r.as_of ? new Date(r.as_of).toISOString() : new Date().toISOString(),
+            parse_meta: {
+              source: 'google-news-llm-multi',
+              articles_count: fetchedArticles.length,
+              provider: r.provider,
+              source_note: r.source_note
+            },
+            raw: `${r.provider} (multi-doc): ${r.value}`
+          };
+        }
+        errors.push(`multi-doc: ${value} out of band`);
+      } else {
+        errors.push(`multi-doc: LLM no value across ${fetchedArticles.length} articles`);
+      }
+    } catch (e) {
+      errors.push(`multi-doc: ${(e.message||'').slice(0,80)}`);
+    }
+  }
+
+  throw new Error(`${metric.metric_id}: ${candidates.length} candidates, none yielded value · ${errors.slice(0,3).join(' | ')}`);
 }
 
 export async function fetchCrosscheck(metric, idx, primaryValue) {
