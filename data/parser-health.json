@@ -39,62 +39,62 @@
       "last_success_value": 256
     },
     "fii_equity_daily": {
-      "last_success_at": "2026-05-12T18:26:54.794Z",
-      "last_success_value": -1959.39,
+      "last_success_at": "2026-05-13T18:26:37.269Z",
+      "last_success_value": -4703.15,
       "consecutive_failures": 0,
       "status": "green"
     },
     "fii_equity_mtd": {
-      "last_success_at": "2026-05-12T18:26:54.889Z",
-      "last_success_value": -1959.39,
+      "last_success_at": "2026-05-13T18:26:37.403Z",
+      "last_success_value": -4703.15,
       "consecutive_failures": 0,
       "status": "green"
     },
     "fii_equity_cytd": {
-      "last_success_at": "2026-05-12T18:26:54.949Z",
-      "last_success_value": -1959.39,
+      "last_success_at": "2026-05-13T18:26:37.493Z",
+      "last_success_value": -4703.15,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dii_daily": {
-      "last_success_at": "2026-05-12T18:26:55.170Z",
-      "last_success_value": 7990.32,
+      "last_success_at": "2026-05-13T18:26:37.637Z",
+      "last_success_value": 5869.05,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dii_mtd": {
-      "last_success_at": "2026-05-12T18:26:55.254Z",
-      "last_success_value": 7990.32,
+      "last_success_at": "2026-05-13T18:26:37.717Z",
+      "last_success_value": 5869.05,
       "consecutive_failures": 0,
       "status": "green"
     },
     "absorption_ratio": {
-      "last_success_at": "2026-05-12T18:26:55.260Z",
-      "last_success_value": 4.08,
+      "last_success_at": "2026-05-13T18:26:37.726Z",
+      "last_success_value": 1.25,
       "consecutive_failures": 0,
       "status": "green"
     },
     "nifty_50": {
-      "last_success_at": "2026-05-12T18:26:57.199Z",
-      "last_success_value": 23379.55,
+      "last_success_at": "2026-05-13T18:26:38.601Z",
+      "last_success_value": 23412.6,
       "consecutive_failures": 0,
       "status": "green"
     },
     "bank_nifty": {
-      "last_success_at": "2026-05-12T18:26:57.633Z",
-      "last_success_value": 53555.2,
+      "last_success_at": "2026-05-13T18:26:39.226Z",
+      "last_success_value": 53456.15,
       "consecutive_failures": 0,
       "status": "green"
     },
     "nifty_pe_5y": {
-      "last_success_at": "2026-05-12T18:26:58.044Z",
-      "last_success_value": 20.3,
+      "last_success_at": "2026-05-13T18:26:39.622Z",
+      "last_success_value": 20.33,
       "consecutive_failures": 0,
       "status": "green"
     },
     "india_vix": {
-      "last_success_at": "2026-05-12T18:26:58.531Z",
-      "last_success_value": 19.28,
+      "last_success_at": "2026-05-13T18:26:40.098Z",
+      "last_success_value": 19.43,
       "consecutive_failures": 0,
       "status": "green"
     },
@@ -333,17 +333,17 @@
       "status": "green"
     },
     "fno_oi_buildup": {
-      "last_failure_at": "2026-05-13T16:40:07.290Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: getSharedBrowser is not defined | html_render:playwright_render_v1: fno_oi_buildup: playwright failed [https://www.nseindia.com/option-chain: page.goto: Timeout 60000ms | llm:google_",
-      "consecutive_failures": 4,
+      "last_failure_at": "2026-05-13T18:26:37.727Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:playwright_render_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
+      "consecutive_failures": 5,
       "status": "red",
       "last_success_at": "2026-05-12T01:29:52.123Z",
       "last_success_value": 9.38
     },
     "block_deals_notional": {
-      "last_failure_at": "2026-05-13T16:40:13.216Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · html_render:web_llm_v1: browserContext.newPage: Target page, context or browser has been closed | html_render:bse_v1: getSharedBrowser is not defined | html_render:moneycontrol_v1: getSharedBrowser is not define",
-      "consecutive_failures": 7,
+      "last_failure_at": "2026-05-13T18:26:37.727Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · html_render:web_llm_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:moneycontrol_v1: in cooldown",
+      "consecutive_failures": 8,
       "status": "red"
     },
     "fpi_debt_flows": {
@@ -367,5 +367,5 @@
     "red": 7,
     "total": 56
   },
-  "generated_at": "2026-05-13T16:40:16.477Z"
+  "generated_at": "2026-05-13T18:26:40.098Z"
 }
