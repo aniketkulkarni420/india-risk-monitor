@@ -39,61 +39,61 @@
       "last_success_value": 256
     },
     "fii_equity_daily": {
-      "last_success_at": "2026-05-14T11:29:22.921Z",
-      "last_success_value": -4703.15,
+      "last_success_at": "2026-05-14T17:28:32.360Z",
+      "last_success_value": 187.46,
       "consecutive_failures": 0,
       "status": "green"
     },
     "fii_equity_mtd": {
-      "last_success_at": "2026-05-14T11:29:23.048Z",
-      "last_success_value": -4703.15,
+      "last_success_at": "2026-05-14T17:28:32.422Z",
+      "last_success_value": 187.46,
       "consecutive_failures": 0,
       "status": "green"
     },
     "fii_equity_cytd": {
-      "last_success_at": "2026-05-14T11:29:23.169Z",
-      "last_success_value": -4703.15,
+      "last_success_at": "2026-05-14T17:28:32.487Z",
+      "last_success_value": 187.46,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dii_daily": {
-      "last_success_at": "2026-05-14T11:29:23.359Z",
-      "last_success_value": 5869.05,
+      "last_success_at": "2026-05-14T17:28:32.547Z",
+      "last_success_value": 684.33,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dii_mtd": {
-      "last_success_at": "2026-05-14T11:29:23.506Z",
-      "last_success_value": 5869.05,
+      "last_success_at": "2026-05-14T17:28:32.628Z",
+      "last_success_value": 684.33,
       "consecutive_failures": 0,
       "status": "green"
     },
     "absorption_ratio": {
-      "last_success_at": "2026-05-14T11:29:23.574Z",
-      "last_success_value": 1.25,
+      "last_success_at": "2026-05-14T17:28:32.637Z",
+      "last_success_value": 3.65,
       "consecutive_failures": 0,
       "status": "green"
     },
     "nifty_50": {
-      "last_success_at": "2026-05-14T11:30:58.129Z",
+      "last_success_at": "2026-05-14T17:28:33.577Z",
       "last_success_value": 23689.6,
       "consecutive_failures": 0,
       "status": "green"
     },
     "bank_nifty": {
-      "last_success_at": "2026-05-14T11:30:58.207Z",
+      "last_success_at": "2026-05-14T17:28:34.130Z",
       "last_success_value": 54128.95,
       "consecutive_failures": 0,
       "status": "green"
     },
     "nifty_pe_5y": {
-      "last_success_at": "2026-05-14T11:30:58.279Z",
-      "last_success_value": 20.33,
+      "last_success_at": "2026-05-14T17:28:34.549Z",
+      "last_success_value": 20.61,
       "consecutive_failures": 0,
       "status": "green"
     },
     "india_vix": {
-      "last_success_at": "2026-05-14T11:30:58.415Z",
+      "last_success_at": "2026-05-14T17:28:35.029Z",
       "last_success_value": 18.61,
       "consecutive_failures": 0,
       "status": "green"
@@ -337,17 +337,17 @@
       "status": "green"
     },
     "fno_oi_buildup": {
-      "last_failure_at": "2026-05-14T11:30:57.246Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: getSharedBrowser is not defined | html_render:playwright_render_v1: fno_oi_buildup: playwright failed [https://www.nseindia.com/option-chain: page.goto: Timeout 60000ms | llm:google_",
-      "consecutive_failures": 7,
+      "last_failure_at": "2026-05-14T17:28:32.638Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:playwright_render_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
+      "consecutive_failures": 8,
       "status": "red",
       "last_success_at": "2026-05-12T01:29:52.123Z",
       "last_success_value": 9.38
     },
     "block_deals_notional": {
-      "last_failure_at": "2026-05-14T11:30:57.933Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · html_render:web_llm_v1: browser.newContext: Target page, context or browser has been closed | html_render:bse_v1: getSharedBrowser is not defined | html_render:moneycontrol_v1: getSharedBrowser is not defined",
-      "consecutive_failures": 10,
+      "last_failure_at": "2026-05-14T17:28:32.639Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · html_render:web_llm_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:moneycontrol_v1: in cooldown",
+      "consecutive_failures": 11,
       "status": "red"
     },
     "fpi_debt_flows": {
@@ -383,5 +383,5 @@
     "red": 12,
     "total": 58
   },
-  "generated_at": "2026-05-14T11:32:08.775Z"
+  "generated_at": "2026-05-14T17:28:35.029Z"
 }
