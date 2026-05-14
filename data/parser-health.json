@@ -1,32 +1,32 @@
 {
   "parsers": {
     "hormuz_throughput": {
-      "last_success_at": "2026-05-13T11:17:43.596Z",
-      "last_success_value": 84,
+      "last_success_at": "2026-05-14T09:41:41.088Z",
+      "last_success_value": 141,
       "consecutive_failures": 0,
       "status": "green"
     },
     "baltic_dry_index": {
-      "last_success_at": "2026-05-13T11:17:43.873Z",
-      "last_success_value": 3063,
+      "last_success_at": "2026-05-14T09:41:41.279Z",
+      "last_success_value": 3189,
       "consecutive_failures": 0,
       "status": "green"
     },
     "brent_crude": {
-      "last_success_at": "2026-05-13T11:17:43.903Z",
-      "last_success_value": 102.1,
+      "last_success_at": "2026-05-14T09:41:42.396Z",
+      "last_success_value": 101.47,
       "consecutive_failures": 0,
       "status": "green"
     },
     "gold_usd": {
-      "last_success_at": "2026-05-13T11:17:43.930Z",
-      "last_success_value": 4698.6,
+      "last_success_at": "2026-05-14T09:41:42.676Z",
+      "last_success_value": 4692.47,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dxy": {
-      "last_success_at": "2026-05-13T11:17:44.018Z",
-      "last_success_value": 98.478,
+      "last_success_at": "2026-05-14T09:41:42.706Z",
+      "last_success_value": 98.526,
       "consecutive_failures": 0,
       "status": "green"
     },
@@ -35,8 +35,8 @@
       "last_failure_reason": "fetch failed",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-13T11:17:44.679Z",
-      "last_success_value": 256
+      "last_success_at": "2026-05-14T09:41:43.268Z",
+      "last_success_value": 240
     },
     "fii_equity_daily": {
       "last_success_at": "2026-05-13T18:26:37.269Z",
@@ -357,9 +357,9 @@
       "last_success_value": 1
     },
     "vlcc_tanker_rates": {
-      "last_failure_at": "2026-05-13T11:17:43.875Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · press_release:baltic_dirty_v1: not registered | html_scrape:tradingeconomics_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
-      "consecutive_failures": 6,
+      "last_failure_at": "2026-05-14T09:41:42.296Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · press_release:baltic_dirty_v1: not registered | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/commodity/baltic-dirty-tanker-index: pattern not matched (selector tuni | llm:google_news_llm_v1: vlc",
+      "consecutive_failures": 7,
       "status": "red"
     }
   },
@@ -369,5 +369,5 @@
     "red": 7,
     "total": 56
   },
-  "generated_at": "2026-05-13T20:23:24.511Z"
+  "generated_at": "2026-05-14T09:41:43.268Z"
 }
