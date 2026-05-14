@@ -112,6 +112,20 @@ export function applyIngest(metric_id, ingestResult, { dryRun = false } = {}) {
   }
   if (ingestResult.status !== undefined) data.status = ingestResult.status;
 
+  // Merge parser `extra` fields (snapshot payloads, source-state flags, baselines).
+  // Without this, parser-computed fields like `_source_static` are silently dropped
+  // and stale values from prior runs persist. Bug fixed 2026-05-14 (Hormuz stale-flag).
+  if (ingestResult.extra && typeof ingestResult.extra === 'object') {
+    Object.assign(data, ingestResult.extra);
+  }
+
+  // Recompute deviation_from_baseline_pct whenever we have a fresh value + baseline.
+  // Previously only updated if the parser explicitly returned it — leaving stale
+  // garbage (e.g. Hormuz -98.6% against a value that was actually +5.7%).
+  if (typeof data.value === 'number' && typeof data.baseline_30d === 'number' && data.baseline_30d !== 0) {
+    data.deviation_from_baseline_pct = +(((data.value - data.baseline_30d) / data.baseline_30d) * 100).toFixed(1);
+  }
+
   // Persist
   return writeMetric(file, data, { dryRun });
 }

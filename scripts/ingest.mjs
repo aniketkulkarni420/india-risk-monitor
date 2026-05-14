@@ -201,7 +201,11 @@ async function ingestOne(metric_id) {
       as_of: primary.as_of,
       last_verified_at: new Date().toISOString(),
       verification_state: verdict.verification_state,
-      ...trends
+      ...trends,
+      // Forward parser `extra` fields (snapshot payloads, source-state flags,
+      // baselines) so persistence can merge them. Without this, parser-computed
+      // fields like `_source_static` are dropped and stale values persist.
+      ...(primary.extra && typeof primary.extra === 'object' ? { extra: primary.extra } : {})
     };
 
     // Persist + history

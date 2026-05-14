@@ -68,9 +68,19 @@ export async function fetchPrimary(metric) {
         ?? j.total_active
         ?? null;
       if (typeof value === 'number' && value >= 0 && value < 500) {
-        // Detect static snapshot · the v1 endpoint self-identifies as such
-        const sourceField = String(j.source || '').toLowerCase();
-        const isStatic = sourceField.includes('static') || sourceField.includes('placeholder') || sourceField.includes('snapshot · v1');
+        // Static-snapshot detection. The V2 endpoint authoritatively reports
+        // `is_static` — trust it directly. Fall back to source-string heuristic
+        // only for the legacy V1 endpoint that didn't carry the flag.
+        let isStatic;
+        if (typeof j.is_static === 'boolean') {
+          isStatic = j.is_static;
+        } else {
+          const sourceField = String(j.source || '').toLowerCase();
+          isStatic = sourceField.includes('static') || sourceField.includes('placeholder') || sourceField.includes('snapshot · v1');
+        }
+        // Pull the live 30-day baseline if the endpoint provides one — lets
+        // persistence recompute deviation_from_baseline_pct against fresh data.
+        const baseline = typeof j.baseline_30d === 'number' ? j.baseline_30d : undefined;
         return {
           value,
           as_of: j.as_of || new Date().toISOString(),
@@ -88,7 +98,10 @@ export async function fetchPrimary(metric) {
               incidents_30d: j.incidents_30d,
               source: j.source
             },
-            _source_static: isStatic
+            _source_static: isStatic,
+            _live_source_count: j.live_source_count ?? null,
+            _ais_state_age_sec: j.ais_state_age_sec ?? null,
+            ...(baseline !== undefined ? { baseline_30d: baseline } : {})
           },
           parse_meta: {
             source: 'hormuz-watch /api/snapshot' + (isStatic ? ' (static)' : ''),

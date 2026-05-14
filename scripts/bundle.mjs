@@ -109,6 +109,31 @@ function trimFlatTail(metric) {
   metric._sparkline_tail_trimmed = `dropped ${runLen - 1} flat-tail values (parser seed contamination)`;
 }
 
+// Cleanup #3 · leading flat-line head. When a parser was registered with N
+// months of seed-padding at the FRONT (e.g. Hormuz [84,84,...,84,148] where
+// 84 was the static-snapshot seed and 148 is the first real value), the
+// sparkline shows a fake flat history. Detect a leading run of >=4 identical
+// values and trim it, keeping the last seed value as an anchor so renderers
+// can show "history accruing · N real points".
+function trimFlatHead(metric) {
+  const sl = metric.sparkline_12m;
+  if (!Array.isArray(sl) || sl.length < 5) return;
+  const first = sl[0];
+  let runEnd = 0;
+  for (let i = 0; i < sl.length; i++) {
+    if (sl[i] === first) runEnd = i;
+    else break;
+  }
+  const runLen = runEnd + 1;
+  if (runLen < 4) return;            // short leading run can be coincidence
+  if (runLen === sl.length) return;  // all identical — leave for sanitize/other logic
+  // Keep one anchor seed value + everything after the run.
+  const kept = sl.slice(runEnd);
+  metric.sparkline_12m = kept;
+  metric._sparkline_head_trimmed = `dropped ${runLen - 1} leading flat values (parser seed contamination) · ${kept.length} real points`;
+  metric._history_state = 'accruing';
+}
+
 // Sanity guard for day-over-day deltas. The history CSV may contain Phase-1
 // mock-seed values from before a parser was registered; when the parser later
 // switched to real data with different units / sign convention, the prev/current
@@ -142,10 +167,11 @@ let dodAccepted = 0, dodRejected = 0, sparklineSanitized = 0, anomalyCount = 0;
 for (const file of walk(DATA)) {
   const data = JSON.parse(readFileSync(file, 'utf8'));
   if (data.metric_id) {
-    // Sanitize sparkline first (unit-shift detection + flat-tail trim)
+    // Sanitize sparkline first (unit-shift detection + flat-tail/head trim)
     sanitizeSparkline(data);
     trimFlatTail(data);
-    if (data._sparkline_sanitized || data._sparkline_tail_trimmed) sparklineSanitized++;
+    trimFlatHead(data);
+    if (data._sparkline_sanitized || data._sparkline_tail_trimmed || data._sparkline_head_trimmed) sparklineSanitized++;
 
     // 2026-05-12 · Plausibility · when sparkline has <4 unique values, MoM/YoY
     // math is technically valid but semantically meaningless (e.g. Hormuz [2, 84]
