@@ -1,32 +1,32 @@
 {
   "parsers": {
     "hormuz_throughput": {
-      "last_success_at": "2026-05-14T09:58:20.865Z",
-      "last_success_value": 141,
+      "last_success_at": "2026-05-14T10:37:56.919Z",
+      "last_success_value": 148,
       "consecutive_failures": 0,
       "status": "green"
     },
     "baltic_dry_index": {
-      "last_success_at": "2026-05-14T09:58:20.997Z",
+      "last_success_at": "2026-05-14T10:37:57.214Z",
       "last_success_value": 3189,
       "consecutive_failures": 0,
       "status": "green"
     },
     "brent_crude": {
-      "last_success_at": "2026-05-14T09:58:21.014Z",
-      "last_success_value": 100.9,
+      "last_success_at": "2026-05-14T10:37:57.248Z",
+      "last_success_value": 100.88,
       "consecutive_failures": 0,
       "status": "green"
     },
     "gold_usd": {
-      "last_success_at": "2026-05-14T09:58:21.109Z",
-      "last_success_value": 4696.34,
+      "last_success_at": "2026-05-14T10:37:57.285Z",
+      "last_success_value": 4697.76,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dxy": {
-      "last_success_at": "2026-05-14T09:58:21.683Z",
-      "last_success_value": 98.513,
+      "last_success_at": "2026-05-14T10:37:57.445Z",
+      "last_success_value": 98.507,
       "consecutive_failures": 0,
       "status": "green"
     },
@@ -35,7 +35,7 @@
       "last_failure_reason": "fetch failed",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-14T09:58:22.144Z",
+      "last_success_at": "2026-05-14T10:37:58.006Z",
       "last_success_value": 240
     },
     "fii_equity_daily": {
@@ -357,9 +357,9 @@
       "last_success_value": 1
     },
     "vlcc_tanker_rates": {
-      "last_failure_at": "2026-05-14T09:58:20.998Z",
+      "last_failure_at": "2026-05-14T10:37:57.215Z",
       "last_failure_reason": "tiered: all 3 tiers failed · press_release:baltic_dirty_v1: not registered | html_scrape:tradingeconomics_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
-      "consecutive_failures": 8,
+      "consecutive_failures": 9,
       "status": "red"
     }
   },
@@ -369,5 +369,5 @@
     "red": 7,
     "total": 56
   },
-  "generated_at": "2026-05-14T09:58:22.144Z"
+  "generated_at": "2026-05-14T10:37:58.006Z"
 }
