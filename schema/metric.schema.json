@@ -102,7 +102,7 @@
     },
     "verification_state": {
       "type": "string",
-      "enum": ["verified", "crosscheck_pending", "history_pending", "source_pending"]
+      "enum": ["verified", "crosscheck_pending", "history_pending", "source_pending", "manual_override"]
     },
     "last_verified_at": { "type": "string", "format": "date-time" },
     "why_it_matters": { "type": "string", "minLength": 12 },

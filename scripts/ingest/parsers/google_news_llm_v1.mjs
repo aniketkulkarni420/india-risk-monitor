@@ -183,6 +183,22 @@ const CONFIGS = {
     plausible: (v) => v > 200 && v < 5000,
     maxArticles: 5,
     maxAgeDays: 90
+  },
+
+  hormuz_throughput: {
+    queryFn: () => 'Strait of Hormuz vessels transit daily count ships',
+    target: 'The number of ships/vessels transiting the Strait of Hormuz PER DAY in the most recent reported period. ' +
+      'CONTEXT: As of 2026 the Strait is in crisis — Iran has largely blocked it since Feb 28 2026, transits collapsed from a ~130-160/day baseline to single digits. ' +
+      'Return the DAILY transit count. If an article gives a weekly total (e.g. "40 ships crossed the strait this week"), divide by 7 and return the daily figure. ' +
+      'If an article says the strait is "closed" or reports "zero transits", return 0. ' +
+      'STRICT EXCLUSIONS: (1) the pre-crisis baseline (~130-160/day) — that is historical context, NOT current; ' +
+      '(2) vessels STRANDED, ANCHORED, WAITING, or STUCK in/outside the Persian Gulf (those are 200-2000+ counts and are NOT transits); ' +
+      '(3) cumulative totals since the crisis began; (4) oil volume in barrels (that is mbpd, not ship count). ' +
+      'Return only the current daily TRANSIT count, expected range 0-60 in the current crisis, or up to 160 if the article explicitly describes normal pre-crisis operations dated to the most recent period.',
+    headlineFilter: (t) => /hormuz/i.test(t),
+    plausible: (v) => v >= 0 && v <= 200,
+    maxArticles: 6,
+    maxAgeDays: 21
   }
 };
 
