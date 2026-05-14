@@ -101,39 +101,39 @@
     "gsec_curve": {
       "last_success_at": "2026-05-12T20:20:00.413Z",
       "last_success_value": 7.05,
-      "consecutive_failures": 4,
+      "consecutive_failures": 5,
       "status": "red",
-      "last_failure_at": "2026-05-14T19:23:47.204Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · json_api:ccil_v1: https://tradingeconomics.com/india/government-bond-yield: pattern not matched (selector tuning neede | json_api:dbnomics_v1: No dbnomics config for gsec_curve | html_scrape:tradingeconomics_v1:"
+      "last_failure_at": "2026-05-14T20:18:34.039Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · json_api:ccil_v1: in cooldown | json_api:dbnomics_v1: in cooldown | html_scrape:tradingeconomics_v1: in cooldown"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-05-14T19:23:47.218Z",
+      "last_success_at": "2026-05-14T20:18:34.052Z",
       "last_success_value": 3.27,
       "consecutive_failures": 0,
       "status": "green"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-05-14T19:23:47.252Z",
+      "last_success_at": "2026-05-14T20:18:34.419Z",
       "last_success_value": 322144.23,
       "consecutive_failures": 0,
       "status": "green"
     },
     "wacr_repo_spread": {
-      "last_failure_at": "2026-05-14T19:23:50.556Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 1 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx: WACR n | llm:google_news_llm_v1: wacr_repo_spread: 4 candidates, none yielded value · h",
-      "consecutive_failures": 9,
+      "last_failure_at": "2026-05-14T20:18:34.422Z",
+      "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
+      "consecutive_failures": 10,
       "status": "red",
       "last_success_at": "2026-05-12T01:24:27.459Z",
       "last_success_value": -5
     },
     "inr_usd": {
-      "last_success_at": "2026-05-14T19:23:50.633Z",
-      "last_success_value": 95.568,
+      "last_success_at": "2026-05-14T20:18:34.466Z",
+      "last_success_value": 95.571,
       "consecutive_failures": 0,
       "status": "green"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-05-14T19:23:50.647Z",
+      "last_success_at": "2026-05-14T20:18:34.480Z",
       "last_success_value": 230,
       "consecutive_failures": 0,
       "status": "green"
@@ -351,9 +351,9 @@
       "status": "red"
     },
     "fpi_debt_flows": {
-      "last_failure_at": "2026-05-14T19:23:46.973Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: getSharedBrowser is not defined | html_render:bse_v1: getSharedBrowser is not defined | html_render:playwright_render_v1: browserType.launch: Executable doesn't exist at /home/runner",
-      "consecutive_failures": 9,
+      "last_failure_at": "2026-05-14T20:18:34.038Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:playwright_render_v1: in cooldown",
+      "consecutive_failures": 10,
       "status": "red",
       "last_success_at": "2026-05-12T01:32:10.433Z",
       "last_success_value": 1
@@ -383,5 +383,5 @@
     "red": 12,
     "total": 58
   },
-  "generated_at": "2026-05-14T19:23:50.647Z"
+  "generated_at": "2026-05-14T20:18:34.480Z"
 }
