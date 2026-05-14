@@ -20,7 +20,7 @@
 // dbnomics / TradingEconomics archive pulls), replace SCENARIOS below with
 // actual historical snapshots.
 
-import { recomputeComposites, REFERENCE_EVENTS } from './ingest/composite-recompute.mjs';
+import { recomputeComposites, REFERENCE_EVENTS } from './composite-recompute.mjs';
 
 const args = new Set(process.argv.slice(2));
 const VERBOSE = args.has('--verbose');

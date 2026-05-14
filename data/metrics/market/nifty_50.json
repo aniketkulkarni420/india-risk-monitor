@@ -4,16 +4,15 @@
   "display_subtitle": "NSE benchmark index",
   "section": "market",
   "sub_cluster": "equity",
-  "value": 23412.6,
+  "value": 23689.6,
   "unit": "Index",
   "value_format": "decimal_2",
-  "as_of": "2026-05-13T18:26:38.598Z",
+  "as_of": "2026-05-14T11:30:58.123Z",
   "as_of_period": "live",
-  "mom_pct": 3.95,
-  "yoy_pct": 2.63,
+  "mom_pct": 5.17,
+  "yoy_pct": 3.84,
   "vs_5y_avg_pct": 41.6,
   "sparkline_12m": [
-    24032.8,
     24032.8,
     24330.95,
     24330.95,
@@ -24,10 +23,11 @@
     23815.85,
     23379.55,
     23379.55,
-    23412.6
+    23412.6,
+    23689.6
   ],
   "baseline_30d": 22730,
-  "deviation_from_baseline_pct": -1.2,
+  "deviation_from_baseline_pct": 4.2,
   "status": "med",
   "shock_eligible": true,
   "shock_rule": "intraday move > 3% OR drawdown > 8% from rolling 60d high",
@@ -56,7 +56,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-13T18:26:38.601Z",
+  "last_verified_at": "2026-05-14T11:30:58.127Z",
   "why_it_matters": "The headline equity index. A market risk dashboard without Nifty is incomplete; the level + drawdown vs rolling high contextualise every other risk signal.",
   "formula": null,
   "trigger_thresholds": [
