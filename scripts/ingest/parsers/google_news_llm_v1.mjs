@@ -199,6 +199,103 @@ const CONFIGS = {
     plausible: (v) => v >= 0 && v <= 200,
     maxArticles: 6,
     maxAgeDays: 21
+  },
+
+  // ── Genuine independent tiers added 2026-05-14 ──
+  // These metrics previously had tier chains referencing unregistered parsers
+  // (rbi_wss_v1, cwc_v1) or parsers with no config. News-LLM is a real,
+  // origin-independent fallback: all of these are reported in Indian/global
+  // press on a regular cadence.
+
+  fx_reserves: {
+    queryFn: () => 'India forex reserves RBI weekly billion',
+    target: 'India total foreign exchange reserves in USD billion, most recent weekly figure from the RBI Weekly Statistical Supplement. ' +
+      'Typical range 550-720 USD billion. Reported every Friday/Saturday. ' +
+      'STRICT EXCLUSIONS: (1) foreign currency assets component alone (that is a subset, ~85% of the total); ' +
+      '(2) gold reserves alone; (3) the weekly CHANGE (e.g. "rose $2 bn") — return the TOTAL level, not the change; ' +
+      '(4) figures in INR. Return the total reserves level in USD billion.',
+    headlineFilter: (t) => /(forex|foreign exchange|fx)\s*reserve/i.test(t),
+    plausible: (v) => v > 500 && v < 800,
+    maxArticles: 6,
+    maxAgeDays: 14
+  },
+
+  reservoir_levels: {
+    queryFn: () => 'India reservoir storage level CWC percent capacity',
+    target: 'All-India live reservoir storage as a PERCENTAGE of total capacity, from the Central Water Commission (CWC) weekly bulletin. ' +
+      'Typical range 20-85% depending on season. Reported weekly (usually Thursday/Friday). ' +
+      'STRICT EXCLUSIONS: (1) a single reservoir or single state/region (return the ALL-INDIA aggregate); ' +
+      '(2) storage in BCM/billion cubic metres (return the PERCENTAGE); (3) "percent of last year" or "percent of normal" comparisons — ' +
+      'return the percent of TOTAL CAPACITY. If only BCM given with total capacity, compute the percentage.',
+    headlineFilter: (t) => /reservoir|water storage|CWC/i.test(t),
+    plausible: (v) => v > 5 && v < 100,
+    maxArticles: 6,
+    maxAgeDays: 14
+  },
+
+  drewry_wci: {
+    queryFn: () => 'Drewry World Container Index composite freight rate',
+    target: 'The Drewry World Container Index (WCI) composite — the global average 40-foot container shipping spot rate in USD per 40ft container (FEU). ' +
+      'Typical range 1000-6000 USD/FEU. Reported weekly (Thursday). ' +
+      'STRICT EXCLUSIONS: (1) a single trade-lane rate (e.g. Shanghai-Rotterdam alone — those are lane-specific); ' +
+      '(2) percentage week-on-week change; (3) the Shanghai Containerized Freight Index (SCFI) — that is a different index. ' +
+      'Return the WCI composite in USD per FEU.',
+    headlineFilter: (t) => /(container|freight rate|drewry|WCI)/i.test(t),
+    plausible: (v) => v > 500 && v < 12000,
+    maxArticles: 5,
+    maxAgeDays: 21
+  },
+
+  vlcc_tanker_rates: {
+    queryFn: () => 'Baltic Dirty Tanker Index BDTI crude tanker freight rate',
+    target: 'The Baltic Dirty Tanker Index (BDTI) — a daily index tracking crude-oil tanker (VLCC/Suezmax/Aframax) shipping rates. ' +
+      'Typical range 500-2500. ' +
+      'STRICT EXCLUSIONS: (1) the Baltic CLEAN Tanker Index (BCTI) — different index for refined products; ' +
+      '(2) the Baltic DRY Index (BDI) — that is for dry bulk, not tankers; (3) a percentage change; ' +
+      '(4) Worldscale points or $/day TCE for a single route. Return the BDTI index value. ' +
+      'If the article does not contain a BDTI numeric value, return null.',
+    headlineFilter: null,   // let the LLM + plausibility guard judge from body — headline filter was rejecting all candidates
+    plausible: (v) => v > 200 && v < 5000,
+    maxArticles: 6,
+    maxAgeDays: 30
+  },
+
+  gsec_curve: {
+    queryFn: () => 'India 10 year government bond yield G-Sec',
+    target: 'The India 10-year government bond (G-Sec) yield, as a percentage. Typical range 5.5-8.0%. ' +
+      'STRICT EXCLUSIONS: (1) the 1-year, 5-year, or any non-10-year tenor; (2) US Treasury yields; ' +
+      '(3) corporate bond yields; (4) the repo rate. Return the 10-year G-Sec yield percentage.',
+    headlineFilter: (t) => /(bond yield|g-sec|gsec|10[- ]year)/i.test(t),
+    plausible: (v) => v > 4 && v < 12,
+    maxArticles: 5,
+    maxAgeDays: 14
+  },
+
+  foreign_tourist_arrivals: {
+    queryFn: () => 'India foreign tourist arrivals',
+    target: 'India monthly Foreign Tourist Arrivals (FTA) in LAKH (1 lakh = 100,000). Typical monthly range 5-12 lakh. ' +
+      'Reported monthly by the Ministry of Tourism. ' +
+      'STRICT EXCLUSIONS: (1) annual/FY cumulative totals (those are 70-100 lakh range); ' +
+      '(2) domestic tourist visits (different, far larger); (3) foreign exchange earnings from tourism (that is rupees, not arrivals). ' +
+      'UNIT HANDLING: if the figure is given in millions, convert to lakh (1 million = 10 lakh). ' +
+      'If the article gives no monthly absolute FTA count, return null.',
+    headlineFilter: null,   // niche metric — few articles match a strict headline filter; let LLM judge from body
+    plausible: (v) => v > 2 && v < 20,
+    maxArticles: 6,
+    maxAgeDays: 120
+  },
+
+  baltic_dry_index: {
+    queryFn: () => 'Baltic Dry Index BDI dry bulk shipping',
+    target: 'The Baltic Dry Index (BDI) — a daily index tracking dry-bulk (iron ore, coal, grain) shipping rates. ' +
+      'Typical range 800-4000. ' +
+      'STRICT EXCLUSIONS: (1) the Baltic DIRTY Tanker Index (BDTI) — that is for crude oil tankers, different index; ' +
+      '(2) a percentage change; (3) individual vessel-class indices (Capesize/Panamax/Supramax) — return the headline BDI composite. ' +
+      'Return the BDI index value.',
+    headlineFilter: (t) => /(baltic dry|BDI|dry bulk)/i.test(t),
+    plausible: (v) => v > 400 && v < 8000,
+    maxArticles: 5,
+    maxAgeDays: 21
   }
 };
 

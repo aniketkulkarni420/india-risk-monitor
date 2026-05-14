@@ -7,6 +7,7 @@
   "scripts": {
     "validate": "node scripts/validate.mjs",
     "validate:strict": "node scripts/validate.mjs --strict",
+    "audit:tiers": "node scripts/audit-tier-chains.mjs",
     "ingest": "node scripts/ingest.mjs",
     "ingest:dry": "node scripts/ingest.mjs --dry-run",
     "ingest:live": "node scripts/ingest.mjs --live",
@@ -14,7 +15,7 @@
     "audit": "node scripts/audit.mjs",
     "audit:visual": "node scripts/visual-audit.mjs",
     "audit:full": "npm run audit && npm run audit:visual",
-    "build": "node scripts/validate.mjs && node scripts/bundle.mjs && node scripts/audit.mjs",
+    "build": "node scripts/validate.mjs && node scripts/audit-tier-chains.mjs && node scripts/bundle.mjs && node scripts/audit.mjs",
     "preview": "node scripts/bundle.mjs && node scripts/build-preview.mjs",
     "backfill": "node scripts/backfill.mjs",
     "serve": "node scripts/serve.mjs"

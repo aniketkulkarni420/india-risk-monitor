@@ -65,15 +65,11 @@ const EXTRACTORS = {
     extractRe: /Current\s+Account\s+to\s+GDP[^0-9-]*?(-?\d{1,2}\.\d{1,2})/i,
     plausible: (v) => Math.abs(v) < 10
   },
-  // VLCC tanker rates: Baltic Dirty Tanker Index.
-  // 2026-05-12: re-enabled with broader regex · TE has page at /commodity/baltic-dirty-tanker-index
-  // Falls back via tiered chain to news+LLM if extractor breaks.
-  vlcc_tanker_rates: {
-    url: 'https://tradingeconomics.com/commodity/baltic-dirty-tanker-index',
-    extractRe: /(?:Baltic\s+Dirty|Dirty\s+Tanker|BDTI)[^0-9]*?(\d[\d,]*)/i,
-    plausible: (v) => v > 200 && v < 5000,
-    valueParser: (s) => parseInt(s.replace(/,/g, ''), 10)
-  },
+  // VLCC tanker rates / Baltic Dirty Tanker Index.
+  // 2026-05-14: TE's /commodity/ pages are JS-rendered and do NOT expose the
+  // value in meta tags (verified by curl — meta description is generic).
+  // Removed from TE extractors. vlcc_tanker_rates now relies on the news-LLM
+  // tier (BDTI is quoted regularly in shipping press) — see google_news_llm_v1.
 
   // Fiscal deficit % of GDP. TE format: "deficit equal to 4.80 percent of...GDP"
   // or "fiscal deficit to 4.8% of GDP". Both patterns supported.
@@ -133,21 +129,22 @@ const EXTRACTORS = {
   // gsec_curve: store the 10Y yield as the canonical value (unit: % (10Y)).
   // The full 1Y/5Y/10Y curve is rendered from snapshot text in main.mjs;
   // here we just keep the headline value live.
+  //
+  // 2026-05-14 ROBUSTNESS FIX: TE renders the live value into the
+  // <meta name="description"> tag in a stable sentence — e.g.
+  //   "The yield on India 10Y Bond Yield held steady at 7.05% on May 14..."
+  // The verb varies (rose/fell/held steady/edged up/stands/...), so we no
+  // longer enumerate verbs. We extract the FIRST percentage that appears
+  // after "India 10Y Bond Yield" within the meta description. Server-
+  // rendered + stable = far more durable than scraping the live widget.
   gsec_curve: {
     url: 'https://tradingeconomics.com/india/government-bond-yield',
-    extractRe: /yield\s+on\s+India\s+10Y\s+Bond\s+Yield\s+(?:rose|fell|stands|holds)\s+to\s+(\d{1,2}\.\d{1,2})/i,
+    extractRe: /India 10Y Bond Yield[^.%]*?(\d{1,2}\.\d{1,2})\s*%/i,
     plausible: (v) => v > 4 && v < 12
-  },
-
-  // High-yield credit spread proxy via India corporate bond yield (TE has no AAA-G-sec direct)
-  high_yield_credit_spread: {
-    url: 'https://tradingeconomics.com/india/government-bond-yield',
-    // TE format: "yield on India 10Y Bond Yield rose to 7.02% on May 5"
-    extractRe: /(?:yield\s+on\s+India\s+10Y\s+Bond\s+Yield\s+(?:rose|fell|stands|holds)\s+to|10[- ]year\s+G[-\s]?Sec\s+(?:rose|fell|holds|stands|traded)\s+toward)\s+(\d{1,2}\.\d{1,2})/i,
-    plausible: (v) => v > -100 && v < 500,  // post-conversion: bps spread. -100 to 500 covers all realistic regimes
-    // Convert 10Y G-sec yield to a proxy spread (corporate AAA typically G-sec + 75 bps)
-    valueParser: (s) => +((parseFloat(s) - 5.5) * 100).toFixed(0)  // bps over repo
   }
+  // high_yield_credit_spread moved to derived_v1 (computed from gsec_curve)
+  // — TE has no clean corporate-spread source and re-fetching the same
+  // bond-yield page was fake independence. See derived_v1.mjs.
 };
 
 async function fetchHtml(url, timeoutMs = 30000) {

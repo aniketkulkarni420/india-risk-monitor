@@ -3,17 +3,7 @@
 import { recordSnapshot } from '../snapshot-store.mjs';
 import { tryProviders } from './llm_extract_v1.mjs';
 import { stripHtml } from './google_news_llm_v1.mjs';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
-let _bp = null;
-async function getBrowser() {
-  if (!_bp) {
-    let pw; try { pw = require('playwright'); } catch { return null; }
-    _bp = pw.chromium.launch({ headless: true, args: ['--disable-http2','--disable-blink-features=AutomationControlled'] });
-  }
-  return _bp;
-}
+import { getSharedBrowser } from '../browser-pool.mjs';
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
@@ -38,9 +28,8 @@ const CONFIGS = {
 export async function fetchPrimary(metric) {
   const cfg = CONFIGS[metric.metric_id];
   if (!cfg) throw new Error(`No bse_v1 config for ${metric.metric_id}`);
-  const browser = await getSharedBrowser();
-  if (!browser) throw new Error('bse_v1: playwright not installed');
-  const b = await browser;
+  const b = await getSharedBrowser();
+  if (!b) throw new Error('bse_v1: playwright not installed');
   const ctx = await b.newContext({ userAgent: UA, locale: 'en-IN', viewport: { width: 1280, height: 800 } });
   const errors = [];
   try {
