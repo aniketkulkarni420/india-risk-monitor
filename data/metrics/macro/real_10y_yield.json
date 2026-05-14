@@ -4,13 +4,13 @@
   "display_subtitle": "10Y G-sec minus CPI YoY",
   "section": "macro",
   "sub_cluster": "rates",
-  "value": 3.35,
+  "value": 3.27,
   "unit": "%",
   "value_format": "decimal_2",
-  "as_of": "2026-03-31T17:30:00.000Z",
+  "as_of": "2026-04-30T12:00:00.000Z",
   "as_of_period": "live",
-  "mom_pct": -4.15,
-  "yoy_pct": -1.51,
+  "mom_pct": -5.55,
+  "yoy_pct": -5.68,
   "vs_5y_avg_pct": 24.1,
   "sparkline_12m": [
     3.35,
@@ -24,7 +24,7 @@
     3.35,
     3.35,
     3.35,
-    3.35
+    3.27
   ],
   "status": "med",
   "shock_eligible": false,
@@ -44,7 +44,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-14T11:30:58.995Z",
+  "last_verified_at": "2026-05-14T19:23:47.216Z",
   "why_it_matters": "Real yield is what fund managers actually price off — nominal yield minus inflation. Currently elevated (~3.6%) — attractive carry, supports debt FPI inflows.",
   "formula": "gsec_curve_10y - cpi_inflation_yoy. Updates daily on G-sec close; re-pegs monthly when CPI prints.",
   "linked_metrics": [
