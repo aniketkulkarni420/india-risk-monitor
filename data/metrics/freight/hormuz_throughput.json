@@ -7,7 +7,7 @@
   "value": 148,
   "unit": "ships/day",
   "value_format": "integer",
-  "as_of": "2026-05-14T11:09:21.681Z",
+  "as_of": "2026-05-14T10:37:56.864Z",
   "as_of_period": "24h",
   "mom_pct": 7335.69,
   "yoy_pct": 7686.6,
@@ -22,12 +22,12 @@
     84,
     84,
     84,
-    148,
-    148,
+    141,
+    141,
     148
   ],
   "baseline_30d": 140,
-  "deviation_from_baseline_pct": 5.7,
+  "deviation_from_baseline_pct": -98.6,
   "status": "shock",
   "shock_eligible": true,
   "shock_rule": "value < 50% baseline_30d",
@@ -56,17 +56,17 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-14T11:09:21.611Z",
-  "_source_static": false,
+  "last_verified_at": "2026-05-14T10:37:56.917Z",
+  "_source_static": true,
   "_snapshot_payload": {
-    "vessel_count_inbound": 0,
-    "vessel_count_outbound": 0,
-    "total_active": 0,
+    "vessel_count_inbound": 38,
+    "vessel_count_outbound": 42,
+    "total_active": 80,
     "dark_vessels": 947,
-    "bdti": 3063,
-    "pct_of_normal": 105.7,
+    "bdti": 14,
+    "pct_of_normal": 60,
     "incidents_30d": 58,
-    "source": "Web scrape · VesselFinder Gulf ports (1/2 sites · confidence medium)"
+    "source": "hormuz-watch · static snapshot · v1"
   },
   "_source_count_actual": 1,
   "why_it_matters": "Approximately 40% of India's crude imports route through the Strait of Hormuz. Strategic petroleum reserves cover only ~9.5 days of imports, so a sustained collapse forces immediate sourcing pivot.",
@@ -93,7 +93,5 @@
     "Cape route diversion volumes",
     "Mumbai port arrivals 7-day moving avg"
   ],
-  "notes": "AIS data has a ~2hr lag. Manual cross-check vs Reuters wire daily during shock periods.",
-  "_live_source_count": 1,
-  "_ais_state_age_sec": 4136
+  "notes": "AIS data has a ~2hr lag. Manual cross-check vs Reuters wire daily during shock periods."
 }
