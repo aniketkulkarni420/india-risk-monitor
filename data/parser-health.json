@@ -123,7 +123,7 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T05:05:32.283Z",
+      "last_success_at": "2026-05-15T13:29:23.820Z",
       "last_success_value": -29
     },
     "inr_usd": {
@@ -157,11 +157,11 @@
       "last_failure_reason": "india_port_dwell_time: 2 candidates, none yielded value · https://news.google.com/rss/articles/CBMilgFBVV95cUxQTm1Xd3N: browser.newContext: Target page, context or browser has been closed | https://news.google.com/rss/articles/CBMiyAFBVV95c",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T05:06:00.970Z",
+      "last_success_at": "2026-05-15T13:29:56.036Z",
       "last_success_value": 0.95
     },
     "india_crude_basket": {
-      "last_success_at": "2026-05-15T05:06:20.944Z",
+      "last_success_at": "2026-05-15T13:34:03.682Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green"
@@ -209,7 +209,7 @@
       "last_failure_reason": "google_news_rss: empty feed for \"UPI transactions value lakh crore May 2026 OR April 2026\"",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T05:06:29.558Z",
+      "last_success_at": "2026-05-15T13:34:01.362Z",
       "last_success_value": 29.53
     },
     "pol_demand": {
@@ -217,7 +217,7 @@
       "last_failure_reason": "pol_demand: 1 candidates, none yielded value · https://news.google.com/rss/articles/CBMiW0FVX3lxTFBzZ3hYcVF: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T05:06:33.023Z",
+      "last_success_at": "2026-05-15T13:29:27.814Z",
       "last_success_value": 19.3
     },
     "air_pax": {
@@ -225,7 +225,7 @@
       "last_failure_reason": "air_pax: all sources failed [https://www.dgca.gov.in/digigov-portal/?nq=qHE4MM%2BFwSPaUnbl0Wqejg%3D%3D: no match | https://pib.gov.in/AllRelease.aspx?MinCode=03: no match]",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T05:06:35.444Z",
+      "last_success_at": "2026-05-15T13:29:29.022Z",
       "last_success_value": 132.67
     },
     "iip_growth": {
@@ -247,7 +247,7 @@
       "status": "green"
     },
     "naukri_jobspeak": {
-      "last_success_at": "2026-05-15T05:06:37.409Z",
+      "last_success_at": "2026-05-15T13:34:06.862Z",
       "last_success_value": 2858,
       "consecutive_failures": 0,
       "status": "green"
@@ -257,7 +257,7 @@
       "last_failure_reason": "cement_dispatches: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMiggFBVV95cUxPNFplNDZ: 3.89 out of band | https://news.google.com/rss/articles/CBMimAFBVV95cUxPOXA0S2l: All LLM providers failed: groq: returned no",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T05:06:41.384Z",
+      "last_success_at": "2026-05-15T13:33:59.355Z",
       "last_success_value": 40.7
     },
     "steel_consumption": {
@@ -277,7 +277,7 @@
       "last_failure_reason": "eway_bills: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMigAFBVV95cUxQMnpkNHJ: browser.newContext: Target page, context or browser has been closed | https://news.google.com/rss/articles/CBMixwFBVV95cUxQQnZoRHF:",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T05:08:59.659Z",
+      "last_success_at": "2026-05-15T13:30:36.056Z",
       "last_success_value": 90
     },
     "fastag_toll": {
@@ -285,24 +285,24 @@
       "last_failure_reason": "tiered: all 4 tiers failed · email:email_pipeline_v1: Gmail IMAP not configured · set GMAIL_ADDRESS + GMAIL_APP_PASSWORD | html_render:web_llm_v1: browser.newContext: Target page, context or browser has been closed | rss:publisher_rss_v1: p",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T05:09:05.875Z",
+      "last_success_at": "2026-05-15T13:31:01.125Z",
       "last_success_value": 5559.91
     },
     "rail_freight": {
-      "last_failure_at": "2026-05-14T11:31:56.615Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · email:email_pipeline_v1: Gmail IMAP not configured · set GMAIL_ADDRESS + GMAIL_APP_PASSWORD | html_render:web_llm_v1: browser.newContext: Target page, context or browser has been closed | rss:publisher_rss_v1: p",
-      "consecutive_failures": 0,
-      "status": "green",
+      "last_failure_at": "2026-05-15T13:32:47.963Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · email:email_pipeline_v1: email_pipeline: no matching emails for rail_freight (subscription may not have delivered yet) | llm:google_news_llm_v1: rail_freight: 6 candidates, none yielded value · https://news.goog",
+      "consecutive_failures": 1,
+      "status": "amber",
       "last_success_at": "2026-05-15T05:09:20.483Z",
       "last_success_value": 137.72
     },
     "port_cargo": {
       "last_failure_at": "2026-05-15T05:10:27.924Z",
       "last_failure_reason": "tiered: all 3 tiers failed · llm:google_news_llm_v1: port_cargo: 6 candidates, none yielded value · https://news.google.com/rss/articles/CBMiugFBVV95cUxN | rss:publisher_rss_v1: publisher_rss_v1: 2 articles tried · https://www.maritimegatew",
-      "consecutive_failures": 2,
-      "status": "amber",
-      "last_success_at": "2026-05-13T16:37:50.066Z",
-      "last_success_value": 60
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-15T13:33:48.718Z",
+      "last_success_value": 62.11
     },
     "fiscal_deficit_pct": {
       "last_success_at": "2026-05-15T05:10:28.292Z",
@@ -345,14 +345,14 @@
       "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: getSharedBrowser is not defined | html_render:playwright_render_v1: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_ | llm:google_",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T05:03:07.295Z",
-      "last_success_value": 24.85
+      "last_success_at": "2026-05-15T13:41:03.247Z",
+      "last_success_value": -2.64
     },
     "block_deals_notional": {
-      "last_failure_at": "2026-05-14T18:25:11.592Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · html_render:web_llm_v1: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_ | html_render:bse_v1: getSharedBrowser is not defined | html_render:moneycontrol_v1: g",
-      "consecutive_failures": 0,
-      "status": "green",
+      "last_failure_at": "2026-05-15T13:42:43.293Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: nse_api_v1: block_deals_notional — no extractable value from https://www.nseindia.com/api/block-deal | html_render:bse_v1: bse_v1: all 2 URLs failed · https://www.bseindia.com/markets/equity",
+      "consecutive_failures": 1,
+      "status": "amber",
       "last_success_at": "2026-05-15T05:03:50.288Z",
       "last_success_value": 5326
     },
@@ -361,7 +361,7 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:playwright_render_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T05:05:23.849Z",
+      "last_success_at": "2026-05-15T13:44:58.946Z",
       "last_success_value": 1
     },
     "vlcc_tanker_rates": {
@@ -390,10 +390,10 @@
     }
   },
   "summary": {
-    "green": 57,
-    "amber": 1,
+    "green": 56,
+    "amber": 2,
     "red": 0,
     "total": 58
   },
-  "generated_at": "2026-05-15T10:43:21.483Z"
+  "generated_at": "2026-05-15T13:44:58.946Z"
 }
