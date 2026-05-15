@@ -12,7 +12,11 @@ let _closed = false;
 const LAUNCH_ARGS = [
   '--disable-http2',                          // bypass NSE's HTTP/2 bot wall
   '--disable-blink-features=AutomationControlled',  // hide webdriver fingerprint
-  '--single-process',                         // Windows perf · ~200ms faster launch
+  // NOTE: `--single-process` was removed 2026-05-14. It saved ~200ms launch
+  // but is unstable when multiple browser contexts are opened concurrently
+  // (ingest runs metrics in parallel; google_news_llm_v1 opens contexts in
+  // Promise.allSettled). Under load chromium would crash → "Target page,
+  // context or browser has been closed". Stability > 200ms.
   '--disable-dev-shm-usage',                  // Avoid shm crashes in CI
   '--no-sandbox',                             // CI containers
   '--disable-gpu'                             // headless doesn't need GPU
@@ -34,13 +38,21 @@ export async function getSharedBrowser() {
     try { pw = require('playwright'); }
     catch { return null; }
     _browserPromise = pw.chromium.launch({ headless: true, args: LAUNCH_ARGS });
-    // Best-effort cleanup on process exit
+    // Best-effort cleanup on real process termination ONLY.
+    //
+    // BUG FIX 2026-05-14: do NOT register a `beforeExit` handler here.
+    // `beforeExit` fires every time the event loop drains — which happens
+    // mid-run between parser awaits — so a beforeExit close would shut the
+    // shared browser down while later parsers still need it, producing
+    // "Target page, context or browser has been closed" failures across
+    // moneycontrol_v1 / bse_v1 / web_llm_v1 / playwright_render_v1.
+    // SIGINT/SIGTERM are the only signals that mean "actually exiting".
+    // Normal completion is handled by the explicit closeBrowser() call.
     const close = async () => {
       try { _closed = true; const b = await _browserPromise; await b.close(); } catch {}
     };
     process.once('SIGINT', close);
     process.once('SIGTERM', close);
-    process.once('beforeExit', close);
   }
   return _browserPromise;
 }

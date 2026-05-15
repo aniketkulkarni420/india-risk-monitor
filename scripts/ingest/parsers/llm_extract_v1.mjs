@@ -109,7 +109,7 @@ async function callProvider(provider, prompt) {
         response_format: { type: 'json_object' }
       })
     });
-    if (!res.ok) throw new Error(`groq ${res.status}: ${(await res.text()).slice(0,200)}`);
+    if (!res.ok) throw httpError('groq', res, await res.text());
     const j = await res.json();
     const txt = j?.choices?.[0]?.message?.content || '';
     return { provider: 'groq', text: txt };
@@ -126,7 +126,7 @@ async function callProvider(provider, prompt) {
         generationConfig: { temperature: 0, responseMimeType: 'application/json' }
       })
     });
-    if (!res.ok) throw new Error(`gemini ${res.status}: ${(await res.text()).slice(0,200)}`);
+    if (!res.ok) throw httpError('gemini', res, await res.text());
     const j = await res.json();
     const txt = j?.candidates?.[0]?.content?.parts?.[0]?.text || '';
     return { provider: 'gemini', text: txt };
@@ -147,7 +147,7 @@ async function callProvider(provider, prompt) {
         temperature: 0
       })
     });
-    if (!res.ok) throw new Error(`cloudflare ${res.status}: ${(await res.text()).slice(0,200)}`);
+    if (!res.ok) throw httpError('cloudflare', res, await res.text());
     const j = await res.json();
     const txt = j?.result?.response || '';
     return { provider: 'cloudflare', text: txt };
@@ -155,22 +155,55 @@ async function callProvider(provider, prompt) {
   return null;
 }
 
+// Build a classified HTTP error. 429 (rate limit) and 503 (overloaded) are
+// marked `.retryable` — the caller waits and retries the SAME provider once
+// before failing over, because these clear in seconds. `retryAfterMs` honors
+// the provider's Retry-After header when present.
+function httpError(provider, res, bodyText) {
+  const status = res.status;
+  const e = new Error(`${provider} ${status}: ${(bodyText || '').slice(0, 160)}`);
+  e.status = status;
+  e.provider = provider;
+  if (status === 429 || status === 503 || status === 500) {
+    e.retryable = true;
+    const ra = res.headers.get('retry-after');
+    const raSec = ra ? parseFloat(ra) : NaN;
+    e.retryAfterMs = Number.isFinite(raSec) ? Math.min(raSec * 1000, 15000) : null;
+  }
+  return e;
+}
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
 async function tryProviders(prompt) {
   const errors = [];
   for (const provider of ['groq', 'gemini', 'cloudflare']) {
-    try {
-      const r = await callProvider(provider, prompt);
-      if (r === null) continue;  // env key missing — skip
-      const parsed = parseLlmJson(r.text);
-      if (parsed && Number.isFinite(parsed.value)) {
-        try { recordLlmCall(provider, true); } catch {}
-        return { ...parsed, provider: r.provider };
+    // Up to 2 attempts per provider: the 2nd only happens on a retryable
+    // error (429/503), after a short backoff. Free LLM tiers rate-limit
+    // under burst load (a full ingest fires dozens of calls); a brief wait
+    // usually clears it — far cheaper than failing the whole metric.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const r = await callProvider(provider, prompt);
+        if (r === null) break;  // env key missing — skip provider entirely
+        const parsed = parseLlmJson(r.text);
+        if (parsed && Number.isFinite(parsed.value)) {
+          try { recordLlmCall(provider, true); } catch {}
+          return { ...parsed, provider: r.provider };
+        }
+        try { recordLlmCall(provider, false); } catch {}
+        errors.push(`${provider}: returned no value (raw: ${r.text.slice(0, 120)})`);
+        break;  // a non-numeric response won't change on retry — fail over
+      } catch (e) {
+        try { recordLlmCall(provider, false); } catch {}
+        if (e.retryable && attempt === 0) {
+          const waitMs = e.retryAfterMs ?? (1500 + Math.floor(Math.random() * 1500));
+          await sleep(waitMs);
+          continue;  // retry SAME provider once
+        }
+        errors.push(`${provider}: ${e.message}`);
+        break;  // non-retryable or already retried — fail over to next provider
       }
-      try { recordLlmCall(provider, false); } catch {}
-      errors.push(`${provider}: returned no value (raw: ${r.text.slice(0,120)})`);
-    } catch (e) {
-      try { recordLlmCall(provider, false); } catch {}
-      errors.push(`${provider}: ${e.message}`);
     }
   }
   if (errors.length === 0) {

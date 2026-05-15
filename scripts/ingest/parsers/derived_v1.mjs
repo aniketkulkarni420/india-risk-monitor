@@ -21,12 +21,21 @@ let _index = null;
 function metricIndex() {
   if (_index) return _index;
   _index = new Map();
+  // BUG FIX 2026-05-14: previously this walk read EVERY .json under data/,
+  // including data/snapshots/{metric}/{date}.json which carry a `metric_id`
+  // field. A stale dated snapshot would overwrite the live metric in the
+  // index — silently corrupting EVERY derived metric (all driver_* composites,
+  // IRS feeders, absorption_ratio, real_10y_yield, etc). Now skips the same
+  // non-metric directories/files as persistence.mjs.
+  const SKIP_DIRS = new Set(['snapshots', 'manual-overrides', 'self-heal-reports', 'history', 'source-cache']);
+  const SKIP_FILES = new Set(['manifest.json', 'parser-health.json', 'source-cooldown.json', 'llm-telemetry.json']);
   function walk(dir) {
     for (const name of readdirSync(dir)) {
+      if (SKIP_DIRS.has(name)) continue;
       const p = join(dir, name);
       const s = statSync(p);
       if (s.isDirectory()) walk(p);
-      else if (name.endsWith('.json') && name !== 'manifest.json' && !name.startsWith('sectors')) {
+      else if (name.endsWith('.json') && !SKIP_FILES.has(name) && !name.startsWith('sectors')) {
         try {
           const d = JSON.parse(readFileSync(p, 'utf8'));
           if (d.metric_id) _index.set(d.metric_id, d);
@@ -100,6 +109,23 @@ const DERIVERS = {
     const us10y = 4.45;  // FRED DGS10 typical when this dashboard ships; replaced by FRED parser
     const spread = +((india10y - us10y) * 100).toFixed(0);  // to bps
     return { value: spread, asof: repo.as_of };
+  },
+
+  // High-yield credit spread — DERIVED PROXY.
+  // 2026-05-14: India has no clean free corporate-bond-spread feed. The
+  // prior tier chain re-fetched the SAME TradingEconomics G-Sec page twice
+  // (crisil_v1 + tradingeconomics_v1 → identical URL) — fake independence.
+  // Honest replacement: derive a term-premium proxy = (10Y G-Sec − repo) in
+  // bps. This moves with rate stress and is bounded; it is NOT a true
+  // corporate credit spread. Metric notes flag it as a proxy pending a real
+  // corporate bond feed (FBIL corporate curve or CCIL corp trades).
+  high_yield_credit_spread: () => {
+    const gsec = readPeer('gsec_curve');
+    const repo = readPeer('repo_rate');
+    if (!gsec || !repo) throw new Error('high_yield_credit_spread needs gsec_curve + repo_rate');
+    const spreadBps = +(((gsec.value - repo.value)) * 100).toFixed(0);
+    const asof = (gsec.as_of > repo.as_of ? gsec.as_of : repo.as_of) || new Date().toISOString();
+    return { value: spreadBps, asof };
   },
 
   // ───────────── Hero / driver composites ─────────────

@@ -7,20 +7,20 @@
   "value": 3189,
   "unit": "Index",
   "value_format": "integer",
-  "as_of": "2026-05-14T11:29:20.861Z",
+  "as_of": "2026-05-14T12:11:30.975Z",
   "as_of_period": "live",
-  "mom_pct": 14.28,
-  "yoy_pct": 13.77,
+  "mom_pct": 14.51,
+  "yoy_pct": 13.52,
   "vs_5y_avg_pct": 22.4,
   "sparkline_12m": [
-    2978,
-    2978,
-    3001,
-    3001,
     3001,
     3063,
     3063,
     3063,
+    3189,
+    3189,
+    3189,
+    3189,
     3189,
     3189,
     3189,
@@ -37,7 +37,8 @@
     "parser": "tiered:tiered_v1",
     "tier_chain": [
       "html_scrape:tradingeconomics_v1",
-      "json_api:dbnomics_v1"
+      "json_api:dbnomics_v1",
+      "llm:google_news_llm_v1"
     ]
   },
   "source_crosscheck": [
@@ -48,7 +49,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-14T11:29:20.864Z",
+  "last_verified_at": "2026-05-14T12:11:30.978Z",
   "why_it_matters": "Bulk shipping (coal, iron ore, grain) rates. Different from container — relevant for India's commodity imports (cement, steel inputs).",
   "linked_metrics": [
     "drewry_wci",

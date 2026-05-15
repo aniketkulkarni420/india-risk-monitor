@@ -4,18 +4,15 @@
   "display_subtitle": "CRISIL AAA – G-sec 5Y · bps",
   "section": "market",
   "sub_cluster": "credit",
-  "value": 146,
+  "value": 180,
   "unit": "bps",
   "value_format": "bps",
-  "as_of": "2026-05-11T05:00:07.210Z",
+  "as_of": "2026-05-14T12:15:53.075Z",
   "as_of_period": "weekly",
   "mom_pct": null,
   "yoy_pct": null,
   "vs_5y_avg_pct": -12.4,
   "sparkline_12m": [
-    64,
-    62,
-    66,
     78,
     152,
     152,
@@ -24,7 +21,10 @@
     152,
     146,
     146,
-    146
+    146,
+    null,
+    180,
+    180
   ],
   "status": "low",
   "shock_eligible": true,
@@ -35,11 +35,7 @@
     "url": "https://www.crisil.com/en/home/our-businesses/research/data-and-analytics.html",
     "type": "Rating agency",
     "frequency": "Weekly",
-    "parser": "tiered:tiered_v1",
-    "tier_chain": [
-      "html_scrape:crisil_v1",
-      "llm:google_news_llm_v1"
-    ]
+    "parser": "manual:derived_v1"
   },
   "source_crosscheck": [
     {
@@ -54,7 +50,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-11T05:00:07.210Z",
+  "last_verified_at": "2026-05-14T12:16:20.194Z",
   "why_it_matters": "Credit spread widening = corporate funding stress. Currently widening on Hormuz event but well below stress thresholds.",
   "trigger_thresholds": [
     {

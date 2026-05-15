@@ -51,7 +51,30 @@ async function fetchHtml(url, timeoutMs = 15000) {
 }
 
 export async function fetchPrimary(metric) {
-  // Primary: try Aniket's snapshot endpoint
+  // vlcc_tanker_rates · the hormuz-watch-2 snapshot also carries a live,
+  // dated Baltic Dirty Tanker Index (`bdti` + `bdti_as_of` + `bdti_stale`).
+  // BDTI is the canonical proxy for VLCC/dirty-tanker rates and the endpoint
+  // refreshes it daily — far more reliable than scraping TE's JS-rendered
+  // commodity page or hoping for fresh news coverage.
+  if (metric.metric_id === 'vlcc_tanker_rates') {
+    for (const url of SNAPSHOT_URLS) {
+      try {
+        const j = await fetchJson(url);
+        const bdti = typeof j.bdti === 'number' ? j.bdti : null;
+        if (bdti !== null && bdti > 200 && bdti < 8000 && j.bdti_stale !== true) {
+          return {
+            value: bdti,
+            as_of: j.bdti_as_of ? new Date(j.bdti_as_of).toISOString() : (j.as_of || new Date().toISOString()),
+            parse_meta: { source: 'hormuz-watch /api/snapshot · bdti field', endpoint: url, bdti_as_of: j.bdti_as_of },
+            raw: `BDTI ${bdti} (as of ${j.bdti_as_of || '?'})`
+          };
+        }
+      } catch (_) { /* try next url, then fall through to error */ }
+    }
+    throw new Error('hormuz_v1: bdti unavailable or stale on snapshot endpoint');
+  }
+
+  // hormuz_throughput · primary path: try the snapshot endpoint
   for (const url of SNAPSHOT_URLS) {
     try {
       const j = await fetchJson(url);

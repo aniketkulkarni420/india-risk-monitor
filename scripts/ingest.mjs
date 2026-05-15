@@ -18,6 +18,7 @@ import { verify } from './ingest/crosscheck.mjs';
 import { lookupOverride } from './ingest/manual-override.mjs';
 import { SLOTS, ALL_DAILY, ALL_EVERY, COMPOSITES, slotFor } from './ingest/schedule.mjs';
 import { info, warn, error } from './ingest/logger.mjs';
+import { closeBrowser } from './ingest/browser-pool.mjs';
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -282,4 +283,7 @@ if (ARGS.dryRun) console.log(YELLOW('DRY RUN — no files written.'));
 if (!ARGS.live) console.log(DIM('Mock mode — no network. Re-run with --live once parsers are registered.'));
 console.log();
 
+// Explicit shared-browser shutdown before exit. The browser pool no longer
+// auto-closes on `beforeExit` (that fired mid-run and killed in-flight parsers).
+await closeBrowser().catch(() => {});
 process.exit(failed ? 1 : 0);
