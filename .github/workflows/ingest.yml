@@ -51,6 +51,14 @@ jobs:
       - name: Install deps
         run: npm install --no-audit --no-fund --prefer-offline
 
+      - name: Install Playwright chromium
+        # Several parsers (moneycontrol_v1, bse_v1, playwright_render_v1, web_llm_v1,
+        # google_news_llm_v1 redirect resolver) need a real chromium binary. The npm
+        # `playwright` package alone does NOT bring the browser — Issue #2 surfaced
+        # `Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_*`
+        # for ~9 parsers. This installs the binary to the standard cache path.
+        run: npx playwright install --with-deps chromium
+
       - name: Security audit (warn only)
         run: npm audit --audit-level=high || true
 
