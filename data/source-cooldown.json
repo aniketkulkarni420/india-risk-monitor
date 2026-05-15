@@ -30,9 +30,10 @@
     "last_success_at": "2026-05-14T12:11:33.438Z"
   },
   "wacr_repo_spread:html_scrape:rbi_mmo_daily_v1": {
-    "consecutive_failures": 2,
+    "consecutive_failures": 0,
     "last_failure_at": "2026-05-14T12:15:54.143Z",
-    "_cooldown_reset": "2026-05-14 · cleared after getSharedBrowser+single-process bug fixes"
+    "_cooldown_reset": "2026-05-14 · cleared after getSharedBrowser+single-process bug fixes",
+    "last_success_at": "2026-05-15T04:49:36.201Z"
   },
   "wacr_repo_spread:llm:google_news_llm_v1": {
     "consecutive_failures": 1,
@@ -135,20 +136,22 @@
     "_cooldown_reset": "2026-05-14 · cleared after getSharedBrowser+single-process bug fixes"
   },
   "block_deals_notional:html_render:bse_v1": {
-    "consecutive_failures": 2,
-    "last_failure_at": "2026-05-14T12:14:10.298Z",
-    "_cooldown_reset": "2026-05-14 · cleared after getSharedBrowser+single-process bug fixes"
+    "consecutive_failures": 3,
+    "last_failure_at": "2026-05-15T04:50:05.458Z",
+    "_cooldown_reset": "2026-05-14 · cleared after getSharedBrowser+single-process bug fixes",
+    "cooled_until": "2026-05-15T10:50:05.458Z"
   },
   "block_deals_notional:html_render:moneycontrol_v1": {
-    "consecutive_failures": 2,
-    "last_failure_at": "2026-05-14T12:14:16.732Z",
-    "_cooldown_reset": "2026-05-14 · cleared after getSharedBrowser+single-process bug fixes"
+    "consecutive_failures": 3,
+    "last_failure_at": "2026-05-15T04:50:15.537Z",
+    "_cooldown_reset": "2026-05-14 · cleared after getSharedBrowser+single-process bug fixes",
+    "cooled_until": "2026-05-15T10:50:15.537Z"
   },
   "block_deals_notional:llm:google_news_llm_v1": {
-    "consecutive_failures": 1,
+    "consecutive_failures": 0,
     "last_failure_at": "2026-05-14T12:14:29.233Z",
     "_cooldown_reset": "2026-05-14 · cleared after getSharedBrowser+single-process bug fixes",
-    "last_success_at": "2026-05-14T11:53:16.235Z"
+    "last_success_at": "2026-05-15T04:50:42.633Z"
   },
   "fpi_debt_flows:html_render:moneycontrol_v1": {
     "consecutive_failures": 2,
@@ -349,7 +352,12 @@
     "last_success_at": "2026-05-14T12:11:31.833Z"
   },
   "block_deals_notional:json_api:nse_api_v1": {
+    "consecutive_failures": 1,
+    "last_success_at": "2026-05-14T12:26:51.468Z",
+    "last_failure_at": "2026-05-15T04:49:37.233Z"
+  },
+  "fx_reserves:json_api:rbi_wss_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-05-14T12:26:51.468Z"
+    "last_success_at": "2026-05-15T04:49:33.962Z"
   }
 }

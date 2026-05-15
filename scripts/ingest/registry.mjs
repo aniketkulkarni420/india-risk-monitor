@@ -14,6 +14,7 @@ import * as fada_monthly_v1 from './parsers/fada_monthly_v1.mjs';
 import * as hormuz_v1 from './parsers/hormuz_v1.mjs';
 import * as hormuz_multitracker_v1 from './parsers/hormuz_multitracker_v1.mjs';
 import * as nse_api_v1 from './parsers/nse_api_v1.mjs';
+import * as rbi_wss_v1 from './parsers/rbi_wss_v1.mjs';
 import * as tradingeconomics_v1 from './parsers/tradingeconomics_v1.mjs';
 import * as drewry_v1 from './parsers/drewry_v1.mjs';
 import * as derived_v1 from './parsers/derived_v1.mjs';
@@ -61,6 +62,7 @@ const REAL = new Map([
   ['html_scrape:hormuz_v1', hormuz_v1],
   ['html_scrape:hormuz_multitracker_v1', hormuz_multitracker_v1],
   ['json_api:nse_api_v1', nse_api_v1],
+  ['json_api:rbi_wss_v1', rbi_wss_v1],
   // Trading Economics generic parser — covers commodity + India macro indicators
   ['json_api:public_gold_v1', tradingeconomics_v1],
   ['json_api:public_dxy_v1', tradingeconomics_v1],

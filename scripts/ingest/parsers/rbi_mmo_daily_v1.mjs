@@ -12,36 +12,54 @@
 import { fetchResilient } from '../fetch-resilient.mjs';
 import { recordSnapshot } from '../snapshot-store.mjs';
 
-const RBI_MMO_LIST = 'https://www.rbi.org.in/Scripts/BS_ViewBulletin.aspx';
+const RBI_PRESS_LIST = 'https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx';
 const RBI_MMO_PAGE = 'https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx';
+const RBI_BASE = 'https://www.rbi.org.in/Scripts/';
 
 const CONFIGS = {
   wacr_repo_spread: {
-    // Multiple regex fallbacks for various RBI release wordings
+    // BUG FIX 2026-05-15: previous regex expected the literal phrase
+    // "Weighted Average Call Rate" but the actual MMO HTML has the row
+    // label "Call Money" and the WACR sits in a separate table cell
+    // whose ONLY identifier is the header attribute "WeightedAverageRate":
+    //   <th> ... Call Money </th>
+    //   <td headers="...VolumeOneLeg"> 15,463.05 </td>
+    //   <td headers="...WeightedAverageRate"> 5.21 </td>   ← WACR
+    // New regex finds "Call Money" → skips ahead (volume cell) → matches
+    // the WeightedAverageRate cell-header attribute → captures the number
+    // before the closing "<".
     extractors: [
-      /Weighted\s+Average\s+Call\s+Rate[^0-9]{0,80}(\d{1,2}\.\d{2,4})\s*%/i,
-      /WACR[^0-9]{0,80}(\d{1,2}\.\d{2,4})\s*%/i,
-      /Call\s+Money\s+Rate[^0-9]{0,80}(\d{1,2}\.\d{2,4})\s*%/i
+      /Call\s+Money[\s\S]{1,400}?WeightedAverageRate[^>]*>\s*([0-9]{1,2}\.[0-9]+)\s*</i,
+      /Weighted\s+Average\s+Call\s+Rate[^0-9]{0,80}(\d{1,2}\.\d{2,4})\s*%/i,  // legacy fallback
+      /WACR[^0-9]{0,80}(\d{1,2}\.\d{2,4})\s*%/i
     ],
     repoExtractors: [
-      /Repo\s+Rate[^0-9]{0,40}(\d{1,2}\.\d{2})\s*%/i,
-      /Policy\s+Repo\s+Rate[^0-9]{0,40}(\d{1,2}\.\d{2})\s*%/i
+      /Policy\s+Repo\s+Rate[^0-9]{0,40}(\d{1,2}\.\d{2})\s*%/i,
+      /Repo\s+Rate[^0-9]{0,40}(\d{1,2}\.\d{2})\s*%/i
     ],
     plausible: (v) => Math.abs(v) <= 300  // spread in bps
   }
 };
 
 async function fetchListAndPickLatest() {
-  // RBI press releases list page — find latest MMO link
-  const res = await fetchResilient(RBI_MMO_LIST, {
+  // Find the latest "Money Market Operations as on …" press-release on the
+  // RBI press-release listing. Press releases are listed newest-first and
+  // prid increases monotonically — pick max prid for the safest "latest".
+  const res = await fetchResilient(RBI_PRESS_LIST, {
     timeoutMs: 25000, retries: 1, wayback: false, browserUa: true
   });
-  // Find first link matching "Money Market Operations"
-  const m = res.body.match(/<a[^>]+href="([^"]+)"[^>]*>[^<]*Money\s+Market\s+Operations[^<]*<\/a>/i);
-  if (!m) return null;
-  let url = m[1];
-  if (url.startsWith('/')) url = 'https://www.rbi.org.in' + url;
-  return url;
+  if (!res.body) return null;
+  const re = /<a[^>]*href=['"]?(BS_PressReleaseDisplay\.aspx\?prid=(\d+))['"]?[^>]*>([^<]{1,200})<\/a>/gi;
+  const links = [];
+  let m;
+  while ((m = re.exec(res.body)) !== null) {
+    if (/Money\s+Market\s+Operations/i.test(m[3])) {
+      links.push({ url: RBI_BASE + m[1], prid: +m[2] });
+    }
+  }
+  if (!links.length) return null;
+  links.sort((a, b) => b.prid - a.prid);
+  return links[0].url;
 }
 
 export async function fetchPrimary(metric) {

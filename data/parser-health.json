@@ -121,10 +121,10 @@
     "wacr_repo_spread": {
       "last_failure_at": "2026-05-14T12:16:06.201Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 1 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx: WACR n | llm:google_news_llm_v1: wacr_repo_spread: 4 candidates, none yielded value · h",
-      "consecutive_failures": 1,
-      "status": "amber",
-      "last_success_at": "2026-05-14T11:54:54.325Z",
-      "last_success_value": -5
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-15T04:49:36.241Z",
+      "last_success_value": -29
     },
     "inr_usd": {
       "last_success_at": "2026-05-14T12:16:07.874Z",
@@ -353,8 +353,8 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:web_llm_v1: web_llm_v1: all 2 sources failed · https://www.trendlyne.com/markets-today/today-block-deals-in: All | html_render:bse_v1: bse_v1: all 2 URLs failed · https://www.bseindia.com/markets/equ",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-14T12:26:51.471Z",
-      "last_success_value": 2315
+      "last_success_at": "2026-05-15T04:50:42.710Z",
+      "last_success_value": 5326
     },
     "fpi_debt_flows": {
       "last_failure_at": "2026-05-14T11:46:39.686Z",
@@ -375,10 +375,10 @@
     "fx_reserves": {
       "last_failure_at": "2026-05-14T12:23:36.033Z",
       "last_failure_reason": "tiered: all 1 tiers failed · llm:google_news_llm_v1: fx_reserves: 5 candidates, none yielded value · https://news.google.com/rss/articles/CBMilAFBVV95cUx",
-      "consecutive_failures": 2,
-      "status": "amber",
-      "last_success_at": "2026-05-14T12:05:40.159Z",
-      "last_success_value": 690
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-15T04:49:33.972Z",
+      "last_success_value": 690.7
     },
     "reservoir_levels": {
       "last_failure_at": "2026-05-14T12:24:07.322Z",
@@ -398,10 +398,10 @@
     }
   },
   "summary": {
-    "green": 51,
-    "amber": 6,
+    "green": 53,
+    "amber": 4,
     "red": 2,
     "total": 59
   },
-  "generated_at": "2026-05-14T12:26:51.472Z"
+  "generated_at": "2026-05-15T04:50:42.711Z"
 }
