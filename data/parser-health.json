@@ -123,7 +123,7 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T19:09:38.125Z",
+      "last_success_at": "2026-05-17T05:10:55.312Z",
       "last_success_value": -29
     },
     "inr_usd": {
@@ -161,7 +161,7 @@
       "last_success_value": 0.95
     },
     "india_crude_basket": {
-      "last_success_at": "2026-05-16T03:18:08.463Z",
+      "last_success_at": "2026-05-17T05:11:01.113Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green"
@@ -345,15 +345,15 @@
       "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: getSharedBrowser is not defined | html_render:playwright_render_v1: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_ | llm:google_",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T18:11:05.036Z",
-      "last_success_value": 41
+      "last_success_at": "2026-05-17T05:13:44.351Z",
+      "last_success_value": 24.85
     },
     "block_deals_notional": {
       "last_failure_at": "2026-05-15T18:11:34.613Z",
       "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:moneycontrol_v1: in cooldown",
-      "consecutive_failures": 1,
-      "status": "amber",
-      "last_success_at": "2026-05-15T17:16:18.586Z",
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-17T05:14:57.530Z",
       "last_success_value": 5326
     },
     "fpi_debt_flows": {
@@ -361,7 +361,7 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:playwright_render_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-15T19:09:33.509Z",
+      "last_success_at": "2026-05-17T05:16:50.348Z",
       "last_success_value": 1
     },
     "vlcc_tanker_rates": {
@@ -390,10 +390,10 @@
     }
   },
   "summary": {
-    "green": 56,
-    "amber": 2,
+    "green": 57,
+    "amber": 1,
     "red": 0,
     "total": 58
   },
-  "generated_at": "2026-05-16T08:29:46.316Z"
+  "generated_at": "2026-05-17T05:16:50.349Z"
 }
