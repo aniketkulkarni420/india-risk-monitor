@@ -123,8 +123,8 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-19T20:21:11.979Z",
-      "last_success_value": -32
+      "last_success_at": "2026-05-20T10:38:59.289Z",
+      "last_success_value": -29
     },
     "inr_usd": {
       "last_success_at": "2026-05-19T20:21:12.118Z",
@@ -161,7 +161,7 @@
       "last_success_value": 0.95
     },
     "india_crude_basket": {
-      "last_success_at": "2026-05-19T03:26:54.897Z",
+      "last_success_at": "2026-05-20T10:39:01.637Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green"
@@ -341,10 +341,10 @@
       "status": "green"
     },
     "fno_oi_buildup": {
-      "last_failure_at": "2026-05-19T18:30:05.503Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:playwright_render_v1: in cooldown | llm:google_news_llm_v1: fno_oi_buildup: 5 candidates, none yielded value · https://news.google.com/rss/articles/CBMi_AFB",
-      "consecutive_failures": 2,
-      "status": "amber",
+      "last_failure_at": "2026-05-20T10:41:18.203Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: moneycontrol_v1: all 2 URLs failed · https://www.moneycontrol.com/markets/indian-indices/changeinoi. | html_render:playwright_render_v1: fno_oi_buildup: playwright failed [https://ww",
+      "consecutive_failures": 3,
+      "status": "red",
       "last_success_at": "2026-05-18T18:26:27.381Z",
       "last_success_value": 41
     },
@@ -353,7 +353,7 @@
       "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:moneycontrol_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-19T18:30:19.188Z",
+      "last_success_at": "2026-05-20T10:42:13.802Z",
       "last_success_value": 5326
     },
     "fpi_debt_flows": {
@@ -361,7 +361,7 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:playwright_render_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-19T20:21:09.005Z",
+      "last_success_at": "2026-05-20T10:43:52.182Z",
       "last_success_value": 1
     },
     "vlcc_tanker_rates": {
@@ -391,9 +391,9 @@
   },
   "summary": {
     "green": 56,
-    "amber": 2,
-    "red": 0,
+    "amber": 1,
+    "red": 1,
     "total": 58
   },
-  "generated_at": "2026-05-19T20:21:12.125Z"
+  "generated_at": "2026-05-20T10:43:52.182Z"
 }
