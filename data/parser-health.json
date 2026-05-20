@@ -39,61 +39,61 @@
       "last_success_value": 260.5
     },
     "fii_equity_daily": {
-      "last_success_at": "2026-05-20T19:54:35.482Z",
+      "last_success_at": "2026-05-20T20:32:55.524Z",
       "last_success_value": -1597.35,
       "consecutive_failures": 0,
       "status": "green"
     },
     "fii_equity_mtd": {
-      "last_success_at": "2026-05-20T19:54:35.617Z",
+      "last_success_at": "2026-05-20T20:32:55.602Z",
       "last_success_value": -1597.35,
       "consecutive_failures": 0,
       "status": "green"
     },
     "fii_equity_cytd": {
-      "last_success_at": "2026-05-20T19:54:35.677Z",
+      "last_success_at": "2026-05-20T20:32:55.686Z",
       "last_success_value": -1597.35,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dii_daily": {
-      "last_success_at": "2026-05-20T19:54:35.744Z",
+      "last_success_at": "2026-05-20T20:32:55.923Z",
       "last_success_value": 1968.35,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dii_mtd": {
-      "last_success_at": "2026-05-20T19:54:35.928Z",
+      "last_success_at": "2026-05-20T20:32:56.043Z",
       "last_success_value": 1968.35,
       "consecutive_failures": 0,
       "status": "green"
     },
     "absorption_ratio": {
-      "last_success_at": "2026-05-20T19:54:35.932Z",
+      "last_success_at": "2026-05-20T20:32:56.047Z",
       "last_success_value": 1.23,
       "consecutive_failures": 0,
       "status": "green"
     },
     "nifty_50": {
-      "last_success_at": "2026-05-20T19:57:12.558Z",
+      "last_success_at": "2026-05-20T20:33:12.443Z",
       "last_success_value": 23659,
       "consecutive_failures": 0,
       "status": "green"
     },
     "bank_nifty": {
-      "last_success_at": "2026-05-20T19:57:12.973Z",
+      "last_success_at": "2026-05-20T20:33:13.611Z",
       "last_success_value": 53562.2,
       "consecutive_failures": 0,
       "status": "green"
     },
     "nifty_pe_5y": {
-      "last_success_at": "2026-05-20T19:57:13.352Z",
+      "last_success_at": "2026-05-20T20:33:14.584Z",
       "last_success_value": 20.41,
       "consecutive_failures": 0,
       "status": "green"
     },
     "india_vix": {
-      "last_success_at": "2026-05-20T19:57:13.653Z",
+      "last_success_at": "2026-05-20T20:33:14.991Z",
       "last_success_value": 18.44,
       "consecutive_failures": 0,
       "status": "green"
@@ -341,9 +341,9 @@
       "status": "green"
     },
     "fno_oi_buildup": {
-      "last_failure_at": "2026-05-20T19:56:34.910Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: moneycontrol_v1: all 2 URLs failed · https://www.moneycontrol.com/markets/indian-indices/changeinoi. | html_render:playwright_render_v1: fno_oi_buildup: playwright failed [https://ww",
-      "consecutive_failures": 4,
+      "last_failure_at": "2026-05-20T20:32:56.048Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:playwright_render_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
+      "consecutive_failures": 5,
       "status": "red",
       "last_success_at": "2026-05-18T18:26:27.381Z",
       "last_success_value": 41
@@ -353,7 +353,7 @@
       "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:moneycontrol_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-20T19:57:11.841Z",
+      "last_success_at": "2026-05-20T20:33:11.065Z",
       "last_success_value": 5326
     },
     "fpi_debt_flows": {
@@ -395,5 +395,5 @@
     "red": 1,
     "total": 58
   },
-  "generated_at": "2026-05-20T19:57:13.653Z"
+  "generated_at": "2026-05-20T20:33:14.991Z"
 }
