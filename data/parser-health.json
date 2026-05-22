@@ -123,8 +123,8 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-21T20:27:01.134Z",
-      "last_success_value": -27
+      "last_success_at": "2026-05-22T10:38:51.211Z",
+      "last_success_value": -23
     },
     "inr_usd": {
       "last_success_at": "2026-05-21T20:27:01.226Z",
@@ -161,7 +161,7 @@
       "last_success_value": 0.95
     },
     "india_crude_basket": {
-      "last_success_at": "2026-05-21T11:57:01.286Z",
+      "last_success_at": "2026-05-22T10:38:54.404Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green"
@@ -343,25 +343,25 @@
     "fno_oi_buildup": {
       "last_failure_at": "2026-05-21T18:31:25.222Z",
       "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:playwright_render_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
-      "consecutive_failures": 8,
-      "status": "red",
-      "last_success_at": "2026-05-18T18:26:27.381Z",
-      "last_success_value": 41
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-22T10:41:01.174Z",
+      "last_success_value": 28.72
     },
     "block_deals_notional": {
       "last_failure_at": "2026-05-21T18:31:34.573Z",
       "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:moneycontrol_v1: in cooldown",
-      "consecutive_failures": 1,
-      "status": "amber",
-      "last_success_at": "2026-05-21T18:26:40.718Z",
-      "last_success_value": 5326
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-22T10:41:26.566Z",
+      "last_success_value": 982.6
     },
     "fpi_debt_flows": {
       "last_failure_at": "2026-05-14T20:18:34.038Z",
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:playwright_render_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-21T20:26:56.880Z",
+      "last_success_at": "2026-05-22T10:42:58.056Z",
       "last_success_value": 1
     },
     "vlcc_tanker_rates": {
@@ -390,10 +390,10 @@
     }
   },
   "summary": {
-    "green": 55,
-    "amber": 2,
-    "red": 1,
+    "green": 57,
+    "amber": 1,
+    "red": 0,
     "total": 58
   },
-  "generated_at": "2026-05-21T20:27:01.233Z"
+  "generated_at": "2026-05-22T10:42:58.056Z"
 }
