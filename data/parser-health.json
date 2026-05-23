@@ -1,32 +1,32 @@
 {
   "parsers": {
     "hormuz_throughput": {
-      "last_success_at": "2026-05-22T12:03:54.691Z",
+      "last_success_at": "2026-05-23T08:34:48.454Z",
       "last_success_value": 12,
       "consecutive_failures": 0,
       "status": "green"
     },
     "baltic_dry_index": {
-      "last_success_at": "2026-05-22T12:03:54.921Z",
-      "last_success_value": 2964,
+      "last_success_at": "2026-05-23T08:34:48.595Z",
+      "last_success_value": 2991,
       "consecutive_failures": 0,
       "status": "green"
     },
     "brent_crude": {
-      "last_success_at": "2026-05-22T12:03:55.433Z",
-      "last_success_value": 97.48,
+      "last_success_at": "2026-05-23T08:34:49.204Z",
+      "last_success_value": 97,
       "consecutive_failures": 0,
       "status": "green"
     },
     "gold_usd": {
-      "last_success_at": "2026-05-22T12:03:55.449Z",
-      "last_success_value": 4520.53,
+      "last_success_at": "2026-05-23T08:34:49.226Z",
+      "last_success_value": 4516.75,
       "consecutive_failures": 0,
       "status": "green"
     },
     "dxy": {
-      "last_success_at": "2026-05-22T12:03:55.540Z",
-      "last_success_value": 99.359,
+      "last_success_at": "2026-05-23T08:34:49.315Z",
+      "last_success_value": 99.324,
       "consecutive_failures": 0,
       "status": "green"
     },
@@ -35,8 +35,8 @@
       "last_failure_reason": "fetch failed",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-22T12:03:56.134Z",
-      "last_success_value": 271
+      "last_success_at": "2026-05-23T08:34:49.927Z",
+      "last_success_value": 270
     },
     "fii_equity_daily": {
       "last_success_at": "2026-05-22T18:26:27.698Z",
@@ -369,7 +369,7 @@
       "last_failure_reason": "tiered: all 3 tiers failed · press_release:baltic_dirty_v1: not registered | html_scrape:tradingeconomics_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-22T12:03:55.416Z",
+      "last_success_at": "2026-05-23T08:34:49.186Z",
       "last_success_value": 2307
     },
     "fx_reserves": {
@@ -395,5 +395,5 @@
     "red": 0,
     "total": 58
   },
-  "generated_at": "2026-05-22T20:27:08.510Z"
+  "generated_at": "2026-05-23T08:34:49.927Z"
 }
