@@ -18,7 +18,29 @@ import { lookupOverride } from './ingest/manual-override.mjs';
 
 const STATUS_TO_SCORE = { shock: 92, high: 75, med: 55, low: 30, neutral: 50 };
 
-const STALENESS_DAYS = 7;
+// Cadence-aware staleness thresholds.
+// 2026-05-26 BUG FIX: a single STALENESS_DAYS=7 cliff broke IRS for 23 of 30
+// days every month because Monthly cadence metrics legitimately have
+// last_verified_at of 0-30 days between scheduled refreshes. Cliff at 7 was
+// flagging fresh-by-cadence data as stale and nulling 3 of 6 drivers.
+// Threshold = cadence × 1.5 with sensible floor, so a Monthly metric only
+// counts as stale if it's overdue by 50% beyond its expected refresh.
+const STALENESS_DAYS_BY_CADENCE = {
+  'Live':         2,
+  'Daily':        2,
+  'Weekly':       10,
+  'Fortnightly':  21,
+  'Monthly':      45,    // covers normal 30d cycle + 15d slack
+  'Quarterly':    120,   // covers normal 90d cycle + 30d slack
+  'Per release':  180    // irregular cadence — generous slack
+};
+const STALENESS_DAYS_DEFAULT = 14;  // for metrics without a known cadence
+
+function stalenessDaysFor(metric) {
+  const freq = metric?.source_primary?.frequency;
+  return STALENESS_DAYS_BY_CADENCE[freq] ?? STALENESS_DAYS_DEFAULT;
+}
+
 const MISSING_DATA_THRESHOLD = 0.30;  // fail driver if >30% feeders stale/absent
 
 // EWMA smoothing factor for regime score
@@ -132,20 +154,28 @@ function feederScore(metric) {
 function feederHealth(metrics, ids) {
   const now = Date.now();
   let total = 0, fresh = 0, stale = 0, missing = 0;
+  const staleDetail = [];
   for (const id of ids) {
     total++;
     const m = metrics.get(id);
-    if (!m) { missing++; continue; }
+    if (!m) { missing++; staleDetail.push({ id, reason: 'missing' }); continue; }
     const lv = m.last_verified_at;
-    if (!lv) { stale++; continue; }
+    if (!lv) { stale++; staleDetail.push({ id, reason: 'no last_verified_at' }); continue; }
     const ageDays = (now - new Date(lv).getTime()) / 86400000;
-    if (ageDays > STALENESS_DAYS) stale++; else fresh++;
+    const threshold = stalenessDaysFor(m);  // cadence-aware
+    if (ageDays > threshold) {
+      stale++;
+      staleDetail.push({ id, ageDays: +ageDays.toFixed(1), thresholdDays: threshold, cadence: m.source_primary?.frequency });
+    } else {
+      fresh++;
+    }
   }
   return {
     total,
     fresh, stale, missing,
     fresh_pct: total ? +(100 * fresh / total).toFixed(1) : 0,
-    missing_pct: total ? +(100 * (stale + missing) / total).toFixed(1) : 100
+    missing_pct: total ? +(100 * (stale + missing) / total).toFixed(1) : 100,
+    stale_detail: staleDetail.length ? staleDetail : undefined
   };
 }
 

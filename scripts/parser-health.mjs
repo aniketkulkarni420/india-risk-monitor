@@ -11,10 +11,17 @@
 //       status: 'green' | 'amber' | 'red'
 //     }}}
 //
-// Status rules:
-//   green = success within 1 cadence_days × 1.0
-//   amber = no success in 1× to 2× cadence_days · or 1-2 consecutive failures
-//   red   = 3+ consecutive failures OR no success in 2× cadence_days
+// Status rules · UPGRADED 2026-05-26 to catch silent rot
+//   green  = success within 1× cadence_days AND attempted within 24h
+//   amber  = no success in 1× to 2× cadence_days · OR 1-2 consecutive failures
+//             · OR not attempted in 24h (the new "silent rot" trigger)
+//   red    = 3+ consecutive failures · OR no success in 2× cadence_days
+//             · OR not attempted in 7d (the bug that hid 12 stale metrics)
+//
+// The old logic only tracked SUCCESS and FAILURE — it couldn't see a parser
+// that simply stopped being ATTEMPTED (e.g. because the slot only fires
+// monthly and 25 days have passed). last_attempted_at tracks every single
+// invocation, success or failure, so we catch that case.
 //
 // Bundle.mjs reads this and the live dashboard surfaces a "X/70 healthy"
 // indicator. CI workflow opens a GitHub issue when any parser hits red.
@@ -36,6 +43,22 @@ function loadHealth() {
 
 function classify(p, cadenceDays = 30) {
   const now = Date.now();
+
+  // ATTEMPTED-RECENTLY check (added 2026-05-26 · catches silent rot).
+  // The "rot at green" bug from May 15 was that classify() only looked at
+  // last_success_at — if a parser was just not being attempted (slot didn't
+  // fire, runner offline, schedule misconfigured), status stayed green
+  // forever even as freshness degraded. Now we track attempts separately.
+  if (!p.last_attempted_at) return 'amber';   // never attempted → suspicious
+  const sinceLastAttemptHrs = (now - new Date(p.last_attempted_at).getTime()) / 36e5;
+  // 7 days · no parser should go that long without being TRIED, regardless of cadence
+  if (sinceLastAttemptHrs > 24 * 7) return 'red';
+  // 24 hours · if a parser hasn't been attempted in a day, something's off — amber
+  // EXCEPT for genuinely Monthly+ cadence parsers where this is expected.
+  const isMonthlyOrSlower = cadenceDays >= 25;
+  if (!isMonthlyOrSlower && sinceLastAttemptHrs > 24) return 'amber';
+
+  // Original SUCCESS-based logic
   if (!p.last_success_at) return 'red';
   const sinceLastSuccessHrs = (now - new Date(p.last_success_at).getTime()) / 36e5;
   const sinceLastSuccessDays = sinceLastSuccessHrs / 24;
@@ -46,12 +69,17 @@ function classify(p, cadenceDays = 30) {
   return 'green';
 }
 
+// New: stamp last_attempted_at on EVERY parser invocation, success or fail.
+// Both recordSuccess and recordFailure call this implicitly via setting it.
+
 // Called per parser-attempt by ingest pipeline.
 export function recordSuccess(metricId, value) {
   const h = loadHealth();
   h.parsers[metricId] = h.parsers[metricId] || {};
   const p = h.parsers[metricId];
-  p.last_success_at = new Date().toISOString();
+  const nowIso = new Date().toISOString();
+  p.last_attempted_at = nowIso;
+  p.last_success_at = nowIso;
   p.last_success_value = value;
   p.consecutive_failures = 0;
   p.status = classify(p, CADENCE_DAYS[metricId]);
@@ -62,11 +90,26 @@ export function recordFailure(metricId, reason) {
   const h = loadHealth();
   h.parsers[metricId] = h.parsers[metricId] || {};
   const p = h.parsers[metricId];
-  p.last_failure_at = new Date().toISOString();
+  const nowIso = new Date().toISOString();
+  p.last_attempted_at = nowIso;
+  p.last_failure_at = nowIso;
   p.last_failure_reason = String(reason).slice(0, 240);
   p.consecutive_failures = (p.consecutive_failures || 0) + 1;
   p.status = classify(p, CADENCE_DAYS[metricId]);
   saveHealth(h);
+}
+
+// New: re-classify ALL parsers without recording a new attempt.
+// Used by the freshness-audit workflow to surface decay over time.
+// Without this, a parser's classification only changes when the parser
+// runs — which is exactly the bug we're fixing.
+export function reclassifyAll() {
+  const h = loadHealth();
+  for (const [id, p] of Object.entries(h.parsers || {})) {
+    p.status = classify(p, CADENCE_DAYS[id]);
+  }
+  saveHealth(h);
+  return h;
 }
 
 function saveHealth(h) {

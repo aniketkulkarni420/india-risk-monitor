@@ -298,6 +298,56 @@ if (compositeChanges.length) {
   console.log(`  · composites re-derived (${compositeChanges.length}): ${compositeChanges.map(c => `${c.id} ${c.old}→${c.new}`).join(', ')}`);
 }
 
+// ───────────────── FRESHNESS GATE (Tier C · 2026-05-26) ─────────────────
+// Fail-loud rather than ship-stale. Before writing data.json, scan every
+// metric's last_verified_at against its declared cadence. If too many are
+// stale-by-cadence, exit non-zero with an explicit ::error:: annotation.
+//
+// This catches what happened May 15 → May 26: monthly metrics that quietly
+// sat unrefreshed for 11 days, no parser failure logged, dashboard showing
+// IRS=null. With this gate, the build would have failed loudly on day 1,
+// not silently for 11 days.
+//
+// Threshold is intentionally CADENCE-AWARE matching composite-recompute.
+const FRESHNESS_GATE_PCT = parseFloat(process.env.IRM_FRESHNESS_GATE_PCT || '15');
+const FRESHNESS_GATE_DAYS_BY_CADENCE = {
+  'Live': 2, 'Daily': 2, 'Weekly': 10, 'Fortnightly': 21,
+  'Monthly': 45, 'Quarterly': 120, 'Per release': 180
+};
+const FRESHNESS_GATE_DAYS_DEFAULT = 14;
+
+(() => {
+  const now = Date.now();
+  const offenders = [];
+  let totalChecked = 0;
+  for (const [id, m] of Object.entries(metrics)) {
+    if (id.startsWith('driver_') || id === 'india_risk_score' || id.endsWith('_state') || id.endsWith('_regime')) continue;  // skip composites
+    totalChecked++;
+    const lv = m.last_verified_at;
+    const freq = m.source_primary?.frequency || 'Daily';
+    const thresholdDays = FRESHNESS_GATE_DAYS_BY_CADENCE[freq] ?? FRESHNESS_GATE_DAYS_DEFAULT;
+    if (!lv) { offenders.push({ id, ageDays: '?', thresholdDays, cadence: freq, reason: 'no last_verified_at' }); continue; }
+    const ageDays = (now - new Date(lv).getTime()) / 86400000;
+    if (ageDays > thresholdDays) offenders.push({ id, ageDays: +ageDays.toFixed(1), thresholdDays, cadence: freq });
+  }
+  const stalePct = totalChecked ? (offenders.length / totalChecked) * 100 : 0;
+  if (stalePct > FRESHNESS_GATE_PCT) {
+    console.error(`\n::error::FRESHNESS GATE FAILED · ${offenders.length} of ${totalChecked} metrics stale (${stalePct.toFixed(1)}% > threshold ${FRESHNESS_GATE_PCT}%)`);
+    console.error('Stale metrics (cadence-aware):');
+    for (const o of offenders.slice(0, 25)) {
+      console.error(`  · ${o.id.padEnd(28)} ${o.cadence.padEnd(10)} age ${String(o.ageDays).padEnd(8)} threshold ${o.thresholdDays}d ${o.reason || ''}`);
+    }
+    if (offenders.length > 25) console.error(`  · ... and ${offenders.length - 25} more`);
+    console.error('\nThis build is REFUSING to ship stale data. Investigate parser pipeline before retry.');
+    console.error(`Override with IRM_FRESHNESS_GATE_PCT=<higher_pct> if intentional · current default 15%.`);
+    process.exit(1);
+  } else if (offenders.length) {
+    console.log(`  · freshness gate: ${offenders.length} stale (${stalePct.toFixed(1)}% < ${FRESHNESS_GATE_PCT}% threshold · within tolerance)`);
+  } else {
+    console.log(`  · freshness gate: all ${totalChecked} metrics within cadence ✓`);
+  }
+})();
+
 const bundle = {
   generated_at: new Date().toISOString(),
   metric_count: Object.keys(metrics).length,
