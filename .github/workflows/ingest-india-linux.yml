@@ -15,6 +15,11 @@ on:
         description: 'Single metric_id to ingest (optional)'
         required: false
 
+# Shared serialisation with all other workflows that push to main.
+concurrency:
+  group: irm-data-push
+  cancel-in-progress: false
+
 jobs:
   ingest-india-linux:
     runs-on: [self-hosted, linux, india]
@@ -79,5 +84,11 @@ jobs:
             echo "No data changes."
           else
             git commit -m "ingest(india-linux): scheduled run"
-            git push
+            for attempt in 1 2 3; do
+              if git push 2>&1; then break; fi
+              echo "Push attempt $attempt failed — rebasing on remote and retrying"
+              git pull --rebase --autostash origin main || { git rebase --abort 2>/dev/null; true; }
+              sleep $((attempt * 5))
+              if [ $attempt -eq 3 ]; then echo "::error::Push failed after 3 attempts"; exit 1; fi
+            done
           fi

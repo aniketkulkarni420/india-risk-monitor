@@ -18,6 +18,11 @@ on:
     - cron: '30 6 25-30 * *'
   workflow_dispatch:
 
+# Shared serialisation with all other workflows that push to main.
+concurrency:
+  group: irm-data-push
+  cancel-in-progress: false
+
 jobs:
   burst:
     runs-on: [self-hosted, windows, india]
@@ -65,7 +70,13 @@ jobs:
           git diff --staged --quiet
           if errorlevel 1 (
             git commit -m "ingest(burst): release-window run"
-            git push
+            for attempt in 1 2 3; do
+              if git push 2>&1; then break; fi
+              echo "Push attempt $attempt failed — rebasing on remote and retrying"
+              git pull --rebase --autostash origin main || { git rebase --abort 2>/dev/null; true; }
+              sleep $((attempt * 5))
+              if [ $attempt -eq 3 ]; then echo "::error::Push failed after 3 attempts"; exit 1; fi
+            done
           ) else (
             echo No data changes.
           )

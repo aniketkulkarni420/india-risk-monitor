@@ -31,6 +31,14 @@ on:
           - monthly_5
           - all
 
+# Serialise all workflows that push to main · prevents the 19:08 UTC race
+# observed 2026-05-25 where two scheduled runs committed simultaneously and
+# the loser was rejected with "(fetch first)". cancel-in-progress: false
+# queues rather than cancels — never drop a successful ingest's data.
+concurrency:
+  group: irm-data-push
+  cancel-in-progress: false
+
 jobs:
   ingest:
     runs-on: ubuntu-latest
@@ -122,5 +130,20 @@ jobs:
             echo "No data changes to commit."
           else
             git commit -m "ingest: ${{ steps.slot.outputs.slot }} @ $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push
+            # Defensive push: rebase + retry if remote moved between checkout and push.
+            # Concurrency block above should prevent this, but cross-workflow edge cases
+            # (manual push, scheduled-trigger drift on busy GH days) can still race.
+            for attempt in 1 2 3; do
+              if git push 2>&1; then
+                echo "Push succeeded on attempt $attempt"
+                break
+              fi
+              echo "Push attempt $attempt failed — rebasing on remote and retrying"
+              git pull --rebase --autostash origin main || { git rebase --abort 2>/dev/null; true; }
+              sleep $((attempt * 5))
+              if [ $attempt -eq 3 ]; then
+                echo "::error::Push failed after 3 attempts · this ingest's data was NOT recorded · investigate"
+                exit 1
+              fi
+            done
           fi
