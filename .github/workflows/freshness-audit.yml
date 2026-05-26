@@ -1,0 +1,92 @@
+name: Freshness audit
+
+# Independent daily check of the LIVE bundled data.json for staleness.
+# Decoupled from the noisy ingest workflow so signal isn't drowned out.
+# Reads the deployed site directly (not the local repo) so it catches
+# deploy-pipeline issues too.
+#
+# Fires Telegram alert if anything is stale-by-cadence; never fails the
+# workflow itself unless infrastructure breaks (then it CAN'T audit, which
+# is also worth knowing).
+
+on:
+  schedule:
+    # 09:00 UTC daily = 14:30 IST · before market open in case anything broke overnight
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+# Independent from data-push workflows — read-only check.
+concurrency:
+  group: irm-freshness-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run freshness audit
+        id: audit
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          node scripts/freshness-audit.mjs --json-output > /tmp/audit.json
+          STATUS=$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/audit.json','utf8')).overall_status)")
+          echo "overall_status=$STATUS" >> $GITHUB_OUTPUT
+          # Re-run in human-readable mode to print + send Telegram
+          node scripts/freshness-audit.mjs
+
+      - name: Open or update GitHub issue if red
+        if: steps.audit.outputs.overall_status == 'red'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create freshness-alert --description "Freshness audit · auto-managed" --color "e88080" 2>/dev/null || true
+
+          ISSUE=$(gh issue list --label freshness-alert --state open --json number --jq '.[0].number // empty')
+
+          BODY=$(node -e "
+            const a = JSON.parse(require('fs').readFileSync('/tmp/audit.json','utf8'));
+            const lines = [
+              '## 🔴 Freshness audit · RED',
+              '',
+              '- Bundle generated: ' + a.bundle_generated_at + ' (' + a.bundle_age_hours + 'h ago)',
+              '- IRS: ' + (a.irs_value === null ? '**NULL** (' + a.irs_score_state + ')' : a.irs_value),
+              '- ' + a.healthy_count + ' healthy · ' + a.stale_count + ' stale · ' + a.severely_stale_count + ' severely stale of ' + a.total_metrics_checked,
+              '',
+              '### Severely stale (>2× cadence)',
+              ...(a.severely_stale_metrics || []).map(s => '- \`' + s.id + '\` · ' + s.cadence + ' · ' + s.ageDays + 'd / ' + s.thresholdDays + 'd threshold'),
+              '',
+              '### Stale (>1× cadence)',
+              ...(a.stale_metrics || []).map(s => '- \`' + s.id + '\` · ' + s.cadence + ' · ' + s.ageDays + 'd / ' + s.thresholdDays + 'd threshold'),
+              '',
+              'Auto-managed by freshness-audit.yml. Auto-closes when overall_status returns to green.'
+            ];
+            console.log(lines.join('\n'));
+          ")
+
+          if [ -n "$ISSUE" ]; then
+            gh issue edit $ISSUE --body "$BODY"
+          else
+            gh issue create --label freshness-alert --title "🔴 Freshness audit alert" --body "$BODY"
+          fi
+
+      - name: Close freshness issue if green
+        if: steps.audit.outputs.overall_status == 'green'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE=$(gh issue list --label freshness-alert --state open --json number --jq '.[0].number // empty')
+          if [ -n "$ISSUE" ]; then
+            gh issue close $ISSUE --comment "Freshness recovered to green at $(date -u +%Y-%m-%dT%H:%MZ). Auto-closed."
+          fi
