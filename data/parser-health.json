@@ -1,42 +1,48 @@
 {
   "parsers": {
     "hormuz_throughput": {
-      "last_success_at": "2026-05-26T09:21:30.707Z",
+      "last_success_at": "2026-05-26T09:45:39.996Z",
       "last_success_value": 12,
       "consecutive_failures": 0,
-      "status": "green"
+      "status": "green",
+      "last_attempted_at": "2026-05-26T09:45:39.996Z"
     },
     "baltic_dry_index": {
-      "last_success_at": "2026-05-26T09:21:31.009Z",
+      "last_success_at": "2026-05-26T09:45:40.188Z",
       "last_success_value": 2991,
       "consecutive_failures": 0,
-      "status": "green"
+      "status": "green",
+      "last_attempted_at": "2026-05-26T09:45:40.188Z"
     },
     "brent_crude": {
-      "last_success_at": "2026-05-26T09:21:46.992Z",
-      "last_success_value": 92.78,
+      "last_success_at": "2026-05-26T09:45:40.620Z",
+      "last_success_value": 93.09,
       "consecutive_failures": 0,
-      "status": "green"
+      "status": "green",
+      "last_attempted_at": "2026-05-26T09:45:40.620Z"
     },
     "gold_usd": {
-      "last_success_at": "2026-05-26T09:21:47.014Z",
-      "last_success_value": 4524.44,
+      "last_success_at": "2026-05-26T09:45:40.701Z",
+      "last_success_value": 4516.49,
       "consecutive_failures": 0,
-      "status": "green"
+      "status": "green",
+      "last_attempted_at": "2026-05-26T09:45:40.701Z"
     },
     "dxy": {
-      "last_success_at": "2026-05-26T09:21:47.038Z",
-      "last_success_value": 99.08,
+      "last_success_at": "2026-05-26T09:45:40.782Z",
+      "last_success_value": 99.049,
       "consecutive_failures": 0,
-      "status": "green"
+      "status": "green",
+      "last_attempted_at": "2026-05-26T09:45:40.782Z"
     },
     "power_demand": {
       "last_failure_at": "2026-05-11T05:05:09.467Z",
       "last_failure_reason": "fetch failed",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-26T09:21:47.580Z",
-      "last_success_value": 270.82
+      "last_success_at": "2026-05-26T09:45:41.346Z",
+      "last_success_value": 270.82,
+      "last_attempted_at": "2026-05-26T09:45:41.346Z"
     },
     "fii_equity_daily": {
       "last_success_at": "2026-05-25T18:14:20.931Z",
@@ -369,8 +375,9 @@
       "last_failure_reason": "tiered: all 3 tiers failed · press_release:baltic_dirty_v1: not registered | html_scrape:tradingeconomics_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-26T09:21:46.966Z",
-      "last_success_value": 2185
+      "last_success_at": "2026-05-26T09:45:40.598Z",
+      "last_success_value": 2185,
+      "last_attempted_at": "2026-05-26T09:45:40.598Z"
     },
     "fx_reserves": {
       "last_failure_at": "2026-05-14T11:31:00.916Z",
@@ -395,5 +402,5 @@
     "red": 0,
     "total": 58
   },
-  "generated_at": "2026-05-26T09:21:47.580Z"
+  "generated_at": "2026-05-26T09:45:41.346Z"
 }
