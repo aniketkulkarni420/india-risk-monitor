@@ -145,29 +145,29 @@
       "status": "green"
     },
     "high_yield_credit_spread": {
-      "last_success_at": "2026-05-26T09:49:59.044Z",
+      "last_success_at": "2026-05-27T12:24:41.092Z",
       "last_success_value": 178,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-05-14T11:31:00.945Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:crisil_v1: https://tradingeconomics.com/india/government-bond-yield: pattern not matched (selector tuning neede | llm:google_news_llm_v1: No google_news_llm config for high_yield_credit_spread",
-      "last_attempted_at": "2026-05-26T09:49:59.044Z"
+      "last_attempted_at": "2026-05-27T12:24:41.092Z"
     },
     "drewry_wci": {
-      "last_success_at": "2026-05-26T09:50:08.949Z",
+      "last_success_at": "2026-05-27T12:24:50.904Z",
       "last_success_value": 2279,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-05-26T09:50:08.949Z"
+      "last_attempted_at": "2026-05-27T12:24:50.904Z"
     },
     "india_port_dwell_time": {
       "last_failure_at": "2026-05-14T11:31:24.057Z",
       "last_failure_reason": "india_port_dwell_time: 2 candidates, none yielded value · https://news.google.com/rss/articles/CBMilgFBVV95cUxQTm1Xd3N: browser.newContext: Target page, context or browser has been closed | https://news.google.com/rss/articles/CBMiyAFBVV95c",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-26T09:50:20.367Z",
-      "last_success_value": 0.95,
-      "last_attempted_at": "2026-05-26T09:50:20.367Z"
+      "last_success_at": "2026-05-27T12:24:58.939Z",
+      "last_success_value": 0.94,
+      "last_attempted_at": "2026-05-27T12:24:58.939Z"
     },
     "india_crude_basket": {
       "last_success_at": "2026-05-26T09:50:39.644Z",
@@ -388,18 +388,18 @@
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:rbi_wss_v1: not registered | json_api:dbnomics_v1: No dbnomics config for fx_reserves",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-26T09:49:59.037Z",
+      "last_success_at": "2026-05-27T12:24:41.088Z",
       "last_success_value": 688.9,
-      "last_attempted_at": "2026-05-26T09:49:59.037Z"
+      "last_attempted_at": "2026-05-27T12:24:41.088Z"
     },
     "reservoir_levels": {
       "last_failure_at": "2026-05-14T11:31:24.059Z",
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:cwc_v1: not registered | llm:google_news_llm_v1: No google_news_llm config for reservoir_levels",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-26T09:50:34.889Z",
+      "last_success_at": "2026-05-27T12:25:11.824Z",
       "last_success_value": 34.45,
-      "last_attempted_at": "2026-05-26T09:50:34.889Z"
+      "last_attempted_at": "2026-05-27T12:25:11.824Z"
     }
   },
   "summary": {
@@ -408,5 +408,5 @@
     "red": 0,
     "total": 58
   },
-  "generated_at": "2026-05-26T09:50:39.644Z"
+  "generated_at": "2026-05-27T12:25:11.824Z"
 }
