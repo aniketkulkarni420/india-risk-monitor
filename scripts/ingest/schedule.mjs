@@ -10,7 +10,8 @@ export const SLOTS = {
     metric_ids: [
       // Hand-picked daily metrics that settle overnight
       'hormuz_throughput', 'baltic_dry_index', 'vlcc_tanker_rates',
-      'brent_crude', 'gold_usd', 'dxy', 'power_demand'
+      'brent_crude', 'gold_usd', 'dxy', 'power_demand',
+      'india_crude_basket'  // PPAC daily · moved from fri_17 on 2026-05-26 (was weekly, cadence mismatch)
     ]
   },
   weekday_close: {
@@ -34,12 +35,13 @@ export const SLOTS = {
     ]
   },
   fri_17: {
-    description: '17:00 Friday · weekly releases',
-    cron: '0 17 * * 5',
+    description: '13:30 Friday · weekly releases (was 17:00 Fri — moved 2026-05-26 to avoid cron collision with weekday_close)',
+    cron: '0 8 * * 5',  // 08:00 UTC = 13:30 IST · matches workflow yml after fix
     metric_ids: [
       'fx_reserves', 'high_yield_credit_spread',
       'drewry_wci', 'india_port_dwell_time',
-      'reservoir_levels', 'india_crude_basket'
+      'reservoir_levels'
+      // 'india_crude_basket' moved to daily_06 (Daily cadence, was wrongly here)
     ]
   },
   monthly_1: {

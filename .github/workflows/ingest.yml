@@ -12,7 +12,11 @@ on:
     - cron: '15 12 * * 1-5'   # 17:45 IST · weekday_close retry
     - cron: '30 13 * * 1-5'   # 19:00 IST · weekday_evening primary
     - cron: '15 14 * * 1-5'   # 19:45 IST · weekday_evening retry
-    - cron: '30 11 * * 5'     # 17:00 Fri · fri_17 primary
+    # fri_17 moved 2026-05-26: previous '30 11 * * 5' collided with weekday_close
+    # primary at the same minute on Fridays. GitHub Actions deduplicates same-time
+    # cron triggers, so only weekday_close fired Fridays — fri_17 never ran and the
+    # 4 Weekly metrics rotted (May 15 → May 26 unrefreshed).
+    - cron: '0 8 * * 5'       # 13:30 IST Fri · fri_17 primary (no collision)
     - cron: '30 4 1 * *'      # 10:00 1st · monthly_1
     - cron: '30 4 5 * *'      # 10:00 5th · monthly_5
   workflow_dispatch:
@@ -85,7 +89,7 @@ jobs:
             "30 0 * * *"|"15 1 * * *"|"0 2 * * *")      echo "slot=daily_06" >> $GITHUB_OUTPUT ;;
             "30 11 * * 1-5"|"15 12 * * 1-5")            echo "slot=weekday_close" >> $GITHUB_OUTPUT ;;
             "30 13 * * 1-5"|"15 14 * * 1-5")            echo "slot=weekday_evening" >> $GITHUB_OUTPUT ;;
-            "30 11 * * 5")    echo "slot=fri_17" >> $GITHUB_OUTPUT ;;
+            "0 8 * * 5")      echo "slot=fri_17" >> $GITHUB_OUTPUT ;;
             "30 4 1 * *")     echo "slot=monthly_1" >> $GITHUB_OUTPUT ;;
             "30 4 5 * *")     echo "slot=monthly_5" >> $GITHUB_OUTPUT ;;
             *)                echo "slot=daily_06" >> $GITHUB_OUTPUT ;;
