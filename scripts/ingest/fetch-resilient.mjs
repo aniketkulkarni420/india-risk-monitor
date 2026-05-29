@@ -11,6 +11,8 @@
 // Usage:
 //   const { body, source } = await fetchResilient(url, { timeoutMs, retries, wayback });
 
+import { noteOrigin } from './fetch-origin-context.mjs';
+
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 IRM-Ingest/1.0';
 const UA_BROWSER = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
@@ -75,6 +77,7 @@ export async function fetchResilient(url, opts = {}) {
             writeCache(url, res.body);
           } catch {}
         }
+        noteOrigin('primary');
         return { ...res, source: 'primary', attempt };
       }
       // 4xx → break out for fallbacks (don't waste retries on 404)
@@ -98,7 +101,7 @@ export async function fetchResilient(url, opts = {}) {
       const waybackUrl = await resolveWayback(url, timeoutMs);
       if (waybackUrl) {
         const res = await rawFetch(waybackUrl, { timeoutMs, browserUa: true });
-        if (res.ok && res.body) return { ...res, source: 'wayback', attempt: -1, original_url: url };
+        if (res.ok && res.body) { noteOrigin('wayback'); return { ...res, source: 'wayback', attempt: -1, original_url: url }; }
       }
     } catch (e) {
       lastErr = e;
@@ -115,6 +118,7 @@ export async function fetchResilient(url, opts = {}) {
         if (useCache) {
           try { const { writeCache } = await import('./source-cache.mjs'); writeCache(url, res.body); } catch {}
         }
+        noteOrigin('cf-proxy');
         return { ...res, url, source: 'cf-proxy' };
       }
     }
@@ -127,7 +131,7 @@ export async function fetchResilient(url, opts = {}) {
     try {
       const gcUrl = `https://webcache.googleusercontent.com/search?q=cache:${encodeURIComponent(url)}`;
       const res = await rawFetch(gcUrl, { timeoutMs, browserUa: true });
-      if (res.ok && res.body) return { ...res, source: 'google_cache', attempt: -1, original_url: url };
+      if (res.ok && res.body) { noteOrigin('google_cache'); return { ...res, source: 'google_cache', attempt: -1, original_url: url }; }
     } catch (e) {
       lastErr = e;
     }
@@ -141,6 +145,7 @@ export async function fetchResilient(url, opts = {}) {
       const { readLatestCache } = await import('./source-cache.mjs');
       const cached = readLatestCache(url);
       if (cached && cached.body && cached.body.length > 100) {
+        noteOrigin('local_cache');
         return { ok: true, status: 200, body: cached.body, url, source: 'local_cache', cache_age_days: cached.ageDays };
       }
     } catch {}

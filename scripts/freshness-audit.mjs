@@ -28,6 +28,9 @@ const STALENESS_DAYS_BY_CADENCE = {
   'Monthly': 45, 'Quarterly': 120, 'Per release': 180
 };
 const STALENESS_DAYS_DEFAULT = 14;
+// Frozen = no proven-live fetch (last_live_fetch_at) in FROZEN_FACTOR × cadence,
+// even if last_verified_at is fresh (cache-masking detector).
+const FROZEN_FACTOR = parseFloat(process.env.IRM_FROZEN_FACTOR || '2');
 
 async function fetchJson(url, timeoutMs = 20000) {
   const ac = new AbortController();
@@ -50,9 +53,21 @@ function classifyStaleness(metric) {
   const thresholdDays = STALENESS_DAYS_BY_CADENCE[freq] ?? STALENESS_DAYS_DEFAULT;
   if (!lv) return { stale: true, ageDays: null, thresholdDays, cadence: freq, reason: 'no last_verified_at' };
   const ageDays = (now - new Date(lv).getTime()) / 86400000;
+  // Frozen: proven-liveness age. last_live_fetch_at advances only on genuine
+  // live fetches; if it lags far behind last_verified_at, the metric is being
+  // served from cache (rotted source) and is silently frozen.
+  const liveStamp = metric.last_live_fetch_at;  // absent on pre-A1 data → no frozen verdict
+  let frozen = false, liveAgeDays = null;
+  if (liveStamp) {
+    liveAgeDays = +((now - new Date(liveStamp).getTime()) / 86400000).toFixed(1);
+    frozen = liveAgeDays > thresholdDays * FROZEN_FACTOR;
+  }
   return {
     stale: ageDays > thresholdDays,
     severely_stale: ageDays > thresholdDays * 2,
+    frozen,
+    liveAgeDays,
+    data_origin: metric.data_origin || null,
     ageDays: +ageDays.toFixed(1),
     thresholdDays, cadence: freq,
     last_verified_at: lv
@@ -70,6 +85,7 @@ try {
 
 const stale = [];
 const severelyStale = [];
+const frozen = [];
 let totalChecked = 0;
 let healthy = 0;
 
@@ -77,9 +93,10 @@ for (const [id, m] of Object.entries(data.metrics || {})) {
   if (!INCLUDE_COMPOSITES && isComposite(id)) continue;
   totalChecked++;
   const result = classifyStaleness(m);
+  if (result.frozen) frozen.push({ id, ...result });
   if (result.severely_stale) severelyStale.push({ id, ...result });
   else if (result.stale) stale.push({ id, ...result });
-  else healthy++;
+  else if (!result.frozen) healthy++;
 }
 
 const irsValue = data.metrics?.india_risk_score?.value;
@@ -95,15 +112,18 @@ const audit = {
   healthy_count: healthy,
   stale_count: stale.length,
   severely_stale_count: severelyStale.length,
+  frozen_count: frozen.length,
   irs_value: irsValue,
   irs_score_state: irsScoreState,
   stale_metrics: stale.sort((a, b) => b.ageDays - a.ageDays),
-  severely_stale_metrics: severelyStale.sort((a, b) => b.ageDays - a.ageDays)
+  severely_stale_metrics: severelyStale.sort((a, b) => b.ageDays - a.ageDays),
+  frozen_metrics: frozen.sort((a, b) => (b.liveAgeDays || 0) - (a.liveAgeDays || 0))
 };
 
 const overallStatus =
   bundleAge && bundleAge > 24 ? 'red' :
   severelyStale.length > 0 ? 'red' :
+  frozen.length > 0 ? 'red' :                       // cache-masking / rotted source
   stale.length > totalChecked * 0.15 ? 'amber' :
   stale.length > 0 ? 'amber' :
   'green';
@@ -119,8 +139,15 @@ console.log('─'.repeat(72));
 console.log(`Source: ${URL}`);
 console.log(`Bundle age: ${bundleAge != null ? bundleAge + 'h' : 'unknown'}`);
 console.log(`IRS: ${irsValue == null ? 'NULL · ' + irsScoreState : irsValue + ' · ' + (irsScoreState || 'unknown')}`);
-console.log(`Metrics: ${totalChecked} checked · ${healthy} healthy · ${stale.length} stale · ${severelyStale.length} severely stale`);
+console.log(`Metrics: ${totalChecked} checked · ${healthy} healthy · ${stale.length} stale · ${severelyStale.length} severely stale · ${frozen.length} frozen`);
 console.log(`Overall: ${overallStatus.toUpperCase()}`);
+
+if (frozen.length) {
+  console.log('\n🧊 FROZEN (last_verified fresh but no proven-live fetch — likely cache-masking / rotted source):');
+  for (const f of frozen) {
+    console.log(`  · ${f.id.padEnd(28)} ${f.cadence.padEnd(10)} live-age ${String(f.liveAgeDays).padEnd(8)} origin ${f.data_origin || '?'}`);
+  }
+}
 
 if (severelyStale.length) {
   console.log('\n⚠️  SEVERELY STALE (>2× cadence — investigate immediately):');
@@ -145,9 +172,16 @@ if (overallStatus !== 'green' && TG_TOKEN && TG_CHAT) {
     `${emoji} IRM Freshness Audit · ${overallStatus.toUpperCase()}`,
     `Bundle age: ${bundleAge}h`,
     `IRS: ${irsValue == null ? 'NULL (' + irsScoreState + ')' : irsValue}`,
-    `Stale: ${stale.length} · severely stale: ${severelyStale.length} / ${totalChecked}`,
+    `Stale: ${stale.length} · severely stale: ${severelyStale.length} · frozen: ${frozen.length} / ${totalChecked}`,
     ''
   ];
+  if (frozen.length) {
+    lines.push('🧊 Frozen (cache-masking — source may be dead):');
+    for (const f of frozen.slice(0, 8)) {
+      lines.push(`· ${f.id} (${f.cadence}, live-age ${f.liveAgeDays}d, origin ${f.data_origin || '?'})`);
+    }
+    lines.push('');
+  }
   if (severelyStale.length) {
     lines.push('Severely stale:');
     for (const s of severelyStale.slice(0, 10)) {

@@ -91,11 +91,29 @@ export function appendHistory(metric_id, value, as_of, { dryRun = false, source 
 export function applyIngest(metric_id, ingestResult, { dryRun = false } = {}) {
   const { data, file } = readMetric(metric_id);
 
+  const prevValue = data.value;
+  const nowIso = ingestResult.last_verified_at || new Date().toISOString();
+
   // Update value + as_of + last_verified_at + verification_state
   data.value = ingestResult.value;
   if (ingestResult.as_of) data.as_of = ingestResult.as_of;
-  data.last_verified_at = ingestResult.last_verified_at || new Date().toISOString();
+  data.last_verified_at = nowIso;
   data.verification_state = ingestResult.verification_state;
+
+  // ── Liveness provenance · kills the cache-masking lie ──────────────────
+  // last_verified_at advances on EVERY successful ingest, including ones that
+  // served stale cache (fetch-resilient's local_cache fallback). That makes a
+  // rotted source look "fresh" forever. last_live_fetch_at advances ONLY when
+  // we have proof of liveness: the fetch origin was genuinely live, OR the
+  // value actually moved (a changed number can only come from a live pull).
+  // Monitors key staleness off last_live_fetch_at, not last_verified_at.
+  const valueChanged = typeof ingestResult.value === 'number' && ingestResult.value !== prevValue;
+  const originIsLive = ingestResult.origin_is_live !== false;  // default true (untracked = live)
+  if (ingestResult.data_origin !== undefined) data.data_origin = ingestResult.data_origin;
+  if (originIsLive || valueChanged) {
+    data.last_live_fetch_at = nowIso;
+  }
+  // else: leave last_live_fetch_at at its prior value → it ages → frozen alarm.
 
   // Rotate sparkline_12m — push new value, drop oldest if at 12.
   // (Real Phase 8 logic: aggregate to month-end. For Phase 2: simple rotation.)

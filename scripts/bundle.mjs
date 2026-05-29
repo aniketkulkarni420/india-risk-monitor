@@ -325,9 +325,16 @@ const FRESHNESS_GATE_DAYS_BY_CADENCE = {
 };
 const FRESHNESS_GATE_DAYS_DEFAULT = 14;
 
+// A metric is "frozen" when it hasn't had a proven-live fetch (last_live_fetch_at)
+// within FROZEN_FACTOR × its cadence — even if last_verified_at is recent. This
+// is the cache-masking detector: a rotted source served from cache keeps
+// last_verified_at fresh but last_live_fetch_at stops advancing.
+const FROZEN_FACTOR = parseFloat(process.env.IRM_FROZEN_FACTOR || '2');
+
 const freshnessReport = (() => {
   const now = Date.now();
   const offenders = [];
+  const frozen = [];
   let totalChecked = 0;
   for (const [id, m] of Object.entries(metrics)) {
     if (id.startsWith('driver_') || id === 'india_risk_score' || id.endsWith('_state') || id.endsWith('_regime')) continue;
@@ -335,6 +342,15 @@ const freshnessReport = (() => {
     const lv = m.last_verified_at;
     const freq = m.source_primary?.frequency || 'Daily';
     const thresholdDays = FRESHNESS_GATE_DAYS_BY_CADENCE[freq] ?? FRESHNESS_GATE_DAYS_DEFAULT;
+    // Frozen check: proven-liveness age. Fall back to last_verified_at only when
+    // last_live_fetch_at is absent (pre-A1 data) so we don't false-alarm on old metrics.
+    const liveStamp = m.last_live_fetch_at || lv;
+    if (liveStamp) {
+      const liveAge = (now - new Date(liveStamp).getTime()) / 86400000;
+      if (liveAge > thresholdDays * FROZEN_FACTOR) {
+        frozen.push({ id, liveAgeDays: +liveAge.toFixed(1), thresholdDays, cadence: freq, data_origin: m.data_origin || null });
+      }
+    }
     if (!lv) { offenders.push({ id, ageDays: null, thresholdDays, cadence: freq, reason: 'no last_verified_at' }); continue; }
     const ageDays = (now - new Date(lv).getTime()) / 86400000;
     if (ageDays > thresholdDays) offenders.push({ id, ageDays: +ageDays.toFixed(1), thresholdDays, cadence: freq });
@@ -359,13 +375,21 @@ const freshnessReport = (() => {
   } else {
     console.log(`  · freshness: all ${totalChecked} metrics within cadence ✓`);
   }
+  if (frozen.length) {
+    console.warn(`\n::warning::Frozen-liveness: ${frozen.length} metric(s) have not had a proven-live fetch in >${FROZEN_FACTOR}× cadence (possible cache-masking / rotted source):`);
+    for (const f of frozen.slice(0, 15)) {
+      console.warn(`  · ${f.id.padEnd(28)} ${f.cadence.padEnd(10)} live-age ${String(f.liveAgeDays).padEnd(8)} origin=${f.data_origin || '?'}`);
+    }
+  }
   return {
     checked: totalChecked,
     stale_count: offenders.length,
     stale_pct: stalePct,
     over_threshold: overThreshold,
     threshold_pct: FRESHNESS_GATE_PCT,
-    stale: offenders
+    stale: offenders,
+    frozen_count: frozen.length,
+    frozen
   };
 })();
 

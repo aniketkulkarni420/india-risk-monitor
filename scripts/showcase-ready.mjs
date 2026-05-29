@@ -25,6 +25,7 @@ const JSON_OUT = args.has('--json');
 
 const STALE_DAYS = { Live: 2, Daily: 2, Weekly: 10, Fortnightly: 21, Monthly: 45, Quarterly: 120, 'Per release': 180 };
 const STALE_DEFAULT = 14;
+const FROZEN_FACTOR = parseFloat(process.env.IRM_FROZEN_FACTOR || '2');
 
 // Plausibility bounds for the headline metrics a viewer would scan first.
 // Wide enough to allow crisis values, tight enough to catch decimal/unit errors.
@@ -78,18 +79,24 @@ const bundleAgeH = data.generated_at ? (now - new Date(data.generated_at).getTim
 if (bundleAgeH > 24) fails.push(`bundle is ${bundleAgeH.toFixed(1)}h old (>24h) — deploy pipeline may be stuck`);
 else if (bundleAgeH > 12) warns.push(`bundle is ${bundleAgeH.toFixed(1)}h old (>12h)`);
 
-// 2 · freshness (cadence-aware)
-let stale = [], severe = [];
+// 2 · freshness (cadence-aware) + frozen-liveness (cache-masking detector)
+let stale = [], severe = [], frozen = [];
 for (const [id, m] of Object.entries(data.metrics || {})) {
   if (isComposite(id)) continue;
   const freq = m.source_primary?.frequency || 'Daily';
   const th = STALE_DAYS[freq] ?? STALE_DEFAULT;
   const lv = m.last_verified_at;
+  // Frozen: no proven-live fetch in >FROZEN_FACTOR× cadence even if last_verified is fresh.
+  if (m.last_live_fetch_at) {
+    const liveAge = (now - new Date(m.last_live_fetch_at).getTime()) / 86400000;
+    if (liveAge > th * FROZEN_FACTOR) frozen.push(`${id} (live-age ${liveAge.toFixed(1)}d/${th}d, origin ${m.data_origin || '?'})`);
+  }
   if (!lv) { severe.push(id); continue; }
   const age = (now - new Date(lv).getTime()) / 86400000;
   if (age > th * 2) severe.push(`${id} (${age.toFixed(1)}d/${th}d)`);
   else if (age > th) stale.push(`${id} (${age.toFixed(1)}d/${th}d)`);
 }
+if (frozen.length) fails.push(`${frozen.length} frozen (cache-masking — source likely dead): ${frozen.slice(0, 6).join(', ')}${frozen.length > 6 ? '…' : ''}`);
 if (severe.length) fails.push(`${severe.length} severely stale (>2× cadence): ${severe.slice(0, 8).join(', ')}${severe.length > 8 ? '…' : ''}`);
 if (stale.length > (Object.keys(data.metrics).length * 0.10)) fails.push(`${stale.length} metrics stale (>10% of total)`);
 else if (stale.length) warns.push(`${stale.length} metrics mildly stale: ${stale.slice(0, 6).join(', ')}`);

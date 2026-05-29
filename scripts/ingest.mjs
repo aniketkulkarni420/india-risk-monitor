@@ -12,6 +12,7 @@
 // and registered in scripts/ingest/registry.mjs.
 
 import { readMetric, applyIngest, appendHistory, listMetrics } from './ingest/persistence.mjs';
+import { runWithOriginTracking, readOrigin } from './ingest/fetch-origin-context.mjs';
 import { resolve, listRealParsers } from './ingest/registry.mjs';
 import { recordSuccess, recordFailure } from './parser-health.mjs';
 import { verify } from './ingest/crosscheck.mjs';
@@ -141,6 +142,8 @@ async function ingestOne(metric_id) {
         as_of: override.as_of,
         last_verified_at: new Date().toISOString(),
         verification_state: 'manual_override',
+        data_origin: 'manual_override',
+        origin_is_live: true,   // an authoritative human-set value counts as live
         ...trends
       };
       const writeRes = applyIngest(metric_id, result, { dryRun: ARGS.dryRun });
@@ -170,8 +173,16 @@ async function ingestOne(metric_id) {
       return { ok: true, skipped: true, metric_id, mode, parser_id, reason: 'no live parser registered' };
     }
 
-    // Primary fetch
-    const primary = await parser.fetchPrimary(metric);
+    // Primary fetch — wrapped in origin tracking so we can tell whether the
+    // value came from a genuine live fetch or from a stale cache/archive
+    // fallback (fetch-resilient's local_cache/wayback). Untracked parsers
+    // (raw fetch / LLM / NSE JSON) report no origin → treated as live.
+    let fetchOrigin = { origin: null, isLive: true };
+    const primary = await runWithOriginTracking(async () => {
+      const p = await parser.fetchPrimary(metric);
+      fetchOrigin = readOrigin();
+      return p;
+    });
 
     // Cross-checks (sequential — keeps polite to sources)
     const crosschecks = [];
@@ -202,6 +213,9 @@ async function ingestOne(metric_id) {
       as_of: primary.as_of,
       last_verified_at: new Date().toISOString(),
       verification_state: verdict.verification_state,
+      // Liveness provenance (kills the cache-masking lie · see fetch-origin-context.mjs)
+      data_origin: fetchOrigin.origin || 'live',
+      origin_is_live: fetchOrigin.isLive,
       ...trends,
       // Forward parser `extra` fields (snapshot payloads, source-state flags,
       // baselines) so persistence can merge them. Without this, parser-computed
