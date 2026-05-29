@@ -1,18 +1,23 @@
 name: Weekly backup to Cloudflare R2
 
-# Disaster-recovery mirror: weekly snapshot of data/ + app/dist/ to R2 (free tier).
-# Protects against GitHub repo corruption / accidental deletion.
+# Disaster-recovery mirror: weekly snapshot of data/ + app/dist/ to Cloudflare R2
+# (free tier, 10 GB). Protects against GitHub repo corruption / accidental deletion.
 #
-# One-time setup:
-#   1. Create R2 bucket at dash.cloudflare.com → R2 → Create bucket "irm-backup"
-#   2. R2 → Manage R2 API Tokens → Create API token (R2:Edit scope)
-#   3. Add GitHub secrets:
-#        R2_ACCOUNT_ID (same as CF_ACCOUNT_ID)
-#        R2_ACCESS_KEY_ID
-#        R2_SECRET_ACCESS_KEY
-#        R2_BUCKET (default "irm-backup")
+# Uses wrangler with the CLOUDFLARE_API_TOKEN you already have set (no separate
+# S3 access keys needed). Bundles everything into one dated .tgz + a "latest"
+# pointer, so it's a single upload, not thousands of object PUTs.
 #
-# Storage cost: free tier = 10 GB. Repo's data/ is ~50MB.
+# ONE-TIME SETUP (the only manual step — ~2 min):
+#   1. Enable R2: dash.cloudflare.com → R2 → "Enable R2" (free; needs a card on
+#      file even for the free tier). This is why the job skips until you do it.
+#   2. Make sure CLOUDFLARE_API_TOKEN has the "Workers R2 Storage: Edit"
+#      permission (dash → My Profile → API Tokens → edit the token).
+#   3. Turn this on: repo → Settings → Secrets and variables → Actions →
+#      Variables → New variable:  R2_ENABLED = 1
+#      (optional) R2_BUCKET = irm-backup   ← defaults to irm-backup if unset
+#   Then: Actions → this workflow → "Run workflow" to verify.
+#
+# Until R2_ENABLED=1 is set, the job SKIPS (neutral, not failed) — no red noise.
 
 on:
   schedule:
@@ -22,39 +27,34 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
-    if: ${{ vars.R2_BUCKET != '' || secrets.R2_BUCKET != '' }}
+    # Gate on a repo VARIABLE (secrets context is NOT allowed in job-level if —
+    # that was the old startup-failure bug). Skips cleanly until R2 is enabled.
+    if: ${{ vars.R2_ENABLED == '1' }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install rclone
-        run: |
-          curl -sL https://rclone.org/install.sh | sudo bash
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'   # wrangler ≥4 requires Node ≥22
 
-      - name: Configure rclone for R2
-        env:
-          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: |
-          mkdir -p ~/.config/rclone
-          cat > ~/.config/rclone/rclone.conf <<EOF
-          [r2]
-          type = s3
-          provider = Cloudflare
-          access_key_id = ${R2_ACCESS_KEY_ID}
-          secret_access_key = ${R2_SECRET_ACCESS_KEY}
-          endpoint = https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
-          region = auto
-          EOF
+      - name: Install wrangler
+        run: npm install -g wrangler@latest
 
-      - name: Sync data/ to R2
+      - name: Backup data/ + dist/ to R2 (single dated archive + latest)
         env:
-          BUCKET: ${{ secrets.R2_BUCKET }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          BUCKET: ${{ vars.R2_BUCKET || 'irm-backup' }}
         run: |
+          set -e
           DATE=$(date -u +%Y-%m-%d)
-          rclone copy data/ "r2:${BUCKET}/snapshots/${DATE}/data/" --transfers=8 --quiet
-          rclone copy app/dist/ "r2:${BUCKET}/snapshots/${DATE}/dist/" --transfers=4 --quiet
-          # Also keep a "latest" pointer
-          rclone sync data/ "r2:${BUCKET}/latest/data/" --transfers=8 --quiet
-          rclone sync app/dist/ "r2:${BUCKET}/latest/dist/" --transfers=4 --quiet
-          echo "Backup complete: ${DATE}"
+          # Create the bucket if it doesn't exist yet (idempotent — ignore "exists").
+          wrangler r2 bucket create "$BUCKET" 2>&1 | tee /tmp/bkt.log || \
+            grep -qiE "already (exists|owned)" /tmp/bkt.log
+          # One tarball of everything worth restoring.
+          tar czf /tmp/irm-backup.tgz data/ app/dist/ 2>/dev/null || tar czf /tmp/irm-backup.tgz data/
+          ls -lh /tmp/irm-backup.tgz
+          # Dated snapshot + a stable "latest" pointer.
+          wrangler r2 object put "$BUCKET/snapshots/${DATE}.tgz" --file /tmp/irm-backup.tgz --content-type application/gzip
+          wrangler r2 object put "$BUCKET/latest.tgz"            --file /tmp/irm-backup.tgz --content-type application/gzip
+          echo "Backup complete: ${DATE} → r2://${BUCKET}/snapshots/${DATE}.tgz"
