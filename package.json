@@ -18,7 +18,9 @@
     "build": "node scripts/validate.mjs && node scripts/audit-tier-chains.mjs && node scripts/bundle.mjs && node scripts/audit.mjs",
     "preview": "node scripts/bundle.mjs && node scripts/build-preview.mjs",
     "backfill": "node scripts/backfill.mjs",
-    "serve": "node scripts/serve.mjs"
+    "serve": "node scripts/serve.mjs",
+    "showcase:ready": "node scripts/showcase-ready.mjs",
+    "freshness": "node scripts/freshness-audit.mjs"
   },
   "engines": {
     "node": ">=18.0.0"
