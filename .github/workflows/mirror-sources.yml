@@ -4,7 +4,10 @@ name: Daily content mirror
 # Combined with cache-fallback in fetchResilient(), this ensures the
 # dashboard keeps working even when PIB/NHAI/etc are temporarily down.
 #
-# Runs from the self-hosted India runner so PIB/NHAI/etc are reachable.
+# 2026-05-29: moved from the self-hosted Windows India runner to ubuntu-latest.
+# India-IP sources are reached via the CF Worker proxy (fetch-resilient falls
+# back to it automatically), so no physical runner is needed and this no longer
+# gets cancelled when that machine is offline.
 
 on:
   schedule:
@@ -16,13 +19,10 @@ on:
 
 jobs:
   mirror:
-    runs-on: [self-hosted, windows, india]
+    runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
       contents: write
-    defaults:
-      run:
-        shell: cmd
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,6 +34,9 @@ jobs:
         run: npm install --no-audit --no-fund --prefer-offline
 
       - name: Run mirror
+        env:
+          CF_WORKER_URL: ${{ secrets.CF_WORKER_URL }}
+          CF_WORKER_TOKEN: ${{ secrets.WORKER_TOKEN }}
         run: node scripts/mirror-sources.mjs
         continue-on-error: true
 
@@ -42,8 +45,9 @@ jobs:
           git config user.name "IRM Mirror Bot"
           git config user.email "irm-mirror@bot.local"
           git add data/source-cache
-          git diff --staged --quiet
-          if errorlevel 1 (
+          if git diff --staged --quiet; then
+            echo "No cache changes."
+          else
             git commit -m "chore: daily source mirror"
             for attempt in 1 2 3; do
               if git push 2>&1; then break; fi
@@ -53,6 +57,4 @@ jobs:
               sleep $((attempt * 5))
               if [ $attempt -eq 3 ]; then echo "::error::Push failed after 3 attempts"; exit 1; fi
             done
-          ) else (
-            echo No cache changes.
-          )
+          fi

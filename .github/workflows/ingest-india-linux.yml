@@ -6,9 +6,11 @@ name: Scheduled ingest (India Linux runner · Termux/VPS)
 #
 # Register a runner with labels: self-hosted, linux, india
 
+# 2026-05-29: schedule REMOVED (see ingest-india-runner.yml). Cloud ingest.yml +
+# CF Worker proxy now cover all India-IP metrics; the scheduled cron only
+# produced cancelled runs while no `self-hosted, linux, india` runner was online.
+# Kept as workflow_dispatch-only for optional future redundancy.
 on:
-  schedule:
-    - cron: '30 */6 * * *'   # offset 30min from Windows runner
   workflow_dispatch:
     inputs:
       metric:

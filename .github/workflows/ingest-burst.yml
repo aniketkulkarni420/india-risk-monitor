@@ -7,6 +7,11 @@ name: Burst ingest (release-window targeted)
 #
 # Generic 6h cron misses the release window if everyone's slow. This workflow
 # bursts ingest on known release days to catch fresh data sooner.
+#
+# 2026-05-29: moved from the self-hosted Windows India runner to ubuntu-latest.
+# All India-IP sources are reachable via the CF Worker proxy (fetch-resilient +
+# nse_api fall back to it automatically), so no physical runner is needed and
+# this no longer gets cancelled when that machine is offline.
 
 on:
   schedule:
@@ -23,13 +28,10 @@ on:
 
 jobs:
   burst:
-    runs-on: [self-hosted, windows, india]
+    runs-on: ubuntu-latest
     timeout-minutes: 35
     permissions:
       contents: write
-    defaults:
-      run:
-        shell: cmd
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -65,8 +67,9 @@ jobs:
           git config user.name "IRM Burst Runner"
           git config user.email "irm-burst@bot.local"
           git add data/
-          git diff --staged --quiet
-          if errorlevel 1 (
+          if git diff --staged --quiet; then
+            echo "No data changes."
+          else
             git commit -m "ingest(burst): release-window run"
             for attempt in 1 2 3; do
               if git push 2>&1; then break; fi
@@ -76,6 +79,4 @@ jobs:
               sleep $((attempt * 5))
               if [ $attempt -eq 3 ]; then echo "::error::Push failed after 3 attempts"; exit 1; fi
             done
-          ) else (
-            echo No data changes.
-          )
+          fi

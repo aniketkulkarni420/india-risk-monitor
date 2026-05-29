@@ -4,9 +4,13 @@ name: Scheduled ingest (India IP)
 # need an India IP. Uses cmd shell (always present) + Node scripts for loops
 # to avoid pwsh/powershell/bash availability issues on the runner.
 
+# 2026-05-29: schedule REMOVED. All India-IP metrics this runner used to fetch
+# are now covered by the cloud ingest.yml slots (via the CF Worker proxy), so
+# the scheduled cron only produced cancelled runs when the self-hosted Windows
+# runner was offline. Kept as workflow_dispatch-only: if you ever register a
+# `self-hosted, windows, india` runner again for extra redundancy, trigger it
+# manually or re-add the schedule.
 on:
-  schedule:
-    - cron: '0 */6 * * *'   # every 6h
   workflow_dispatch:
     inputs:
       metric:
