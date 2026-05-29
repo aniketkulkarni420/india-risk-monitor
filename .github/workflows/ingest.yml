@@ -35,13 +35,14 @@ on:
           - monthly_5
           - all
 
-# Serialise all workflows that push to main · prevents the 19:08 UTC race
-# observed 2026-05-25 where two scheduled runs committed simultaneously and
-# the loser was rejected with "(fetch first)". cancel-in-progress: false
-# queues rather than cancels — never drop a successful ingest's data.
-concurrency:
-  group: irm-data-push
-  cancel-in-progress: false
+# NOTE (2026-05-28): a `concurrency: irm-data-push` block was removed here.
+# It was meant to prevent the May-25 push race, but `cancel-in-progress: false`
+# still CANCELS queued runs when a newer run with the same group arrives — and
+# with many cron triggers firing close together that cancelled 88% of runs
+# (22 of 25), leaving data ~2 days stale. The push race is already handled by
+# the `git pull --rebase` + 3-attempt retry in the commit step below, which
+# lets concurrent runs merge safely without cancelling each other. Do NOT
+# re-add a concurrency block unless you also solve the queued-run cancellation.
 
 jobs:
   ingest:

@@ -13,10 +13,8 @@ on:
         description: 'Single metric_id to ingest (optional)'
         required: false
 
-# Shared serialisation with all other workflows that push to main.
-concurrency:
-  group: irm-data-push
-  cancel-in-progress: false
+# concurrency block removed 2026-05-28 — it cancelled queued runs (see ingest.yml note).
+# Push race is handled by rebase-retry in the commit step.
 
 jobs:
   ingest-india:
