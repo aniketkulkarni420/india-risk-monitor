@@ -7,14 +7,12 @@
   "value": 137.72,
   "unit": "Mn tonnes",
   "value_format": "decimal_1",
-  "as_of": "2026-05-27T18:39:31.000Z",
+  "as_of": "2026-03-06T08:00:00.000Z",
   "as_of_period": "monthly",
   "mom_pct": null,
   "yoy_pct": null,
   "vs_5y_avg_pct": 18.4,
   "sparkline_12m": [
-    138.5,
-    139.2,
     139.8,
     140.4,
     140.8,
@@ -23,6 +21,8 @@
     141.8,
     140.9,
     142.8,
+    137.72,
+    137.72,
     137.72,
     137.72
   ],
@@ -37,6 +37,7 @@
     "parser": "tiered:tiered_v1",
     "tier_chain": [
       "email:email_pipeline_v1",
+      "rss:google_news_rss_v1",
       "llm:google_news_llm_v1",
       "rss:publisher_rss_v1",
       "html_render:web_llm_v1"
@@ -50,7 +51,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-29T04:31:16.398Z",
+  "last_verified_at": "2026-05-29T04:56:39.161Z",
   "why_it_matters": "Coal, iron ore, cement, container loading proxy for industrial activity. Stable growth = industrial economy holding up.",
   "linked_metrics": [
     "steel_consumption",

@@ -13,6 +13,8 @@
 // NSE blocks requests with no cookies from some IPs. We do a cheap warmup
 // (GET a regular NSE page to collect cookies) then hit the API with them.
 
+import { fetchViaProxy, isProxyAvailable } from '../cf-proxy.mjs';
+
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
 async function fetchWithTimeout(url, opts = {}, timeoutMs = 15000) {
@@ -59,11 +61,20 @@ async function fetchNseJson(apiUrl, referer) {
     }
   });
   body = await res.text();
-  if (!res.ok) throw new Error(`${apiUrl} → ${res.status}`);
-  if (!body || body.trim() === '{}' || body.length < 3) {
-    throw new Error(`${apiUrl} → empty response (NSE bot wall — needs CF Worker proxy or India IP)`);
+  const looksBlocked = !res.ok || !body || body.trim() === '{}' || body.length < 3 || !body.trim().startsWith('{');
+  if (!looksBlocked) {
+    try { return JSON.parse(body); } catch { /* fall through to proxy */ }
   }
-  return JSON.parse(body);
+  // Attempt 3: CF Worker proxy (reaches NSE from CF's India edge — works from
+  // foreign cloud runners where NSE bot-walls the direct request).
+  if (isProxyAvailable()) {
+    try {
+      const { body: pbody } = await fetchViaProxy(apiUrl);
+      if (pbody && pbody.trim().startsWith('{')) return JSON.parse(pbody);
+    } catch { /* fall through to error */ }
+  }
+  if (!res.ok) throw new Error(`${apiUrl} → ${res.status}`);
+  throw new Error(`${apiUrl} → empty/blocked response (NSE bot wall — needs CF Worker proxy or India IP)`);
 }
 
 const CONFIGS = {
@@ -89,6 +100,39 @@ const CONFIGS = {
       return new Date(`${m[2]} ${m[1]}, ${m[3]}`).toISOString();
     },
     plausible: (v) => v >= 0 && v < 100000
+  },
+
+  fno_oi_buildup: {
+    // OI-weighted aggregate % change in open interest for NIFTY + BANKNIFTY
+    // (current vs previous trading session), from NSE's OI-spurts feed.
+    // changeInOI is absolute Δ contracts; avgInOI is the per-symbol % change.
+    // We aggregate the two index books: (ΣΔOI / ΣprevOI) × 100 — an OI-weighted
+    // build-up that treats Nifty + Bank Nifty as one positioning book.
+    api: 'https://www.nseindia.com/api/live-analysis-oi-spurts-underlyings',
+    referer: 'https://www.nseindia.com/market-data/oi-spurts',
+    extract: (j) => {
+      const rows = Array.isArray(j.data) ? j.data : [];
+      if (!rows.length) return null;
+      const wanted = new Set(['NIFTY', 'BANKNIFTY']);
+      let sumChg = 0, sumPrev = 0, found = 0;
+      for (const r of rows) {
+        if (!wanted.has(r.symbol)) continue;
+        const prev = Number(r.prevOI), chg = Number(r.changeInOI);
+        if (!Number.isFinite(prev) || !Number.isFinite(chg) || prev <= 0) continue;
+        sumPrev += prev; sumChg += chg; found++;
+      }
+      if (found === 0 || sumPrev <= 0) return null;
+      return +((sumChg / sumPrev) * 100).toFixed(2);
+    },
+    asOf: (j) => {
+      const ts = j.timestamp || j.currTradingDate;
+      if (!ts) return new Date().toISOString();
+      // "29-May-2026 10:16:02" or "29-May-2026"
+      const m = String(ts).match(/(\d{2})-(\w{3})-(\d{4})/);
+      if (!m) return new Date().toISOString();
+      return new Date(`${m[2]} ${m[1]}, ${m[3]}`).toISOString();
+    },
+    plausible: (v) => Math.abs(v) < 500
   }
 };
 

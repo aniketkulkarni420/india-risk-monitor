@@ -64,12 +64,16 @@ const CONFIGS = {
   },
 
   rail_freight: {
-    // Default query targets monthly figure; FY-total has different units (1670 MT range)
-    queryFn: () => 'Indian Railways freight loading million tonnes monthly ' + recentMonthsQuery(),
-    matchRe: /(?:Indian\s+Railways|Railways)[\s\S]{0,200}?([\d.]+)\s*(?:million\s+tonnes|MT|Mn\s+tonnes|MnT)/i,
-    headlineFilter: (t) => /Indian\s+Railways/i.test(t) && !/Central\s+Railway|Western\s+Railway|Northern\s+Railway|South[\s-]?(Western|Central|Eastern)\s+Railway|East\s+Coast\s+Railway|Konkan\s+Railway|FY\d/i.test(t),
-    plausible: (v) => v > 100 && v < 200,                         // monthly range
-    maxAgeDays: 45
+    // Monthly freight loading is reported in MT (~120-150 range). News coverage
+    // lags ~2-3 months and FY-totals (~1670 MT) / billion-tonne milestones must
+    // be excluded — the plausibility band (100-200) + 'billion'/'FY' filter do that.
+    // No recentMonthsQuery: the latest monthly MT figure is often 60-90d old in
+    // news, so we widen maxAgeDays rather than over-constrain the query.
+    queryFn: () => 'Indian Railways freight loading million tonnes',
+    matchRe: /([\d]{3}(?:\.\d+)?)\s*(?:million\s+tonnes|mn\s+tonnes|MnT|\bMT\b)/i,
+    headlineFilter: (t) => /(Indian\s+Railways|Railways|freight\s+loading)/i.test(t) && !/Central\s+Railway|Western\s+Railway|Northern\s+Railway|South[\s-]?(Western|Central|Eastern)\s+Railway|East\s+Coast\s+Railway|Konkan\s+Railway|\bFY\d|billion/i.test(t),
+    plausible: (v) => v > 100 && v < 200,                         // monthly range (excludes 1670 FY-total)
+    maxAgeDays: 100
   },
 
   power_demand: {

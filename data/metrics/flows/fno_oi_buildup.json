@@ -1,19 +1,18 @@
 {
   "metric_id": "fno_oi_buildup",
   "display_name": "F&O OI build-up",
-  "display_subtitle": "Nifty + Bank Nifty · weekly change",
+  "display_subtitle": "Nifty + Bank Nifty · OI-weighted change vs prev session",
   "section": "flows",
   "sub_cluster": "structure",
-  "value": 28.72,
+  "value": 23.63,
   "unit": "%",
   "value_format": "percent",
-  "as_of": "2026-05-13T05:07:39.000Z",
+  "as_of": "2026-05-28T18:30:00.000Z",
   "as_of_period": "weekly",
   "mom_pct": null,
   "yoy_pct": null,
   "vs_5y_avg_pct": null,
   "sparkline_12m": [
-    14.73,
     24.85,
     -2.64,
     24.85,
@@ -24,7 +23,8 @@
     41,
     28.72,
     28.72,
-    28.72
+    28.72,
+    23.63
   ],
   "status": "high",
   "shock_eligible": false,
@@ -36,6 +36,7 @@
     "frequency": "Weekly",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
+      "json_api:nse_api_v1",
       "html_render:moneycontrol_v1",
       "html_render:playwright_render_v1",
       "llm:google_news_llm_v1"
@@ -49,7 +50,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-22T18:26:38.579Z",
+  "last_verified_at": "2026-05-29T04:49:10.002Z",
   "why_it_matters": "OI unwind precedes cash flow. Negative OI build-up alongside FII selling = synchronised positioning shift. Leading indicator that cash flows lag.",
   "linked_metrics": [
     "fii_equity_mtd",
