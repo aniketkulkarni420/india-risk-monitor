@@ -142,9 +142,9 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T09:10:08.752Z",
+      "last_success_at": "2026-05-29T18:17:48.349Z",
       "last_success_value": -10,
-      "last_attempted_at": "2026-05-29T09:10:08.752Z"
+      "last_attempted_at": "2026-05-29T18:17:48.349Z"
     },
     "inr_usd": {
       "last_success_at": "2026-05-29T04:29:14.428Z",
@@ -186,11 +186,11 @@
       "last_attempted_at": "2026-05-29T18:21:44.324Z"
     },
     "india_crude_basket": {
-      "last_success_at": "2026-05-29T12:37:27.950Z",
+      "last_success_at": "2026-05-29T18:19:55.408Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-05-29T12:37:27.950Z"
+      "last_attempted_at": "2026-05-29T18:19:55.408Z"
     },
     "gst_gross": {
       "last_failure_at": "2026-05-11T05:00:21.341Z",
@@ -237,31 +237,31 @@
       "last_attempted_at": "2026-05-29T04:30:21.941Z"
     },
     "upi_value": {
-      "last_failure_at": "2026-05-29T09:15:25.073Z",
-      "last_failure_reason": "google_news_rss: 67 items, none matched · tried: Upi Transactions Jump 3 95 Mom In July - India IPO | Mobile wallets lose pace as UPI surges, growth remains muted over four years - S | UPI remains above 22 Bn transactions for consecutive mo",
-      "consecutive_failures": 2,
-      "status": "amber",
+      "last_failure_at": "2026-05-29T18:19:48.957Z",
+      "last_failure_reason": "google_news_rss: 68 items, none matched · tried: Mobile wallet growth stagnates amidst UPI surge, new RBI norms likely to pinch e | Upi Transactions Jump 3 95 Mom In July - India IPO | UPI remains above 22 Bn transactions for consecutive mo",
+      "consecutive_failures": 3,
+      "status": "red",
       "last_success_at": "2026-05-15T13:34:01.362Z",
       "last_success_value": 29.53,
-      "last_attempted_at": "2026-05-29T09:15:25.073Z"
+      "last_attempted_at": "2026-05-29T18:19:48.957Z"
     },
     "pol_demand": {
       "last_failure_at": "2026-05-11T12:09:41.277Z",
       "last_failure_reason": "pol_demand: 1 candidates, none yielded value · https://news.google.com/rss/articles/CBMiW0FVX3lxTFBzZ3hYcVF: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T09:10:13.781Z",
+      "last_success_at": "2026-05-29T18:17:53.548Z",
       "last_success_value": 19.3,
-      "last_attempted_at": "2026-05-29T09:10:13.781Z"
+      "last_attempted_at": "2026-05-29T18:17:53.548Z"
     },
     "air_pax": {
       "last_failure_at": "2026-05-11T05:00:58.776Z",
       "last_failure_reason": "air_pax: all sources failed [https://www.dgca.gov.in/digigov-portal/?nq=qHE4MM%2BFwSPaUnbl0Wqejg%3D%3D: no match | https://pib.gov.in/AllRelease.aspx?MinCode=03: no match]",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T09:10:14.491Z",
+      "last_success_at": "2026-05-29T18:17:55.557Z",
       "last_success_value": 132.67,
-      "last_attempted_at": "2026-05-29T09:10:14.491Z"
+      "last_attempted_at": "2026-05-29T18:17:55.557Z"
     },
     "iip_growth": {
       "last_success_at": "2026-05-29T04:30:31.468Z",
@@ -285,20 +285,20 @@
       "last_attempted_at": "2026-05-29T04:30:31.555Z"
     },
     "naukri_jobspeak": {
-      "last_success_at": "2026-05-29T09:15:32.358Z",
+      "last_success_at": "2026-05-29T18:20:01.670Z",
       "last_success_value": 2858,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-05-29T09:15:32.358Z"
+      "last_attempted_at": "2026-05-29T18:20:01.670Z"
     },
     "cement_dispatches": {
       "last_failure_at": "2026-05-11T12:10:56.452Z",
       "last_failure_reason": "cement_dispatches: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMiggFBVV95cUxPNFplNDZ: 3.89 out of band | https://news.google.com/rss/articles/CBMimAFBVV95cUxPOXA0S2l: All LLM providers failed: groq: returned no",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T09:15:24.137Z",
+      "last_success_at": "2026-05-29T18:19:47.916Z",
       "last_success_value": 40.7,
-      "last_attempted_at": "2026-05-29T09:15:24.137Z"
+      "last_attempted_at": "2026-05-29T18:19:47.916Z"
     },
     "steel_consumption": {
       "last_success_at": "2026-05-29T04:30:39.444Z",
@@ -319,36 +319,36 @@
       "last_failure_reason": "eway_bills: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMigAFBVV95cUxQMnpkNHJ: browser.newContext: Target page, context or browser has been closed | https://news.google.com/rss/articles/CBMixwFBVV95cUxQQnZoRHF:",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T09:10:38.645Z",
-      "last_success_value": 140.6,
-      "last_attempted_at": "2026-05-29T09:10:38.645Z"
+      "last_success_at": "2026-05-29T18:18:24.321Z",
+      "last_success_value": 90,
+      "last_attempted_at": "2026-05-29T18:18:24.321Z"
     },
     "fastag_toll": {
       "last_failure_at": "2026-05-14T11:31:51.453Z",
       "last_failure_reason": "tiered: all 4 tiers failed · email:email_pipeline_v1: Gmail IMAP not configured · set GMAIL_ADDRESS + GMAIL_APP_PASSWORD | html_render:web_llm_v1: browser.newContext: Target page, context or browser has been closed | rss:publisher_rss_v1: p",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T09:10:45.361Z",
+      "last_success_at": "2026-05-29T18:18:32.366Z",
       "last_success_value": 5559.91,
-      "last_attempted_at": "2026-05-29T09:10:45.361Z"
+      "last_attempted_at": "2026-05-29T18:18:32.366Z"
     },
     "rail_freight": {
       "last_failure_at": "2026-05-15T13:32:47.963Z",
       "last_failure_reason": "tiered: all 4 tiers failed · email:email_pipeline_v1: email_pipeline: no matching emails for rail_freight (subscription may not have delivered yet) | llm:google_news_llm_v1: rail_freight: 6 candidates, none yielded value · https://news.goog",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T09:11:16.724Z",
+      "last_success_at": "2026-05-29T18:18:34.988Z",
       "last_success_value": 137.72,
-      "last_attempted_at": "2026-05-29T09:11:16.724Z"
+      "last_attempted_at": "2026-05-29T18:18:34.988Z"
     },
     "port_cargo": {
       "last_failure_at": "2026-05-29T09:15:19.500Z",
       "last_failure_reason": "tiered: all 3 tiers failed · llm:google_news_llm_v1: port_cargo: 6 candidates, none yielded value · https://news.google.com/rss/articles/CBMiaEFVX3lxTE9q | rss:publisher_rss_v1: in cooldown | html_render:web_llm_v1: web_llm_v1: all 3 source",
-      "consecutive_failures": 2,
-      "status": "amber",
-      "last_success_at": "2026-05-15T13:33:48.718Z",
-      "last_success_value": 62.11,
-      "last_attempted_at": "2026-05-29T09:15:19.500Z"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-05-29T18:19:43.421Z",
+      "last_success_value": 60,
+      "last_attempted_at": "2026-05-29T18:19:43.421Z"
     },
     "fiscal_deficit_pct": {
       "last_success_at": "2026-05-29T04:32:09.871Z",
@@ -397,27 +397,27 @@
       "last_failure_reason": "tiered: all 3 tiers failed · html_render:moneycontrol_v1: moneycontrol_v1: all 2 URLs failed · https://www.moneycontrol.com/markets/indian-indices/changeinoi. | html_render:playwright_render_v1: fno_oi_buildup: playwright failed [https://ww",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T09:15:33.548Z",
-      "last_success_value": 37.89,
-      "last_attempted_at": "2026-05-29T09:15:33.548Z"
+      "last_success_at": "2026-05-29T18:20:02.730Z",
+      "last_success_value": 29.56,
+      "last_attempted_at": "2026-05-29T18:20:02.730Z"
     },
     "block_deals_notional": {
       "last_failure_at": "2026-05-21T18:31:34.573Z",
       "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:moneycontrol_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T09:15:34.558Z",
+      "last_success_at": "2026-05-29T18:20:03.724Z",
       "last_success_value": 665.4,
-      "last_attempted_at": "2026-05-29T09:15:34.558Z"
+      "last_attempted_at": "2026-05-29T18:20:03.724Z"
     },
     "fpi_debt_flows": {
-      "last_failure_at": "2026-05-14T20:18:34.038Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: in cooldown | html_render:bse_v1: in cooldown | html_render:playwright_render_v1: in cooldown",
-      "consecutive_failures": 0,
-      "status": "green",
+      "last_failure_at": "2026-05-29T18:21:22.354Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: moneycontrol_v1: all 1 URLs failed · https://www.moneycontrol.com/stocks/marketstats/fii_fpi.php: Al | html_render:bse_v1: bse_v1: all 1 URLs failed · https://www.bseindia.com/market",
+      "consecutive_failures": 1,
+      "status": "amber",
       "last_success_at": "2026-05-29T09:17:21.823Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-05-29T09:17:21.823Z"
+      "last_attempted_at": "2026-05-29T18:21:22.354Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-05-14T11:29:20.867Z",
@@ -449,8 +449,8 @@
   },
   "summary": {
     "green": 56,
-    "amber": 2,
-    "red": 0,
+    "amber": 1,
+    "red": 1,
     "total": 58
   },
   "generated_at": "2026-05-29T18:21:58.782Z"

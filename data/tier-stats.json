@@ -1,95 +1,104 @@
 {
   "fno_oi_buildup": {
     "json_api:nse_api_v1": {
+      "attempts": 3,
+      "successes": 3,
+      "recent": [
+        1,
+        1,
+        1
+      ],
+      "last_success_at": "2026-05-29T18:20:02.728Z",
+      "success_rate": 1
+    }
+  },
+  "wacr_repo_spread": {
+    "html_scrape:rbi_mmo_daily_v1": {
+      "attempts": 2,
+      "successes": 0,
+      "recent": [
+        0,
+        0
+      ],
+      "last_failure_at": "2026-05-29T18:17:35.405Z",
+      "success_rate": 0
+    },
+    "llm:google_news_llm_v1": {
       "attempts": 2,
       "successes": 2,
       "recent": [
         1,
         1
       ],
-      "last_success_at": "2026-05-29T09:15:33.546Z",
-      "success_rate": 1
-    }
-  },
-  "wacr_repo_spread": {
-    "html_scrape:rbi_mmo_daily_v1": {
-      "attempts": 1,
-      "successes": 0,
-      "recent": [
-        0
-      ],
-      "last_failure_at": "2026-05-29T09:08:23.738Z",
-      "success_rate": 0
-    },
-    "llm:google_news_llm_v1": {
-      "attempts": 1,
-      "successes": 1,
-      "recent": [
-        1
-      ],
-      "last_success_at": "2026-05-29T09:10:08.747Z",
+      "last_success_at": "2026-05-29T18:17:48.344Z",
       "success_rate": 1
     }
   },
   "air_pax": {
     "press_release:dgca_v1": {
-      "attempts": 1,
-      "successes": 1,
+      "attempts": 2,
+      "successes": 2,
       "recent": [
+        1,
         1
       ],
-      "last_success_at": "2026-05-29T09:10:14.489Z",
+      "last_success_at": "2026-05-29T18:17:55.555Z",
       "success_rate": 1
     }
   },
   "fastag_toll": {
     "email:email_pipeline_v1": {
-      "attempts": 1,
+      "attempts": 2,
       "successes": 0,
       "recent": [
+        0,
         0
       ],
-      "last_failure_at": "2026-05-29T09:10:40.280Z",
+      "last_failure_at": "2026-05-29T18:18:26.754Z",
       "success_rate": 0
     },
     "html_render:web_llm_v1": {
-      "attempts": 1,
-      "successes": 1,
+      "attempts": 2,
+      "successes": 2,
       "recent": [
+        1,
         1
       ],
-      "last_success_at": "2026-05-29T09:10:45.357Z",
+      "last_success_at": "2026-05-29T18:18:32.357Z",
       "success_rate": 1
     }
   },
   "rail_freight": {
     "email:email_pipeline_v1": {
-      "attempts": 1,
+      "attempts": 2,
       "successes": 0,
       "recent": [
+        0,
         0
       ],
-      "last_failure_at": "2026-05-29T09:11:16.148Z",
+      "last_failure_at": "2026-05-29T18:18:34.366Z",
       "success_rate": 0
     },
     "rss:google_news_rss_v1": {
-      "attempts": 1,
-      "successes": 1,
+      "attempts": 2,
+      "successes": 2,
       "recent": [
+        1,
         1
       ],
-      "last_success_at": "2026-05-29T09:11:16.723Z",
+      "last_success_at": "2026-05-29T18:18:34.986Z",
       "success_rate": 1
     }
   },
   "port_cargo": {
     "llm:google_news_llm_v1": {
-      "attempts": 1,
+      "attempts": 2,
       "successes": 0,
       "recent": [
+        0,
         0
       ],
-      "last_failure_at": "2026-05-29T09:11:50.270Z",
+      "last_failure_at": "2026-05-29T18:19:40.327Z",
       "success_rate": 0
     },
     "html_render:web_llm_v1": {
@@ -100,91 +109,118 @@
       ],
       "last_failure_at": "2026-05-29T09:15:19.499Z",
       "success_rate": 0
-    }
-  },
-  "cement_dispatches": {
-    "email:email_pipeline_v1": {
-      "attempts": 1,
-      "successes": 0,
-      "recent": [
-        0
-      ],
-      "last_failure_at": "2026-05-29T09:15:21.266Z",
-      "success_rate": 0
     },
-    "pdf:eaindustry_ieci_v1": {
+    "rss:publisher_rss_v1": {
       "attempts": 1,
       "successes": 1,
       "recent": [
         1
       ],
-      "last_success_at": "2026-05-29T09:15:24.135Z",
+      "last_success_at": "2026-05-29T18:19:43.419Z",
+      "success_rate": 1
+    }
+  },
+  "cement_dispatches": {
+    "email:email_pipeline_v1": {
+      "attempts": 2,
+      "successes": 0,
+      "recent": [
+        0,
+        0
+      ],
+      "last_failure_at": "2026-05-29T18:19:45.254Z",
+      "success_rate": 0
+    },
+    "pdf:eaindustry_ieci_v1": {
+      "attempts": 2,
+      "successes": 2,
+      "recent": [
+        1,
+        1
+      ],
+      "last_success_at": "2026-05-29T18:19:47.914Z",
       "success_rate": 1
     }
   },
   "india_crude_basket": {
     "press_release:ppac_v1": {
-      "attempts": 4,
-      "successes": 4,
+      "attempts": 5,
+      "successes": 5,
       "recent": [
+        1,
         1,
         1,
         1,
         1
       ],
-      "last_success_at": "2026-05-29T12:37:27.946Z",
+      "last_success_at": "2026-05-29T18:19:55.397Z",
       "success_rate": 1
     }
   },
   "naukri_jobspeak": {
     "press_release:naukri_v1": {
-      "attempts": 1,
-      "successes": 1,
+      "attempts": 2,
+      "successes": 2,
       "recent": [
+        1,
         1
       ],
-      "last_success_at": "2026-05-29T09:15:32.356Z",
+      "last_success_at": "2026-05-29T18:20:01.668Z",
       "success_rate": 1
     }
   },
   "block_deals_notional": {
     "json_api:nse_api_v1": {
-      "attempts": 1,
-      "successes": 1,
+      "attempts": 2,
+      "successes": 2,
       "recent": [
+        1,
         1
       ],
-      "last_success_at": "2026-05-29T09:15:34.556Z",
+      "last_success_at": "2026-05-29T18:20:03.722Z",
       "success_rate": 1
     }
   },
   "fpi_debt_flows": {
     "html_render:moneycontrol_v1": {
-      "attempts": 1,
+      "attempts": 2,
       "successes": 0,
       "recent": [
+        0,
         0
       ],
-      "last_failure_at": "2026-05-29T09:15:44.173Z",
+      "last_failure_at": "2026-05-29T18:20:12.296Z",
       "success_rate": 0
     },
     "html_render:bse_v1": {
+      "attempts": 2,
+      "successes": 0,
+      "recent": [
+        0,
+        0
+      ],
+      "last_failure_at": "2026-05-29T18:20:21.968Z",
+      "success_rate": 0
+    },
+    "html_render:playwright_render_v1": {
+      "attempts": 2,
+      "successes": 1,
+      "recent": [
+        1,
+        0
+      ],
+      "last_success_at": "2026-05-29T09:17:21.821Z",
+      "success_rate": 0.5,
+      "last_failure_at": "2026-05-29T18:21:22.034Z"
+    },
+    "llm:google_news_llm_v1": {
       "attempts": 1,
       "successes": 0,
       "recent": [
         0
       ],
-      "last_failure_at": "2026-05-29T09:16:08.015Z",
+      "last_failure_at": "2026-05-29T18:21:22.353Z",
       "success_rate": 0
-    },
-    "html_render:playwright_render_v1": {
-      "attempts": 1,
-      "successes": 1,
-      "recent": [
-        1
-      ],
-      "last_success_at": "2026-05-29T09:17:21.821Z",
-      "success_rate": 1
     }
   },
   "baltic_dry_index": {
