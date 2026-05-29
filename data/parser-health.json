@@ -161,29 +161,29 @@
       "last_attempted_at": "2026-05-29T04:29:14.434Z"
     },
     "high_yield_credit_spread": {
-      "last_success_at": "2026-05-29T04:29:19.373Z",
+      "last_success_at": "2026-05-29T18:21:31.891Z",
       "last_success_value": 173,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-05-14T11:31:00.945Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:crisil_v1: https://tradingeconomics.com/india/government-bond-yield: pattern not matched (selector tuning neede | llm:google_news_llm_v1: No google_news_llm config for high_yield_credit_spread",
-      "last_attempted_at": "2026-05-29T04:29:19.373Z"
+      "last_attempted_at": "2026-05-29T18:21:31.891Z"
     },
     "drewry_wci": {
-      "last_success_at": "2026-05-29T04:29:29.183Z",
+      "last_success_at": "2026-05-29T18:21:33.251Z",
       "last_success_value": 2800,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-05-29T04:29:29.183Z"
+      "last_attempted_at": "2026-05-29T18:21:33.251Z"
     },
     "india_port_dwell_time": {
       "last_failure_at": "2026-05-14T11:31:24.057Z",
       "last_failure_reason": "india_port_dwell_time: 2 candidates, none yielded value · https://news.google.com/rss/articles/CBMilgFBVV95cUxQTm1Xd3N: browser.newContext: Target page, context or browser has been closed | https://news.google.com/rss/articles/CBMiyAFBVV95c",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T09:10:26.490Z",
-      "last_success_value": 0.95,
-      "last_attempted_at": "2026-05-29T09:10:26.490Z"
+      "last_success_at": "2026-05-29T18:21:44.324Z",
+      "last_success_value": 0.94,
+      "last_attempted_at": "2026-05-29T18:21:44.324Z"
     },
     "india_crude_basket": {
       "last_success_at": "2026-05-29T12:37:27.950Z",
@@ -433,18 +433,18 @@
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:rbi_wss_v1: not registered | json_api:dbnomics_v1: No dbnomics config for fx_reserves",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T04:29:19.369Z",
-      "last_success_value": 688.9,
-      "last_attempted_at": "2026-05-29T04:29:19.369Z"
+      "last_success_at": "2026-05-29T18:21:31.881Z",
+      "last_success_value": 681.4,
+      "last_attempted_at": "2026-05-29T18:21:31.881Z"
     },
     "reservoir_levels": {
       "last_failure_at": "2026-05-14T11:31:24.059Z",
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:cwc_v1: not registered | llm:google_news_llm_v1: No google_news_llm config for reservoir_levels",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-05-29T04:30:13.154Z",
+      "last_success_at": "2026-05-29T18:21:58.781Z",
       "last_success_value": 34.45,
-      "last_attempted_at": "2026-05-29T04:30:13.154Z"
+      "last_attempted_at": "2026-05-29T18:21:58.781Z"
     }
   },
   "summary": {
@@ -453,5 +453,5 @@
     "red": 0,
     "total": 58
   },
-  "generated_at": "2026-05-29T12:37:27.950Z"
+  "generated_at": "2026-05-29T18:21:58.782Z"
 }

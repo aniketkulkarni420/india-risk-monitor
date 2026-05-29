@@ -251,5 +251,38 @@
       "last_success_at": "2026-05-29T12:37:21.298Z",
       "success_rate": 1
     }
+  },
+  "fx_reserves": {
+    "json_api:rbi_wss_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-05-29T18:21:31.879Z",
+      "success_rate": 1
+    }
+  },
+  "drewry_wci": {
+    "html_scrape:drewry_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-05-29T18:21:33.250Z",
+      "success_rate": 1
+    }
+  },
+  "reservoir_levels": {
+    "llm:google_news_llm_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-05-29T18:21:58.780Z",
+      "success_rate": 1
+    }
   }
 }

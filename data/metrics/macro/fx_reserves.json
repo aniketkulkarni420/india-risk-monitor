@@ -4,16 +4,15 @@
   "display_subtitle": "RBI weekly · level + WoW change",
   "section": "macro",
   "sub_cluster": "external",
-  "value": 688.9,
+  "value": 681.4,
   "unit": "$ Bn",
   "value_format": "currency_usd_bn",
-  "as_of": "2026-05-29T04:29:19.368Z",
+  "as_of": "2026-05-29T18:21:31.879Z",
   "as_of_period": "weekly",
   "mom_pct": null,
   "yoy_pct": null,
   "vs_5y_avg_pct": 16.2,
   "sparkline_12m": [
-    688,
     695,
     700,
     703,
@@ -24,7 +23,8 @@
     690.7,
     688.9,
     688.9,
-    688.9
+    688.9,
+    681.4
   ],
   "status": "low",
   "shock_eligible": true,
@@ -54,7 +54,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-29T04:29:19.368Z",
+  "last_verified_at": "2026-05-29T18:21:31.880Z",
   "why_it_matters": "Reserves act as INR defense buffer. WoW drop > $5 Bn signals RBI intervention to defend currency. Weekly change is more informative than the level.",
   "trigger_thresholds": [
     {
@@ -70,5 +70,7 @@
     "inr_usd",
     "trade_deficit",
     "cad_pct_gdp"
-  ]
+  ],
+  "data_origin": "primary",
+  "last_live_fetch_at": "2026-05-29T18:21:31.880Z"
 }
