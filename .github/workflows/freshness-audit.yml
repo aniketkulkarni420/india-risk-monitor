@@ -30,6 +30,7 @@ jobs:
     permissions:
       issues: write
       contents: read
+      actions: write        # allows auto-heal: dispatch ingest.yml via ambient GITHUB_TOKEN
     steps:
       - uses: actions/checkout@v4
 
@@ -48,6 +49,54 @@ jobs:
           echo "overall_status=$STATUS" >> $GITHUB_OUTPUT
           # Re-run in human-readable mode to print + send Telegram
           node scripts/freshness-audit.mjs
+
+      - name: Auto-heal · dispatch fresh ingest if RED (ambient token, no PAT)
+        if: steps.audit.outputs.overall_status == 'red'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          # Bound the heal: skip if an ingest already ran in the last 2h (it's
+          # already trying). Otherwise dispatch a full refresh. No extra secret —
+          # uses the workflow's own GITHUB_TOKEN + actions:write permission.
+          LAST=$(gh run list --workflow ingest.yml --limit 1 --json createdAt --jq '.[0].createdAt // empty' 2>/dev/null || true)
+          NOW=$(date -u +%s)
+          AGE=999999
+          if [ -n "$LAST" ]; then AGE=$(( (NOW - $(date -u -d "$LAST" +%s)) / 60 )); fi
+          if [ "$AGE" -lt 120 ]; then
+            echo "Last ingest ran ${AGE}min ago (<120) — skipping heal, already refreshing."
+          else
+            echo "RED + last ingest ${AGE}min ago — triggering auto-heal (ingest slot=all)."
+            if gh workflow run ingest.yml -f slot=all 2>&1; then
+              [ -n "$TELEGRAM_BOT_TOKEN" ] && curl -fsS -m 10 "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+                --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+                --data-urlencode "text=🔧 IRM auto-heal: freshness RED → dispatched ingest slot=all (GitHub audit)" >/dev/null || true
+            fi
+          fi
+
+      - name: Watchdog-liveness · alert if CF Worker is down (mutual monitoring)
+        if: always()
+        env:
+          CF_WORKER_URL: ${{ secrets.CF_WORKER_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          # The CF Worker watches GitHub/Pages; this watches the Worker. If the
+          # independent watchdog itself is down, that silence would otherwise go
+          # unnoticed — so this pings its /health and alerts on failure.
+          # (Replaces the need for an external healthchecks.io account for the
+          #  common single-failure case.)
+          if [ -z "$CF_WORKER_URL" ]; then echo "(no CF_WORKER_URL — skipping)"; exit 0; fi
+          BASE="${CF_WORKER_URL%/}"; BASE="${BASE%/proxy}"
+          if curl -fsS -m 15 "${BASE}/health" | grep -q '"ok":true'; then
+            echo "CF Worker watchdog alive."
+          else
+            echo "::warning::CF Worker watchdog /health failed."
+            [ -n "$TELEGRAM_BOT_TOKEN" ] && curl -fsS -m 10 "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+              --data-urlencode "text=🔴 IRM watchdog DOWN: CF Worker /health not responding. The independent watchdog is offline — investigate." >/dev/null || true
+          fi
 
       - name: Open or update GitHub issue if red
         if: steps.audit.outputs.overall_status == 'red'

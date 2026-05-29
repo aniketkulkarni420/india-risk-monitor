@@ -173,7 +173,9 @@ async function pingHealthcheck(env, ok) {
 
 // Auto-heal: trigger a fresh full ingest via workflow_dispatch. Bounded by KV.
 async function triggerHeal(env) {
-  if (!env.GH_DISPATCH_TOKEN || !env.GH_REPO) return { healed: false, reason: 'no GH token/repo' };
+  // Optional faster-cadence heal. If no PAT is configured the GitHub
+  // freshness-audit workflow heals instead (ambient GITHUB_TOKEN, 3×/day).
+  if (!env.GH_DISPATCH_TOKEN || !env.GH_REPO) return { healed: false, reason: 'deferred to GitHub audit (no Worker PAT)' };
   const today = new Date().toISOString().slice(0, 10);
   let count = 0;
   if (env.IRM_STATE) {

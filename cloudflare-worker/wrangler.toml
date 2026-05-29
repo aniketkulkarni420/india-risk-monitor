@@ -15,14 +15,10 @@ GH_REPO = "aniketkulkarni420/india-risk-monitor"
 [triggers]
 crons = ["0 */3 * * *"]
 
-# KV for heal-counters, heartbeat dedupe, alert dedupe. The worker degrades
-# gracefully without it (best-effort heartbeat, unbounded heal on persistent
-# outage). To enable full dedupe + heal-bounding (SETUP_FULLPROOF.md step):
-#   wrangler kv namespace create IRM_STATE
-# then UNCOMMENT below with the printed id and redeploy.
-# [[kv_namespaces]]
-# binding = "IRM_STATE"
-# id = "REPLACE_WITH_KV_NAMESPACE_ID"
+# KV for heartbeat dedupe + alert dedupe (created via CF API 2026-05-29).
+[[kv_namespaces]]
+binding = "IRM_STATE"
+id = "f00fc45762064b4b8b5497006b10b382"
 
 [observability]
 enabled = true
