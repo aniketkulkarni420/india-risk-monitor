@@ -55,14 +55,15 @@
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 3,
-      "successes": 3,
+      "attempts": 4,
+      "successes": 4,
       "recent": [
+        1,
         1,
         1,
         1
       ],
-      "last_success_at": "2026-05-29T21:19:07.284Z",
+      "last_success_at": "2026-05-29T21:23:27.673Z",
       "success_rate": 1
     }
   },
@@ -265,15 +266,16 @@
       "success_rate": 0
     },
     "html_render:playwright_render_v1": {
-      "attempts": 3,
-      "successes": 2,
+      "attempts": 4,
+      "successes": 3,
       "recent": [
         1,
         0,
+        1,
         1
       ],
-      "last_success_at": "2026-05-29T21:18:52.206Z",
-      "success_rate": 0.667,
+      "last_success_at": "2026-05-29T21:23:15.703Z",
+      "success_rate": 0.75,
       "last_failure_at": "2026-05-29T18:21:22.034Z"
     },
     "llm:google_news_llm_v1": {
@@ -494,34 +496,37 @@
   },
   "gsec_curve": {
     "html_scrape:tradingeconomics_v1": {
-      "attempts": 1,
-      "successes": 1,
+      "attempts": 2,
+      "successes": 2,
       "recent": [
+        1,
         1
       ],
-      "last_success_at": "2026-05-29T21:18:52.354Z",
+      "last_success_at": "2026-05-29T21:23:15.981Z",
       "success_rate": 1
     }
   },
   "banking_liquidity": {
     "json_api:rbi_mmo_v1": {
-      "attempts": 1,
-      "successes": 1,
+      "attempts": 2,
+      "successes": 2,
       "recent": [
+        1,
         1
       ],
-      "last_success_at": "2026-05-29T21:18:52.635Z",
+      "last_success_at": "2026-05-29T21:23:16.041Z",
       "success_rate": 1
     }
   },
   "inr_usd": {
     "html_scrape:te_inr_v1": {
-      "attempts": 1,
-      "successes": 1,
+      "attempts": 2,
+      "successes": 2,
       "recent": [
+        1,
         1
       ],
-      "last_success_at": "2026-05-29T21:19:07.339Z",
+      "last_success_at": "2026-05-29T21:23:27.716Z",
       "success_rate": 1
     }
   }
