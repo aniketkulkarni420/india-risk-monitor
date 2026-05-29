@@ -144,7 +144,8 @@ jobs:
                 break
               fi
               echo "Push attempt $attempt failed — rebasing on remote and retrying"
-              git pull --rebase --autostash origin main || { git rebase --abort 2>/dev/null; true; }
+              git merge --abort 2>/dev/null || git rebase --abort 2>/dev/null || true
+              git pull --no-rebase --no-edit -X ours origin main 2>&1 || true
               sleep $((attempt * 5))
               if [ $attempt -eq 3 ]; then
                 echo "::error::Push failed after 3 attempts · this ingest's data was NOT recorded · investigate"
