@@ -124,12 +124,13 @@
   },
   "india_crude_basket": {
     "press_release:ppac_v1": {
-      "attempts": 1,
-      "successes": 1,
+      "attempts": 2,
+      "successes": 2,
       "recent": [
+        1,
         1
       ],
-      "last_success_at": "2026-05-29T09:15:30.801Z",
+      "last_success_at": "2026-05-29T12:29:49.928Z",
       "success_rate": 1
     }
   },
@@ -181,6 +182,61 @@
         1
       ],
       "last_success_at": "2026-05-29T09:17:21.821Z",
+      "success_rate": 1
+    }
+  },
+  "baltic_dry_index": {
+    "html_scrape:tradingeconomics_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-05-29T12:29:43.486Z",
+      "success_rate": 1
+    }
+  },
+  "vlcc_tanker_rates": {
+    "html_scrape:hormuz_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-05-29T12:29:43.905Z",
+      "success_rate": 1
+    }
+  },
+  "brent_crude": {
+    "json_api:public_oil_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-05-29T12:29:43.937Z",
+      "success_rate": 1
+    }
+  },
+  "gold_usd": {
+    "json_api:public_gold_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-05-29T12:29:43.958Z",
+      "success_rate": 1
+    }
+  },
+  "dxy": {
+    "json_api:public_dxy_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-05-29T12:29:44.038Z",
       "success_rate": 1
     }
   }
