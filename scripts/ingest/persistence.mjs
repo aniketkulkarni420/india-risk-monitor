@@ -16,7 +16,7 @@ mkdirSync(HISTORY, { recursive: true });
 // Build an in-memory map of metric_id → file path, walking data/
 // ──────────────────────────────────────────────────────────────
 const SKIP_DIRS = new Set(['snapshots', 'manual-overrides', 'self-heal-reports', 'history', 'source-cache']);
-const SKIP_FILES = new Set(['manifest.json', 'parser-health.json', 'source-cooldown.json', 'llm-telemetry.json']);
+const SKIP_FILES = new Set(['manifest.json', 'parser-health.json', 'source-cooldown.json', 'llm-telemetry.json', 'tier-stats.json', 'self-improvement-log.json']);
 function walk(dir) {
   const out = [];
   for (const name of readdirSync(dir)) {

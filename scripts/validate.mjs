@@ -178,7 +178,7 @@ function customRules(file, m) {
 const SKIP_DIRS = new Set(['snapshots', 'manual-overrides', 'self-heal-reports']);
 
 // Files that live in data/ but aren't metric/composite JSONs (skip from validate).
-const SKIP_FILES = new Set(['manifest.json', 'parser-health.json', 'source-cooldown.json', 'llm-telemetry.json']);
+const SKIP_FILES = new Set(['manifest.json', 'parser-health.json', 'source-cooldown.json', 'llm-telemetry.json', 'tier-stats.json', 'self-improvement-log.json']);
 
 function walk(dir) {
   const out = [];

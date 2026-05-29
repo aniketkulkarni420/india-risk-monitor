@@ -9,6 +9,39 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
 const COOLDOWN_FILE = join(ROOT, 'data', 'source-cooldown.json');
 const LLM_TELEMETRY_FILE = join(ROOT, 'data', 'llm-telemetry.json');
+const TIER_STATS_FILE = join(ROOT, 'data', 'tier-stats.json');
+
+// ──────────────────────────────────────────────────────────────
+// Per-tier outcome stats · powers the self-improvement loop.
+// Records, per (metric_id → parser_id), cumulative attempts/successes plus a
+// rolling window of recent outcomes. optimize-reliability.mjs reads this to
+// auto-reorder tier_chains (promote reliable tiers) and quarantine dead ones.
+// ──────────────────────────────────────────────────────────────
+const TIER_RECENT_WINDOW = 30;  // keep last 30 outcomes per tier
+
+function loadTierStats() {
+  if (!existsSync(TIER_STATS_FILE)) return {};
+  try { return JSON.parse(readFileSync(TIER_STATS_FILE, 'utf8')); } catch { return {}; }
+}
+function saveTierStats(s) {
+  try { writeFileSync(TIER_STATS_FILE, JSON.stringify(s, null, 2)); } catch {}
+}
+
+export function recordTierOutcome(metric_id, parser_id, success) {
+  if (!metric_id || !parser_id) return;
+  const s = loadTierStats();
+  const m = s[metric_id] || (s[metric_id] = {});
+  const t = m[parser_id] || (m[parser_id] = { attempts: 0, successes: 0, recent: [] });
+  t.attempts++;
+  if (success) { t.successes++; t.last_success_at = new Date().toISOString(); }
+  else { t.last_failure_at = new Date().toISOString(); }
+  t.recent.push(success ? 1 : 0);
+  if (t.recent.length > TIER_RECENT_WINDOW) t.recent = t.recent.slice(-TIER_RECENT_WINDOW);
+  t.success_rate = +(t.successes / t.attempts).toFixed(3);
+  saveTierStats(s);
+}
+
+export function getTierStats() { return loadTierStats(); }
 
 // ──────────────────────────────────────────────────────────────
 // Source cooldown

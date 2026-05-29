@@ -9,7 +9,7 @@
 // field `tier_chain` in the metric JSON listing parser_ids to try in sequence.
 
 import { resolve as resolveParser } from '../registry.mjs';
-import { isInCooldown, recordSourceOutcome, checkAnomaly } from '../observability.mjs';
+import { isInCooldown, recordSourceOutcome, recordTierOutcome, checkAnomaly } from '../observability.mjs';
 import { chainDiversity, classOfParser } from '../source-origin.mjs';
 
 export async function fetchPrimary(metric) {
@@ -42,6 +42,7 @@ export async function fetchPrimary(metric) {
       const r = await parser.fetchPrimary(metric);
       if (r && typeof r.value === 'number' && Number.isFinite(r.value)) {
         try { recordSourceOutcome(cooldownKey, true); } catch {}
+        try { recordTierOutcome(metric.metric_id, parser_id, true); } catch {}
         primaryResult = {
           ...r,
           parse_meta: {
@@ -57,9 +58,11 @@ export async function fetchPrimary(metric) {
         break;
       }
       try { recordSourceOutcome(cooldownKey, false); } catch {}
+      try { recordTierOutcome(metric.metric_id, parser_id, false); } catch {}
       errors.push(`${parser_id}: no value`);
     } catch (e) {
       try { recordSourceOutcome(cooldownKey, false); } catch {}
+      try { recordTierOutcome(metric.metric_id, parser_id, false); } catch {}
       errors.push(`${parser_id}: ${(e.message || '').slice(0, 100)}`);
     }
   }

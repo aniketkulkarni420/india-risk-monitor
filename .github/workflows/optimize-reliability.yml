@@ -1,0 +1,77 @@
+name: Self-improvement · optimize tier routing
+
+# The self-correction/self-improvement loop. Reads observed per-tier success
+# rates (data/tier-stats.json, written by the tiered orchestrator on every
+# ingest) and auto-reorders each metric's tier_chain so the reliably-winning
+# tier runs first; quarantines dead tiers to the back (never removed).
+#
+# SAFE: only reorders already-validated parsers — never edits values, regex,
+# cadence or plausibility bands (those stay human-gated via self-heal.yml).
+# Every change is logged to data/self-improvement-log.json + Telegram.
+#
+# Kill switch: set repo variable IRM_AUTO_OPTIMIZE=0 → runs report-only.
+
+on:
+  schedule:
+    - cron: '0 1 * * *'   # 06:30 IST daily · after the overnight ingest cycle settles
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Report only, do not apply'
+        required: false
+        default: 'false'
+
+# Independent read-mostly job. Push race handled by rebase-retry below.
+concurrency:
+  group: irm-optimize
+  cancel-in-progress: false
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm install --no-audit --no-fund --prefer-offline
+
+      - name: Optimize tier routing from observed reliability
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          IRM_AUTO_OPTIMIZE: ${{ vars.IRM_AUTO_OPTIMIZE || '1' }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            node scripts/optimize-reliability.mjs --dry-run
+          else
+            node scripts/optimize-reliability.mjs
+          fi
+
+      - name: Validate (Gate 2 · ensure reorder didn't break any metric)
+        run: npm run validate
+
+      - name: Commit routing changes if any
+        run: |
+          git config user.name "IRM Self-Improve Bot"
+          git config user.email "irm-optimize@bot.local"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "No routing changes to commit."
+          else
+            git commit -m "optimize(routing): auto-reorder tier_chains from observed reliability"
+            for attempt in 1 2 3; do
+              if git push 2>&1; then break; fi
+              echo "Push attempt $attempt failed — rebasing on remote and retrying"
+              git merge --abort 2>/dev/null || git rebase --abort 2>/dev/null || true
+              git pull --no-rebase --no-edit -X ours origin main 2>&1 || true
+              sleep $((attempt * 5))
+              if [ $attempt -eq 3 ]; then echo "::error::Push failed after 3 attempts"; exit 1; fi
+            done
+          fi
