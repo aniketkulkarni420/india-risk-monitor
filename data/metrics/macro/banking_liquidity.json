@@ -4,13 +4,13 @@
   "display_subtitle": "RBI net absorption / injection",
   "section": "macro",
   "sub_cluster": "rates",
-  "value": 322144.23,
+  "value": 310231.76,
   "unit": "₹ Cr",
   "value_format": "currency_inr_cr",
-  "as_of": "2026-05-29T04:29:10.319Z",
+  "as_of": "2026-05-29T21:18:52.634Z",
   "as_of_period": "live",
-  "mom_pct": 73.48,
-  "yoy_pct": 82.54,
+  "mom_pct": 66.03,
+  "yoy_pct": 76.75,
   "vs_5y_avg_pct": -8.4,
   "sparkline_12m": [
     322144.23,
@@ -24,7 +24,7 @@
     322144.23,
     322144.23,
     322144.23,
-    322144.23
+    310231.76
   ],
   "status": "med",
   "shock_eligible": false,
@@ -49,11 +49,13 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-29T04:29:10.321Z",
+  "last_verified_at": "2026-05-29T21:18:52.638Z",
   "why_it_matters": "Surplus liquidity (positive number = absorption) keeps short rates anchored to repo. Tight liquidity raises WACR + spreads — direct funding-cost signal.",
   "linked_metrics": [
     "wacr_repo_spread",
     "repo_rate",
     "credit_deposit_growth"
-  ]
+  ],
+  "data_origin": "live",
+  "last_live_fetch_at": "2026-05-29T21:18:52.638Z"
 }
