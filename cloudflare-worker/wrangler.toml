@@ -2,9 +2,27 @@ name = "irm-india-proxy"
 main = "worker.js"
 compatibility_date = "2026-05-01"
 
-# WORKER_TOKEN is set via wrangler secret · NOT in this file
+# Secrets (set via `wrangler secret put`, NOT here):
+#   WORKER_TOKEN, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID,
+#   GH_DISPATCH_TOKEN, GH_REPO, HEALTHCHECK_URL
 [vars]
-# (none — runtime vars come from secrets)
+LIVE_DATA_URL = "https://india-risk-monitor.pages.dev/dist/data.json"
+HEARTBEAT_HOUR_UTC = "4"   # 09:30 IST daily green heartbeat
+GH_REPO = "aniketkulkarni420/india-risk-monitor"
+
+# Watchdog cadence — independent of GitHub Actions. Every 3h catches a break
+# within ~3h (vs once/day for the GH freshness-audit). Free tier allows this.
+[triggers]
+crons = ["0 */3 * * *"]
+
+# KV for heal-counters, heartbeat dedupe, alert dedupe. The worker degrades
+# gracefully without it (best-effort heartbeat, unbounded heal on persistent
+# outage). To enable full dedupe + heal-bounding (SETUP_FULLPROOF.md step):
+#   wrangler kv namespace create IRM_STATE
+# then UNCOMMENT below with the printed id and redeploy.
+# [[kv_namespaces]]
+# binding = "IRM_STATE"
+# id = "REPLACE_WITH_KV_NAMESPACE_ID"
 
 [observability]
 enabled = true

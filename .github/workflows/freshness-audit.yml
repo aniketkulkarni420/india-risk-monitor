@@ -11,8 +11,11 @@ name: Freshness audit
 
 on:
   schedule:
-    # 09:00 UTC daily = 14:30 IST · before market open in case anything broke overnight
+    # 3×/day GH-side layer (the CF Worker watchdog checks every 3h independently).
+    # 03:30, 09:00, 14:30 UTC ≈ 09:00, 14:30, 20:00 IST — morning, pre-open, evening.
     - cron: '0 9 * * *'
+    - cron: '30 3 * * *'
+    - cron: '30 14 * * *'
   workflow_dispatch:
 
 # Independent from data-push workflows — read-only check.

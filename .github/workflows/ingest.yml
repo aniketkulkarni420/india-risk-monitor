@@ -153,3 +153,18 @@ jobs:
               fi
             done
           fi
+
+      - name: Ping ingest dead-man's-switch (optional)
+        if: always()
+        env:
+          INGEST_HEALTHCHECK_URL: ${{ secrets.INGEST_HEALTHCHECK_URL }}
+        run: |
+          # Defense-in-depth: if this URL is configured (healthchecks.io check),
+          # a successful ingest pings it. If pings stop arriving, healthchecks
+          # alerts you that the ingest pipeline has gone silent. Independent of
+          # the CF Worker watchdog (which monitors the live bundle separately).
+          if [ -n "$INGEST_HEALTHCHECK_URL" ] && [ "${{ job.status }}" = "success" ]; then
+            curl -fsS -m 10 "$INGEST_HEALTHCHECK_URL" >/dev/null 2>&1 || echo "healthcheck ping failed (non-fatal)"
+          else
+            echo "(no INGEST_HEALTHCHECK_URL set, or job not success — skipping ping)"
+          fi
