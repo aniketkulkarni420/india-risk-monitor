@@ -4,18 +4,17 @@
   "display_subtitle": "Grid India · daily peak met (drawer: total energy)",
   "section": "economy",
   "sub_cluster": "production_energy",
-  "value": 270.82,
+  "value": 270,
   "unit": "GW",
   "value_format": "decimal_1",
-  "as_of": "2026-05-21T14:29:46.000Z",
+  "as_of": "2026-05-21T07:00:00.000Z",
   "as_of_period": "live",
-  "mom_pct": 17.78,
-  "yoy_pct": 15.63,
+  "mom_pct": 17.48,
+  "yoy_pct": 14.49,
   "vs_5y_avg_pct": 24,
   "sparkline_12m": [
     270,
     270,
-    270,
     270.82,
     270.82,
     270.82,
@@ -24,10 +23,11 @@
     270.82,
     270.82,
     270.82,
-    270.82
+    270.82,
+    270
   ],
   "baseline_30d": 220,
-  "deviation_from_baseline_pct": 23.1,
+  "deviation_from_baseline_pct": 22.7,
   "status": "low",
   "shock_eligible": false,
   "trend_direction": "good",
@@ -46,7 +46,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-29T12:37:21.792Z",
+  "last_verified_at": "2026-05-30T09:06:28.668Z",
   "why_it_matters": "Peak power demand is the cleanest real-time real-economy gauge. No lag, free, daily. Strong YoY growth = industrial + AC load both holding.",
   "linked_metrics": [
     "iip_growth",
@@ -55,5 +55,5 @@
   ],
   "notes": "Drawer shows: peak demand met (232.4 GW), peak demand requirement (234.2 GW), shortfall (1.8 GW), 7-day total energy (47,860 MU).",
   "data_origin": "primary",
-  "last_live_fetch_at": "2026-05-29T12:37:21.792Z"
+  "last_live_fetch_at": "2026-05-30T09:06:28.668Z"
 }
