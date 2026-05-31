@@ -1,0 +1,39 @@
+{
+  "entries": [
+    {
+      "ts": "2026-05-31T10:02:33.043Z",
+      "metric_id": "fpi_debt_flows",
+      "action": "reorder",
+      "from": [
+        "html_render:moneycontrol_v1",
+        "html_render:bse_v1",
+        "html_render:playwright_render_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "to": [
+        "html_render:playwright_render_v1",
+        "html_render:moneycontrol_v1",
+        "html_render:bse_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "quarantined": [],
+      "reason": "playwright_render_v1=confident(0.80), moneycontrol_v1=unknown(0.00), bse_v1=unknown(0.00), google_news_llm_v1=unknown(0.00)"
+    },
+    {
+      "ts": "2026-05-31T10:02:33.043Z",
+      "metric_id": "wacr_repo_spread",
+      "action": "reorder",
+      "from": [
+        "html_scrape:rbi_mmo_daily_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "to": [
+        "llm:google_news_llm_v1",
+        "html_scrape:rbi_mmo_daily_v1"
+      ],
+      "quarantined": [],
+      "reason": "google_news_llm_v1=confident(1.00), rbi_mmo_daily_v1=unknown(0.00)"
+    }
+  ],
+  "last_run": "2026-05-31T10:02:33.043Z"
+}
