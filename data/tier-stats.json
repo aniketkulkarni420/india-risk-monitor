@@ -60,9 +60,10 @@
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 6,
-      "successes": 6,
+      "attempts": 7,
+      "successes": 7,
       "recent": [
+        1,
         1,
         1,
         1,
@@ -70,7 +71,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-01T20:51:14.365Z",
+      "last_success_at": "2026-06-01T22:39:14.979Z",
       "success_rate": 1
     }
   },
@@ -309,18 +310,19 @@
       "success_rate": 0
     },
     "html_render:playwright_render_v1": {
-      "attempts": 6,
-      "successes": 5,
+      "attempts": 7,
+      "successes": 6,
       "recent": [
         1,
         0,
         1,
         1,
         1,
+        1,
         1
       ],
-      "last_success_at": "2026-06-01T20:57:35.629Z",
-      "success_rate": 0.833,
+      "last_success_at": "2026-06-01T22:39:02.065Z",
+      "success_rate": 0.857,
       "last_failure_at": "2026-05-29T18:21:22.034Z"
     },
     "llm:google_news_llm_v1": {
@@ -594,37 +596,40 @@
   },
   "gsec_curve": {
     "html_scrape:tradingeconomics_v1": {
-      "attempts": 2,
-      "successes": 2,
+      "attempts": 3,
+      "successes": 3,
       "recent": [
+        1,
         1,
         1
       ],
-      "last_success_at": "2026-05-29T21:23:15.981Z",
+      "last_success_at": "2026-06-01T22:39:02.443Z",
       "success_rate": 1
     }
   },
   "banking_liquidity": {
     "json_api:rbi_mmo_v1": {
-      "attempts": 2,
-      "successes": 2,
+      "attempts": 3,
+      "successes": 3,
       "recent": [
+        1,
         1,
         1
       ],
-      "last_success_at": "2026-05-29T21:23:16.041Z",
+      "last_success_at": "2026-06-01T22:39:02.702Z",
       "success_rate": 1
     }
   },
   "inr_usd": {
     "html_scrape:te_inr_v1": {
-      "attempts": 2,
-      "successes": 2,
+      "attempts": 3,
+      "successes": 3,
       "recent": [
+        1,
         1,
         1
       ],
-      "last_success_at": "2026-05-29T21:23:27.716Z",
+      "last_success_at": "2026-06-01T22:39:15.184Z",
       "success_rate": 1
     }
   },
