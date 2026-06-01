@@ -60,9 +60,10 @@
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 7,
-      "successes": 7,
+      "attempts": 8,
+      "successes": 8,
       "recent": [
+        1,
         1,
         1,
         1,
@@ -71,7 +72,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-01T22:39:14.979Z",
+      "last_success_at": "2026-06-01T22:42:28.651Z",
       "success_rate": 1
     }
   },
@@ -310,8 +311,8 @@
       "success_rate": 0
     },
     "html_render:playwright_render_v1": {
-      "attempts": 7,
-      "successes": 6,
+      "attempts": 8,
+      "successes": 7,
       "recent": [
         1,
         0,
@@ -319,10 +320,11 @@
         1,
         1,
         1,
+        1,
         1
       ],
-      "last_success_at": "2026-06-01T22:39:02.065Z",
-      "success_rate": 0.857,
+      "last_success_at": "2026-06-01T22:42:14.286Z",
+      "success_rate": 0.875,
       "last_failure_at": "2026-05-29T18:21:22.034Z"
     },
     "llm:google_news_llm_v1": {
@@ -596,40 +598,43 @@
   },
   "gsec_curve": {
     "html_scrape:tradingeconomics_v1": {
-      "attempts": 3,
-      "successes": 3,
+      "attempts": 4,
+      "successes": 4,
       "recent": [
+        1,
         1,
         1,
         1
       ],
-      "last_success_at": "2026-06-01T22:39:02.443Z",
+      "last_success_at": "2026-06-01T22:42:14.512Z",
       "success_rate": 1
     }
   },
   "banking_liquidity": {
     "json_api:rbi_mmo_v1": {
-      "attempts": 3,
-      "successes": 3,
+      "attempts": 4,
+      "successes": 4,
       "recent": [
+        1,
         1,
         1,
         1
       ],
-      "last_success_at": "2026-06-01T22:39:02.702Z",
+      "last_success_at": "2026-06-01T22:42:14.593Z",
       "success_rate": 1
     }
   },
   "inr_usd": {
     "html_scrape:te_inr_v1": {
-      "attempts": 3,
-      "successes": 3,
+      "attempts": 4,
+      "successes": 4,
       "recent": [
+        1,
         1,
         1,
         1
       ],
-      "last_success_at": "2026-06-01T22:39:15.184Z",
+      "last_success_at": "2026-06-01T22:42:28.728Z",
       "success_rate": 1
     }
   },
