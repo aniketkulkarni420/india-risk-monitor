@@ -72,14 +72,15 @@
   },
   "air_pax": {
     "press_release:dgca_v1": {
-      "attempts": 3,
-      "successes": 3,
+      "attempts": 4,
+      "successes": 4,
       "recent": [
+        1,
         1,
         1,
         1
       ],
-      "last_success_at": "2026-05-30T11:09:24.080Z",
+      "last_success_at": "2026-06-01T20:47:25.613Z",
       "success_rate": 1
     }
   },
@@ -587,6 +588,81 @@
         1
       ],
       "last_success_at": "2026-05-29T21:23:27.716Z",
+      "success_rate": 1
+    }
+  },
+  "gst_gross": {
+    "email:email_pipeline_v1": {
+      "attempts": 1,
+      "successes": 0,
+      "recent": [
+        0
+      ],
+      "last_failure_at": "2026-06-01T20:46:43.599Z",
+      "success_rate": 0
+    },
+    "rss:google_news_rss_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-01T20:46:44.287Z",
+      "success_rate": 1
+    }
+  },
+  "auto_2w": {
+    "press_release:fada_monthly_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-01T20:46:50.592Z",
+      "success_rate": 1
+    }
+  },
+  "auto_3w": {
+    "press_release:fada_monthly_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-01T20:46:50.596Z",
+      "success_rate": 1
+    }
+  },
+  "auto_pv": {
+    "press_release:fada_monthly_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-01T20:46:50.598Z",
+      "success_rate": 1
+    }
+  },
+  "auto_cv": {
+    "press_release:fada_monthly_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-01T20:46:50.601Z",
+      "success_rate": 1
+    }
+  },
+  "auto_tractor": {
+    "press_release:fada_monthly_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-01T20:46:50.603Z",
       "success_rate": 1
     }
   }
