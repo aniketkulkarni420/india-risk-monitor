@@ -4,16 +4,15 @@
   "display_subtitle": "Baltic Dirty Tanker Index · daily",
   "section": "freight",
   "sub_cluster": "tanker",
-  "value": 2068,
+  "value": 2053,
   "unit": "Index",
   "value_format": "integer",
-  "as_of": "2026-05-29T00:00:00.000Z",
+  "as_of": "2026-06-01T00:00:00.000Z",
   "as_of_period": "live",
-  "mom_pct": 13.22,
-  "yoy_pct": 13.76,
+  "mom_pct": 12.37,
+  "yoy_pct": 11.79,
   "vs_5y_avg_pct": 142.8,
   "sparkline_12m": [
-    2185,
     2088,
     2088,
     2088,
@@ -24,10 +23,11 @@
     2068,
     2068,
     2068,
-    2068
+    2068,
+    2053
   ],
   "baseline_30d": 575,
-  "deviation_from_baseline_pct": 259.7,
+  "deviation_from_baseline_pct": 257,
   "status": "shock",
   "shock_eligible": true,
   "shock_rule": "MoM > 100%",
@@ -56,7 +56,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-06-01T19:59:29.458Z",
+  "last_verified_at": "2026-06-02T13:03:13.505Z",
   "why_it_matters": "VLCC = Very Large Crude Carrier. India's primary crude import vessel class. Rates +220% on Hormuz forces re-routing via Cape — adds $4-6/bbl to delivered cost.",
   "trigger_thresholds": [
     {
@@ -75,5 +75,5 @@
     "trade_deficit"
   ],
   "data_origin": "live",
-  "last_live_fetch_at": "2026-06-01T19:59:29.458Z"
+  "last_live_fetch_at": "2026-06-02T13:03:13.505Z"
 }
