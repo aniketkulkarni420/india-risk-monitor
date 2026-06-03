@@ -36,11 +36,11 @@
     "frequency": "Monthly",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "email:email_pipeline_v1",
       "rss:google_news_rss_v1",
       "llm:google_news_llm_v1",
       "rss:publisher_rss_v1",
-      "html_render:web_llm_v1"
+      "html_render:web_llm_v1",
+      "email:email_pipeline_v1"
     ]
   },
   "source_crosscheck": [
@@ -60,5 +60,6 @@
     "port_cargo"
   ],
   "data_origin": "primary",
-  "last_live_fetch_at": "2026-06-02T19:08:00.140Z"
+  "last_live_fetch_at": "2026-06-02T19:08:00.140Z",
+  "_reliability_optimized_at": "2026-06-03T18:12:43.657Z"
 }

@@ -33,7 +33,83 @@
       ],
       "quarantined": [],
       "reason": "google_news_llm_v1=confident(1.00), rbi_mmo_daily_v1=unknown(0.00)"
+    },
+    {
+      "ts": "2026-06-03T18:12:43.657Z",
+      "metric_id": "cement_dispatches",
+      "action": "reorder",
+      "from": [
+        "email:email_pipeline_v1",
+        "pdf:eaindustry_ieci_v1",
+        "rss:publisher_rss_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "to": [
+        "pdf:eaindustry_ieci_v1",
+        "rss:publisher_rss_v1",
+        "llm:google_news_llm_v1",
+        "email:email_pipeline_v1"
+      ],
+      "quarantined": [],
+      "reason": "eaindustry_ieci_v1=confident(1.00), publisher_rss_v1=unknown, google_news_llm_v1=unknown, email_pipeline_v1=confident(0.00)"
+    },
+    {
+      "ts": "2026-06-03T18:12:43.657Z",
+      "metric_id": "fastag_toll",
+      "action": "reorder",
+      "from": [
+        "email:email_pipeline_v1",
+        "html_render:web_llm_v1",
+        "rss:publisher_rss_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "to": [
+        "html_render:web_llm_v1",
+        "rss:publisher_rss_v1",
+        "llm:google_news_llm_v1",
+        "email:email_pipeline_v1"
+      ],
+      "quarantined": [],
+      "reason": "web_llm_v1=confident(1.00), publisher_rss_v1=unknown, google_news_llm_v1=unknown, email_pipeline_v1=confident(0.00)"
+    },
+    {
+      "ts": "2026-06-03T18:12:43.657Z",
+      "metric_id": "port_cargo",
+      "action": "reorder",
+      "from": [
+        "llm:google_news_llm_v1",
+        "rss:publisher_rss_v1",
+        "html_render:web_llm_v1"
+      ],
+      "to": [
+        "rss:publisher_rss_v1",
+        "html_render:web_llm_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "quarantined": [],
+      "reason": "publisher_rss_v1=unknown(1.00), web_llm_v1=unknown(0.00), google_news_llm_v1=confident(0.00)"
+    },
+    {
+      "ts": "2026-06-03T18:12:43.657Z",
+      "metric_id": "rail_freight",
+      "action": "reorder",
+      "from": [
+        "email:email_pipeline_v1",
+        "rss:google_news_rss_v1",
+        "llm:google_news_llm_v1",
+        "rss:publisher_rss_v1",
+        "html_render:web_llm_v1"
+      ],
+      "to": [
+        "rss:google_news_rss_v1",
+        "llm:google_news_llm_v1",
+        "rss:publisher_rss_v1",
+        "html_render:web_llm_v1",
+        "email:email_pipeline_v1"
+      ],
+      "quarantined": [],
+      "reason": "google_news_rss_v1=confident(1.00), google_news_llm_v1=unknown, publisher_rss_v1=unknown, web_llm_v1=unknown, email_pipeline_v1=confident(0.00)"
     }
   ],
-  "last_run": "2026-05-31T10:02:33.043Z"
+  "last_run": "2026-06-03T18:12:43.657Z"
 }
