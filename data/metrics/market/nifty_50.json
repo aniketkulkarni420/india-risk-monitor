@@ -4,16 +4,15 @@
   "display_subtitle": "NSE benchmark index",
   "section": "market",
   "sub_cluster": "equity",
-  "value": 23405.6,
+  "value": 23416.55,
   "unit": "Index",
   "value_format": "decimal_2",
-  "as_of": "2026-06-03T22:15:58.939Z",
+  "as_of": "2026-06-04T14:14:03.874Z",
   "as_of_period": "live",
-  "mom_pct": 3.16,
-  "yoy_pct": 4.12,
+  "mom_pct": -3.76,
+  "yoy_pct": 3.8,
   "vs_5y_avg_pct": 41.6,
   "sparkline_12m": [
-    24031.7,
     24031.7,
     23913.95,
     23890.05,
@@ -24,7 +23,8 @@
     23483.55,
     23483.55,
     23405.6,
-    23405.6
+    23405.6,
+    23416.55
   ],
   "baseline_30d": 22730,
   "deviation_from_baseline_pct": 3,
@@ -56,7 +56,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-06-03T22:15:58.943Z",
+  "last_verified_at": "2026-06-04T14:14:03.878Z",
   "why_it_matters": "The headline equity index. A market risk dashboard without Nifty is incomplete; the level + drawdown vs rolling high contextualise every other risk signal.",
   "formula": null,
   "trigger_thresholds": [
@@ -78,5 +78,5 @@
   ],
   "notes": "Live during market hours; we publish 15:30 IST close as canonical. 1D/1M/YTD percentages computed at fetch time.",
   "data_origin": "live",
-  "last_live_fetch_at": "2026-06-03T22:15:58.943Z"
+  "last_live_fetch_at": "2026-06-04T14:14:03.878Z"
 }
