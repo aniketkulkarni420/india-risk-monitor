@@ -251,9 +251,10 @@
   },
   "india_crude_basket": {
     "press_release:ppac_v1": {
-      "attempts": 27,
-      "successes": 27,
+      "attempts": 28,
+      "successes": 28,
       "recent": [
+        1,
         1,
         1,
         1,
@@ -282,7 +283,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-05T04:54:23.957Z",
+      "last_success_at": "2026-06-05T05:48:59.723Z",
       "success_rate": 1
     }
   },
@@ -419,7 +420,7 @@
   },
   "baltic_dry_index": {
     "html_scrape:tradingeconomics_v1": {
-      "attempts": 20,
+      "attempts": 21,
       "successes": 19,
       "recent": [
         1,
@@ -441,36 +442,40 @@
         1,
         1,
         0,
-        1
-      ],
-      "last_success_at": "2026-06-05T04:54:15.783Z",
-      "success_rate": 0.95,
-      "last_failure_at": "2026-06-04T06:37:53.741Z"
-    },
-    "json_api:dbnomics_v1": {
-      "attempts": 1,
-      "successes": 0,
-      "recent": [
+        1,
         0
       ],
-      "last_failure_at": "2026-06-04T06:37:53.743Z",
+      "last_success_at": "2026-06-05T04:54:15.783Z",
+      "success_rate": 0.905,
+      "last_failure_at": "2026-06-05T05:48:51.356Z"
+    },
+    "json_api:dbnomics_v1": {
+      "attempts": 2,
+      "successes": 0,
+      "recent": [
+        0,
+        0
+      ],
+      "last_failure_at": "2026-06-05T05:48:51.357Z",
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 1,
+      "attempts": 2,
       "successes": 0,
       "recent": [
+        0,
         0
       ],
-      "last_failure_at": "2026-06-04T06:37:54.295Z",
+      "last_failure_at": "2026-06-05T05:48:51.883Z",
       "success_rate": 0
     }
   },
   "vlcc_tanker_rates": {
     "html_scrape:hormuz_v1": {
-      "attempts": 20,
-      "successes": 20,
+      "attempts": 21,
+      "successes": 21,
       "recent": [
+        1,
         1,
         1,
         1,
@@ -492,13 +497,13 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-05T04:54:16.342Z",
+      "last_success_at": "2026-06-05T05:48:52.322Z",
       "success_rate": 1
     }
   },
   "brent_crude": {
     "json_api:public_oil_v1": {
-      "attempts": 20,
+      "attempts": 21,
       "successes": 19,
       "recent": [
         1,
@@ -520,34 +525,37 @@
         1,
         1,
         0,
-        1
-      ],
-      "last_success_at": "2026-06-05T04:54:16.445Z",
-      "success_rate": 0.95,
-      "last_failure_at": "2026-06-04T06:37:54.829Z"
-    },
-    "json_api:dbnomics_v1": {
-      "attempts": 1,
-      "successes": 0,
-      "recent": [
+        1,
         0
       ],
-      "last_failure_at": "2026-06-04T06:37:54.829Z",
+      "last_success_at": "2026-06-05T04:54:16.445Z",
+      "success_rate": 0.905,
+      "last_failure_at": "2026-06-05T05:48:52.337Z"
+    },
+    "json_api:dbnomics_v1": {
+      "attempts": 2,
+      "successes": 0,
+      "recent": [
+        0,
+        0
+      ],
+      "last_failure_at": "2026-06-05T05:48:52.339Z",
       "success_rate": 0
     },
     "html_scrape:tradingeconomics_v1": {
-      "attempts": 1,
+      "attempts": 2,
       "successes": 0,
       "recent": [
+        0,
         0
       ],
-      "last_failure_at": "2026-06-04T06:37:54.830Z",
+      "last_failure_at": "2026-06-05T05:48:52.340Z",
       "success_rate": 0
     }
   },
   "gold_usd": {
     "json_api:public_gold_v1": {
-      "attempts": 20,
+      "attempts": 21,
       "successes": 19,
       "recent": [
         1,
@@ -569,34 +577,37 @@
         1,
         1,
         0,
-        1
-      ],
-      "last_success_at": "2026-06-05T04:54:16.539Z",
-      "success_rate": 0.95,
-      "last_failure_at": "2026-06-04T06:37:54.839Z"
-    },
-    "json_api:dbnomics_v1": {
-      "attempts": 1,
-      "successes": 0,
-      "recent": [
+        1,
         0
       ],
-      "last_failure_at": "2026-06-04T06:37:54.840Z",
+      "last_success_at": "2026-06-05T04:54:16.539Z",
+      "success_rate": 0.905,
+      "last_failure_at": "2026-06-05T05:48:52.366Z"
+    },
+    "json_api:dbnomics_v1": {
+      "attempts": 2,
+      "successes": 0,
+      "recent": [
+        0,
+        0
+      ],
+      "last_failure_at": "2026-06-05T05:48:52.367Z",
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 1,
+      "attempts": 2,
       "successes": 0,
       "recent": [
+        0,
         0
       ],
-      "last_failure_at": "2026-06-04T06:37:54.840Z",
+      "last_failure_at": "2026-06-05T05:48:52.368Z",
       "success_rate": 0
     }
   },
   "dxy": {
     "json_api:public_dxy_v1": {
-      "attempts": 20,
+      "attempts": 21,
       "successes": 19,
       "recent": [
         1,
@@ -618,19 +629,21 @@
         1,
         1,
         0,
-        1
-      ],
-      "last_success_at": "2026-06-05T04:54:16.649Z",
-      "success_rate": 0.95,
-      "last_failure_at": "2026-06-04T06:37:54.846Z"
-    },
-    "json_api:dbnomics_v1": {
-      "attempts": 1,
-      "successes": 0,
-      "recent": [
+        1,
         0
       ],
-      "last_failure_at": "2026-06-04T06:37:54.846Z",
+      "last_success_at": "2026-06-05T04:54:16.649Z",
+      "success_rate": 0.905,
+      "last_failure_at": "2026-06-05T05:48:52.378Z"
+    },
+    "json_api:dbnomics_v1": {
+      "attempts": 2,
+      "successes": 0,
+      "recent": [
+        0,
+        0
+      ],
+      "last_failure_at": "2026-06-05T05:48:52.379Z",
       "success_rate": 0
     }
   },
