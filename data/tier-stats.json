@@ -137,9 +137,10 @@
       "success_rate": 0
     },
     "html_render:web_llm_v1": {
-      "attempts": 8,
-      "successes": 8,
+      "attempts": 9,
+      "successes": 9,
       "recent": [
+        1,
         1,
         1,
         1,
@@ -149,7 +150,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-05T08:59:01.126Z",
+      "last_success_at": "2026-06-05T14:09:13.224Z",
       "success_rate": 1
     }
   },
@@ -168,9 +169,10 @@
       "success_rate": 0
     },
     "rss:google_news_rss_v1": {
-      "attempts": 8,
-      "successes": 8,
+      "attempts": 9,
+      "successes": 9,
       "recent": [
+        1,
         1,
         1,
         1,
@@ -180,13 +182,13 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-05T08:59:02.412Z",
+      "last_success_at": "2026-06-05T14:09:13.862Z",
       "success_rate": 1
     }
   },
   "port_cargo": {
     "llm:google_news_llm_v1": {
-      "attempts": 6,
+      "attempts": 7,
       "successes": 0,
       "recent": [
         0,
@@ -194,23 +196,25 @@
         0,
         0,
         0,
+        0,
         0
       ],
-      "last_failure_at": "2026-06-04T09:10:37.784Z",
+      "last_failure_at": "2026-06-05T14:13:39.336Z",
       "success_rate": 0
     },
     "html_render:web_llm_v1": {
-      "attempts": 2,
+      "attempts": 3,
       "successes": 0,
       "recent": [
         0,
+        0,
         0
       ],
-      "last_failure_at": "2026-06-04T09:10:22.786Z",
+      "last_failure_at": "2026-06-05T14:13:20.366Z",
       "success_rate": 0
     },
     "rss:publisher_rss_v1": {
-      "attempts": 7,
+      "attempts": 8,
       "successes": 6,
       "recent": [
         1,
@@ -219,11 +223,12 @@
         1,
         1,
         0,
-        1
+        1,
+        0
       ],
       "last_success_at": "2026-06-05T08:59:14.482Z",
-      "success_rate": 0.857,
-      "last_failure_at": "2026-06-04T09:09:56.146Z"
+      "success_rate": 0.75,
+      "last_failure_at": "2026-06-05T14:12:50.668Z"
     }
   },
   "cement_dispatches": {
@@ -241,9 +246,10 @@
       "success_rate": 0
     },
     "pdf:eaindustry_ieci_v1": {
-      "attempts": 8,
-      "successes": 8,
+      "attempts": 9,
+      "successes": 9,
       "recent": [
+        1,
         1,
         1,
         1,
@@ -253,7 +259,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-05T08:59:18.184Z",
+      "last_success_at": "2026-06-05T14:08:52.233Z",
       "success_rate": 1
     }
   },
@@ -299,9 +305,10 @@
   },
   "naukri_jobspeak": {
     "press_release:naukri_v1": {
-      "attempts": 8,
-      "successes": 8,
+      "attempts": 9,
+      "successes": 9,
       "recent": [
+        1,
         1,
         1,
         1,
@@ -311,7 +318,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-05T08:59:36.864Z",
+      "last_success_at": "2026-06-05T14:08:49.156Z",
       "success_rate": 1
     }
   },
@@ -1049,6 +1056,83 @@
         1
       ],
       "last_success_at": "2026-06-01T20:46:50.603Z",
+      "success_rate": 1
+    }
+  },
+  "iip_growth": {
+    "press_release:mospi_iip_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-05T14:08:46.182Z",
+      "success_rate": 1
+    }
+  },
+  "wpi_inflation": {
+    "press_release:eaindustry_wpi_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-05T14:08:46.465Z",
+      "success_rate": 1
+    }
+  },
+  "cpi_inflation": {
+    "press_release:mospi_cpi_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-05T14:08:46.569Z",
+      "success_rate": 1
+    }
+  },
+  "steel_consumption": {
+    "press_release:jpc_steel_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-05T14:08:52.430Z",
+      "success_rate": 1
+    }
+  },
+  "pmi_combined": {
+    "press_release:sp_pmi_india_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-05T14:08:52.618Z",
+      "success_rate": 1
+    }
+  },
+  "fiscal_deficit_pct": {
+    "press_release:cga_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-05T14:13:39.396Z",
+      "success_rate": 1
+    }
+  },
+  "govt_capex_runrate": {
+    "press_release:cga_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-05T14:13:39.414Z",
       "success_rate": 1
     }
   }

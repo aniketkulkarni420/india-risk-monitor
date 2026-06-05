@@ -4,10 +4,10 @@
   "display_subtitle": "RBI fortnightly bulletin · YoY",
   "section": "macro",
   "sub_cluster": "credit",
-  "value": 16,
+  "value": 16.2,
   "unit": "% YoY (credit)",
   "value_format": "decimal_1",
-  "as_of": "2026-05-29T04:32:10.150Z",
+  "as_of": "2026-06-05T14:13:39.509Z",
   "as_of_period": "fortnightly",
   "mom_pct": null,
   "yoy_pct": null,
@@ -16,7 +16,6 @@
     15,
     15,
     15,
-    15,
     16,
     16,
     16,
@@ -24,7 +23,8 @@
     16,
     16,
     16,
-    16
+    16,
+    16.2
   ],
   "status": "low",
   "shock_eligible": false,
@@ -44,12 +44,14 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-29T04:32:10.150Z",
+  "last_verified_at": "2026-06-05T14:13:39.509Z",
   "why_it_matters": "Credit growth > deposit growth signals tight funding. Currently 14.8% credit vs 13.0% deposit = healthy gap, no funding stress.",
   "linked_metrics": [
     "banking_liquidity",
     "wacr_repo_spread",
     "iip_growth"
   ],
-  "notes": "Drawer shows split: Credit 14.8%, Deposit 13.0%, gap 1.8%. Industrial credit growth shown separately in drawer."
+  "notes": "Drawer shows split: Credit 14.8%, Deposit 13.0%, gap 1.8%. Industrial credit growth shown separately in drawer.",
+  "data_origin": "live",
+  "last_live_fetch_at": "2026-06-05T14:13:39.509Z"
 }

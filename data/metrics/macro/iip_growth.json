@@ -4,10 +4,10 @@
   "display_subtitle": "MoSPI · monthly · ~42d lag",
   "section": "macro",
   "sub_cluster": "leading",
-  "value": 4.1,
+  "value": 4.9,
   "unit": "% YoY",
   "value_format": "decimal_1",
-  "as_of": "2026-03-31T17:30:00.000Z",
+  "as_of": "2026-04-30T17:30:00.000Z",
   "as_of_period": "monthly",
   "mom_pct": null,
   "yoy_pct": null,
@@ -24,7 +24,7 @@
     4.1,
     4.1,
     4.1,
-    4.1
+    4.9
   ],
   "status": "low",
   "shock_eligible": true,
@@ -50,7 +50,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-05-29T04:30:31.468Z",
+  "last_verified_at": "2026-06-05T14:08:46.184Z",
   "why_it_matters": "Actual industrial output. Confirms or contradicts PMI direction with 4-6 week confirmation lag. 5%+ sustained = healthy expansion.",
   "trigger_thresholds": [
     {
@@ -72,5 +72,7 @@
     "auto_cv",
     "steel_consumption"
   ],
-  "notes": "Latest reading is Feb 2026 (Mar 14 release). Mar 2026 reading expects ~Apr 12 release."
+  "notes": "Latest reading is Feb 2026 (Mar 14 release). Mar 2026 reading expects ~Apr 12 release.",
+  "data_origin": "live",
+  "last_live_fetch_at": "2026-06-05T14:08:46.184Z"
 }
