@@ -4,9 +4,9 @@
     "last_success_at": "2026-05-14T10:37:56.912Z"
   },
   "baltic_dry_index:html_scrape:tradingeconomics_v1": {
-    "consecutive_failures": 0,
+    "consecutive_failures": 1,
     "last_success_at": "2026-06-06T05:05:37.978Z",
-    "last_failure_at": "2026-06-05T05:48:51.355Z"
+    "last_failure_at": "2026-06-06T05:49:40.226Z"
   },
   "vlcc_tanker_rates:html_scrape:tradingeconomics_v1": {
     "consecutive_failures": 0,
@@ -19,19 +19,19 @@
     "_cleared": "2026-05-27 · post-fix re-test after May 25 race"
   },
   "brent_crude:json_api:public_oil_v1": {
-    "consecutive_failures": 0,
+    "consecutive_failures": 1,
     "last_success_at": "2026-06-06T05:05:38.519Z",
-    "last_failure_at": "2026-06-05T05:48:52.337Z"
+    "last_failure_at": "2026-06-06T05:49:41.137Z"
   },
   "gold_usd:json_api:public_gold_v1": {
-    "consecutive_failures": 0,
+    "consecutive_failures": 1,
     "last_success_at": "2026-06-06T05:05:38.564Z",
-    "last_failure_at": "2026-06-05T05:48:52.365Z"
+    "last_failure_at": "2026-06-06T05:49:41.165Z"
   },
   "": {
-    "consecutive_failures": 0,
+    "consecutive_failures": 2,
     "last_success_at": "2026-06-06T05:05:38.621Z",
-    "last_failure_at": "2026-06-05T05:48:52.379Z"
+    "last_failure_at": "2026-06-06T05:49:41.177Z"
   },
   "wacr_repo_spread:html_scrape:rbi_mmo_daily_v1": {
     "consecutive_failures": 0,
@@ -114,7 +114,7 @@
   },
   "india_crude_basket:press_release:ppac_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-06-06T05:06:02.344Z"
+    "last_success_at": "2026-06-06T05:49:48.905Z"
   },
   "naukri_jobspeak:press_release:naukri_v1": {
     "consecutive_failures": 0,
@@ -344,7 +344,7 @@
   },
   "vlcc_tanker_rates:html_scrape:hormuz_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-06-06T05:05:38.487Z"
+    "last_success_at": "2026-06-06T05:49:41.122Z"
   },
   "block_deals_notional:json_api:nse_api_v1": {
     "consecutive_failures": 1,
@@ -385,27 +385,33 @@
     "last_success_at": "2026-06-03T22:37:11.763Z"
   },
   "baltic_dry_index:json_api:dbnomics_v1": {
-    "consecutive_failures": 2,
-    "last_failure_at": "2026-06-05T05:48:51.357Z"
+    "consecutive_failures": 3,
+    "last_failure_at": "2026-06-06T05:49:40.228Z",
+    "cooled_until": "2026-06-06T11:49:40.228Z"
   },
   "baltic_dry_index:llm:google_news_llm_v1": {
-    "consecutive_failures": 2,
-    "last_failure_at": "2026-06-05T05:48:51.883Z"
+    "consecutive_failures": 3,
+    "last_failure_at": "2026-06-06T05:49:40.634Z",
+    "cooled_until": "2026-06-06T11:49:40.634Z"
   },
   "brent_crude:json_api:dbnomics_v1": {
-    "consecutive_failures": 2,
-    "last_failure_at": "2026-06-05T05:48:52.338Z"
+    "consecutive_failures": 3,
+    "last_failure_at": "2026-06-06T05:49:41.138Z",
+    "cooled_until": "2026-06-06T11:49:41.138Z"
   },
   "brent_crude:html_scrape:tradingeconomics_v1": {
-    "consecutive_failures": 2,
-    "last_failure_at": "2026-06-05T05:48:52.339Z"
+    "consecutive_failures": 3,
+    "last_failure_at": "2026-06-06T05:49:41.139Z",
+    "cooled_until": "2026-06-06T11:49:41.139Z"
   },
   "gold_usd:json_api:dbnomics_v1": {
-    "consecutive_failures": 2,
-    "last_failure_at": "2026-06-05T05:48:52.367Z"
+    "consecutive_failures": 3,
+    "last_failure_at": "2026-06-06T05:49:41.166Z",
+    "cooled_until": "2026-06-06T11:49:41.166Z"
   },
   "gold_usd:llm:google_news_llm_v1": {
-    "consecutive_failures": 2,
-    "last_failure_at": "2026-06-05T05:48:52.368Z"
+    "consecutive_failures": 3,
+    "last_failure_at": "2026-06-06T05:49:41.167Z",
+    "cooled_until": "2026-06-06T11:49:41.167Z"
   }
 }
