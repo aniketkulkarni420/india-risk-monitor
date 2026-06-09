@@ -36,8 +36,8 @@
     "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "llm:google_news_llm_v1",
-      "html_scrape:rbi_mmo_daily_v1"
+      "html_scrape:rbi_mmo_daily_v1",
+      "llm:google_news_llm_v1"
     ]
   },
   "source_crosscheck": [
@@ -57,5 +57,5 @@
   ],
   "data_origin": "primary",
   "last_live_fetch_at": "2026-06-05T16:39:47.329Z",
-  "_reliability_optimized_at": "2026-05-31T10:02:33.043Z"
+  "_reliability_optimized_at": "2026-06-09T04:59:56.666Z"
 }
