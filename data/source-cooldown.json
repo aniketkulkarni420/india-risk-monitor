@@ -36,7 +36,7 @@
   "wacr_repo_spread:html_scrape:rbi_mmo_daily_v1": {
     "consecutive_failures": 0,
     "last_failure_at": "2026-06-08T17:30:04.754Z",
-    "last_success_at": "2026-06-09T16:46:59.662Z"
+    "last_success_at": "2026-06-10T16:49:14.585Z"
   },
   "wacr_repo_spread:llm:google_news_llm_v1": {
     "consecutive_failures": 6,
@@ -174,7 +174,7 @@
   "fpi_debt_flows:html_render:playwright_render_v1": {
     "consecutive_failures": 0,
     "last_failure_at": "2026-05-29T18:21:22.034Z",
-    "last_success_at": "2026-06-09T16:46:56.673Z"
+    "last_success_at": "2026-06-10T16:48:57.250Z"
   },
   "fpi_debt_flows:llm:google_news_llm_v1": {
     "consecutive_failures": 1,
@@ -224,14 +224,14 @@
     "_cleared": "2026-05-27 · post-fix re-test after May 25 race"
   },
   "banking_liquidity:json_api:rbi_mmo_v1": {
-    "consecutive_failures": 0,
+    "consecutive_failures": 1,
     "last_success_at": "2026-06-09T16:46:56.980Z",
-    "last_failure_at": "2026-06-03T22:36:57.758Z"
+    "last_failure_at": "2026-06-10T16:49:11.286Z"
   },
   "inr_usd:html_scrape:te_inr_v1": {
-    "consecutive_failures": 0,
+    "consecutive_failures": 1,
     "last_success_at": "2026-06-09T16:46:59.779Z",
-    "last_failure_at": "2026-06-03T22:37:10.341Z"
+    "last_failure_at": "2026-06-10T16:49:14.596Z"
   },
   "cement_dispatches:rss:publisher_rss_v1": {
     "consecutive_failures": 0,
@@ -243,8 +243,8 @@
     "_cleared": "2026-05-27 · post-fix re-test after May 25 race"
   },
   "gsec_curve:html_scrape:tradingeconomics_v1": {
-    "consecutive_failures": 0,
-    "last_failure_at": "2026-06-03T22:36:46.412Z",
+    "consecutive_failures": 1,
+    "last_failure_at": "2026-06-10T16:48:57.346Z",
     "last_success_at": "2026-06-09T16:46:56.848Z"
   },
   "fx_reserves:json_api:dbnomics_v1": {
@@ -372,19 +372,19 @@
   },
   "gsec_curve:llm:google_news_llm_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-06-03T22:36:57.726Z"
+    "last_success_at": "2026-06-10T16:49:11.228Z"
   },
   "banking_liquidity:json_api:dbnomics_v1": {
-    "consecutive_failures": 1,
-    "last_failure_at": "2026-06-03T22:36:57.759Z"
+    "consecutive_failures": 2,
+    "last_failure_at": "2026-06-10T16:49:11.294Z"
   },
   "banking_liquidity:html_scrape:tradingeconomics_v1": {
-    "consecutive_failures": 1,
-    "last_failure_at": "2026-06-03T22:36:57.771Z"
+    "consecutive_failures": 2,
+    "last_failure_at": "2026-06-10T16:49:11.318Z"
   },
   "inr_usd:json_api:rbi_refrate_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-06-03T22:37:11.763Z"
+    "last_success_at": "2026-06-10T16:49:15.455Z"
   },
   "baltic_dry_index:json_api:dbnomics_v1": {
     "consecutive_failures": 3,
