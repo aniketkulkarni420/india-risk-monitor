@@ -123,27 +123,27 @@
       "last_attempted_at": "2026-06-10T16:11:16.313Z"
     },
     "gsec_curve": {
-      "last_success_at": "2026-06-10T16:49:11.236Z",
-      "last_success_value": 6.911,
+      "last_success_at": "2026-06-10T17:35:23.390Z",
+      "last_success_value": 6.92,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-05-14T20:18:34.039Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:ccil_v1: in cooldown | json_api:dbnomics_v1: in cooldown | html_scrape:tradingeconomics_v1: in cooldown",
-      "last_attempted_at": "2026-06-10T16:49:11.236Z"
+      "last_attempted_at": "2026-06-10T17:35:23.390Z"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-06-10T16:49:11.247Z",
+      "last_success_at": "2026-06-10T17:35:23.410Z",
       "last_success_value": 3.27,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-10T16:49:11.247Z"
+      "last_attempted_at": "2026-06-10T17:35:23.410Z"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-06-09T16:46:56.984Z",
+      "last_success_at": "2026-06-10T17:35:23.691Z",
       "last_success_value": 310231.76,
-      "consecutive_failures": 1,
-      "status": "amber",
-      "last_attempted_at": "2026-06-10T16:49:11.320Z",
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_attempted_at": "2026-06-10T17:35:23.691Z",
       "last_failure_at": "2026-06-10T16:49:11.320Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:rbi_mmo_v1: https://tradingeconomics.com/india/money-supply-m3 → 405 | json_api:dbnomics_v1: No dbnomics config for banking_liquidity | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/indi"
     },
@@ -152,23 +152,23 @@
       "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: in cooldown | html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 2 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=62",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-06-10T16:49:14.589Z",
+      "last_success_at": "2026-06-10T17:35:27.005Z",
       "last_success_value": -23,
-      "last_attempted_at": "2026-06-10T16:49:14.589Z"
+      "last_attempted_at": "2026-06-10T17:35:27.005Z"
     },
     "inr_usd": {
-      "last_success_at": "2026-06-10T16:49:15.458Z",
-      "last_success_value": 95.1855,
+      "last_success_at": "2026-06-10T17:35:27.140Z",
+      "last_success_value": 95.105,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-10T16:49:15.458Z"
+      "last_attempted_at": "2026-06-10T17:35:27.140Z"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-06-10T16:49:15.464Z",
+      "last_success_at": "2026-06-10T17:35:27.148Z",
       "last_success_value": 230,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-10T16:49:15.464Z"
+      "last_attempted_at": "2026-06-10T17:35:27.148Z"
     },
     "high_yield_credit_spread": {
       "last_success_at": "2026-06-05T17:03:09.771Z",
@@ -425,9 +425,9 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: moneycontrol_v1: all 1 URLs failed · https://www.moneycontrol.com/stocks/marketstats/fii_fpi.php: Al | html_render:bse_v1: bse_v1: all 1 URLs failed · https://www.bseindia.com/market",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-06-10T16:48:57.253Z",
+      "last_success_at": "2026-06-10T17:35:23.018Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-06-10T16:48:57.253Z"
+      "last_attempted_at": "2026-06-10T17:35:23.018Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-05-14T11:29:20.867Z",
@@ -458,10 +458,10 @@
     }
   },
   "summary": {
-    "green": 55,
-    "amber": 3,
+    "green": 56,
+    "amber": 2,
     "red": 0,
     "total": 58
   },
-  "generated_at": "2026-06-10T16:49:15.464Z"
+  "generated_at": "2026-06-10T17:35:27.148Z"
 }
