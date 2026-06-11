@@ -27,6 +27,14 @@ const STALE_DAYS = { Live: 2, Daily: 2, Weekly: 10, Fortnightly: 21, Monthly: 45
 const STALE_DEFAULT = 14;
 const FROZEN_FACTOR = parseFloat(process.env.IRM_FROZEN_FACTOR || '2');
 
+// Data-VINTAGE allowance: how old may the data point itself (as_of) be, given
+// publication lag? Different question from retrieval staleness — a parser can
+// fetch "successfully" every day yet keep re-confirming a years-old release
+// (observed: fastag_toll as_of 2024-01-01 stamped verified in 2026). These
+// bounds are generous for real publication lags but catch vintage rot.
+const VINTAGE_DAYS = { Live: 7, Daily: 7, Weekly: 21, Fortnightly: 35, Monthly: 75, Quarterly: 160, 'Per release': 270 };
+const VINTAGE_DEFAULT = 75;
+
 // Plausibility bounds for the headline metrics a viewer would scan first.
 // Wide enough to allow crisis values, tight enough to catch decimal/unit errors.
 // (INR 95 is real here — bound 75-105 allows it but rejects 9.5 or 950.)
@@ -39,7 +47,7 @@ const BOUNDS = {
   india_vix:      [5, 60,    'India VIX'],
   nifty_pe_5y:    [12, 32,   'Nifty PE'],
   cpi_inflation:  [0, 15,    'CPI %'],
-  wpi_inflation:  [-5, 20,   'WPI %'],
+  core_cpi:       [1.5, 9,   'core CPI %'],
   repo_rate:      [3, 9,     'Repo %'],
   gsec_curve:     [4, 12,    '10Y G-Sec %'],
   fx_reserves:    [400, 800, 'FX reserves $bn'],
@@ -79,8 +87,31 @@ const bundleAgeH = data.generated_at ? (now - new Date(data.generated_at).getTim
 if (bundleAgeH > 24) fails.push(`bundle is ${bundleAgeH.toFixed(1)}h old (>24h) — deploy pipeline may be stuck`);
 else if (bundleAgeH > 12) warns.push(`bundle is ${bundleAgeH.toFixed(1)}h old (>12h)`);
 
+// 1b · C6 guard (2026-06-11): no untagged history rows (seed-purge regression),
+//      and no metric sparkline longer than its real-history month count.
+try {
+  const { readdirSync: rd, readFileSync: rf, existsSync: ex } = await import('node:fs');
+  let untagged = 0;
+  const realMonths = {};
+  if (ex('data/history')) for (const f of rd('data/history')) {
+    if (!f.endsWith('.csv')) continue;
+    const lines = rf('data/history/' + f, 'utf8').trim().split('\n').slice(1).filter(Boolean);
+    const bad = lines.filter(l => { const p = l.split(','); return p.length < 3 || p[2].trim() === ''; });
+    untagged += bad.length;
+    const months = new Set(lines.filter(l => !bad.includes(l)).map(l => l.slice(0, 7)));
+    realMonths[f.replace('.csv', '')] = months.size;
+  }
+  if (untagged > 0) fails.push(`${untagged} untagged history rows — unprovable data re-entered after seed purge`);
+  for (const [id, m] of Object.entries(data.metrics || {})) {
+    const sl = Array.isArray(m.sparkline_12m) ? m.sparkline_12m.length : 0;
+    const rm = realMonths[id];
+    if (rm !== undefined && sl > rm) fails.push(`${id}: sparkline has ${sl} points but only ${rm} real history months — fabricated points`);
+  }
+} catch (e) { warns.push('C6 history-integrity check skipped: ' + e.message); }
+
 // 2 · freshness (cadence-aware) + frozen-liveness (cache-masking detector)
-let stale = [], severe = [], frozen = [];
+//     + data-vintage (as_of age — catches "fresh fetch of an ancient release")
+let stale = [], severe = [], frozen = [], oldVintage = [];
 for (const [id, m] of Object.entries(data.metrics || {})) {
   if (isComposite(id)) continue;
   const freq = m.source_primary?.frequency || 'Daily';
@@ -91,11 +122,24 @@ for (const [id, m] of Object.entries(data.metrics || {})) {
     const liveAge = (now - new Date(m.last_live_fetch_at).getTime()) / 86400000;
     if (liveAge > th * FROZEN_FACTOR) frozen.push(`${id} (live-age ${liveAge.toFixed(1)}d/${th}d, origin ${m.data_origin || '?'})`);
   }
+  // Vintage: the data point itself is older than any plausible publication lag.
+  // Manual overrides are exempt from the BLOCKER (a human explicitly attested
+  // the value); they surface as warnings instead.
+  if (m.as_of) {
+    const vth = VINTAGE_DAYS[freq] ?? VINTAGE_DEFAULT;
+    const vAge = (now - new Date(m.as_of).getTime()) / 86400000;
+    if (vAge > vth) {
+      const isOverride = m.verification_state === 'manual_override' || m._verification_state_original === 'manual_override';
+      if (isOverride) warns.push(`${id}: manual override dated ${String(m.as_of).slice(0, 10)} (${vAge.toFixed(0)}d old) — consider re-issuing`);
+      else oldVintage.push(`${id} (data dated ${String(m.as_of).slice(0, 10)} · ${vAge.toFixed(0)}d/${vth}d)`);
+    }
+  }
   if (!lv) { severe.push(id); continue; }
   const age = (now - new Date(lv).getTime()) / 86400000;
   if (age > th * 2) severe.push(`${id} (${age.toFixed(1)}d/${th}d)`);
   else if (age > th) stale.push(`${id} (${age.toFixed(1)}d/${th}d)`);
 }
+if (oldVintage.length) fails.push(`${oldVintage.length} metrics show OLD DATA (as_of beyond publication lag): ${oldVintage.slice(0, 6).join(', ')}${oldVintage.length > 6 ? '…' : ''}`);
 if (frozen.length) fails.push(`${frozen.length} frozen (cache-masking — source likely dead): ${frozen.slice(0, 6).join(', ')}${frozen.length > 6 ? '…' : ''}`);
 if (severe.length) fails.push(`${severe.length} severely stale (>2× cadence): ${severe.slice(0, 8).join(', ')}${severe.length > 8 ? '…' : ''}`);
 if (stale.length > (Object.keys(data.metrics).length * 0.10)) fails.push(`${stale.length} metrics stale (>10% of total)`);

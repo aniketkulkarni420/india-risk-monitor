@@ -184,6 +184,16 @@ async function ingestOne(metric_id) {
       return p;
     });
 
+    // Final vintage guard (covers non-tiered parsers; tiered_v1 also rejects
+    // per-tier). Never stamp "verified" on data older than its publication lag.
+    {
+      const { checkVintage } = await import('./ingest/observability.mjs');
+      const v = checkVintage(metric, primary.as_of);
+      if (!v.ok) {
+        throw new Error(`OLD DATA rejected: as_of ${String(primary.as_of).slice(0, 10)} is ${v.ageDays}d old (> ${v.allowDays}d allowance for ${v.cadence}) — refusing to verify stale release`);
+      }
+    }
+
     // Cross-checks (sequential — keeps polite to sources)
     const crosschecks = [];
     for (let i = 0; i < (metric.source_crosscheck?.length || 0); i++) {
@@ -194,6 +204,16 @@ async function ingestOne(metric_id) {
         warn('crosscheck_fail', { metric_id, idx: i, err: e.message });
       }
     }
+
+    // Honesty stamp: how many INDEPENDENT sources actually confirmed this value?
+    // Most parsers' fetchCrosscheck is a stub that echoes the primary back
+    // (parse_meta.source === 'pending' / name '*-crosscheck-pending') — that is
+    // self-confirmation, not verification. Count only real ones. The bundle
+    // demotes "verified" → "single_source" display when this is < 2.
+    const realCrosschecks = crosschecks.filter(c =>
+      c && c.parse_meta && c.parse_meta.source !== 'pending' &&
+      !/crosscheck-pending/.test(String(c.source_name || ''))
+    ).length;
 
     // Verification
     const verdict = verify(primary, crosschecks);
@@ -216,11 +236,11 @@ async function ingestOne(metric_id) {
       // Liveness provenance (kills the cache-masking lie · see fetch-origin-context.mjs)
       data_origin: fetchOrigin.origin || 'live',
       origin_is_live: fetchOrigin.isLive,
+      // Verification honesty: 1 primary + N real (non-stub) crosschecks
+      extra: { ...(primary.extra && typeof primary.extra === 'object' ? primary.extra : {}), _source_count_actual: 1 + realCrosschecks },
       ...trends,
-      // Forward parser `extra` fields (snapshot payloads, source-state flags,
-      // baselines) so persistence can merge them. Without this, parser-computed
-      // fields like `_source_static` are dropped and stale values persist.
-      ...(primary.extra && typeof primary.extra === 'object' ? { extra: primary.extra } : {})
+      // (parser `extra` fields are merged into the honesty-stamped extra above —
+      // a second `extra:` key here would silently override it)
     };
 
     // Persist + history

@@ -1,0 +1,69 @@
+{
+  "value": -271979,
+  "as_of": "2026-06-10T00:00:00.000Z",
+  "as_of_period": "24h",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    -271979
+  ],
+  "status": "high",
+  "shock_eligible": true,
+  "trend_direction": "neutral",
+  "source_crosscheck": [
+    {
+      "name": "NSE F&O participant report (next-day re-fetch)",
+      "url": "https://www.nseindia.com/reports",
+      "type": "Exchange"
+    }
+  ],
+  "verification_state": "source_pending",
+  "last_verified_at": "2026-06-11T13:04:12.740Z",
+  "linked_metrics": [
+    "fii_equity_daily",
+    "india_vix",
+    "nifty_50"
+  ],
+  "notes": "Created 2026-06-11 (approved metric set). Value populates on first live ingest.",
+  "metric_id": "fii_index_fut_positioning",
+  "display_name": "FII index-futures net position",
+  "display_subtitle": "NSE participant-wise OI · net contracts (− = net short)",
+  "section": "flows",
+  "sub_cluster": "structure",
+  "unit": "contracts",
+  "value_format": "integer",
+  "why_it_matters": "FIIs actual long/short book in index futures — leads their cash-market behaviour. Extreme net-short readings have historically marked panic bottoms; extreme net-long marks euphoria.",
+  "formula": "FII Future Index Long − Future Index Short (contracts), NSE participant-wise OI",
+  "source_primary": {
+    "name": "NSE participant-wise OI",
+    "url": "https://archives.nseindia.com/content/nsccl/",
+    "type": "Exchange",
+    "frequency": "Daily",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "csv_download:nse_participant_oi_v1"
+    ]
+  },
+  "data_origin": "live",
+  "last_live_fetch_at": "2026-06-11T13:04:12.740Z",
+  "fii_index_fut_long": 32698,
+  "fii_index_fut_short": 304677,
+  "fii_long_ratio_pct": 9.7,
+  "_source_count_actual": 1,
+  "trigger_thresholds": [
+    {
+      "level": "med",
+      "rule": "value < -100000"
+    },
+    {
+      "level": "high",
+      "rule": "value < -200000"
+    },
+    {
+      "level": "shock",
+      "rule": "value < -350000"
+    }
+  ],
+  "_history_state": "accruing"
+}

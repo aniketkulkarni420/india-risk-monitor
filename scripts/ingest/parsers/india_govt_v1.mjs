@@ -18,16 +18,6 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 IRM-Ing
 const CONFIGS = {
   // Tier 1 ─────────────────────────────────────────────────────────
 
-  // Naukri JobSpeak Index — monthly press release on Naukri's hiring page
-  naukri_jobspeak: {
-    urls: [
-      'https://www.naukri.com/jobspeak/index',
-      'https://www.naukri.com/blog/naukri-jobspeak-report'
-    ],
-    extractRe: /JobSpeak\s+(?:Index|stood at|registered)\s+[a-z\s]*?([1-9]\d{2,4})/i,
-    plausible: (v) => v > 1000 && v < 5000,
-    valueParser: (s) => parseInt(s.replace(/,/g, ''), 10)
-  },
 
   // NSDL FPI debt flows — month-to-date INR Cr. Page has a summary panel.
   fpi_debt_flows: {
@@ -41,16 +31,6 @@ const CONFIGS = {
     valueParser: (s) => parseInt(s.replace(/,/g, ''), 10)
   },
 
-  // NSE F&O OI build-up — long vs short open interest ratio change
-  fno_oi_buildup: {
-    urls: [
-      'https://www.nseindia.com/api/marketStatus'  // placeholder; real impl needs cookie warmup like nse_indices_v1
-    ],
-    // OI build-up is typically a derived metric; placeholder regex that won't match
-    // (ensures we throw cleanly until proper NSE F&O bhavcopy parser is wired)
-    extractRe: /placeholder_no_match_yet/i,
-    plausible: () => false  // force throw — needs custom NSE F&O parser, scheduled for future session
-  },
 
   // NSE block deals notional — daily total in INR Cr
   block_deals_notional: {
@@ -116,26 +96,6 @@ const CONFIGS = {
     timeoutMs: 30000
   },
 
-  // NPCI UPI — monthly value in lakh crore
-  // NPCI page is slow (frequent timeouts) · multiple fallbacks added
-  upi_value: {
-    // Aggregator-first: news / TE before NPCI SPA (which often times out)
-    urls: [
-      'https://www.business-standard.com/topic/upi-transactions',
-      'https://economictimes.indiatimes.com/topic/upi-transactions',
-      'https://www.livemint.com/topic/upi',
-      'https://tradingeconomics.com/india/indicators',
-      'https://www.npci.org.in/what-we-do/upi/product-statistics',
-      'https://pib.gov.in/PressReleasePage.aspx'
-    ],
-    extractRe: /(?:₹\s*)?([\d,]+\.?\d*)\s*(?:lakh\s+crore|trillion|Cr|crore)\s+(?:in\s+)?(?:total\s+)?(?:value|UPI|transaction\s+value)/i,
-    plausible: (v) => v > 5 && v < 50,
-    valueParser: (s) => {
-      const n = parseFloat(s.replace(/,/g, ''));
-      return n > 1000 ? n / 100000 : n;  // crore → lakh crore if needed
-    },
-    timeoutMs: 45000  // NPCI is slow
-  },
 
   // IHMCL FASTag toll — monthly INR Cr
   // IHMCL URL returned 404 · DROPPED · NHAI + PIB + news fallbacks
@@ -195,15 +155,6 @@ const CONFIGS = {
     plausible: (v) => v > 100 && v < 250
   },
 
-  // Sectoral FII MTD — NSDL sectoral breakdown · returns label string
-  // (top-3 sectors by net inflow)
-  sectoral_fii_mtd: {
-    urls: [
-      'https://www.fpi.nsdl.co.in/web/Reports/Sectorwise_Investment.aspx'
-    ],
-    extractRe: /placeholder_no_match_yet/i,
-    plausible: () => false
-  },
 
   // Cement dispatches — top-5 cement co aggregate · BSE/NSE filings (custom)
   cement_dispatches: {
@@ -214,14 +165,6 @@ const CONFIGS = {
     plausible: (v) => v > 25 && v < 60
   },
 
-  // Indian port dwell time — JNPT + Mundra weekly bulletins (low confidence)
-  india_port_dwell_time: {
-    urls: [
-      'https://jnport.gov.in/'
-    ],
-    extractRe: /placeholder_no_match_yet/i,
-    plausible: () => false
-  }
 };
 
 async function fetchHtml(url, timeoutMs = 25000, headers = {}) {

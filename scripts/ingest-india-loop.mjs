@@ -21,16 +21,12 @@ const METRICS = [
   'wacr_repo_spread',
   'pol_demand',
   'air_pax',
-  'india_port_dwell_time',
   'eway_bills',
   'fastag_toll',
   'rail_freight',
   'port_cargo',
   'cement_dispatches',
-  'upi_value',
   'india_crude_basket',
-  'naukri_jobspeak',
-  'fno_oi_buildup',
   'block_deals_notional',
   'fpi_debt_flows'
 ];
@@ -44,16 +40,12 @@ const CADENCE_DAYS = {
   wacr_repo_spread: 1,
   pol_demand: 30,
   air_pax: 30,
-  india_port_dwell_time: 90,
   eway_bills: 30,
   fastag_toll: 30,
   rail_freight: 30,
   port_cargo: 30,
   cement_dispatches: 30,
-  upi_value: 30,
   india_crude_basket: 1,
-  naukri_jobspeak: 30,
-  fno_oi_buildup: 1,
   block_deals_notional: 1,
   fpi_debt_flows: 1
 };

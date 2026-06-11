@@ -4,27 +4,17 @@
   "display_subtitle": "Carry-trade decider · bps",
   "section": "market",
   "sub_cluster": "rates_global",
-  "value": 230,
+  "value": 237,
   "unit": "bps",
   "value_format": "bps",
-  "as_of": "2026-05-29T04:32:10.292Z",
+  "as_of": "2026-06-11T12:20:00.000Z",
   "as_of_period": "live",
-  "mom_pct": -8.36,
-  "yoy_pct": -9.41,
+  "mom_pct": 3.04,
+  "yoy_pct": -4.69,
   "vs_5y_avg_pct": -22.4,
   "sparkline_12m": [
     230,
-    230,
-    230,
-    230,
-    230,
-    230,
-    230,
-    230,
-    230,
-    230,
-    230,
-    230
+    237
   ],
   "status": "med",
   "shock_eligible": true,
@@ -50,7 +40,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-06-10T17:35:27.147Z",
+  "last_verified_at": "2026-06-11T12:51:33.598Z",
   "why_it_matters": "Spread = carry compensation for FII debt. Compression → debt FPI outflow + INR pressure. Currently stable around 250 bps.",
   "formula": "gsec_curve_10y - fred_us_10y_yield. Updated daily after India bond market close (17:30 IST).",
   "trigger_thresholds": [
@@ -72,6 +62,10 @@
     "fpi_debt_flows",
     "inr_usd"
   ],
-  "data_origin": "live",
-  "last_live_fetch_at": "2026-06-10T17:35:27.147Z"
+  "data_origin": "primary",
+  "last_live_fetch_at": "2026-06-11T12:51:33.598Z",
+  "_us10y_used": 4.550000190734863,
+  "_us10y_date": "2026-06-11",
+  "_source_count_actual": 3,
+  "_history_state": "accruing"
 }

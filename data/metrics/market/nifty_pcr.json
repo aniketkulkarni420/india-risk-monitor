@@ -1,0 +1,61 @@
+{
+  "value": null,
+  "as_of": "2026-06-11T13:17:42.604Z",
+  "as_of_period": "24h",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [],
+  "status": "med",
+  "shock_eligible": true,
+  "trend_direction": "neutral",
+  "verification_state": "source_pending",
+  "last_verified_at": "2026-06-11T13:17:42.604Z",
+  "linked_metrics": [
+    "india_vix",
+    "fii_index_fut_positioning"
+  ],
+  "notes": "Created 2026-06-11 (approved metric set). Populates on first live ingest.",
+  "metric_id": "nifty_pcr",
+  "display_name": "Nifty put-call ratio",
+  "display_subtitle": "NSE option chain · OI-based · contrarian at extremes",
+  "section": "market",
+  "sub_cluster": "sentiment",
+  "unit": "ratio",
+  "value_format": "ratio_x",
+  "why_it_matters": "Crowd positioning in one number. Below 0.7 = put complacency (often near tops); above 1.4 = hedging panic (often near bottoms). Mid-zone readings carry no signal.",
+  "formula": "Total Nifty put OI ÷ total call OI across strikes (NSE option chain)",
+  "source_primary": {
+    "name": "NSE option chain",
+    "url": "https://www.nseindia.com/option-chain",
+    "type": "Exchange",
+    "frequency": "Daily",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "json_api:nse_api_v1",
+      "html_render:web_llm_v1"
+    ]
+  },
+  "source_crosscheck": [
+    {
+      "name": "NSE option chain (next-session re-fetch)",
+      "url": "https://www.nseindia.com/option-chain",
+      "type": "Exchange"
+    }
+  ],
+  "trigger_thresholds": [
+    {
+      "level": "med",
+      "rule": "value < 0.7 || value > 1.4"
+    },
+    {
+      "level": "high",
+      "rule": "value < 0.6 || value > 1.6"
+    },
+    {
+      "level": "shock",
+      "rule": "value < 0.5 || value > 1.8"
+    }
+  ],
+  "_history_state": "accruing"
+}

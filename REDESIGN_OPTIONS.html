@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IRM redesign · brutal audit + 3 versions</title>
+<style>
+  :root {
+    --bg: #0a0e14; --card: #131820; --line: #1f2733; --text: #e4e7eb;
+    --mute: #8b95a3; --dim: #5c6471;
+    --green: #4ade80; --amber: #f59e0b; --red: #ef4444; --blue: #60a5fa; --purple: #a78bfa;
+    --shock: #dc2626;
+    --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 28px; }
+  h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.02em; line-height: 1.1; }
+  h2 { font-size: 16px; margin: 32px 0 8px; letter-spacing: -0.01em; }
+  h3 { font-size: 14px; margin: 0 0 8px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  p.lede { color: var(--mute); margin: 0 0 24px; font-size: 13px; }
+
+  /* ─────────────── Audit section ─────────────── */
+  .audit { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin-bottom: 32px; max-width: 1100px; }
+  .audit ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 32px; }
+  @media (max-width: 800px) { .audit ol { columns: 1; } }
+  .audit ol li { margin-bottom: 8px; font-size: 13px; break-inside: avoid; }
+  .audit ol li b { color: var(--red); }
+  .audit .note { font-size: 12px; color: var(--mute); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .audit .note b { color: var(--amber); }
+
+  /* ─────────────── Version frames ─────────────── */
+  .version { margin-bottom: 56px; max-width: 1200px; }
+  .version-header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 16px; }
+  .version-tag { font-family: var(--mono); font-size: 11px; padding: 4px 8px; border-radius: 4px; letter-spacing: 0.04em; }
+  .v1-tag { background: rgba(96,165,250,0.12); color: var(--blue); }
+  .v2-tag { background: rgba(245,158,11,0.12); color: var(--amber); }
+  .v3-tag { background: rgba(167,139,250,0.12); color: var(--purple); }
+  .version-philosophy { color: var(--mute); font-size: 13px; }
+
+  /* ============================================================
+     VERSION 1 · CONTROL ROOM (Bloomberg-tight)
+     ============================================================ */
+  .v1-frame { background: #06080c; border: 1px solid var(--line); border-radius: 10px; padding: 20px; font-family: var(--mono); }
+  .v1-topbar { display: flex; align-items: center; gap: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--line); font-size: 11px; color: var(--mute); letter-spacing: 0.04em; }
+  .v1-topbar .sect { padding: 4px 8px; border-radius: 3px; cursor: pointer; }
+  .v1-topbar .sect.active { background: var(--line); color: var(--text); border-left: 2px solid var(--blue); border-radius: 0; padding-left: 6px; }
+  .v1-topbar .meta { margin-left: auto; color: var(--dim); }
+
+  .v1-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; padding: 24px 0; }
+
+  /* hero number */
+  .v1-hero { display: flex; flex-direction: column; gap: 18px; }
+  .v1-score-row { display: flex; align-items: flex-end; gap: 24px; }
+  .v1-score-num { font-size: 72px; line-height: 0.95; font-weight: 600; letter-spacing: -0.04em; color: var(--text); font-feature-settings: 'tnum'; }
+  .v1-score-meta { padding-bottom: 14px; }
+  .v1-score-meta .label { font-size: 10px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.08em; }
+  .v1-score-meta .delta { font-size: 13px; color: var(--amber); margin-top: 4px; }
+  .v1-score-meta .status { display: inline-block; background: rgba(245,158,11,0.16); color: var(--amber); padding: 3px 8px; border-radius: 3px; font-size: 11px; letter-spacing: 0.04em; }
+
+  /* drivers compact */
+  .v1-drivers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .v1-driver { padding: 12px 14px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .v1-driver:nth-child(3n) { border-right: none; }
+  .v1-driver:nth-last-child(-n+3) { border-bottom: none; }
+  .v1-driver .name { font-size: 10px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.06em; }
+  .v1-driver .val { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; }
+  .v1-driver .val .n { font-size: 24px; font-weight: 600; font-feature-settings: 'tnum'; }
+  .v1-driver .val .d { font-size: 11px; color: var(--mute); }
+  .v1-driver .bar { height: 2px; background: var(--line); margin-top: 6px; position: relative; }
+  .v1-driver .bar > div { position: absolute; left: 0; top: 0; bottom: 0; }
+  .v1-driver .bar > div.r { background: var(--red); }
+  .v1-driver .bar > div.a { background: var(--amber); }
+  .v1-driver .bar > div.g { background: var(--green); }
+
+  /* reference axis */
+  .v1-ref { padding-top: 18px; border-top: 1px solid var(--line); }
+  .v1-ref .row { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--mute); }
+  .v1-ref .axis { flex: 1; position: relative; height: 18px; }
+  .v1-ref .axis .line { position: absolute; top: 9px; left: 0; right: 0; height: 1px; background: var(--line); }
+  .v1-ref .axis .mark { position: absolute; top: 2px; bottom: 2px; width: 1px; background: var(--dim); }
+  .v1-ref .axis .mark::after { content: attr(data-l); position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--dim); white-space: nowrap; }
+  .v1-ref .axis .you { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+  .v1-ref .axis .you::after { content: "YOU 50"; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--amber); white-space: nowrap; }
+
+  /* right rail — actions + watchlist */
+  .v1-rail { display: flex; flex-direction: column; gap: 24px; }
+  .v1-rail-block { border-left: 2px solid var(--line); padding-left: 14px; }
+  .v1-rail-block h3 { margin-bottom: 10px; }
+  .v1-rail-block.urgent { border-left-color: var(--red); }
+  .v1-rail-block.urgent h3 { color: var(--red); }
+  .v1-rail-block ol { margin: 0; padding-left: 18px; font-size: 12px; }
+  .v1-rail-block ol li { margin-bottom: 6px; }
+  .v1-rail-block ol li b { color: var(--text); }
+
+  /* bottom strip */
+  .v1-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .v1-strip .cell { font-size: 11px; }
+  .v1-strip .cell .k { color: var(--mute); text-transform: uppercase; font-size: 9px; letter-spacing: 0.08em; }
+  .v1-strip .cell .v { font-size: 13px; color: var(--text); margin-top: 2px; }
+  .v1-strip .cell .v.warn { color: var(--red); }
+
+  /* annotation callouts */
+  .callout { background: rgba(96,165,250,0.06); border-left: 2px solid var(--blue); padding: 10px 14px; border-radius: 4px; margin-top: 14px; font-size: 12px; color: var(--mute); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  .callout b { color: var(--blue); }
+
+  /* ============================================================
+     VERSION 2 · PULSE BRIEF (magazine-story)
+     ============================================================ */
+  .v2-frame { background: #0c1118; border: 1px solid var(--line); border-radius: 10px; padding: 32px 36px; }
+  .v2-eyebrow { font-size: 11px; color: var(--amber); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+  .v2-headline { font-size: 22px; line-height: 1.25; letter-spacing: -0.02em; margin: 0 0 8px; max-width: 760px; font-weight: 600; }
+  .v2-sub { font-size: 14px; color: var(--mute); margin: 0 0 24px; max-width: 760px; }
+  .v2-sub b { color: var(--text); font-weight: 500; }
+
+  .v2-pulse-section { margin: 28px 0 28px; }
+  .v2-pulse-label { font-size: 10px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .v2-pulse { position: relative; height: 56px; margin: 0 0 36px; }
+  .v2-pulse-bar { position: absolute; left: 0; right: 0; top: 24px; height: 8px; background: linear-gradient(90deg, rgba(74,222,128,0.15), rgba(245,158,11,0.22) 50%, rgba(220,38,38,0.35)); border-radius: 4px; }
+  .v2-pulse .marker { position: absolute; top: 16px; bottom: 16px; width: 1px; background: rgba(255,255,255,0.4); }
+  .v2-pulse .marker::after { content: attr(data-l); position: absolute; top: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--mute); white-space: nowrap; padding: 0 4px; }
+  .v2-pulse .you { position: absolute; top: 8px; bottom: 8px; width: 4px; background: var(--amber); border-radius: 2px; box-shadow: 0 0 12px var(--amber); }
+  .v2-pulse .you::before { content: "50"; position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: 18px; font-weight: 600; color: var(--amber); font-feature-settings: 'tnum'; }
+  .v2-pulse-scale { display: flex; justify-content: space-between; font-size: 9px; color: var(--dim); padding: 0 2px; margin-top: -12px; }
+
+  .v2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 32px; }
+  .v2-col h3 { color: var(--mute); margin-bottom: 14px; }
+  .v2-col.elevated h3 { color: var(--red); }
+  .v2-row { display: flex; align-items: baseline; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .v2-row:last-child { border-bottom: none; }
+  .v2-row .name { flex: 1; }
+  .v2-row .val { font-family: var(--mono); font-feature-settings: 'tnum'; font-size: 14px; }
+  .v2-row .delta { font-size: 11px; color: var(--mute); width: 50px; text-align: right; }
+  .v2-row .delta.up { color: var(--red); }
+  .v2-row .delta.down { color: var(--green); }
+  .v2-row .note { font-size: 11px; color: var(--mute); flex-basis: 100%; padding-left: 0; margin-top: 2px; }
+
+  .v2-footer { display: flex; gap: 24px; padding-top: 20px; border-top: 1px solid var(--line); margin-top: 24px; font-size: 11px; color: var(--mute); }
+  .v2-footer span { display: inline-flex; gap: 6px; }
+  .v2-footer span b { color: var(--text); font-weight: 500; }
+
+  /* ============================================================
+     VERSION 3 · PERSONALIZED WATCH
+     ============================================================ */
+  .v3-frame { background: linear-gradient(180deg, #0e131b, #0a0e14); border: 1px solid var(--line); border-radius: 10px; padding: 24px 28px; }
+  .v3-top { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .v3-greet { font-size: 17px; font-weight: 500; letter-spacing: -0.01em; }
+  .v3-greet .sub { color: var(--mute); font-size: 12px; margin-top: 4px; font-weight: 400; }
+  .v3-mini-score { text-align: right; }
+  .v3-mini-score .n { font-size: 32px; font-feature-settings: 'tnum'; line-height: 1; color: var(--amber); font-weight: 600; }
+  .v3-mini-score .lbl { font-size: 10px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+  .v3-section { padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .v3-section:last-child { border-bottom: none; }
+  .v3-section h3 { display: flex; align-items: center; gap: 8px; }
+  .v3-section h3 .count { background: var(--line); color: var(--text); padding: 1px 6px; border-radius: 3px; font-size: 10px; font-family: var(--mono); }
+
+  /* watchlist */
+  .v3-watch { margin-top: 6px; }
+  .v3-watch .row { display: grid; grid-template-columns: 24px 1fr auto auto 80px; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .v3-watch .row:last-child { border-bottom: none; }
+  .v3-watch .row .star { color: var(--amber); font-size: 13px; }
+  .v3-watch .row .name { font-size: 13px; }
+  .v3-watch .row .val { font-family: var(--mono); font-feature-settings: 'tnum'; font-size: 14px; }
+  .v3-watch .row .delta { font-family: var(--mono); font-size: 11px; min-width: 44px; text-align: right; }
+  .v3-watch .row .delta.up { color: var(--red); }
+  .v3-watch .row .delta.down { color: var(--red); }
+  .v3-watch .row .delta.good { color: var(--green); }
+  .v3-watch .row .pill { font-size: 10px; padding: 2px 7px; border-radius: 3px; text-align: center; font-weight: 600; letter-spacing: 0.04em; }
+  .v3-watch .row .pill.shock { background: rgba(220,38,38,0.18); color: #fca5a5; }
+  .v3-watch .row .pill.high { background: rgba(245,158,11,0.18); color: var(--amber); }
+  .v3-watch .row .pill.med { background: rgba(96,165,250,0.14); color: var(--blue); }
+  .v3-watch .row .pill.low { background: rgba(74,222,128,0.14); color: var(--green); }
+
+  /* actions */
+  .v3-actions .action { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: flex-start; }
+  .v3-actions .action:last-child { border-bottom: none; }
+  .v3-actions .action .num { font-family: var(--mono); font-size: 11px; color: var(--dim); padding-top: 2px; width: 24px; flex-shrink: 0; }
+  .v3-actions .action .body { flex: 1; }
+  .v3-actions .action .body .head { font-size: 13px; }
+  .v3-actions .action .body .head b { color: var(--text); font-weight: 500; }
+  .v3-actions .action .body .why { font-size: 11px; color: var(--mute); margin-top: 4px; }
+  .v3-actions .action .tag { font-size: 10px; padding: 2px 8px; border-radius: 3px; letter-spacing: 0.04em; font-weight: 600; }
+  .v3-actions .action .tag.watch { background: rgba(245,158,11,0.16); color: var(--amber); }
+  .v3-actions .action .tag.act { background: rgba(220,38,38,0.18); color: #fca5a5; }
+  .v3-actions .action .tag.hold { background: rgba(74,222,128,0.14); color: var(--green); }
+
+  /* diff */
+  .v3-diff { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 6px; }
+  .v3-diff h4 { font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 10px; font-weight: 600; }
+  .v3-diff ul { margin: 0; padding-left: 16px; font-size: 12px; color: var(--mute); }
+  .v3-diff ul li { padding: 3px 0; }
+  .v3-diff ul li b { color: var(--text); font-family: var(--mono); font-weight: 400; }
+
+  /* ─────────────── Comparison + Recommendation ─────────────── */
+  .compare { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; max-width: 1100px; margin-top: 40px; }
+  .compare table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+  .compare th, .compare td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); }
+  .compare th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mute); font-weight: 600; }
+  .compare td.dim { color: var(--mute); }
+  .compare td .good { color: var(--green); }
+  .compare td .ok { color: var(--amber); }
+  .compare td .weak { color: var(--red); }
+
+  .rec { background: linear-gradient(135deg, rgba(96,165,250,0.05), rgba(167,139,250,0.05)); border: 1px solid var(--line); border-left: 3px solid var(--blue); border-radius: 10px; padding: 20px 24px; margin-top: 24px; max-width: 1100px; }
+  .rec h2 { margin: 0 0 12px; color: var(--blue); }
+  .rec p { font-size: 13px; line-height: 1.6; margin: 0 0 12px; }
+  .rec p:last-child { margin-bottom: 0; }
+  .rec b { color: var(--text); }
+</style>
+</head>
+<body>
+
+<h1>IRM redesign · brutal audit + 3 versions</h1>
+<p class="lede">Dashboards are digital control rooms, not magazines. Current IRM violates the principles enough that the home view actively works against the user's primary need: <i>"is anything wrong right now?"</i></p>
+
+<!-- ─────────────── BRUTAL AUDIT ─────────────── -->
+<section class="audit">
+  <h2 style="margin-top:0">What's wrong (15 specific violations)</h2>
+  <ol>
+    <li><b>Scrolling is mandatory</b> — critical metrics live below the fold. Single most-violated principle.</li>
+    <li><b>Hero has 5+ competing elements</b> — IRS + 6 tiles + timeline + chips + reference events. 50ms window blown.</li>
+    <li><b>3 different section layouts</b> — V60 Flows ≠ Cluster Real Econ ≠ Ranked Sectors. No muscle memory.</li>
+    <li><b>4 status levels × N color tints</b> — color is decoration here, not a tool.</li>
+    <li><b>No "what changed today"</b> — user must mentally diff yesterday vs today.</li>
+    <li><b>70 visible data points</b> — the 3–7 rule is broken by 10×.</li>
+    <li><b>Sparklines without labels</b> — pure decoration, not informative.</li>
+    <li><b>No personalization</b> — Hormuz analyst = FII analyst = retail subscriber. Same screen.</li>
+    <li><b>★ watchlist exists but isn't surfaced</b> as a primary view.</li>
+    <li><b>No actions/recommendations</b> — risk dashboards exist to inform decisions; we inform <i>about</i> decisions.</li>
+    <li><b>No sidebar</b> — top tab nav burns vertical real estate that should hold KPIs.</li>
+    <li><b>No breadcrumbs on inline expand</b> — user gets lost in drill-down.</li>
+    <li><b>Inconsistent grid</b> — sections drift off the 4pt/8pt baseline.</li>
+    <li><b>Reference events buried</b> — the "is this normal?" anchor should frame the score, not sit below it.</li>
+    <li><b>Drill-down kills overview</b> — inline expand replaces context; only one metric in mind at a time.</li>
+  </ol>
+  <div class="note"><b>Root cause:</b> the IRM was built bottom-up (parsers → metrics → sections → hero). The design report explicitly says: design the dashboard <i>last</i>. We're feeling the cost — the home view is a sum of components, not a designed summary. Scoring v2 (triple-jeopardy, regime/shock, reference events) added value but added <i>more elements to render</i> = more cognitive load.</div>
+</section>
+
+<!-- ═════════════════ VERSION 1 · CONTROL ROOM ═════════════════ -->
+<section class="version">
+  <div class="version-header">
+    <span class="version-tag v1-tag">V1 · CONTROL ROOM</span>
+    <h2 style="margin:0">Bloomberg-terminal tight · ruthless density</h2>
+  </div>
+  <p class="version-philosophy">One screen. One number. Six driver pills. Three actions. Nothing else above the fold. Cold, fast, professional. For people who already know what they're looking at.</p>
+
+  <div class="v1-frame">
+    <!-- Top bar: sidebar-as-spine in compressed horizontal form -->
+    <div class="v1-topbar">
+      <span class="sect active">HOME</span><span class="sect">FLOWS</span><span class="sect">MACRO</span><span class="sect">REAL&nbsp;ECON</span><span class="sect">FREIGHT</span><span class="sect">MARKET</span><span class="sect">SECTORS</span>
+      <span class="meta">IST 14:38 · DATA AGE 3m · CI #7041</span>
+    </div>
+
+    <div class="v1-grid">
+      <!-- Left 2/3: score + drivers + reference axis -->
+      <div class="v1-hero">
+        <div class="v1-score-row">
+          <div class="v1-score-num">50</div>
+          <div class="v1-score-meta">
+            <div class="label">INDIA RISK SCORE · 0-100</div>
+            <div class="status">MEDIUM · UP 5 PTS 7D</div>
+            <div class="delta">regime 58 (smoothed) · spot 50</div>
+          </div>
+        </div>
+
+        <div class="v1-drivers">
+          <div class="v1-driver"><div class="name">OIL &amp; PHYSICAL</div><div class="val"><span class="n">84</span><span class="d">▲ 92→84</span></div><div class="bar"><div class="r" style="width:84%"></div></div></div>
+          <div class="v1-driver"><div class="name">FREIGHT</div><div class="val"><span class="n">66</span><span class="d">─</span></div><div class="bar"><div class="a" style="width:66%"></div></div></div>
+          <div class="v1-driver"><div class="name">MACRO</div><div class="val"><span class="n">47</span><span class="d">▲ 43→47</span></div><div class="bar"><div class="a" style="width:47%"></div></div></div>
+          <div class="v1-driver"><div class="name">INST. FLOWS</div><div class="val"><span class="n">35</span><span class="d">▼ 43→35</span></div><div class="bar"><div class="g" style="width:35%"></div></div></div>
+          <div class="v1-driver"><div class="name">REAL ECONOMY</div><div class="val"><span class="n">30</span><span class="d">─</span></div><div class="bar"><div class="g" style="width:30%"></div></div></div>
+          <div class="v1-driver"><div class="name">SECTOR BREADTH</div><div class="val"><span class="n">40</span><span class="d">─</span></div><div class="bar"><div class="a" style="width:40%"></div></div></div>
+        </div>
+
+        <div class="v1-ref">
+          <h3 style="margin-bottom:8px">HISTORICAL FRAME · YOU vs known stress</h3>
+          <div class="row">
+            <span>0</span>
+            <div class="axis">
+              <div class="line"></div>
+              <div class="mark" style="left:49%;" data-l="Election '24 · 49"></div>
+              <div class="mark" style="left:60%;" data-l="COVID '20 · 60"></div>
+              <div class="mark" style="left:67%;" data-l="Oil '22 · 67"></div>
+              <div class="mark" style="left:70%;" data-l="Lehman '08 · 70"></div>
+              <div class="you" style="left:50%;"></div>
+            </div>
+            <span>100</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right 1/3: ranked actions + watchlist -->
+      <div class="v1-rail">
+        <div class="v1-rail-block urgent">
+          <h3>3 things to watch · now</h3>
+          <ol>
+            <li><b>Hormuz throughput 12/day</b> · still SHOCK · 5d unchanged</li>
+            <li><b>Oil driver 84</b> · biggest mover (was 92, easing on tanker rates)</li>
+            <li><b>INR 86.4</b> · weak streak 9d · RBI intervention prob.</li>
+          </ol>
+        </div>
+        <div class="v1-rail-block">
+          <h3>Watchlist · 5 pinned</h3>
+          <ol style="list-style:none; padding:0">
+            <li>★ Hormuz · 12 · <span style="color:var(--red)">SHOCK</span></li>
+            <li>★ Brent · $82 · ↑3 wk</li>
+            <li>★ INR/USD · 86.4 · weak 9d</li>
+            <li>★ FII MTD · −15,200 cr</li>
+            <li>★ Bank Nifty · +0.5%</li>
+          </ol>
+        </div>
+        <div class="v1-rail-block">
+          <h3>System state</h3>
+          <ol style="list-style:none; padding:0; font-size:11px; color:var(--mute);">
+            <li>61 parsers green / 8 amber / 1 red</li>
+            <li>Last ingest 3m ago · all sources current</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom strip: persistent context bar -->
+    <div class="v1-strip">
+      <div class="cell"><div class="k">Triple Jeopardy</div><div class="v">Inactive · 1/3 drivers ≥65</div></div>
+      <div class="cell"><div class="k">Shock indicator</div><div class="v warn">↑ +5 vs 30d baseline</div></div>
+      <div class="cell"><div class="k">Correlation adj</div><div class="v">−0.9 pts</div></div>
+      <div class="cell"><div class="k">Score state</div><div class="v">Fresh · 6/6 drivers</div></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>What this fixes:</b> single-screen (no scroll), 3-7 key elements (score + 6 driver pills + 3 actions),
+    one accent color (red = urgent), reference axis as the visual frame, sidebar-style nav as the spine,
+    monospace numbers for scan-time, all telemetry from scoring v2 surfaced in a quiet bottom strip rather than competing.
+    <b>Trade-off:</b> looks cold; needs a 30-second onboarding for first-time visitors.
+  </div>
+</section>
+
+<!-- ═════════════════ VERSION 2 · PULSE BRIEF ═════════════════ -->
+<section class="version">
+  <div class="version-header">
+    <span class="version-tag v2-tag">V2 · PULSE BRIEF</span>
+    <h2 style="margin:0">Magazine headline + one horizontal pulse line</h2>
+  </div>
+  <p class="version-philosophy">Reads like a Bloomberg morning brief. One headline summarises the day; one pulse line shows where India sits vs known crises; one column shows what's elevated, one shows what's calm. For retail / HNI / first-time visitors who need the story, not the dashboard.</p>
+
+  <div class="v2-frame">
+    <div class="v2-eyebrow">India Risk Monitor · 15 May 2026 · 14:38 IST</div>
+    <h2 class="v2-headline">Strait of Hormuz still closed. Oil pressure easing as tanker rates retreat. India risk holds at medium.</h2>
+    <p class="v2-sub">
+      Risk score <b>50/100</b>, up 5 points from a week ago.
+      The score sits <b>between the 2024 election day (49)</b> and <b>COVID lockdown (60)</b> — meaningful but not crisis-grade.
+      Oil &amp; physical driver eased from 92 to 84 as the Baltic Dirty Tanker Index retreated; FII flows turned mildly positive; macro nudged up on INR weakness.
+    </p>
+
+    <div class="v2-pulse-section">
+      <div class="v2-pulse-label">Where India sits today vs every known stress event the score has been calibrated for</div>
+      <div class="v2-pulse">
+        <div class="v2-pulse-bar"></div>
+        <div class="marker" style="left:49%;" data-l="Election '24 · 49"></div>
+        <div class="marker" style="left:60%;" data-l="COVID lockdown · 60"></div>
+        <div class="marker" style="left:63%;" data-l="Taper '13 · 63"></div>
+        <div class="marker" style="left:67%;" data-l="Oil shock '22 · 67"></div>
+        <div class="marker" style="left:70%;" data-l="Lehman '08 · 70"></div>
+        <div class="you" style="left:50%;"></div>
+      </div>
+      <div class="v2-pulse-scale">
+        <span>0 · calm</span>
+        <span>30 · low</span>
+        <span>50 · medium</span>
+        <span>70 · high</span>
+        <span>100 · shock</span>
+      </div>
+    </div>
+
+    <div class="v2-cols">
+      <div class="v2-col elevated">
+        <h3>What's elevated</h3>
+        <div class="v2-row">
+          <span class="name">Oil &amp; physical</span>
+          <span class="val">84</span>
+          <span class="delta down">−8</span>
+        </div>
+        <div class="v2-row" style="border-bottom:none;">
+          <span class="note">Hormuz at 12 transits/day (was ~140 baseline). Brent $82. Tanker rates easing.</span>
+        </div>
+        <div class="v2-row">
+          <span class="name">Freight</span>
+          <span class="val">66</span>
+          <span class="delta">—</span>
+        </div>
+        <div class="v2-row" style="border-bottom:none;">
+          <span class="note">Drewry WCI elevated. Port dwell-time normal.</span>
+        </div>
+      </div>
+      <div class="v2-col">
+        <h3>What's calm</h3>
+        <div class="v2-row"><span class="name">Macro</span><span class="val">47</span><span class="delta up">+4</span></div>
+        <div class="v2-row"><span class="name">Sector breadth</span><span class="val">40</span><span class="delta">—</span></div>
+        <div class="v2-row"><span class="name">Inst. flows</span><span class="val">35</span><span class="delta down">−8</span></div>
+        <div class="v2-row"><span class="name">Real economy</span><span class="val">30</span><span class="delta">—</span></div>
+      </div>
+    </div>
+
+    <div class="v2-footer">
+      <span><b>Triple-jeopardy</b> inactive · oil + macro + flows not all elevated</span>
+      <span><b>Confidence</b> fresh · 6/6 driver feeders current</span>
+      <span><b>Last update</b> 3 minutes ago</span>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>What this fixes:</b> the user gets the story in 5 seconds — headline tells them <i>what's happening</i>,
+    pulse line tells them <i>how serious</i>, two columns tell them <i>where to drill</i>. Reference events frame the score
+    rather than hide beneath it. Bigger typography for the headline, but no element exceeds 24px (rules respected).
+    <b>Trade-off:</b> less data visible at once; power users will drill down. Best home page; pair with V1 as a "compact mode" toggle.
+  </div>
+</section>
+
+<!-- ═════════════════ VERSION 3 · PERSONALIZED WATCH ═════════════════ -->
+<section class="version">
+  <div class="version-header">
+    <span class="version-tag v3-tag">V3 · PERSONALIZED WATCH</span>
+    <h2 style="margin:0">"Good morning, here's what changed for you"</h2>
+  </div>
+  <p class="version-philosophy">The dashboard is reframed around the user's watchlist (the ★ system that already exists). Shows only the metrics the user pinned, the actions they should take, and the diff since yesterday. Composite score is in the corner, not the centre. For daily-return power users.</p>
+
+  <div class="v3-frame">
+    <div class="v3-top">
+      <div class="v3-greet">
+        Good morning, Aniket.
+        <div class="sub">Friday · 15 May 2026 · 5 metrics on your watchlist · 1 in shock state</div>
+      </div>
+      <div class="v3-mini-score">
+        <div class="n">50</div>
+        <div class="lbl">IRS · medium · ↑5 wk</div>
+      </div>
+    </div>
+
+    <!-- Watchlist -->
+    <div class="v3-section">
+      <h3>Your watchlist <span class="count">5</span></h3>
+      <div class="v3-watch">
+        <div class="row">
+          <span class="star">★</span>
+          <span class="name">Hormuz throughput</span>
+          <span class="val">12</span>
+          <span class="delta up">−2 wk</span>
+          <span class="pill shock">SHOCK</span>
+        </div>
+        <div class="row">
+          <span class="star">★</span>
+          <span class="name">Brent crude</span>
+          <span class="val">$82</span>
+          <span class="delta up">+3 wk</span>
+          <span class="pill high">HIGH</span>
+        </div>
+        <div class="row">
+          <span class="star">★</span>
+          <span class="name">INR / USD</span>
+          <span class="val">86.4</span>
+          <span class="delta up">+0.6 wk</span>
+          <span class="pill med">MED</span>
+        </div>
+        <div class="row">
+          <span class="star">★</span>
+          <span class="name">FII equity MTD</span>
+          <span class="val">−15.2K</span>
+          <span class="delta up">−4K wk</span>
+          <span class="pill med">MED</span>
+        </div>
+        <div class="row">
+          <span class="star">★</span>
+          <span class="name">Bank Nifty</span>
+          <span class="val">52,840</span>
+          <span class="delta good">+0.5% d</span>
+          <span class="pill low">LOW</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's actions -->
+    <div class="v3-section">
+      <h3>Today's actions <span class="count">3</span></h3>
+      <div class="v3-actions">
+        <div class="action">
+          <span class="num">01</span>
+          <div class="body">
+            <div class="head"><b>Hold the Hormuz position</b> — strait remains effectively closed; no exit signal yet.</div>
+            <div class="why">5-day baseline 12 transits/day · zero re-opening rhetoric · tanker rates easing but vessels still anchored</div>
+          </div>
+          <span class="tag hold">HOLD</span>
+        </div>
+        <div class="action">
+          <span class="num">02</span>
+          <div class="body">
+            <div class="head"><b>Watch FII flows closely</b> — net outflow widened by ₹4k cr this week.</div>
+            <div class="why">If MTD passes −₹20k cr, triple-jeopardy trigger likely · DII absorption ratio falling 1.4 → 1.1</div>
+          </div>
+          <span class="tag watch">WATCH</span>
+        </div>
+        <div class="action">
+          <span class="num">03</span>
+          <div class="body">
+            <div class="head"><b>Pre-position for RBI INR action</b> — INR weak streak now 9 days, $690 bn reserves give RBI ammunition.</div>
+            <div class="why">Historical pattern: 10-day weak streak + above-baseline reserves = 70% intervention probability within 3 trading days</div>
+          </div>
+          <span class="tag act">ACT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diff since yesterday -->
+    <div class="v3-section">
+      <h3>What changed since yesterday</h3>
+      <div class="v3-diff">
+        <div>
+          <h4>Got worse</h4>
+          <ul>
+            <li><b>INR</b> 86.1 → 86.4 (weak streak +1d)</li>
+            <li><b>FII MTD</b> −11.2K → −15.2K cr</li>
+            <li><b>Oil driver</b> 81 → 84</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Got better</h4>
+          <ul>
+            <li><b>Brent</b> $84 → $82</li>
+            <li><b>VLCC rates</b> 2429 → 2350</li>
+            <li><b>Hormuz</b> 11 → 12 transits (tiny)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>What this fixes:</b> personalization &gt; customization (per the report). User sees only what they pinned;
+    composite score is contextual, not central. Actions panel converts data into decisions — the missing link in the current IRM.
+    Diff list answers <i>"what changed?"</i> directly instead of forcing mental subtraction.
+    <b>Trade-off:</b> needs auth/state (the ★ system already exists in localStorage — extend it). Biggest build of the three. Highest user value once shipped.
+  </div>
+</section>
+
+<!-- ─────────────── COMPARISON ─────────────── -->
+<section class="compare">
+  <h2 style="margin-top:0">Side-by-side</h2>
+  <table>
+    <tr>
+      <th>Dimension</th>
+      <th>V1 · Control Room</th>
+      <th>V2 · Pulse Brief</th>
+      <th>V3 · Personalized Watch</th>
+    </tr>
+    <tr>
+      <td><b>"Am I OK?" in 50ms</b></td>
+      <td><span class="good">★★★ Single number prominent</span></td>
+      <td><span class="good">★★★ Headline answers directly</span></td>
+      <td class="dim"><span class="ok">★★ Composite is smaller</span></td>
+    </tr>
+    <tr>
+      <td><b>"What changed today?"</b></td>
+      <td class="dim"><span class="ok">★★ Driver deltas visible</span></td>
+      <td><span class="good">★★★ Pulse line + headline</span></td>
+      <td><span class="good">★★★ Explicit diff list</span></td>
+    </tr>
+    <tr>
+      <td><b>"What should I do?"</b></td>
+      <td><span class="good">★★ "3 things to watch"</span></td>
+      <td class="dim"><span class="ok">★ Implicit from elevated col</span></td>
+      <td><span class="good">★★★ Explicit ACT/WATCH/HOLD tags</span></td>
+    </tr>
+    <tr>
+      <td><b>Drill-down depth</b></td>
+      <td><span class="good">★★★ All drivers visible</span></td>
+      <td class="dim"><span class="ok">★★ Two columns max</span></td>
+      <td class="dim"><span class="ok">★★ Watchlist only</span></td>
+    </tr>
+    <tr>
+      <td><b>First-time visitor friendly</b></td>
+      <td class="dim"><span class="weak">★ Cold; needs onboarding</span></td>
+      <td><span class="good">★★★ Reads like a news brief</span></td>
+      <td class="dim"><span class="weak">★ Empty until they pin metrics</span></td>
+    </tr>
+    <tr>
+      <td><b>Power-user repeat value</b></td>
+      <td><span class="good">★★★ Same view everyday</span></td>
+      <td class="dim"><span class="ok">★★ Story repeats; feels same</span></td>
+      <td><span class="good">★★★ Diff &amp; actions are unique daily</span></td>
+    </tr>
+    <tr>
+      <td><b>Build effort</b></td>
+      <td><span class="good">★★ Layout reshuffle</span></td>
+      <td><span class="good">★★ Layout reshuffle + 1 new component</span></td>
+      <td><span class="weak">★ Needs state model, action engine, diff backend</span></td>
+    </tr>
+    <tr>
+      <td><b>Above-the-fold</b></td>
+      <td><span class="good">100% — single screen</span></td>
+      <td><span class="good">100% — single screen</span></td>
+      <td><span class="good">~95% with 5-metric watchlist</span></td>
+    </tr>
+  </table>
+</section>
+
+<!-- ─────────────── RECOMMENDATION ─────────────── -->
+<section class="rec">
+  <h2>Recommendation</h2>
+  <p><b>Ship V2 (Pulse Brief) as the new home page.</b> It's the highest signal-to-cognitive-load ratio of the three, the cheapest build, and the only version that answers all three primary questions ("am I OK / what changed / what's elevated") in the first 5 seconds. The pulse line is the single most-information-dense element across the three versions — it does the work of the current Hero's 5 competing elements.</p>
+  <p><b>Add V1 (Control Room) as a "Compact" toggle.</b> Power users who already know the system will prefer the terminal-tight version. One CSS class swap; same data layer; minimal extra work.</p>
+  <p><b>Treat V3 (Personalized Watch) as Phase 4 / paid tier.</b> Highest user value but requires auth, a state model, and an "action engine" that converts metric states into ACT/WATCH/HOLD guidance. That's a 3–4 week build — not a redesign, a product expansion. Worth doing once V2 ships and the basics are correct.</p>
+  <p><b>What this means for build order:</b> the redesign isn't a "Phase 3 UI" task — it's a re-architecture of the home page. The 9 metric-section refinements in the Phase 3 picker (Sectors 4D grid, Macro toggle, etc.) become <i>drill-down views</i>, not home-page elements. That actually simplifies the Phase 3 picker.</p>
+</section>
+
+</body>
+</html>

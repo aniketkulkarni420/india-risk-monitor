@@ -18,15 +18,7 @@ const CONFIGS = {
     plausible: (v) => Math.abs(v) < 200000,
     waitMs: 5000
   },
-  fno_oi_buildup: {
-    urls: [
-      'https://www.moneycontrol.com/markets/indian-indices/changeinoi.php?optopt=&optype=BUYWRITE',
-      'https://www.moneycontrol.com/stocks/marketstats/fno_oi.php'
-    ],
-    target: 'the most recent Nifty F&O Open Interest build-up percentage change (Long Buildup or Short Buildup count or % change). If the page shows multiple stocks, sum the top long buildups OR return the index-level net OI change percentage. A signed percentage or signed count.',
-    plausible: (v) => Math.abs(v) < 1000000,
-    waitMs: 6000
-  },
+
   block_deals_notional: {
     urls: ['https://www.moneycontrol.com/stocks/marketstats/bulkblockdeals.php'],
     target: 'the most recent daily total notional value of all block deals on NSE/BSE in INR crore. Sum across the visible block deals table for the latest date.',

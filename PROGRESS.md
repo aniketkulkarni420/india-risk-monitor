@@ -247,3 +247,25 @@ Currently all green. Last run: 0 failures, 2 warnings (composite-metric history 
 - Cross-check threshold of 5% disagreement
 - Free-sources-only rule
 - Trend MoM + YoY + sparkline minimum on every metric
+
+## 2026-06-11 · Metrics finalisation + chart fixes (LOCAL — awaiting push approval)
+Approved metric set built: 61 metrics + 10 composites (71 total).
+- REMOVED: india_port_dwell_time, sectoral_fii_mtd, foreign_tourist_arrivals, upi_value
+- REPLACED: naukri→epfo_payrolls (13 lakh Apr, news) · baltic_dry→baltic_dirty_tanker (2041, Hormuz Watch API) · fno_oi_buildup→fii_index_fut_positioning (−271,979 contracts, NSE participant OI) · wpi→core_cpi (populates on CPI release day; matcher rejects projections)
+- ADDED: net_sip_inflows (₹30,954 Cr May, news+precision-tiebreak) · mf_net_equity_flows (₹22,907.77 Cr May, AMFI MCR XLS + arithmetic self-check + news crosscheck) · nifty_pcr (NSE option-chain-v3; cloud-only, web_llm fallback) · gift_nifty (web_llm + news LLM; cloud-only) · eight_core_industries (+1.7% Apr, OEA XLSX, 8-industry drawer extras)
+- FASTag: NPCI Retail Payments Statistics XLSX (official) — ₹7,627.55 Cr May 2026, QoQ +0.7%, YoY +10.7%, frequency Quarterly. Old 2024 corpse gone.
+- New slots monthly_12 (AMFI+CPI) and monthly_20 (ICI+EPFO) in schedule + ingest.yml.
+- Plausibility guard: release-cadence metrics no longer rolled back (was blocking GST May ₹1.94 L Cr — live accuracy bug fixed).
+- RSS parser: month-priority + precise-figure tie-break (April-vs-May headline bug fixed).
+- C1: purged 37,215 synthetic seed rows from data/history (snapshot at data/snapshots/history-pre-purge-2026-06-11); sparklines rebuilt from real rows only.
+- C4: backfilled 7,569 VERIFIED real rows (Yahoo 5y daily: nifty, banknifty, inr, dxy, gold, vix · ICI monthly since 2011). brent quarantined (Yahoo futures ≠ TE series, 4.2% gap — correct rejection). Auto-verification: overlap median <2%, endpoint drift <8%, unit-shift, date sanity.
+- C2/C3/C5: MetricDrawer renders only source-tagged rows; cadence-aware min points (8/6/4) else "History accruing · N points"; period buttons only where data exists; YoY toggle (default) for monthly metrics with ≥13 months.
+- C6: untagged-history-row guard (freshness-audit RED + showcase fail) + sparkline-vs-real-months assert.
+- KNOWN: nifty_pcr + gift_nifty null until cloud crons (need CF proxy / LLM keys); core_cpi populates Jun 12 (CPI release); cement_dispatches IECI tier reads a WPI sub-index ×0.305 calibration — flagged for review.
+NOT PUSHED — preview delivered, awaiting approval.
+
+## 2026-06-11 (later) · Oil chain re-pointed to Hormuz Watch (canonical)
+- hormuz_throughput: manual override (12 ships, May 29) RETIRED (archived in snapshots/removed-2026-06-11). Tier 1 = hormuz-watch /api/snapshot → 331 transits/day (236% of normal), near-real-time AIS. New parser hormuz_watch_v1.
+- brent_crude: tier 1 = hormuz-watch /api/oil (cross-verified Yahoo+OilPriceAPI, high confidence) → $93 (was $88.71 single TE scrape). Upstream second source reported as real crosscheck.
+- vlcc_tanker_rates: BUG — its hormuz_v1 tier was scraping the BDTI index (2041) as "VLCC rates". Value reset to null/source_pending, contaminated rows purged, news-LLM tier only (fills from cloud). BDTI itself lives in baltic_dirty_tanker.
+- IRS moved 45 → 41 (Hormuz risk easing reflected — correct directionality).

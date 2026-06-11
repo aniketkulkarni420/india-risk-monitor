@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IRM · light vs dark · V2 Pulse Brief side-by-side</title>
+<style>
+  /* Page chrome (neutral) */
+  body { background: #f4f5f7; color: #1a1f2c; font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 24px; }
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.02em; }
+  .lede { color: #5c6471; margin: 0 0 24px; font-size: 13px; max-width: 900px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1480px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+  .panel-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; font-weight: 600; }
+  .panel-title.lite { color: #1a73e8; }
+  .panel-title.dark { color: #f59e0b; }
+
+  /* shared mockup geometry */
+  .mock { border-radius: 12px; padding: 28px 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .mock .eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; }
+  .mock .headline { font-size: 19px; line-height: 1.3; letter-spacing: -0.01em; margin: 0 0 8px; max-width: 760px; font-weight: 600; }
+  .mock .sub { font-size: 13px; margin: 0 0 18px; max-width: 760px; }
+  .mock .sub b { font-weight: 500; }
+  .mock .pulse-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .mock .pulse { position: relative; height: 56px; margin: 0 0 36px; }
+  .mock .pulse-bar { position: absolute; left: 0; right: 0; top: 24px; height: 8px; border-radius: 4px; }
+  .mock .marker { position: absolute; top: 16px; bottom: 16px; width: 1px; }
+  .mock .marker::after { content: attr(data-l); position: absolute; top: 28px; left: 50%; transform: translateX(-50%); font-size: 10px; white-space: nowrap; padding: 0 4px; }
+  .mock .you { position: absolute; top: 8px; bottom: 8px; width: 4px; border-radius: 2px; }
+  .mock .you::before { content: "50"; position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: 18px; font-weight: 600; font-feature-settings: 'tnum'; }
+  .mock .pulse-scale { display: flex; justify-content: space-between; font-size: 9px; padding: 0 2px; margin-top: -12px; }
+
+  .mock .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 30px; }
+  .mock .col h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 12px; font-weight: 600; }
+  .mock .row { display: flex; align-items: baseline; gap: 12px; padding: 8px 0; font-size: 13px; }
+  .mock .row .name { flex: 1; }
+  .mock .row .val { font-family: ui-monospace, "JetBrains Mono", "SF Mono", monospace; font-feature-settings: 'tnum'; font-size: 14px; }
+  .mock .row .delta { font-size: 11px; width: 50px; text-align: right; font-family: ui-monospace, monospace; }
+  .mock .row .note { font-size: 11px; flex-basis: 100%; margin-top: 2px; padding-bottom: 4px; }
+
+  .mock .footer { display: flex; gap: 22px; padding-top: 20px; margin-top: 18px; font-size: 11px; flex-wrap: wrap; }
+
+  /* ─────── LIGHT theme ─────── */
+  .lite-mock { background: #ffffff; color: #0f1419; border: 1px solid #e6e8ed; }
+  .lite-mock .eyebrow { color: #c2410c; }   /* warm amber on white */
+  .lite-mock .sub { color: #4b5563; }
+  .lite-mock .sub b { color: #0f1419; }
+  .lite-mock .pulse-label { color: #6b7280; }
+  .lite-mock .pulse-bar { background: linear-gradient(90deg, #22c55e22 0%, #f59e0b33 50%, #dc262644 100%); }
+  .lite-mock .marker { background: rgba(15,20,25,0.35); }
+  .lite-mock .marker::after { color: #6b7280; background: #ffffff; }
+  .lite-mock .you { background: #d97706; box-shadow: 0 0 12px rgba(217,119,6,0.5); }
+  .lite-mock .you::before { color: #c2410c; }
+  .lite-mock .pulse-scale { color: #9ca3af; }
+  .lite-mock .col h3 { color: #6b7280; }
+  .lite-mock .col.elevated h3 { color: #dc2626; }
+  .lite-mock .row { border-bottom: 1px solid #f0f1f4; }
+  .lite-mock .row .delta.down { color: #16a34a; }
+  .lite-mock .row .delta.up { color: #dc2626; }
+  .lite-mock .row .delta { color: #6b7280; }
+  .lite-mock .row .note { color: #6b7280; border-bottom: none; padding-bottom: 0; }
+  .lite-mock .row:has(+ .row .note) { border-bottom: none; }
+  .lite-mock .footer { color: #6b7280; border-top: 1px solid #e6e8ed; }
+  .lite-mock .footer b { color: #0f1419; font-weight: 500; }
+  .lite-mock .headline { color: #0f1419; }
+
+  /* ─────── DARK theme ─────── */
+  .dark-mock { background: #0c1118; color: #e4e7eb; border: 1px solid #1f2733; }
+  .dark-mock .eyebrow { color: #f59e0b; }
+  .dark-mock .sub { color: #8b95a3; }
+  .dark-mock .sub b { color: #e4e7eb; }
+  .dark-mock .pulse-label { color: #8b95a3; }
+  .dark-mock .pulse-bar { background: linear-gradient(90deg, rgba(74,222,128,0.15) 0%, rgba(245,158,11,0.22) 50%, rgba(220,38,38,0.35) 100%); }
+  .dark-mock .marker { background: rgba(255,255,255,0.4); }
+  .dark-mock .marker::after { color: #8b95a3; background: #0c1118; }
+  .dark-mock .you { background: #f59e0b; box-shadow: 0 0 12px #f59e0b; }
+  .dark-mock .you::before { color: #f59e0b; }
+  .dark-mock .pulse-scale { color: #5c6471; }
+  .dark-mock .col h3 { color: #8b95a3; }
+  .dark-mock .col.elevated h3 { color: #ef4444; }
+  .dark-mock .row { border-bottom: 1px solid #1f2733; }
+  .dark-mock .row .delta.down { color: #4ade80; }
+  .dark-mock .row .delta.up { color: #ef4444; }
+  .dark-mock .row .delta { color: #8b95a3; }
+  .dark-mock .row .note { color: #8b95a3; border-bottom: none; padding-bottom: 0; }
+  .dark-mock .footer { color: #8b95a3; border-top: 1px solid #1f2733; }
+  .dark-mock .footer b { color: #e4e7eb; font-weight: 500; }
+  .dark-mock .headline { color: #e4e7eb; }
+
+  /* Verdict card */
+  .verdict { background: #fff; border: 1px solid #e6e8ed; border-left: 3px solid #1a73e8; border-radius: 10px; padding: 18px 22px; max-width: 1480px; margin-top: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+  .verdict h2 { margin: 0 0 8px; font-size: 16px; color: #1a73e8; }
+  .verdict p { font-size: 13px; line-height: 1.6; margin: 0 0 10px; color: #374151; }
+  .verdict p:last-child { margin: 0; }
+  .verdict b { color: #0f1419; }
+
+  /* Color-token table */
+  .tokens { background: #fff; border: 1px solid #e6e8ed; border-radius: 10px; padding: 18px 22px; max-width: 1480px; margin-top: 22px; }
+  .tokens h2 { margin: 0 0 12px; font-size: 14px; }
+  .tokens table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .tokens th, .tokens td { padding: 7px 10px; text-align: left; border-bottom: 1px solid #f0f1f4; }
+  .tokens th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7280; font-weight: 600; }
+  .tokens td.swatch { font-family: ui-monospace, monospace; font-size: 11px; }
+  .tokens td .chip { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: middle; margin-right: 8px; border: 1px solid #e6e8ed; }
+</style>
+</head>
+<body>
+
+<h1>Same design · LIGHT vs DARK · V2 Pulse Brief</h1>
+<p class="lede">
+  Identical content and layout in both themes — only the color tokens change. This is what theme-agnostic
+  CSS custom properties get you: one HTML / one component tree, two visual modes. The hard call is which one
+  to make the <i>default</i>.
+</p>
+
+<div class="grid">
+
+  <!-- ───── LIGHT ───── -->
+  <div>
+    <div class="panel-title lite">◉ LIGHT (recommended default · matches Indian retail finance norm)</div>
+    <div class="mock lite-mock">
+      <div class="eyebrow">India Risk Monitor · 17 May 2026 · 09:12 IST</div>
+      <h2 class="headline">Strait of Hormuz still closed. Oil pressure easing as tanker rates retreat. India risk holds at medium.</h2>
+      <p class="sub">Risk score <b>50/100</b>, up 5 points from a week ago. Sits between the 2024 election day (49) and COVID lockdown (60) — meaningful but not crisis-grade. Oil &amp; physical eased 92→84; FII flows turned mildly positive; macro nudged up on INR weakness.</p>
+
+      <div class="pulse-label">Where India sits today vs every known stress event</div>
+      <div class="pulse">
+        <div class="pulse-bar"></div>
+        <div class="marker" style="left:49%;" data-l="Election '24 · 49"></div>
+        <div class="marker" style="left:60%;" data-l="COVID · 60"></div>
+        <div class="marker" style="left:63%;" data-l="Taper '13 · 63"></div>
+        <div class="marker" style="left:67%;" data-l="Oil '22 · 67"></div>
+        <div class="marker" style="left:70%;" data-l="Lehman '08 · 70"></div>
+        <div class="you" style="left:50%;"></div>
+      </div>
+      <div class="pulse-scale">
+        <span>0 calm</span><span>30 low</span><span>50 medium</span><span>70 high</span><span>100 shock</span>
+      </div>
+
+      <div class="cols">
+        <div class="col elevated">
+          <h3>What's elevated</h3>
+          <div class="row"><span class="name">Oil &amp; physical</span><span class="val">84</span><span class="delta down">−8</span></div>
+          <div class="row"><span class="note">Hormuz 12 transits/day (baseline ~140). Brent $82. Tanker rates easing.</span></div>
+          <div class="row"><span class="name">Freight</span><span class="val">66</span><span class="delta">—</span></div>
+          <div class="row"><span class="note">Drewry WCI elevated. Port dwell-time normal.</span></div>
+        </div>
+        <div class="col">
+          <h3>What's calm</h3>
+          <div class="row"><span class="name">Macro</span><span class="val">47</span><span class="delta up">+4</span></div>
+          <div class="row"><span class="name">Sector breadth</span><span class="val">40</span><span class="delta">—</span></div>
+          <div class="row"><span class="name">Inst. flows</span><span class="val">35</span><span class="delta down">−8</span></div>
+          <div class="row"><span class="name">Real economy</span><span class="val">30</span><span class="delta">—</span></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span><b>Triple-jeopardy</b> inactive</span>
+        <span><b>Confidence</b> fresh · 6/6 feeders</span>
+        <span><b>Updated</b> 3 min ago</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── DARK ───── -->
+  <div>
+    <div class="panel-title dark">◉ DARK (opt-in toggle · matches Bloomberg / power-user norm)</div>
+    <div class="mock dark-mock">
+      <div class="eyebrow">India Risk Monitor · 17 May 2026 · 09:12 IST</div>
+      <h2 class="headline">Strait of Hormuz still closed. Oil pressure easing as tanker rates retreat. India risk holds at medium.</h2>
+      <p class="sub">Risk score <b>50/100</b>, up 5 points from a week ago. Sits between the 2024 election day (49) and COVID lockdown (60) — meaningful but not crisis-grade. Oil &amp; physical eased 92→84; FII flows turned mildly positive; macro nudged up on INR weakness.</p>
+
+      <div class="pulse-label">Where India sits today vs every known stress event</div>
+      <div class="pulse">
+        <div class="pulse-bar"></div>
+        <div class="marker" style="left:49%;" data-l="Election '24 · 49"></div>
+        <div class="marker" style="left:60%;" data-l="COVID · 60"></div>
+        <div class="marker" style="left:63%;" data-l="Taper '13 · 63"></div>
+        <div class="marker" style="left:67%;" data-l="Oil '22 · 67"></div>
+        <div class="marker" style="left:70%;" data-l="Lehman '08 · 70"></div>
+        <div class="you" style="left:50%;"></div>
+      </div>
+      <div class="pulse-scale">
+        <span>0 calm</span><span>30 low</span><span>50 medium</span><span>70 high</span><span>100 shock</span>
+      </div>
+
+      <div class="cols">
+        <div class="col elevated">
+          <h3>What's elevated</h3>
+          <div class="row"><span class="name">Oil &amp; physical</span><span class="val">84</span><span class="delta down">−8</span></div>
+          <div class="row"><span class="note">Hormuz 12 transits/day (baseline ~140). Brent $82. Tanker rates easing.</span></div>
+          <div class="row"><span class="name">Freight</span><span class="val">66</span><span class="delta">—</span></div>
+          <div class="row"><span class="note">Drewry WCI elevated. Port dwell-time normal.</span></div>
+        </div>
+        <div class="col">
+          <h3>What's calm</h3>
+          <div class="row"><span class="name">Macro</span><span class="val">47</span><span class="delta up">+4</span></div>
+          <div class="row"><span class="name">Sector breadth</span><span class="val">40</span><span class="delta">—</span></div>
+          <div class="row"><span class="name">Inst. flows</span><span class="val">35</span><span class="delta down">−8</span></div>
+          <div class="row"><span class="name">Real economy</span><span class="val">30</span><span class="delta">—</span></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span><b>Triple-jeopardy</b> inactive</span>
+        <span><b>Confidence</b> fresh · 6/6 feeders</span>
+        <span><b>Updated</b> 3 min ago</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="verdict">
+  <h2>Verdict</h2>
+  <p>
+    <b>Light wins the default slot.</b> Look at the headline in both — on light, the eye lands immediately on the
+    sentence (the highest-value piece of content). On dark, the eye competes between the headline and the bright
+    "50" pin on the pulse line.
+  </p>
+  <p>
+    The pulse line is <b>more readable on light</b> — the green→amber→red gradient lands as semantic information
+    rather than as a stylistic flourish. Markers don't fight the bright pulse for attention.
+  </p>
+  <p>
+    But dark is genuinely good too — it signals "pro tool" and several power-user moments (late-night, comparing
+    against Bloomberg in another tab) actively prefer it. Hence: <b>ship both, default light, persist user choice
+    in localStorage</b>.
+  </p>
+</div>
+
+<div class="tokens">
+  <h2>Color tokens · what changes between themes</h2>
+  <table>
+    <tr><th>Token</th><th>Light value</th><th>Dark value</th><th>Where used</th></tr>
+    <tr><td class="swatch">--bg</td><td><span class="chip" style="background:#ffffff"></span>#ffffff</td><td><span class="chip" style="background:#0c1118"></span>#0c1118</td><td>Page background</td></tr>
+    <tr><td class="swatch">--text</td><td><span class="chip" style="background:#0f1419"></span>#0f1419</td><td><span class="chip" style="background:#e4e7eb"></span>#e4e7eb</td><td>Primary text</td></tr>
+    <tr><td class="swatch">--mute</td><td><span class="chip" style="background:#6b7280"></span>#6b7280</td><td><span class="chip" style="background:#8b95a3"></span>#8b95a3</td><td>Secondary text</td></tr>
+    <tr><td class="swatch">--line</td><td><span class="chip" style="background:#e6e8ed"></span>#e6e8ed</td><td><span class="chip" style="background:#1f2733"></span>#1f2733</td><td>Borders / dividers</td></tr>
+    <tr><td class="swatch">--card</td><td><span class="chip" style="background:#ffffff"></span>#ffffff</td><td><span class="chip" style="background:#131820"></span>#131820</td><td>Card surface (light = lighter than bg; dark = lighter than bg too — the "lighter card on darker bg" rule from the audit report)</td></tr>
+    <tr><td class="swatch">--accent-warn</td><td><span class="chip" style="background:#c2410c"></span>#c2410c</td><td><span class="chip" style="background:#f59e0b"></span>#f59e0b</td><td>Amber/warning. Light theme uses a darker amber for contrast on white (pure #f59e0b is unreadable on white).</td></tr>
+    <tr><td class="swatch">--accent-danger</td><td><span class="chip" style="background:#dc2626"></span>#dc2626</td><td><span class="chip" style="background:#ef4444"></span>#ef4444</td><td>Red/shock</td></tr>
+    <tr><td class="swatch">--accent-good</td><td><span class="chip" style="background:#16a34a"></span>#16a34a</td><td><span class="chip" style="background:#4ade80"></span>#4ade80</td><td>Green/safe</td></tr>
+    <tr><td class="swatch">--accent-info</td><td><span class="chip" style="background:#1a73e8"></span>#1a73e8</td><td><span class="chip" style="background:#60a5fa"></span>#60a5fa</td><td>Blue/info/links</td></tr>
+  </table>
+  <p style="font-size: 11px; color: #6b7280; margin-top: 14px; margin-bottom: 0;">
+    The tricky one is <b>amber</b>: dashboards always reach for #f59e0b, but it has 2.4:1 contrast on white — WCAG fails.
+    Light theme needs the darker burnt-orange #c2410c (4.5:1, AA-pass). Most "dark-converted-to-light" dashboards trip on this.
+  </p>
+</div>
+
+</body>
+</html>

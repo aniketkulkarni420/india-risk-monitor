@@ -1,0 +1,54 @@
+{
+  "value": 30954,
+  "as_of": "2026-06-10T05:27:17.000Z",
+  "as_of_period": "monthly",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    31115,
+    30000
+  ],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "verification_state": "verified",
+  "last_verified_at": "2026-06-11T13:22:45.996Z",
+  "linked_metrics": [
+    "mf_net_equity_flows",
+    "dii_daily",
+    "fii_equity_daily"
+  ],
+  "notes": "Created 2026-06-11 (approved metric set). Populates on first live ingest.",
+  "metric_id": "net_sip_inflows",
+  "display_name": "SIP inflows",
+  "display_subtitle": "AMFI monthly · the structural bid under Indian equities",
+  "section": "flows",
+  "sub_cluster": "headline",
+  "unit": "₹ Cr",
+  "value_format": "currency_inr_cr",
+  "why_it_matters": "₹30k Cr/month of automatic buying is why FII selling no longer breaks the market. A sustained SIP drop is a regime change for Indian equities.",
+  "formula": "AMFI monthly SIP contribution (₹ Cr), exact figure from release-day coverage",
+  "source_primary": {
+    "name": "AMFI SIP contribution (via release coverage)",
+    "url": "https://www.amfiindia.com/",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "rss:google_news_rss_v1",
+      "llm:google_news_llm_v1"
+    ]
+  },
+  "source_crosscheck": [
+    {
+      "name": "Multi-publisher AMFI coverage",
+      "url": "https://news.google.com/",
+      "type": "Reputable media"
+    }
+  ],
+  "data_origin": "primary",
+  "last_live_fetch_at": "2026-06-11T13:22:45.996Z",
+  "_source_count_actual": 1,
+  "_history_state": "accruing"
+}

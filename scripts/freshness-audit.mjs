@@ -120,7 +120,22 @@ const audit = {
   frozen_metrics: frozen.sort((a, b) => (b.liveAgeDays || 0) - (a.liveAgeDays || 0))
 };
 
+// C6 guard (2026-06-11) · untagged history rows = unprovable data trying to
+// re-enter after the seed purge. Any appearance is a regression — RED.
+let untaggedRows = 0;
+try {
+  const { readdirSync: rd, readFileSync: rf } = await import('node:fs');
+  for (const f of rd('data/history')) {
+    if (!f.endsWith('.csv')) continue;
+    const lines = rf('data/history/' + f, 'utf8').trim().split('\n').slice(1);
+    untaggedRows += lines.filter(l => { const p = l.split(','); return l.trim() && (p.length < 3 || p[2].trim() === ''); }).length;
+  }
+} catch { /* history dir absent in some contexts — skip */ }
+audit.untagged_history_rows = untaggedRows;
+if (untaggedRows > 0) console.log(`⚠ ${untaggedRows} UNTAGGED history rows found — seed-purge regression`);
+
 const overallStatus =
+  untaggedRows > 0 ? 'red' :
   bundleAge && bundleAge > 24 ? 'red' :
   severelyStale.length > 0 ? 'red' :
   frozen.length > 0 ? 'red' :                       // cache-masking / rotted source

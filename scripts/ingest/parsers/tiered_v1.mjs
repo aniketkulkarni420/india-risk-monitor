@@ -9,7 +9,7 @@
 // field `tier_chain` in the metric JSON listing parser_ids to try in sequence.
 
 import { resolve as resolveParser } from '../registry.mjs';
-import { isInCooldown, recordSourceOutcome, recordTierOutcome, checkAnomaly } from '../observability.mjs';
+import { isInCooldown, recordSourceOutcome, recordTierOutcome, checkAnomaly, checkVintage } from '../observability.mjs';
 import { chainDiversity, classOfParser } from '../source-origin.mjs';
 
 export async function fetchPrimary(metric) {
@@ -40,6 +40,17 @@ export async function fetchPrimary(metric) {
       if (mode !== 'live' || !parser) { errors.push(`${parser_id}: not registered`); continue; }
 
       const r = await parser.fetchPrimary(metric);
+      // Vintage guard: a tier returning ancient data (as_of beyond publication
+      // lag) is a FAILED tier, not a success — let the next tier try.
+      if (r && r.as_of) {
+        const v = checkVintage(metric, r.as_of);
+        if (!v.ok) {
+          try { recordSourceOutcome(cooldownKey, false); } catch {}
+          try { recordTierOutcome(metric.metric_id, parser_id, false); } catch {}
+          errors.push(`${parser_id}: OLD DATA rejected (as_of ${String(r.as_of).slice(0, 10)} · ${v.ageDays}d > ${v.allowDays}d for ${v.cadence})`);
+          continue;
+        }
+      }
       if (r && typeof r.value === 'number' && Number.isFinite(r.value)) {
         try { recordSourceOutcome(cooldownKey, true); } catch {}
         try { recordTierOutcome(metric.metric_id, parser_id, true); } catch {}

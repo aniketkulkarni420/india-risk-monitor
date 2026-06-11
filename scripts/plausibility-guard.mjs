@@ -27,7 +27,7 @@ export const MAX_DOD_PCT = {
 
   // Freight / shipping rates · weekly publication, can move 30%+ between updates
   vlcc_tanker_rates:     50,
-  baltic_dry_index:      30,
+  baltic_dirty_tanker:      30,
   drewry_wci:            30,
 
   // Hormuz · NOT capped. Legitimately swings 0-150 ships/day during real disruptions
@@ -106,6 +106,19 @@ export function applyPlausibilityGuard(metric, prevValue) {
 
   const dodAbsPct = Math.abs((metric.value - ref) / ref) * 100;
   if (dodAbsPct <= cap) return null;
+
+  // RELEASE-CADENCE EXEMPTION · 2026-06-11
+  // For Monthly/Quarterly releases, "rolling back" replaces this period's value
+  // with LAST period's value under this period's date — guaranteed wrong, and it
+  // blocks legitimate seasonality (GST April→May drops ~20% every year; FASTag
+  // Jan-2024→May-2026 gap moves +37%). These metrics are protected by the
+  // vintage gate + per-parser plausible() bounds instead. Flag, don't roll back.
+  const freq = metric.source_primary?.frequency || '';
+  if (/Monthly|Quarterly|Per release|Fortnightly/i.test(freq)) {
+    metric._change_review = { move_pct: +dodAbsPct.toFixed(2), cap, ref, note: 'large move on release-cadence metric · kept (no rollback) · review if unexpected' };
+    return null;
+  }
+
   // For monthly metrics that fell back to sparkline reference, use that as restoredTo
   prevValue = ref;
   // Anomaly · roll back

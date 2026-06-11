@@ -67,6 +67,10 @@ const DEFAULT_LIVE_URL = 'https://india-risk-monitor.pages.dev/dist/data.json';
 const STALE_DAYS = { Live: 2, Daily: 2, Weekly: 10, Fortnightly: 21, Monthly: 45, Quarterly: 120, 'Per release': 180 };
 const STALE_DEFAULT = 14;
 const FROZEN_FACTOR = 2;
+// Data-vintage allowance (as_of age vs publication lag) — catches "fresh fetch
+// of an ancient release" (e.g. fastag_toll re-verifying a 2024 number in 2026).
+const VINTAGE_DAYS = { Live: 7, Daily: 7, Weekly: 21, Fortnightly: 35, Monthly: 75, Quarterly: 160, 'Per release': 270 };
+const VINTAGE_DEFAULT = 75;
 const MAX_HEALS_PER_DAY = 2;
 const BOUNDS = {
   inr_usd: [75, 105, 'INR/USD'],
@@ -97,7 +101,7 @@ function checkReadiness(data) {
   if (bundleAgeH > 24) fails.push(`bundle ${bundleAgeH.toFixed(1)}h old (>24h) — deploy/ingest stuck`);
   else if (bundleAgeH > 12) warns.push(`bundle ${bundleAgeH.toFixed(1)}h old`);
 
-  const stale = [], severe = [], frozen = [];
+  const stale = [], severe = [], frozen = [], oldVintage = [];
   for (const [id, m] of Object.entries(data.metrics || {})) {
     if (isComposite(id)) continue;
     const freq = (m.source_primary && m.source_primary.frequency) || 'Daily';
@@ -106,6 +110,11 @@ function checkReadiness(data) {
       const liveAge = (now - new Date(m.last_live_fetch_at).getTime()) / 864e5;
       if (liveAge > th * FROZEN_FACTOR) frozen.push(`${id} (live ${liveAge.toFixed(1)}d/${th}d, ${m.data_origin || '?'})`);
     }
+    if (m.as_of && m.verification_state !== 'manual_override' && m._verification_state_original !== 'manual_override') {
+      const vth = VINTAGE_DAYS[freq] ?? VINTAGE_DEFAULT;
+      const vAge = (now - new Date(m.as_of).getTime()) / 864e5;
+      if (vAge > vth) oldVintage.push(`${id} (data ${String(m.as_of).slice(0, 10)} · ${vAge.toFixed(0)}d/${vth}d)`);
+    }
     const lv = m.last_verified_at;
     if (!lv) { severe.push(id); continue; }
     const age = (now - new Date(lv).getTime()) / 864e5;
@@ -113,6 +122,7 @@ function checkReadiness(data) {
     else if (age > th) stale.push(`${id} (${age.toFixed(1)}d/${th}d)`);
   }
   const total = Object.keys(data.metrics || {}).length;
+  if (oldVintage.length) fails.push(`${oldVintage.length} metrics show OLD DATA (as_of beyond publication lag): ${oldVintage.slice(0, 5).join(', ')}`);
   if (frozen.length) fails.push(`${frozen.length} frozen (cache-masking): ${frozen.slice(0, 5).join(', ')}`);
   if (severe.length) fails.push(`${severe.length} severely stale: ${severe.slice(0, 6).join(', ')}`);
   if (stale.length > total * 0.10) fails.push(`${stale.length} metrics stale (>10%)`);
@@ -142,7 +152,7 @@ function checkReadiness(data) {
     checked_at: new Date(now).toISOString(),
     bundle_age_hours: +bundleAgeH.toFixed(1),
     irs: irs ? irs.value : null,
-    stale_count: stale.length, severe_count: severe.length, frozen_count: frozen.length,
+    stale_count: stale.length, severe_count: severe.length, frozen_count: frozen.length, vintage_count: oldVintage.length,
     blockers: fails, warnings: warns
   };
 }

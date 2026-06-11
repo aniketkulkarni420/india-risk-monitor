@@ -18,6 +18,42 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 
 // Per-metric: list of (url, target, plausible) configs. First plausible wins.
 const CONFIGS = {
+  gift_nifty: {
+    // GIFT Nifty (NSE IX) — pre-open/overnight India signal. No free JSON API
+    // exists (NSE IX is a JS SPA, Yahoo doesn't carry it) — render a quote page.
+    sources: [
+      {
+        url: 'https://www.moneycontrol.com/indian-indices/gift-nifty-141.html',
+        target: 'the CURRENT/LAST traded price of GIFT Nifty (the index futures level, a number around 20000-27000). Return only the level, not the change.',
+        waitMs: 6000
+      },
+      {
+        url: 'https://groww.in/indices/gift-nifty',
+        target: 'the current GIFT Nifty level (number around 20000-27000).',
+        waitMs: 6000
+      }
+    ],
+    plausible: (v) => v > 15000 && v < 35000
+  },
+
+  nifty_pcr: {
+    // Fallback when the NSE option-chain API is bot-blocked. These pages
+    // display the OI-based PCR directly.
+    sources: [
+      {
+        url: 'https://www.niftytrader.in/nse-option-chain/nifty',
+        target: 'the Nifty Put-Call Ratio (PCR) based on open interest shown on the page. A number between 0.3 and 3, e.g. 0.92.',
+        waitMs: 7000
+      },
+      {
+        url: 'https://upstox.com/option-chain/nifty/',
+        target: 'the Nifty PCR (put call ratio, OI-based) shown on the page — a number between 0.3 and 3.',
+        waitMs: 7000
+      }
+    ],
+    plausible: (v) => v > 0.3 && v < 3
+  },
+
   block_deals_notional: {
     sources: [
       {

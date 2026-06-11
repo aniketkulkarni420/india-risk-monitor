@@ -36,12 +36,7 @@ const EXTRACTORS = {
     extractRe: /(?:Indian Rupee|USDINR|INR)[^0-9]*?(\d{2,3}\.\d{1,4})/i,
     plausible: (v) => v > 60 && v < 120
   },
-  baltic_dry_index: {
-    url: 'https://tradingeconomics.com/commodity/baltic',
-    extractRe: /Baltic\s+(?:Dry|Exchange)[^0-9]*?(\d[\d,]*)/i,
-    plausible: (v) => v > 200 && v < 12000,
-    valueParser: (s) => parseInt(s.replace(/,/g, ''), 10)
-  },
+
   pmi_combined: {
     url: 'https://tradingeconomics.com/india/composite-pmi',
     extractRe: /(?:Composite|S&P\s+Global)\s+PMI[^0-9]*?(\d{2}\.\d{1,2})/i,

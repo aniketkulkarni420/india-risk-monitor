@@ -49,7 +49,7 @@
   "verification_state": "verified",
   "last_verified_at": "2026-05-05T15:36:08.923Z",
   "why_it_matters": "Macro driver weights INR + FX + curve + inflation + fiscal. Currently amber: INR weakening + WPI ticking up offset by fiscal discipline + strong reserves.",
-  "formula": "Weighted avg of feeder z-scores. Feeders: inr_usd w=3 (inverse: weak INR=high risk), cpi_inflation w=3, wpi_inflation w=2, iip_growth w=2 (inverse), fiscal_deficit_pct w=2, cad_pct_gdp w=2. Normalized: 21%/21%/14%/14%/14%/14%. fx_reserves and real_10y_yield were in v1 formula but not in current feeder set — promoted to crosscheck only.",
+  "formula": "Weighted avg of feeder z-scores. Feeders: inr_usd w=3 (inverse: weak INR=high risk), cpi_inflation w=3, core_cpi w=2, iip_growth w=2 (inverse), fiscal_deficit_pct w=2, cad_pct_gdp w=2. Normalized: 21%/21%/14%/14%/14%/14%. fx_reserves and real_10y_yield were in v1 formula but not in current feeder set — promoted to crosscheck only.",
   "methodology_version": "v2-2026-05-12",
   "trigger_thresholds": [
     {
@@ -69,7 +69,7 @@
     "inr_usd",
     "fx_reserves",
     "cpi_inflation",
-    "wpi_inflation",
+    "core_cpi",
     "pmi_combined",
     "iip_growth",
     "fiscal_deficit_pct"

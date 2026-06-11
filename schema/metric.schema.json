@@ -5,9 +5,21 @@
   "description": "Schema for one metric record. Locked per IRM_Build_Spec.html §04.",
   "x-schema-version": "1.2.0",
   "x-schema-changelog": [
-    { "version": "1.0.0", "date": "2026-04-15", "change": "Initial schema · 14 required fields" },
-    { "version": "1.1.0", "date": "2026-05-11", "change": "Parser pattern extended for rss|pdf|html_render|llm|tiered prefixes; tier_chain field added" },
-    { "version": "1.2.0", "date": "2026-05-12", "change": "Email parser kind added; cadence audit-driven tier chains" }
+    {
+      "version": "1.0.0",
+      "date": "2026-04-15",
+      "change": "Initial schema · 14 required fields"
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-05-11",
+      "change": "Parser pattern extended for rss|pdf|html_render|llm|tiered prefixes; tier_chain field added"
+    },
+    {
+      "version": "1.2.0",
+      "date": "2026-05-12",
+      "change": "Email parser kind added; cadence audit-driven tier chains"
+    }
   ],
   "type": "object",
   "required": [
@@ -34,7 +46,9 @@
   "x-schema-changelog-1.3.0": "2026-05-29 · liveness provenance: last_live_fetch_at + data_origin (kills cache-masking lie)",
   "additionalProperties": false,
   "patternProperties": {
-    "^_": { "description": "Bundle/parser-generated metadata · underscore-prefixed · validator ignores" }
+    "^_": {
+      "description": "Bundle/parser-generated metadata · underscore-prefixed · validator ignores"
+    }
   },
   "properties": {
     "metric_id": {
@@ -42,51 +56,212 @@
       "pattern": "^[a-z][a-z0-9_]*$",
       "description": "snake_case, globally unique, used in URLs"
     },
-    "last_live_fetch_at": { "type": ["string", "null"], "format": "date-time", "description": "Last time a GENUINE live fetch (not cache fallback) produced/confirmed this value. Monitors key frozen-detection off this, not last_verified_at." },
-    "data_origin": { "type": ["string", "null"], "description": "Fetch provenance of the current value: live | primary | cf-proxy | wayback | google_cache | local_cache | manual_override" },
-    "display_name": { "type": "string", "minLength": 2 },
-    "display_subtitle": { "type": ["string", "null"] },
+    "last_live_fetch_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Last time a GENUINE live fetch (not cache fallback) produced/confirmed this value. Monitors key frozen-detection off this, not last_verified_at."
+    },
+    "data_origin": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Fetch provenance of the current value: live | primary | cf-proxy | wayback | google_cache | local_cache | manual_override"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 2
+    },
+    "display_subtitle": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "section": {
       "type": "string",
-      "enum": ["flows", "macro", "economy", "freight", "market", "composites", "sectors"]
+      "enum": [
+        "flows",
+        "macro",
+        "economy",
+        "freight",
+        "market",
+        "composites",
+        "sectors"
+      ]
     },
-    "sub_cluster": { "type": ["string", "null"] },
-    "value": { "type": ["number", "string"] },
-    "unit": { "type": "string" },
+    "sub_cluster": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "value": {
+      "type": [
+        "number",
+        "string",
+        "null"
+      ],
+      "description": "Metric value. null permitted ONLY while verification_state=source_pending (awaiting first release capture) — bundle/UI render as awaiting-data."
+    },
+    "unit": {
+      "type": "string"
+    },
     "value_format": {
       "type": "string",
-      "enum": ["integer", "decimal_1", "decimal_2", "percent", "currency_inr_cr", "currency_inr_lcr", "currency_usd_bn", "currency_usd_mn", "currency_usd_per_unit", "ratio_x", "bps", "index", "label"]
+      "enum": [
+        "integer",
+        "decimal_1",
+        "decimal_2",
+        "percent",
+        "currency_inr_cr",
+        "currency_inr_lcr",
+        "currency_usd_bn",
+        "currency_usd_mn",
+        "currency_usd_per_unit",
+        "ratio_x",
+        "bps",
+        "index",
+        "label"
+      ]
     },
-    "as_of": { "type": "string", "format": "date-time" },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
     "as_of_period": {
       "type": "string",
-      "enum": ["live", "24h", "weekly", "fortnightly", "monthly", "quarterly", "policy_event"]
+      "enum": [
+        "live",
+        "24h",
+        "weekly",
+        "fortnightly",
+        "monthly",
+        "quarterly",
+        "policy_event"
+      ]
     },
-    "mom_pct": { "type": ["number", "null"] },
-    "yoy_pct": { "type": ["number", "null"] },
-    "vs_5y_avg_pct": { "type": ["number", "null"] },
+    "mom_pct": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "yoy_pct": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "vs_5y_avg_pct": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
     "sparkline_12m": {
       "type": "array",
-      "items": { "type": "number" },
+      "items": {
+        "type": "number"
+      },
       "description": "Empty array allowed; renders dashed line + history-pending."
     },
-    "baseline_30d": { "type": ["number", "null"] },
-    "deviation_from_baseline_pct": { "type": ["number", "null"] },
-    "status": { "type": "string", "enum": ["low", "med", "high", "shock"] },
-    "shock_eligible": { "type": "boolean" },
-    "shock_rule": { "type": ["string", "null"] },
-    "trend_direction": { "type": "string", "enum": ["good", "bad", "neutral"] },
+    "baseline_30d": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "deviation_from_baseline_pct": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "low",
+        "med",
+        "high",
+        "shock"
+      ]
+    },
+    "shock_eligible": {
+      "type": "boolean"
+    },
+    "shock_rule": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "trend_direction": {
+      "type": "string",
+      "enum": [
+        "good",
+        "bad",
+        "neutral"
+      ]
+    },
     "source_primary": {
       "type": "object",
-      "required": ["name", "url", "type", "frequency", "parser"],
+      "required": [
+        "name",
+        "url",
+        "type",
+        "frequency",
+        "parser"
+      ],
       "additionalProperties": false,
       "properties": {
-        "name": { "type": "string" },
-        "url": { "type": "string", "format": "uri" },
-        "type": { "type": "string", "enum": ["Official", "Exchange", "Regulator", "Public", "Filing", "Rating agency", "Reputable media", "Aggregator", "Manual estimate"] },
-        "frequency": { "type": "string", "enum": ["Live", "Daily", "Weekly", "Fortnightly", "Monthly", "Quarterly", "Per release"] },
-        "parser": { "type": "string", "pattern": "^(csv_download|html_scrape|press_release|json_api|manual|rss|pdf|html_render|llm|tiered|email)(:[a-z0-9_]+)?$" },
-        "tier_chain": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Official",
+            "Exchange",
+            "Regulator",
+            "Public",
+            "Filing",
+            "Rating agency",
+            "Reputable media",
+            "Aggregator",
+            "Manual estimate"
+          ]
+        },
+        "frequency": {
+          "type": "string",
+          "enum": [
+            "Live",
+            "Daily",
+            "Weekly",
+            "Fortnightly",
+            "Monthly",
+            "Quarterly",
+            "Per release"
+          ]
+        },
+        "parser": {
+          "type": "string",
+          "pattern": "^(csv_download|html_scrape|press_release|json_api|manual|rss|pdf|html_render|llm|tiered|email)(:[a-z0-9_]+)?$"
+        },
+        "tier_chain": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
       }
     },
     "source_crosscheck": {
@@ -94,58 +269,351 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["name", "url", "type"],
+        "required": [
+          "name",
+          "url",
+          "type"
+        ],
         "additionalProperties": false,
         "properties": {
-          "name": { "type": "string" },
-          "url": { "type": "string", "format": "uri" },
-          "type": { "type": "string", "enum": ["Official", "Exchange", "Regulator", "Public", "Filing", "Rating agency", "Reputable media", "Aggregator", "Manual estimate"] }
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Official",
+              "Exchange",
+              "Regulator",
+              "Public",
+              "Filing",
+              "Rating agency",
+              "Reputable media",
+              "Aggregator",
+              "Manual estimate"
+            ]
+          }
         }
       }
     },
     "verification_state": {
       "type": "string",
-      "enum": ["verified", "crosscheck_pending", "history_pending", "source_pending", "manual_override"]
+      "enum": [
+        "verified",
+        "crosscheck_pending",
+        "history_pending",
+        "source_pending",
+        "manual_override"
+      ]
     },
-    "last_verified_at": { "type": "string", "format": "date-time" },
-    "why_it_matters": { "type": "string", "minLength": 12 },
-    "formula": { "type": ["string", "null"] },
+    "last_verified_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "why_it_matters": {
+      "type": "string",
+      "minLength": 12
+    },
+    "formula": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "trigger_thresholds": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["level", "rule"],
+        "required": [
+          "level",
+          "rule"
+        ],
         "additionalProperties": false,
         "properties": {
-          "level": { "type": "string", "enum": ["med", "high", "shock"] },
-          "rule": { "type": "string" }
+          "level": {
+            "type": "string",
+            "enum": [
+              "med",
+              "high",
+              "shock"
+            ]
+          },
+          "rule": {
+            "type": "string"
+          }
         }
       }
     },
-    "linked_metrics": { "type": "array", "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" } },
-    "watch_next": { "type": "array", "items": { "type": "string" } },
-    "notes": { "type": ["string", "null"] },
-    "methodology_version": { "type": "string" },
-    "methodology_notes": { "type": "string" },
-    "score_state": { "type": ["string", "null"], "enum": ["fresh", "partial", "insufficient_data", null] },
-    "score_state_reason": { "type": ["string", "null"] },
-    "regime_score": { "type": ["number", "null"] },
-    "point_move_30d": { "type": ["number", "null"] },
-    "shock_indicator": { "type": ["boolean", "null"] },
-    "shock_direction": { "type": ["string", "null"], "enum": ["up", "down", null] },
+    "linked_metrics": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    },
+    "watch_next": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "methodology_version": {
+      "type": "string"
+    },
+    "methodology_notes": {
+      "type": "string"
+    },
+    "score_state": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "fresh",
+        "partial",
+        "insufficient_data",
+        null
+      ]
+    },
+    "score_state_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "regime_score": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "point_move_30d": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "shock_indicator": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "shock_direction": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "up",
+        "down",
+        null
+      ]
+    },
     "triple_jeopardy": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": true
     },
     "reference_events": {
-      "type": ["array", "null"],
-      "items": { "type": "object", "additionalProperties": true }
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
     },
-    "raw_weighted_avg": { "type": ["number", "null"] },
-    "correlation_adjustment": { "type": ["number", "null"] },
-    "driver_inputs": { "type": ["array", "null"] },
-    "feeder_breakdown": { "type": ["array", "null"] },
-    "missing_feeders": { "type": ["array", "null"] },
-    "manual_override": { "type": ["object", "null"], "additionalProperties": true }
+    "raw_weighted_avg": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "correlation_adjustment": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "driver_inputs": {
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "feeder_breakdown": {
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "missing_feeders": {
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "manual_override": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": true
+    },
+    "qoq_pct": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Quarter-on-quarter % change (quarterly-release metrics)"
+    },
+    "yoy_quarter_pct": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Same-quarter-previous-FY % change"
+    },
+    "period_label": {
+      "type": "string",
+      "description": "Human label of the period the value covers (e.g. May 2026, F.Y-2025-26 Q4)"
+    },
+    "period_basis": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "quarterly",
+        "weekly",
+        "daily"
+      ],
+      "description": "Granularity of the latest published period"
+    },
+    "latest_quarter": {
+      "type": "string",
+      "description": "Label of latest complete quarter in the source series"
+    },
+    "latest_quarter_value_cr": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Latest complete quarter value in ₹ Cr"
+    },
+    "latest_quarter_volume_mn": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Latest complete quarter volume in Mn txns"
+    },
+    "volume_mn": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Transaction volume (Mn) for the displayed period"
+    },
+    "wow_pct": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Week-on-week % change (weekly-publish metrics)"
+    },
+    "fii_index_fut_long": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "FII index futures long contracts"
+    },
+    "fii_index_fut_short": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "FII index futures short contracts"
+    },
+    "fii_long_ratio_pct": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "FII long/(long+short) ratio %"
+    },
+    "prev_month_growth_pct": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Previous month YoY growth % (release-cadence context)"
+    },
+    "overall_index": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Underlying index level for growth-rate metrics (e.g. ICI overall index)"
+    },
+    "industry_growth": {
+      "type": "object",
+      "description": "Per-industry YoY growth map (Eight Core drawer breakdown)"
+    },
+    "equity_mobilized_cr": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "AMFI equity funds mobilized ₹ Cr (gross inflow leg)"
+    },
+    "equity_repurchase_cr": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "AMFI equity repurchases ₹ Cr (gross outflow leg)"
+    },
+    "pct_of_normal": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Hormuz transits as % of 30d baseline"
+    },
+    "throughput_mbd_est": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Estimated oil throughput mb/d (Hormuz Watch)"
+    },
+    "incidents_30d": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Maritime incidents in trailing 30d (Hormuz Watch)"
+    },
+    "ukmto_attacks_30d": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "UKMTO-reported attacks in trailing 30d"
+    }
   }
 }

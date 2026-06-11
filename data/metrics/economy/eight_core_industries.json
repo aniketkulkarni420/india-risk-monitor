@@ -1,0 +1,78 @@
+{
+  "value": 1.7,
+  "as_of": "2026-04-30T00:00:00.000Z",
+  "as_of_period": "monthly",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    1.2,
+    2.2,
+    3.7,
+    6.5,
+    3.3,
+    -0.1,
+    2.1,
+    4.7,
+    4.7,
+    2.8,
+    1.2,
+    1.7
+  ],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "verification_state": "verified",
+  "last_verified_at": "2026-06-11T13:19:33.978Z",
+  "linked_metrics": [
+    "cement_dispatches",
+    "steel_consumption",
+    "power_demand",
+    "iip_growth"
+  ],
+  "notes": "Created 2026-06-11 (approved metric set). Populates on first live ingest.",
+  "metric_id": "eight_core_industries",
+  "display_name": "Eight Core Industries",
+  "display_subtitle": "OEA official · 40% of IIP · YoY growth (drawer: 8 industries)",
+  "section": "economy",
+  "sub_cluster": "production_energy",
+  "unit": "% YoY",
+  "value_format": "percent",
+  "why_it_matters": "Coal, crude, gas, refinery, fertilizers, steel, cement, electricity — 40% of industrial production in one official monthly number. The capex-cycle ground truth.",
+  "formula": "Overall ICI YoY growth % (OEA, base 2011-12); drawer shows all 8 industry growth rates",
+  "source_primary": {
+    "name": "OEA Index of Eight Core Industries",
+    "url": "https://eaindustry.nic.in/",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "xlsx:ici_xlsx_v1",
+      "rss:pib_rss_v1",
+      "llm:google_news_llm_v1"
+    ]
+  },
+  "source_crosscheck": [
+    {
+      "name": "PIB / news release coverage",
+      "url": "https://www.pib.gov.in/",
+      "type": "Official"
+    }
+  ],
+  "data_origin": "live",
+  "last_live_fetch_at": "2026-06-11T13:19:33.978Z",
+  "period_label": "Apr-26",
+  "prev_month_growth_pct": 1.2,
+  "overall_index": 166,
+  "industry_growth": {
+    "coal": -8.7,
+    "crude_oil": -3.9,
+    "natural_gas": -4.3,
+    "refinery_products": -0.5,
+    "fertilizers": -8.6,
+    "steel": 6.2,
+    "cement": 9.4,
+    "electricity": 4.1
+  },
+  "_source_count_actual": 1
+}

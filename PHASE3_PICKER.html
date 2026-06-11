@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IRM Phase 3 · Build Picker · 2026-05-12</title>
+<style>
+  :root {
+    --bg: #0a0e14; --card: #131820; --line: #1f2733; --text: #e4e7eb; --mute: #8b95a3;
+    --green: #4ade80; --amber: #f59e0b; --red: #ef4444; --blue: #60a5fa; --gray: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 24px; }
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .lede { color: var(--mute); margin: 0 0 24px; font-size: 13px; }
+  .stack { display: flex; flex-direction: column; gap: 14px; max-width: 1100px; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+  .card.recommended { border-left: 3px solid var(--green); }
+  .card.maybe { border-left: 3px solid var(--amber); }
+  .card.skip { border-left: 3px solid var(--gray); opacity: 0.7; }
+
+  .row1 { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .row1 .title { font-weight: 600; font-size: 15px; flex: 1; min-width: 240px; }
+  .priority { font-family: ui-monospace, "SF Mono", monospace; font-size: 11px; padding: 2px 7px; border-radius: 4px; }
+  .p1 { background: rgba(74,222,128,0.15); color: var(--green); }
+  .p2 { background: rgba(96,165,250,0.15); color: var(--blue); }
+  .p3 { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .p4 { background: rgba(107,114,128,0.15); color: var(--gray); }
+  .effort { font-size: 11px; color: var(--mute); font-family: ui-monospace, "SF Mono", monospace; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  .grid > div { font-size: 13px; }
+  .grid b { color: var(--mute); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 3px; }
+
+  .links { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+  .links a { color: var(--blue); text-decoration: none; font-size: 12px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 5px; }
+  .links a:hover { background: var(--line); }
+
+  .recommendation { background: rgba(74,222,128,0.06); border-left: 2px solid var(--green); padding: 8px 12px; margin-top: 10px; font-size: 13px; }
+  .recommendation.amber { background: rgba(245,158,11,0.06); border-color: var(--amber); }
+  .recommendation.gray { background: rgba(107,114,128,0.06); border-color: var(--gray); }
+  .recommendation b { color: var(--green); }
+  .recommendation.amber b { color: var(--amber); }
+  .recommendation.gray b { color: var(--gray); }
+
+  .summary { background: linear-gradient(135deg, #131820, #1a2030); border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+  .summary h2 { margin: 0 0 10px; font-size: 16px; }
+  .summary .stat { display: inline-block; margin-right: 24px; }
+  .summary .stat .n { font-size: 28px; font-weight: 600; color: var(--green); }
+  .summary .stat .lbl { font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .build-order { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin-top: 16px; }
+  .build-order h2 { margin: 0 0 12px; font-size: 16px; }
+  .build-order ol { margin: 0; padding-left: 20px; }
+  .build-order li { margin-bottom: 8px; font-size: 13px; }
+  .build-order li b { color: var(--green); }
+
+  code { font-family: ui-monospace, "SF Mono", monospace; font-size: 12px; color: var(--blue); background: var(--bg); padding: 1px 5px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>IRM Phase 3 · Build Picker</h1>
+<p class="lede">9 buildable items · 4 deferred. Click "View mockup" to open the design doc. Sorted by my recommendation (P1 first).</p>
+
+<div class="summary">
+  <h2>At a glance</h2>
+  <div class="stat"><div class="n">3</div><div class="lbl">P1 · build</div></div>
+  <div class="stat"><div class="n">3</div><div class="lbl">P2 · build if time</div></div>
+  <div class="stat"><div class="n">3</div><div class="lbl">P3-P4 · defer or skip</div></div>
+  <div class="stat"><div class="n">~10h</div><div class="lbl">to ship all P1</div></div>
+</div>
+
+<div class="stack">
+
+<!-- P1 #1 -->
+<div class="card recommended">
+  <div class="row1">
+    <span class="title">1 · Real Economy · 2 quick chips + 9D cluster expand</span>
+    <span class="priority p1">P1</span>
+    <span class="effort">~2h</span>
+  </div>
+  <div class="grid">
+    <div><b>What ships</b>"Rural-led softness" + "Tractor seasonal context" chips above the cluster card row; click cluster → inline 9D expand with sub-metric breakdown</div>
+    <div><b>Why it matters</b>Smallest lift, biggest narrative payoff. Tells the user *why* rural is weak, not just *that* it's weak.</div>
+  </div>
+  <div class="recommendation"><b>BUILD.</b> Cheapest item on the list and the only one that adds narrative (not just structural) value. Ships in one focused session.</div>
+  <div class="links">
+    <a href="file:///C:/Users/anike/Downloads/IRM_RealEconomy_V60_Synthesis.html" target="_blank">View mockup · V60 Synthesis</a>
+    <a href="file:///C:/Users/anike/Downloads/IRM_RealEconomy_Revised.html" target="_blank">View mockup · Revised</a>
+    <a href="file:///C:/Users/anike/Downloads/IRM_Master_AllSections_Compare.html" target="_blank">Master compare</a>
+  </div>
+</div>
+
+<!-- P1 #2 -->
+<div class="card recommended">
+  <div class="row1">
+    <span class="title">2 · Market · path overlay + 4 chips + 9D Bank Nifty</span>
+    <span class="priority p1">P1</span>
+    <span class="effort">~3h</span>
+  </div>
+  <div class="grid">
+    <div><b>What ships</b>Big Nifty chart with 30-day path overlay on PE band; 4 chips (VIX zone · Bank Nifty +7.9pp · DXY trigger · IND-US band); click Bank Nifty → 9D expand</div>
+    <div><b>Why it matters</b>Market section is where institutional eyes go first. Path overlay turns a static band into a story.</div>
+  </div>
+  <div class="recommendation"><b>BUILD.</b> Highest-visibility section for institutional credibility. Chips reuse existing 3A/10B primitives so the build is fast.</div>
+  <div class="links">
+    <a href="file:///C:/Users/anike/Downloads/IRM_Market_V60_Synthesis.html" target="_blank">View mockup · V60 Synthesis</a>
+    <a href="file:///C:/Users/anike/Downloads/IRM_Master_AllSections_Compare.html" target="_blank">Master compare</a>
+  </div>
+</div>
+
+<!-- P1 #3 -->
+<div class="card recommended">
+  <div class="row1">
+    <span class="title">3 · Sectors · 4D color grid + "Show as table" toggle</span>
+    <span class="priority p1">P1</span>
+    <span class="effort">~5h</span>
+  </div>
+  <div class="grid">
+    <div><b>What ships</b>Treemap-style color grid (sized by weight, colored by 4D pressure: macro/flows/freight/real-econ) replacing the 15-row ranked list; toggle back to V60 table view for power users</div>
+    <div><b>Why it matters</b>Single biggest "wow" upgrade. Sectors section currently looks like a database dump; grid makes it a magazine cover.</div>
+  </div>
+  <div class="recommendation"><b>BUILD.</b> Highest user-visible lift in the queue. 5h is the biggest of the P1 trio but the payoff is also biggest. Tablet/phone responsiveness is the only risk.</div>
+  <div class="links">
+    <a href="file:///C:/Users/anike/Downloads/IRM_Master_AllSections_Compare.html" target="_blank">Master compare (search "Sectors")</a>
+    <a href="file:///C:/Users/anike/Downloads/IRM_Section_Mockups_2026-05-12.html" target="_blank">Section mockups · 2026-05-12</a>
+  </div>
+</div>
+
+<!-- P2 #4 -->
+<div class="card maybe">
+  <div class="row1">
+    <span class="title">4 · Macro · V60 compact + Detailed toggle + 4 chips</span>
+    <span class="priority p2">P2</span>
+    <span class="effort">~7h</span>
+  </div>
+  <div class="grid">
+    <div><b>What ships</b>Macro defaults to compact 4-tile view (INR · DXY · WACR · liquidity regime); "Detailed view →" toggle expands to current 5-panel view; 4 nuance chips (WPI-CPI gap · INR 5Y range · FXR streak · liquidity regime)</div>
+    <div><b>Why it matters</b>Macro is the densest section. Compact default cuts scroll, but the toggle scaffold is reusable infrastructure for other sections.</div>
+  </div>
+  <div class="recommendation amber"><b>BUILD IF TIME.</b> Biggest scaffold lift (7h) because the compact/detailed toggle is new infrastructure. Macro already works well — this is polish, not fix. Worth doing only if P1 trio ships fast.</div>
+  <div class="links">
+    <a href="file:///C:/Users/anike/Downloads/IRM_Macro_V60_Synthesis.html" target="_blank">View mockup · V60 Synthesis</a>
+    <a href="file:///C:/Users/anike/Downloads/IRM_Master_AllSections_Compare.html" target="_blank">Master compare</a>
+  </div>
+</div>
+
+<!-- P2 #5 -->
+<div class="card maybe">
+  <div class="row1">
+    <span class="title">5 · 11A · mobile responsive pass (all sections)</span>
+    <span class="priority p2">P2</span>
+    <span class="effort">~6h</span>
+  </div>
+  <div class="grid">
+    <div><b>What ships</b>Phone-optimized card layout for every section. 4-lens Flows row → 2-col on phone. Sectors grid → 1-col. Hero tiles → 2x3. Tested at 360/390/414 widths.</div>
+    <div><b>Why it matters</b>If a retail/HNI subscriber opens IRM on their phone today, the experience is functional but cramped. Mobile pass is what makes this shareable.</div>
+  </div>
+  <div class="recommendation amber"><b>BUILD AFTER P1.</b> Critical for retail audience but no value until P1 sections ship — would otherwise need to be re-done. Do this AFTER Sectors grid + Market overlay are in.</div>
+  <div class="links">
+    <a href="file:///C:/Users/anike/Downloads/IRM_Hero_Plus_Responsive.html" target="_blank">View mockup · Hero + Responsive</a>
+    <a href="file:///C:/Users/anike/Downloads/IRM_Master_AllSections_Compare.html" target="_blank">Master compare</a>
+  </div>
+</div>
+
+<!-- P2 #6 -->
+<div class="card maybe">
+  <div class="row1">
+    <span class="title">6 · 5A · inline event markers on sparklines</span>
+    <span class="priority p2">P2</span>
+    <span class="effort">~1h</span>
+  </div>
+  <div class="grid">
+    <div><b>What ships</b>Vertical dashed lines on 12-month sparklines marking major events (RBI decision · IIP release · monthly GST · election dates). Pulls from the same event source as 5C timeline strips.</div>
+    <div><b>Why it matters</b>Sparklines today are abstract trend lines. Markers make them ask "what happened in March?" which drives engagement and shows context-awareness.</div>
+  </div>
+  <div class="recommendation amber"><b>BUILD.</b> Cheapest item that adds real value (1h). Reuses 5C event data. Should slot in before mobile pass.</div>
+  <div class="links">
+    <a href="file:///C:/Users/anike/Downloads/IRM_TrendAudit_Toolwide.html" target="_blank">View mockup · Trend audit</a>
+    <a href="file:///C:/Users/anike/Downloads/IRM_FollowUp_Mockups.html" target="_blank">Follow-up mockups</a>
+  </div>
+</div>
+
+<!-- P3 #7 -->
+<div class="card maybe">
+  <div class="row1">
+    <span class="title">7 · 6C · saved tab layouts in topbar</span>
+    <span class="priority p3">P3</span>
+    <span class="effort">~3h</span>
+  </div>
+  <div class="grid">
+    <div><b>What ships</b>Topbar pills: "All · Pre-market · FX deep · Risk regime" — each is a saved metric-filter preset. localStorage-backed like the ★ system.</div>
+    <div><b>Why it matters</b>Power-user feature. Lets institutional users build their own daily view. Retail won't use it.</div>
+  </div>
+  <div class="recommendation gray"><b>DEFER.</b> Nice but not load-bearing. Power-users will wait. Ship after Phase 3 P1+P2 close.</div>
+  <div class="links">
+    <a href="file:///C:/Users/anike/Downloads/IRM_Tab_Bar_Fixed.html" target="_blank">View mockup · Tab bar</a>
+    <a href="file:///C:/Users/anike/Downloads/IRM_Master_AllSections_Compare.html" target="_blank">Master compare</a>
+  </div>
+</div>
+
+<!-- P3 #8 -->
+<div class="card maybe">
+  <div class="row1">
+    <span class="title">8 · 24h Feed panel + bell + event detection</span>
+    <span class="priority p3">P3</span>
+    <span class="effort">~8h</span>
+  </div>
+  <div class="grid">
+    <div><b>What ships</b>Right-side drawer panel listing last 24h of metric crosses, anomalies, and threshold breaches. Bell icon in topbar with unread count.</div>
+    <div><b>Why it matters</b>Recurring users want to know "what changed since I last looked." But this requires building event-detection rules first, which is itself a 2-3h design decision.</div>
+  </div>
+  <div class="recommendation gray"><b>DEFER.</b> Real value but requires upstream design work (rule engine vs LLM summarization decision is open). Ship Telegram alerts (already wired today) instead — covers 80% of the same need.</div>
+  <div class="links">
+    <a href="file:///C:/Users/anike/Downloads/IRM_AllNuances_Approved.html" target="_blank">View mockup · All nuances</a>
+    <a href="file:///C:/Users/anike/Downloads/IRM_FreightCombo_24hBoth.html" target="_blank">Freight 24h combo (related)</a>
+  </div>
+</div>
+
+<!-- P4 #9 -->
+<div class="card skip">
+  <div class="row1">
+    <span class="title">9 · Peer Compare · 6 countries × 7 metrics</span>
+    <span class="priority p4">P4</span>
+    <span class="effort">~12h</span>
+  </div>
+  <div class="grid">
+    <div><b>What ships</b>New section. India · USA · China · Indonesia · Vietnam · Brazil across 7 macro/market rows. Heatmap on every cell. Country tabs on phone.</div>
+    <div><b>Why it matters</b>Useful but expensive. Needs 5-7 new parsers (FRED, OECD, manual JSON for emerging markets) before any UI work begins. Half the effort is data, not design.</div>
+  </div>
+  <div class="recommendation gray"><b>DEFER to Phase 4.</b> Biggest build in the queue (12h) and most of that is parser plumbing for foreign data sources. India-first is the right narrative anyway — peer compare is a "we made it" feature, not a v1.</div>
+  <div class="links">
+    <a href="file:///C:/Users/anike/Downloads/IRM_Master_AllSections_Compare.html" target="_blank">Master compare (search "Peer")</a>
+    <a href="file:///C:/Users/anike/Downloads/IRM_Synthesis_Canonical.html" target="_blank">Synthesis canonical</a>
+  </div>
+</div>
+
+</div>
+
+<div class="build-order">
+  <h2>My recommended build order · ship over 2 sessions</h2>
+  <ol>
+    <li><b>Session A (~10h · one focused day):</b> Real Econ chips → Market overlay → Sectors grid. Ships the 3 P1s. Highest user-visible impact for least scaffold work.</li>
+    <li><b>Session B (~7-8h · split over 2 days):</b> Inline event markers (1h) → Macro V60 toggle (7h). Or skip Macro and do Mobile pass (6h) — depends on whether you want polish or reach.</li>
+    <li><b>Defer:</b> Saved tabs (3h), 24h Feed (8h), Peer Compare (12h). Revisit after retail/HNI feedback on what's already live.</li>
+  </ol>
+</div>
+
+<div class="build-order" style="margin-top:14px;">
+  <h2>Decision checklist for you</h2>
+  <ol>
+    <li>Open each mockup link above for items 1–6. Confirm the design still matches what you want.</li>
+    <li>Tell me: <code>P1 trio approved</code> → I start Session A immediately.</li>
+    <li>Optional: pick between Macro toggle vs Mobile pass for Session B (polish vs reach).</li>
+    <li>Confirm: skip Saved tabs, 24h Feed, Peer Compare until further notice.</li>
+  </ol>
+</div>
+
+</body>
+</html>

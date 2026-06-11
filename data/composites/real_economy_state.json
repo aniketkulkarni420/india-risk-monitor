@@ -33,12 +33,11 @@
   "verification_state": "verified",
   "last_verified_at": "2026-05-05T15:36:11.997Z",
   "why_it_matters": "Composite read across tax/movement/auto/power. Currently Resilient: GST +11.5% YoY, auto retail +8.5% YoY, power demand +6% YoY. Mom_pct displays GST gross YoY as the headline number.",
-  "formula": "Score: 0.30 × yoy(gst_gross) + 0.20 × yoy(power_demand) + 0.20 × avg(yoy(auto_*)) + 0.15 × yoy(eway_bills) + 0.15 × yoy(upi_value). Bands: Weak < 4 / Mixed 4-7 / Resilient 7+",
+  "formula": "Score: 0.35 × yoy(gst_gross) + 0.25 × yoy(power_demand) + 0.20 × avg(yoy(auto_*)) + 0.20 × yoy(eway_bills). Bands: Weak < 4 / Mixed 4-7 / Resilient 7+",
   "linked_metrics": [
     "gst_gross",
     "power_demand",
     "auto_2w",
-    "eway_bills",
-    "upi_value"
+    "eway_bills"
   ]
 }

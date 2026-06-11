@@ -40,19 +40,6 @@ const CONFIGS = {
     maxAgeDays: 60
   },
 
-  // UPI monthly value — from NPCI press releases / news
-  upi_value: {
-    feeds: [
-      'https://www.business-standard.com/rss/technology-10301.rss',
-      'https://economictimes.indiatimes.com/tech/technology/rssfeeds/13357270.cms',
-      'https://www.livemint.com/rss/technology'
-    ],
-    headlineRe: /UPI\s+(?:transactions?|hits|crosses|records)/i,
-    extractRe: /([\d.,]+)\s*(?:lakh\s+crore|trillion)/i,
-    plausible: (v) => v > 5 && v < 50,
-    valueParser: (s) => parseFloat(s.replace(/,/g, '')),
-    maxAgeDays: 45
-  },
 
   // E-way bills monthly count
   eway_bills: {

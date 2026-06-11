@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IRM Scoring v2 · UI surfacing preview</title>
+<style>
+  :root {
+    --bg: #0a0e14; --card: #131820; --line: #1f2733; --text: #e4e7eb; --mute: #8b95a3;
+    --green: #4ade80; --amber: #f59e0b; --red: #ef4444; --blue: #60a5fa; --purple: #a78bfa;
+    --shock: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 24px; }
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .lede { color: var(--mute); margin: 0 0 24px; font-size: 13px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 1100px) { .grid3 { grid-template-columns: 1fr; } }
+
+  .state-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute); margin-bottom: 8px; font-weight: 600; }
+
+  /* === Hero score card === */
+  .hero { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  .hero.calm { border-left: 3px solid var(--amber); }
+  .hero.stress { border-left: 3px solid var(--shock); }
+  .hero.degraded { border-left: 3px solid var(--mute); }
+
+  .score-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 12px; }
+  .score-num { font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; font-feature-settings: 'tnum'; }
+  .score-num.calm { color: var(--amber); }
+  .score-num.stress { color: var(--shock); }
+  .score-num.degraded { color: var(--mute); }
+  .score-unit { color: var(--mute); font-size: 13px; padding-bottom: 8px; }
+  .score-meta { padding-bottom: 10px; flex: 1; text-align: right; }
+  .status-pill { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+  .pill-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .pill-shock { background: rgba(220,38,38,0.2); color: #fca5a5; }
+  .pill-mute { background: rgba(107,114,128,0.15); color: var(--mute); }
+
+  /* === Regime + spot split (NEW v2) === */
+  .regime-row { display: flex; align-items: center; gap: 14px; margin: 10px 0 16px; padding: 10px 12px; background: rgba(96,165,250,0.06); border-radius: 6px; }
+  .regime-row .label { font-size: 10px; text-transform: uppercase; color: var(--mute); letter-spacing: 0.06em; }
+  .regime-row .v { font-family: ui-monospace, "SF Mono", monospace; font-size: 14px; }
+  .regime-row .delta { font-size: 11px; color: var(--mute); }
+  .regime-row .delta.up { color: var(--red); }
+  .regime-row .delta.down { color: var(--green); }
+
+  /* === Triple-jeopardy chip (NEW v2) === */
+  .triple-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
+  .triple-chip.inactive { background: rgba(107,114,128,0.08); color: var(--mute); }
+  .triple-chip.active { background: linear-gradient(90deg, rgba(220,38,38,0.18), rgba(220,38,38,0.06)); color: #fca5a5; border: 1px solid rgba(220,38,38,0.3); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.3); } 50% { box-shadow: 0 0 0 8px rgba(220,38,38,0); } }
+  .triple-chip .icon { font-size: 16px; }
+  .triple-chip .breakdown { color: var(--mute); font-family: ui-monospace, "SF Mono", monospace; font-size: 11px; margin-left: auto; }
+
+  /* === Shock indicator (NEW v2) === */
+  .shock-indicator { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 8px 12px; background: rgba(220,38,38,0.1); border-radius: 6px; margin-bottom: 12px; color: #fca5a5; }
+  .shock-indicator.calm { display: none; }
+  .shock-arrow { font-size: 14px; }
+
+  /* === Score state warning (NEW v2) === */
+  .score-state-warn { display: flex; align-items: flex-start; gap: 10px; padding: 12px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
+  .score-state-warn .icon { font-size: 18px; flex-shrink: 0; }
+  .score-state-warn b { color: var(--amber); }
+
+  /* === Reference events strip (NEW v2) === */
+  .ref-events { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .ref-events .title { font-size: 10px; text-transform: uppercase; color: var(--mute); letter-spacing: 0.06em; margin-bottom: 8px; }
+  .ref-bar { position: relative; height: 28px; background: linear-gradient(90deg, rgba(74,222,128,0.15), rgba(245,158,11,0.15) 50%, rgba(220,38,38,0.25)); border-radius: 4px; }
+  .ref-bar .here { position: absolute; top: -4px; bottom: -4px; width: 3px; background: var(--blue); box-shadow: 0 0 8px var(--blue); }
+  .ref-bar .marker { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.35); }
+  .ref-bar .marker::after { content: attr(data-label); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--mute); white-space: nowrap; padding: 0 4px; background: var(--card); }
+  .ref-bar .marker .num { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--mute); padding-top: 2px; }
+  .ref-legend { display: flex; justify-content: space-between; font-size: 9px; color: var(--mute); margin-top: 14px; padding: 0 2px; }
+
+  /* === Driver breakdown (enhanced for v2) === */
+  .drivers { margin-top: 14px; }
+  .drivers .title { font-size: 10px; text-transform: uppercase; color: var(--mute); letter-spacing: 0.06em; margin-bottom: 8px; }
+  .driver-row { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 4px 0; }
+  .driver-row .name { flex: 1; }
+  .driver-row .bar { flex: 1; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .driver-row .bar-fill { height: 100%; }
+  .driver-row .val { font-family: ui-monospace, "SF Mono", monospace; font-size: 11px; width: 40px; text-align: right; }
+  .driver-row .micro { font-size: 10px; color: var(--mute); font-family: ui-monospace, monospace; width: 30px; text-align: right; }
+  .bar-fill.green { background: var(--green); }
+  .bar-fill.amber { background: var(--amber); }
+  .bar-fill.red { background: var(--red); }
+  .bar-fill.mute { background: var(--mute); opacity: 0.5; }
+
+  /* === Correlation adjustment shown (NEW v2) === */
+  .corr-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(167,139,250,0.06); border-radius: 6px; margin-top: 10px; font-size: 11px; color: var(--mute); }
+  .corr-row b { color: var(--purple); font-family: ui-monospace, monospace; }
+
+  /* === Annotations === */
+  .annotations { background: linear-gradient(135deg, #131820, #1a2030); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin-bottom: 24px; }
+  .annotations h2 { margin: 0 0 10px; font-size: 14px; }
+  .annotations ul { margin: 0; padding-left: 18px; font-size: 12px; line-height: 1.7; color: var(--mute); }
+  .annotations ul b { color: var(--blue); }
+
+  .footer-note { margin-top: 20px; padding: 14px; background: rgba(96,165,250,0.05); border-left: 3px solid var(--blue); border-radius: 4px; font-size: 12px; color: var(--mute); }
+  .footer-note b { color: var(--blue); }
+</style>
+</head>
+<body>
+
+<h1>IRM Scoring v2 · UI surfacing preview</h1>
+<p class="lede">3 score states side-by-side. Every "NEW v2" element shown is backed by real fields already in the merged data.json — nothing here is fake. ~2h to wire into actual Hero component.</p>
+
+<div class="annotations">
+  <h2>What's new in each card (highlighted blue)</h2>
+  <ul>
+    <li><b>Regime + spot row</b> — small panel under main score showing EWMA-smoothed regime vs current spot value. Tells the user "is this a sudden move or a sustained trend?"</li>
+    <li><b>Triple-jeopardy chip</b> — pulses red when oil + macro + flows all simultaneously ≥ 65. Single most actionable risk signal.</li>
+    <li><b>Shock indicator</b> — appears only when |point_move_30d| ≥ 8. Shows direction + magnitude.</li>
+    <li><b>Score state warning</b> — amber banner when ≥30% of drivers are stale/missing. Replaces silent "neutral 50" default.</li>
+    <li><b>Reference events strip</b> — historical anchors (Lehman 70, taper 63, COVID 60, oil-shock 67, election 49) so users know where 51 sits.</li>
+    <li><b>Correlation adjustment row</b> — small note showing the haircut applied (raw avg → final), explains why drivers can be elevated without IRS spiking.</li>
+    <li><b>Driver feeder breakdown</b> — existing tiles, but with new score_state badges (e.g. "insufficient_data").</li>
+  </ul>
+</div>
+
+<div class="grid3">
+
+  <!-- ============ STATE 1 · CALM (today's actual) ============ -->
+  <div>
+    <div class="state-label">State A · Calm (current production)</div>
+    <div class="hero calm">
+
+      <div class="score-row">
+        <div class="score-num calm">51</div>
+        <div class="score-unit">/ 100</div>
+        <div class="score-meta"><span class="status-pill pill-amber">Medium</span></div>
+      </div>
+
+      <!-- NEW v2: regime + spot -->
+      <div class="regime-row">
+        <span class="label">Regime</span>
+        <span class="v">58</span>
+        <span class="label" style="margin-left:14px;">Spot</span>
+        <span class="v">51</span>
+        <span class="delta down">−7 vs 30d</span>
+      </div>
+
+      <!-- NEW v2: triple jeopardy (inactive) -->
+      <div class="triple-chip inactive">
+        <span class="icon">○</span>
+        <span>Triple-jeopardy: inactive</span>
+        <span class="breakdown">oil 84 · macro 47 · flows 35 — 1 of 3 elevated</span>
+      </div>
+
+      <!-- shock indicator hidden in calm state -->
+      <div class="shock-indicator calm"></div>
+
+      <!-- enhanced driver breakdown -->
+      <div class="drivers">
+        <div class="title">Drivers (z-score based · v2)</div>
+        <div class="driver-row"><span class="name">Oil & physical</span><div class="bar"><div class="bar-fill red" style="width:84%"></div></div><span class="val">84</span><span class="micro">▲92</span></div>
+        <div class="driver-row"><span class="name">Freight</span><div class="bar"><div class="bar-fill amber" style="width:66%"></div></div><span class="val">66</span><span class="micro">—</span></div>
+        <div class="driver-row"><span class="name">Macro</span><div class="bar"><div class="bar-fill amber" style="width:47%"></div></div><span class="val">47</span><span class="micro">▲43</span></div>
+        <div class="driver-row"><span class="name">Inst. flows</span><div class="bar"><div class="bar-fill green" style="width:35%"></div></div><span class="val">35</span><span class="micro">▼43</span></div>
+        <div class="driver-row"><span class="name">Real economy</span><div class="bar"><div class="bar-fill green" style="width:30%"></div></div><span class="val">30</span><span class="micro">—</span></div>
+        <div class="driver-row"><span class="name">Sector breadth</span><div class="bar"><div class="bar-fill amber" style="width:40%"></div></div><span class="val">40</span><span class="micro">—</span></div>
+      </div>
+
+      <!-- NEW v2: correlation adjustment -->
+      <div class="corr-row">
+        <span>Raw weighted avg <b>51.3</b> · correlation adjustment <b>−0.7</b> · final <b>51</b></span>
+      </div>
+
+      <!-- NEW v2: reference events strip -->
+      <div class="ref-events">
+        <div class="title">Historical anchors</div>
+        <div class="ref-bar">
+          <div class="marker" style="left:49%;" data-label="Election'24"><span class="num">49</span></div>
+          <div class="marker" style="left:60%;" data-label="COVID'20"><span class="num">60</span></div>
+          <div class="marker" style="left:63%;" data-label="Taper'13"><span class="num">63</span></div>
+          <div class="marker" style="left:67%;" data-label="Oil'22"><span class="num">67</span></div>
+          <div class="marker" style="left:70%;" data-label="Lehman'08"><span class="num">70</span></div>
+          <div class="here" style="left:51%;"></div>
+        </div>
+        <div class="ref-legend"><span>0 · low</span><span>50 · med</span><span>100 · shock</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ STATE 2 · STRESS (synthetic 2022-oil scenario) ============ -->
+  <div>
+    <div class="state-label">State B · Stress (2022 oil-shock-like)</div>
+    <div class="hero stress">
+
+      <div class="score-row">
+        <div class="score-num stress">82</div>
+        <div class="score-unit">/ 100</div>
+        <div class="score-meta"><span class="status-pill pill-shock">High → Shock</span></div>
+      </div>
+
+      <div class="regime-row">
+        <span class="label">Regime</span>
+        <span class="v">68</span>
+        <span class="label" style="margin-left:14px;">Spot</span>
+        <span class="v">82</span>
+        <span class="delta up">+14 vs 30d</span>
+      </div>
+
+      <!-- NEW v2: triple jeopardy ACTIVE -->
+      <div class="triple-chip active">
+        <span class="icon">⚠</span>
+        <span><b>Triple-jeopardy ACTIVE</b> · oil + macro + flows simultaneously elevated</span>
+        <span class="breakdown">oil 87 · macro 91 · flows 73</span>
+      </div>
+
+      <!-- NEW v2: shock indicator visible -->
+      <div class="shock-indicator">
+        <span class="shock-arrow">↑</span>
+        <span>Shock indicator: spot up 14 pts vs 30d baseline (threshold: 8)</span>
+      </div>
+
+      <div class="drivers">
+        <div class="title">Drivers (z-score based · v2)</div>
+        <div class="driver-row"><span class="name">Oil & physical</span><div class="bar"><div class="bar-fill red" style="width:87%"></div></div><span class="val">87</span><span class="micro">▲84</span></div>
+        <div class="driver-row"><span class="name">Freight</span><div class="bar"><div class="bar-fill red" style="width:95%"></div></div><span class="val">95</span><span class="micro">▲66</span></div>
+        <div class="driver-row"><span class="name">Macro</span><div class="bar"><div class="bar-fill red" style="width:91%"></div></div><span class="val">91</span><span class="micro">▲47</span></div>
+        <div class="driver-row"><span class="name">Inst. flows</span><div class="bar"><div class="bar-fill red" style="width:73%"></div></div><span class="val">73</span><span class="micro">▲35</span></div>
+        <div class="driver-row"><span class="name">Real economy</span><div class="bar"><div class="bar-fill amber" style="width:49%"></div></div><span class="val">49</span><span class="micro">▲30</span></div>
+        <div class="driver-row"><span class="name">Sector breadth</span><div class="bar"><div class="bar-fill amber" style="width:50%"></div></div><span class="val">50</span><span class="micro">▲40</span></div>
+      </div>
+
+      <div class="corr-row">
+        <span>Raw weighted avg <b>74</b> · correlation adjustment <b>−7.3</b> · final <b>67</b> · plus shock boost → <b>82</b></span>
+      </div>
+
+      <div class="ref-events">
+        <div class="title">Historical anchors</div>
+        <div class="ref-bar">
+          <div class="marker" style="left:49%;" data-label="Election'24"><span class="num">49</span></div>
+          <div class="marker" style="left:60%;" data-label="COVID'20"><span class="num">60</span></div>
+          <div class="marker" style="left:63%;" data-label="Taper'13"><span class="num">63</span></div>
+          <div class="marker" style="left:67%;" data-label="Oil'22"><span class="num">67</span></div>
+          <div class="marker" style="left:70%;" data-label="Lehman'08"><span class="num">70</span></div>
+          <div class="here" style="left:82%;"></div>
+        </div>
+        <div class="ref-legend"><span>0 · low</span><span>50 · med</span><span>100 · shock</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ STATE 3 · DEGRADED (data missing) ============ -->
+  <div>
+    <div class="state-label">State C · Degraded (NSDL + PIB down)</div>
+    <div class="hero degraded">
+
+      <div class="score-row">
+        <div class="score-num degraded">—</div>
+        <div class="score-unit">/ 100</div>
+        <div class="score-meta"><span class="status-pill pill-mute">Insufficient data</span></div>
+      </div>
+
+      <!-- NEW v2: score state warning -->
+      <div class="score-state-warn">
+        <span class="icon">⚠</span>
+        <div>
+          <b>Score withheld</b><br>
+          2 of 6 drivers in <code>insufficient_data</code> state (Institutional Flows, Macro). v1 would have silently defaulted these to "neutral 50" and shown a confident score. v2 refuses to compute until feeders recover.
+        </div>
+      </div>
+
+      <div class="triple-chip inactive">
+        <span class="icon">○</span>
+        <span>Triple-jeopardy: cannot evaluate</span>
+        <span class="breakdown">2 of 3 input drivers stale</span>
+      </div>
+
+      <div class="drivers">
+        <div class="title">Drivers (showing stale/missing)</div>
+        <div class="driver-row"><span class="name">Oil & physical</span><div class="bar"><div class="bar-fill red" style="width:84%"></div></div><span class="val">84</span><span class="micro">✓</span></div>
+        <div class="driver-row"><span class="name">Freight</span><div class="bar"><div class="bar-fill amber" style="width:66%"></div></div><span class="val">66</span><span class="micro">✓</span></div>
+        <div class="driver-row"><span class="name">Macro</span><div class="bar"><div class="bar-fill mute" style="width:100%"></div></div><span class="val">—</span><span class="micro">⚠</span></div>
+        <div class="driver-row"><span class="name">Inst. flows</span><div class="bar"><div class="bar-fill mute" style="width:100%"></div></div><span class="val">—</span><span class="micro">⚠</span></div>
+        <div class="driver-row"><span class="name">Real economy</span><div class="bar"><div class="bar-fill green" style="width:30%"></div></div><span class="val">30</span><span class="micro">✓</span></div>
+        <div class="driver-row"><span class="name">Sector breadth</span><div class="bar"><div class="bar-fill amber" style="width:40%"></div></div><span class="val">40</span><span class="micro">✓</span></div>
+      </div>
+
+      <div class="corr-row">
+        <span style="color:var(--amber);">⚠ Cannot apply correlation adjustment with 2 drivers missing. Score will resume when feeders recover.</span>
+      </div>
+
+      <div class="ref-events">
+        <div class="title">Historical anchors (unaffected)</div>
+        <div class="ref-bar">
+          <div class="marker" style="left:49%;" data-label="Election'24"><span class="num">49</span></div>
+          <div class="marker" style="left:60%;" data-label="COVID'20"><span class="num">60</span></div>
+          <div class="marker" style="left:63%;" data-label="Taper'13"><span class="num">63</span></div>
+          <div class="marker" style="left:67%;" data-label="Oil'22"><span class="num">67</span></div>
+          <div class="marker" style="left:70%;" data-label="Lehman'08"><span class="num">70</span></div>
+        </div>
+        <div class="ref-legend"><span>0 · low</span><span>50 · med</span><span>100 · shock</span></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-note">
+  <b>What ships in the 2h surfacing build:</b> Hero component (`app/main.mjs` lines around the score render) gets 5 new sub-components — RegimeRow, TripleJeopardyChip, ShockIndicator, ScoreStateWarn, ReferenceEventsStrip. All read from existing v2 fields already in `app/dist/data.json`. The driver tile micro-arrows (▲/▼) already work — just need v2 spec compliance (compare to `_composite_was` field that's already populated). No backend changes. No new parsers. No new design decisions needed.
+</div>
+
+</body>
+</html>

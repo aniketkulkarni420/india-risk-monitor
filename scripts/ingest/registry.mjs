@@ -34,6 +34,12 @@ import * as web_llm_v1 from './parsers/web_llm_v1.mjs';
 import * as publisher_rss_v1 from './parsers/publisher_rss_v1.mjs';
 import * as rbi_mmo_daily_v1 from './parsers/rbi_mmo_daily_v1.mjs';
 import * as email_pipeline_v1 from './parsers/email_pipeline_v1.mjs';
+import * as npci_rps_v1 from './parsers/npci_rps_v1.mjs';
+import * as hormuz_bdti_v1 from './parsers/hormuz_bdti_v1.mjs';
+import * as hormuz_watch_v1 from './parsers/hormuz_watch_v1.mjs';
+import * as nse_participant_oi_v1 from './parsers/nse_participant_oi_v1.mjs';
+import * as amfi_mcr_v1 from './parsers/amfi_mcr_v1.mjs';
+import * as ici_xlsx_v1 from './parsers/ici_xlsx_v1.mjs';
 import * as tiered_v1 from './parsers/tiered_v1.mjs';
 import * as dbnomics_v1 from './parsers/dbnomics_v1.mjs';
 import * as datagovin_v1 from './parsers/datagovin_v1.mjs';
@@ -66,7 +72,7 @@ const REAL = new Map([
   // Trading Economics generic parser — covers commodity + India macro indicators
   ['json_api:public_gold_v1', tradingeconomics_v1],
   ['json_api:public_dxy_v1', tradingeconomics_v1],
-  ['html_scrape:tradingeconomics_v1', tradingeconomics_v1],   // baltic_dry_index
+  ['html_scrape:tradingeconomics_v1', tradingeconomics_v1],
   ['html_scrape:te_inr_v1', tradingeconomics_v1],             // inr_usd live
   ['press_release:sp_pmi_india_v1', tradingeconomics_v1],     // pmi_combined
   ['press_release:rbi_policy_v1', tradingeconomics_v1],       // repo_rate
@@ -86,7 +92,7 @@ const REAL = new Map([
   ['json_api:ccil_v1', tradingeconomics_v1],
   // India govt + NSE/NSDL + PPAC + PIB-mediated sources
   // These often fail from foreign networks but reach from CI / India IPs.
-  ['press_release:naukri_v1', india_govt_v1],
+  
   ['csv_download:nsdl_fpi_v1', india_govt_v1],
   ['html_scrape:nsdl_sectoral_v1', nsdl_sectoral_v1],
   ['csv_download:nse_fno_v1', india_govt_v1],
@@ -139,6 +145,18 @@ const REAL = new Map([
   ['html_scrape:rbi_mmo_daily_v1', rbi_mmo_daily_v1],
   // Email pipeline (PIB / MoSPI / RBI subscriptions) · resilience layer
   ['email:email_pipeline_v1', email_pipeline_v1],
+  // NPCI Retail Payments Statistics XLSX — official NETC FASTag quarterly+monthly (2026-06-11)
+  ['xlsx:npci_rps_v1', npci_rps_v1],
+  // BDTI via Hormuz Watch public API — multi-source verified upstream (2026-06-11)
+  ['json_api:hormuz_bdti_v1', hormuz_bdti_v1],
+  // Hormuz Watch canonical feeds — hormuz_throughput + brent_crude (2026-06-11)
+  ['json_api:hormuz_watch_v1', hormuz_watch_v1],
+  // NSE participant-wise OI — FII net index-futures positioning (2026-06-11)
+  ['csv_download:nse_participant_oi_v1', nse_participant_oi_v1],
+  // AMFI Monthly Cumulative Report XLS — MF net equity flows (2026-06-11)
+  ['xlsx:amfi_mcr_v1', amfi_mcr_v1],
+  // OEA Index of Eight Core Industries XLSX (2026-06-11)
+  ['xlsx:ici_xlsx_v1', ici_xlsx_v1],
   // Tiered orchestrator -- tries multiple sub-parsers in priority order
   ['tiered:tiered_v1', tiered_v1],
 ]);

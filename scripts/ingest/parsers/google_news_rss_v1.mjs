@@ -36,15 +36,6 @@ const CONFIGS = {
     maxAgeDays: 45
   },
 
-  upi_value: {
-    queryFn: () => 'UPI transactions value lakh crore ' + recentMonthsQuery(),
-    // Match the monthly value as "Rs/₹ X lakh crore" — and require a month name nearby
-    matchRe: /(?:₹|Rs\.?\s*)?([\d.]+)\s*lakh\s+crore[\s\S]{0,200}?(?:January|February|March|April|May|June|July|August|September|October|November|December)|(?:January|February|March|April|May|June|July|August|September|October|November|December)[\s\S]{0,200}?(?:₹|Rs\.?\s*)?([\d.]+)\s*lakh\s+crore/i,
-    headlineFilter: (t) => !/FY\d|fiscal\s+year|year[- ]on[- ]year/i.test(t) && /(UPI|transactions)/i.test(t),
-    extractCaptureFn: (m) => m[1] || m[2],                       // either order
-    plausible: (v) => v > 15 && v < 35,
-    maxAgeDays: 45
-  },
 
   eway_bills: {
     queryFn: () => 'India e-way bills generated crore ' + recentMonthsQuery(),
@@ -61,6 +52,38 @@ const CONFIGS = {
     plausible: (v) => v > 4000 && v < 12000,
     valueTransform: (v) => +String(v).replace(/,/g, ''),
     maxAgeDays: 45
+  },
+
+  net_sip_inflows: {
+    // AMFI monthly SIP contribution — quoted exactly in release-day headlines
+    // ("SIP inflows slip 1% to Rs 30,954 crore in May"). Exclude vague
+    // round-number headlines ("hold above Rs 30,000 crore").
+    queryFn: () => 'mutual fund SIP inflows crore AMFI ' + recentMonthsQuery(),
+    matchRe: /SIP\s+(?:inflows?|contributions?|investments?)[^0-9₹]{0,50}(?:₹|Rs\.?\s*)([\d,]+(?:\.\d+)?)\s*crore/i,
+    headlineFilter: (t) => /SIP/i.test(t) && !/above|below|around|hold|stay|cross|breach|top/i.test(t),
+    valueTransform: (v) => (typeof v === 'string' ? parseFloat(v.replace(/,/g, '')) : v),
+    plausible: (v) => v > 15000 && v < 60000,
+    maxAgeDays: 40
+  },
+
+  core_cpi: {
+    // Core CPI (ex food & fuel) is quoted in every CPI-release story (~12th of
+    // month). Exclude projections/polls — released actuals only.
+    queryFn: () => 'India core inflation CPI ' + recentMonthsQuery(),
+    matchRe: /core\s+(?:CPI\s+)?inflation[^%\d]{0,60}?([\d.]+)\s*(?:%|per\s*cent)/i,
+    headlineFilter: (t) => /core/i.test(t) && !/pegged|projected|projection|forecast|poll|likely|expected|estimate|target|FY\d{2}/i.test(t) && !/China|US\b|Japan|Euro/i.test(t),
+    plausible: (v) => v > 1.5 && v < 9,
+    maxAgeDays: 40
+  },
+
+  epfo_payrolls: {
+    // EPFO monthly payroll release (~20th-25th, 2-month lag): "EPFO adds 19.14
+    // lakh net members in March". Value unit: lakh net members.
+    queryFn: () => 'EPFO net members added lakh payroll',
+    matchRe: /EPFO\s+(?:adds?|added|registers?|net\s+adds?)[^0-9]{0,40}?([\d.]+)\s*lakh/i,
+    headlineFilter: (t) => /EPFO/i.test(t) && !/pension\s+hike|interest\s+rate|withdraw/i.test(t),
+    plausible: (v) => v > 5 && v < 35,
+    maxAgeDays: 75
   },
 
   rail_freight: {
@@ -134,6 +157,24 @@ export async function fetchPrimary(metric) {
   const cutoff = Date.now() - (cfg.maxAgeDays || 45) * 24 * 3600 * 1000;
   const tried = [];
 
+  // 2026-06-11 · MONTH-PRIORITY FIX: feed order is relevance-ish, so the FIRST
+  // matching headline can carry LAST month's figure even when the new release
+  // is out (SIP: April's 31,115 beat May's 30,954). Collect all plausible
+  // candidates, then prefer the headline naming the most recent month;
+  // tie-break by newest pubDate.
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const nowM = new Date().getUTCMonth();
+  function monthScore(title) {
+    // current month name = 3, previous = 2, two back = 1, none/other = 0
+    for (let back = 0; back < 3; back++) {
+      const idx = (nowM - back + 12) % 12;
+      const re = new RegExp('\b' + MONTH_NAMES[idx].slice(0, 3), 'i');
+      if (re.test(title)) return 3 - back;
+    }
+    return 0;
+  }
+
+  const candidates = [];
   for (const it of items) {
     if (!it.title) continue;
     if (cfg.headlineFilter && !cfg.headlineFilter(it.title)) continue;
@@ -152,18 +193,28 @@ export async function fetchPrimary(metric) {
       tried.push(`${it.title.slice(0, 60)} → ${value} (out of band)`);
       continue;
     }
+    candidates.push({ value, pub, title: it.title, link: it.link, mScore: monthScore(it.title) });
+  }
 
+  if (candidates.length) {
+    // Within the same month: prefer PRECISE figures over round ones — headlines
+    // like "stay above Rs 30,000 crore" carry approximations; the release story
+    // carries the exact number (30,954). Round = multiple of 500.
+    const precise = (v) => (Math.abs(v) % 500 !== 0) ? 1 : 0;
+    candidates.sort((a, b) => (b.mScore - a.mScore) || (precise(b.value) - precise(a.value)) || (b.pub - a.pub));
+    const best = candidates[0];
     return {
-      value,
-      as_of: it.pubDate ? new Date(it.pubDate).toISOString() : new Date().toISOString(),
+      value: best.value,
+      as_of: new Date(best.pub).toISOString(),
       parse_meta: {
         source: 'google-news-rss',
         query: q,
-        headline: it.title.slice(0, 240),
-        link: it.link,
-        regex: cfg.matchRe.toString()
+        headline: best.title.slice(0, 240),
+        link: best.link,
+        regex: cfg.matchRe.toString(),
+        candidates_considered: candidates.length
       },
-      raw: it.title.slice(0, 240)
+      raw: best.title.slice(0, 240)
     };
   }
 

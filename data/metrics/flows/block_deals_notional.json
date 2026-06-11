@@ -4,27 +4,17 @@
   "display_subtitle": "NSE block deals · 7-day rolling",
   "section": "flows",
   "sub_cluster": "structure",
-  "value": 2873,
+  "value": 2135,
   "unit": "₹ Cr",
   "value_format": "currency_inr_cr",
-  "as_of": "2026-06-03T07:00:00.000Z",
+  "as_of": "2026-06-10T18:30:00.000Z",
   "as_of_period": "weekly",
   "mom_pct": null,
   "yoy_pct": null,
   "vs_5y_avg_pct": null,
   "sparkline_12m": [
-    133.1,
-    5844,
-    5844,
-    2873,
-    153.3,
-    153.3,
-    4919.2,
-    4919.2,
-    2873,
-    2873,
-    2873,
-    2873
+    665.4,
+    2135
   ],
   "status": "med",
   "shock_eligible": false,
@@ -36,10 +26,10 @@
     "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "llm:google_news_llm_v1",
       "json_api:nse_api_v1",
       "html_render:bse_v1",
-      "html_render:moneycontrol_v1"
+      "html_render:moneycontrol_v1",
+      "llm:google_news_llm_v1"
     ]
   },
   "source_crosscheck": [
@@ -50,13 +40,14 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-06-11T12:00:50.290Z",
+  "last_verified_at": "2026-06-11T12:50:19.761Z",
   "why_it_matters": "Elevated block deal activity often signals promoter exits, large institutional rotation, or PE/VC partial exits. Rising during stress events = liquidity events.",
   "linked_metrics": [
     "fii_equity_mtd",
     "sectoral_fii_mtd"
   ],
-  "data_origin": "primary",
-  "last_live_fetch_at": "2026-06-11T12:00:50.290Z",
-  "_reliability_optimized_at": "2026-06-11T05:24:50.048Z"
+  "data_origin": "live",
+  "last_live_fetch_at": "2026-06-11T12:50:19.761Z",
+  "_source_count_actual": 1,
+  "_history_state": "accruing"
 }

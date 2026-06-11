@@ -25,19 +25,20 @@ export const COMPARISON_SPEC = {
   fii_equity_daily:    ['mom', 'yoy'],
   dii_daily:           ['mom', 'yoy'],
   absorption_ratio:    [],          // ratio; no period delta makes sense
-  fno_oi_buildup:      ['dod'],
+  fii_index_fut_positioning: ['dod'],
+  net_sip_inflows:     ['mom', 'yoy'],
+  mf_net_equity_flows: ['mom', 'yoy'],
   fii_equity_mtd:      [],          // cumulative IS the comparison
   dii_mtd:             [],
   fii_equity_cytd:     [],
   fpi_debt_flows:      ['dod'],
-  sectoral_fii_mtd:    [],
   block_deals_notional:['dod'],
 
   // ─── Macro · drop gibberish DoD on rates/inflation ───
   inr_usd:               ['dod', 'mom', 'yoy'],
   repo_rate:             [],        // doesn't change daily; show value + status
   cpi_inflation:         ['yoy'],   // it IS a YoY rate; DoD is gibberish
-  wpi_inflation:         ['yoy'],   // same
+  core_cpi:              ['yoy'],   // same
   gsec_curve:            ['mom', 'yoy'],
   real_10y_yield:        ['yoy'],
   pmi_combined:          [],        // show vs-50 baseline (handled in panel)
@@ -64,22 +65,22 @@ export const COMPARISON_SPEC = {
   rail_freight:             ['dod'],
   port_cargo:               ['dod'],
   eway_bills:               ['dod'],
-  upi_value:                ['dod'],
   pol_demand:               ['dod'],
   cement_dispatches:        ['dod'],
   steel_consumption:        [],
-  naukri_jobspeak:          ['dod'],
+  epfo_payrolls:            ['mom', 'yoy'],
   reservoir_levels:         ['dod'],
-  foreign_tourist_arrivals: [],
 
   // ─── Freight · shock metrics ───
   hormuz_throughput:     ['dod', 'mom', 'yoy'],
   brent_crude:           ['dod', 'mom', 'yoy'],
   india_crude_basket:    ['dod', 'mom', 'yoy'],
   vlcc_tanker_rates:     ['mom', 'yoy'],
-  baltic_dry_index:      ['mom', 'yoy'],
+  baltic_dirty_tanker:   ['wow'],
+  nifty_pcr:             ['dod'],
+  gift_nifty:            ['dod'],
+  eight_core_industries: ['yoy'],
   drewry_wci:            ['mom', 'yoy'],
-  india_port_dwell_time: ['dod'],
 
   // ─── Market ───
   nifty_50:                 ['dod', 'mom', 'yoy'],

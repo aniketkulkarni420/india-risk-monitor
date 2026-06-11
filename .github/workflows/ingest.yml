@@ -19,6 +19,8 @@ on:
     - cron: '0 8 * * 5'       # 13:30 IST Fri · fri_17 primary (no collision)
     - cron: '30 4 1 * *'      # 10:00 1st · monthly_1
     - cron: '30 4 5 * *'      # 10:00 5th · monthly_5
+    - cron: '30 4 12 * *'     # 10:00 12th · monthly_12 (AMFI + CPI/core)
+    - cron: '30 4 20 * *'     # 10:00 20th · monthly_20 (ICI + EPFO)
   workflow_dispatch:
     inputs:
       slot:
@@ -93,6 +95,8 @@ jobs:
             "0 8 * * 5")      echo "slot=fri_17" >> $GITHUB_OUTPUT ;;
             "30 4 1 * *")     echo "slot=monthly_1" >> $GITHUB_OUTPUT ;;
             "30 4 5 * *")     echo "slot=monthly_5" >> $GITHUB_OUTPUT ;;
+            "30 4 12 * *")    echo "slot=monthly_12" >> $GITHUB_OUTPUT ;;
+            "30 4 20 * *")    echo "slot=monthly_20" >> $GITHUB_OUTPUT ;;
             *)                echo "slot=daily_06" >> $GITHUB_OUTPUT ;;
           esac
 

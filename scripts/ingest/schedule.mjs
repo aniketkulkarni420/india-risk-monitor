@@ -9,8 +9,8 @@ export const SLOTS = {
     cron: '0 6 * * *',
     metric_ids: [
       // Hand-picked daily metrics that settle overnight
-      'hormuz_throughput', 'baltic_dry_index', 'vlcc_tanker_rates',
-      'brent_crude', 'gold_usd', 'dxy', 'power_demand',
+      'hormuz_throughput', 'baltic_dirty_tanker', 'vlcc_tanker_rates',
+      'brent_crude', 'gold_usd', 'dxy', 'power_demand', 'gift_nifty',
       'india_crude_basket'  // PPAC daily · moved from fri_17 on 2026-05-26 (was weekly, cadence mismatch)
     ]
   },
@@ -20,8 +20,8 @@ export const SLOTS = {
     metric_ids: [
       'fii_equity_daily', 'fii_equity_mtd', 'fii_equity_cytd',
       'dii_daily', 'dii_mtd', 'absorption_ratio',
-      'fno_oi_buildup', 'block_deals_notional',
-      'nifty_50', 'bank_nifty', 'nifty_pe_5y', 'india_vix'
+      'fii_index_fut_positioning', 'block_deals_notional',
+      'nifty_50', 'bank_nifty', 'nifty_pe_5y', 'india_vix', 'nifty_pcr'
     ]
   },
   weekday_evening: {
@@ -39,7 +39,7 @@ export const SLOTS = {
     cron: '0 8 * * 5',  // 08:00 UTC = 13:30 IST · matches workflow yml after fix
     metric_ids: [
       'fx_reserves', 'high_yield_credit_spread',
-      'drewry_wci', 'india_port_dwell_time',
+      'drewry_wci',
       'reservoir_levels'
       // 'india_crude_basket' moved to daily_06 (Daily cadence, was wrongly here)
     ]
@@ -49,19 +49,29 @@ export const SLOTS = {
     cron: '0 10 1 * *',
     metric_ids: [
       'gst_gross', 'auto_2w', 'auto_3w', 'auto_pv', 'auto_cv', 'auto_tractor',
-      'upi_value', 'pol_demand', 'air_pax'
+      'pol_demand', 'air_pax'
     ]
   },
   monthly_5: {
     description: '10:00 5th of month · mid-month releases',
     cron: '0 10 5 * *',
     metric_ids: [
-      'iip_growth', 'wpi_inflation', 'cpi_inflation',
-      'naukri_jobspeak', 'cement_dispatches', 'steel_consumption',
+      'iip_growth', 'cpi_inflation',
+      'cement_dispatches', 'steel_consumption',
       'pmi_combined',
       'eway_bills', 'fastag_toll', 'rail_freight', 'port_cargo',
       'fiscal_deficit_pct', 'govt_capex_runrate', 'credit_deposit_growth'
     ]
+  },
+  monthly_12: {
+    description: '10:00 12th · AMFI (~10th) + CPI/core (12th) releases',
+    cron: '30 4 12 * *',
+    metric_ids: ['net_sip_inflows', 'mf_net_equity_flows', 'core_cpi']
+  },
+  monthly_20: {
+    description: '10:00 20th · ICI (~20th) + EPFO (~20-25th) releases',
+    cron: '30 4 20 * *',
+    metric_ids: ['eight_core_industries', 'epfo_payrolls']
   },
   policy_event: {
     description: 'On-demand · MPC release · CAD/BoP release · trade data',

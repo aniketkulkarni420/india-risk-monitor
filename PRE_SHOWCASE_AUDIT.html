@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRM · Pre-Showcase Audit · data + design + infra</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fafbfc;--card:#fff;--s2:#f4f5f7;--line:#e5e7eb;--soft:#f0f1f4;--ink:#0a0e14;--ink2:#1f2733;--mute:#5c6471;--dim:#8b95a3;--p0:#b91c1c;--p0bg:#fef2f2;--p1:#c2410c;--p1bg:#fff7ed;--p2:#1d4ed8;--p2bg:#eff6ff;--ok:#15803d;--okbg:#f0fdf4;--mono:'JetBrains Mono',ui-monospace,monospace}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,system-ui,sans-serif;font-size:15px;line-height:1.6;margin:0;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  .doc{max-width:1000px;margin:0 auto;padding:56px 32px 120px}
+  h1{font-size:36px;letter-spacing:-0.025em;line-height:1.1;margin:0 0 8px}
+  h2{font-size:24px;letter-spacing:-0.02em;margin:56px 0 16px;padding-top:28px;border-top:1px solid var(--line)}
+  h2:first-of-type{border-top:none;padding-top:0}
+  h3{font-size:17px;margin:24px 0 8px}
+  p{margin:0 0 12px;color:var(--ink2)}
+  .lede{font-size:17px;color:var(--mute);max-width:760px}
+  .meta{font-family:var(--mono);font-size:12px;color:var(--mute);margin:4px 0 28px}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--s2);padding:1px 5px;border-radius:3px}
+  b{font-weight:600;color:var(--ink)}
+  ul{margin:0 0 12px;padding-left:22px}
+  li{margin-bottom:5px;color:var(--ink2)}
+  .verdict{border-radius:10px;padding:24px 28px;margin:24px 0 40px;border:1px solid}
+  .verdict.no{background:var(--p0bg);border-color:#fecaca}
+  .verdict h2{margin:0 0 8px;padding:0;border:none;font-size:20px;color:var(--p0)}
+  .finding{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 26px;margin:14px 0}
+  .finding.p0{border-left:4px solid var(--p0)}
+  .finding.p1{border-left:4px solid var(--p1)}
+  .finding.p2{border-left:4px solid var(--p2)}
+  .finding.ok{border-left:4px solid var(--ok)}
+  .fh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .tag{font-size:10px;font-weight:700;letter-spacing:0.1em;padding:2px 8px;border-radius:3px;text-transform:uppercase}
+  .tag.p0{background:var(--p0bg);color:var(--p0)}.tag.p1{background:var(--p1bg);color:var(--p1)}.tag.p2{background:var(--p2bg);color:var(--p2)}.tag.ok{background:var(--okbg);color:var(--ok)}
+  .fh .id{font-family:var(--mono);font-size:11px;color:var(--dim)}
+  .fh h3{margin:0;font-size:16px}
+  .ev{background:var(--s2);border-radius:6px;padding:10px 14px;font-family:var(--mono);font-size:11.5px;color:var(--ink2);margin:8px 0;white-space:pre-wrap;line-height:1.5}
+  .fix{font-size:13.5px;color:var(--ink2);margin-top:10px}
+  .fix b{color:var(--ok)}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+  th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--soft);vertical-align:top}
+  th{font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--mute);border-bottom-color:var(--ink2)}
+  td.m{font-family:var(--mono);font-size:12px}
+  .susp{color:var(--p0);font-weight:600}
+  .eyebrow{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--p1);font-weight:600;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="doc">
+
+<div class="eyebrow">Pre-Showcase Audit · do not show until P0s clear</div>
+<h1>Is IRM ready to show people? Not yet — 4 blockers.</h1>
+<p class="meta">Audited 2026-05-28 · live site + source + CI · no changes made · suggestions only</p>
+<p class="lede">Audited the live deployment, the data pipeline, CI health, and the design layer. The scoring engine and the new monitoring are working well. But the dashboard is currently serving ~2-day-stale data because of a CI regression I introduced, and two headline values need verification. Fix the 4 P0s before any demo.</p>
+
+<div class="verdict no">
+  <h2>Verdict: DO NOT SHOWCASE yet</h2>
+  <p style="margin:0;color:var(--ink2)">Live data is 39.5h stale across 27 of 60 metrics — including every fast-mover a viewer would check first (Nifty, INR, VIX, Brent, FII/DII). A demo right now shows a 2-day-old market. Plus INR reads 95.26 (needs verification) and GST has a unit bug. ~1 day of fixes to be demo-ready.</p>
+</div>
+
+<h2>P0 · Showcase blockers (4)</h2>
+
+<div class="finding p0">
+  <div class="fh"><span class="tag p0">P0</span><span class="id">INFRA-01</span><h3>CI ingest is effectively dead — 88% of runs cancelled</h3></div>
+  <p>The concurrency block I added in PR #10 (to fix the May-25 push race) overcorrected. With many cron triggers firing close together and <code>cancel-in-progress: false</code>, GitHub still cancels <i>queued</i> runs when a newer one arrives — so runs cancel each other in a storm.</p>
+  <div class="ev">last 25 ingest runs:  22 cancelled · 2 success · 1 failure
+most recent SUCCESS:  2026-05-27 05:56 UTC  (45.9h ago)
+live bundle age:      39.5h</div>
+  <p style="font-size:13px;color:var(--mute);margin:6px 0 0"><b style="color:var(--p0)">The irony, owned:</b> the push race I "fixed" dropped ~1 run occasionally. This concurrency block drops 22 of 25. Net data freshness is now <i>worse</i> than the bug it replaced.</p>
+  <p class="fix"><b>Suggested fix:</b> Remove the <code>concurrency: irm-data-push</code> block from all 5 workflows. The <code>git pull --rebase</code> + 3-attempt retry on push (also added in PR #10) already solves the push race <i>without</i> serializing/cancelling runs. The concurrency block was belt-and-suspenders that became a noose. Verified the rebase-retry is present in <code>ingest.yml</code>.</p>
+</div>
+
+<div class="finding p0">
+  <div class="fh"><span class="tag p0">P0</span><span class="id">DATA-01</span><h3>Hormuz manual override expired — will revert to the known-bad value</h3></div>
+  <p>The override pinning Hormuz to 12 transits/day (the validated crisis figure) expired 2026-05-28. The live bundle still shows 12 only because it's 39.5h stale. The next successful ingest will run the parser, which reads the <code>hormuz-watch-2</code> endpoint that counts Gulf <i>port presence</i> (~148) not strait <i>transits</i> — reverting to "all normal" during an active closure.</p>
+  <div class="ev">override: value 12 · expires 2026-05-28 · EXPIRED 1.2d ago
+live now: 12 (frozen, stale bundle) · verification_state: source_pending</div>
+  <p class="fix"><b>Suggested fix:</b> Re-issue the override with a longer expiry (or until the layered Google-News + multi-tracker parser is confirmed live and accurate), and confirm today's actual transit figure from Windward/Lloyd's before pinning.</p>
+</div>
+
+<div class="finding p0">
+  <div class="fh"><span class="tag p0">P0</span><span class="id">DATA-02</span><h3>INR/USD = 95.26 — verify before showing (consistent but historically extreme)</h3></div>
+  <p>The dashboard shows INR/USD at 95.26. This is NOT a one-off scrape glitch — the history is a smooth series from TradingEconomics across 8 readings. But it's an ~11% depreciation from the 83–86 range, which would be the weakest INR ever by a wide margin. Either the simulated-2026 crisis genuinely pushed it there, or TradingEconomics' <code>india/currency</code> page is being misread (e.g. a forward/NDF quote, not spot).</p>
+  <div class="ev">2026-05-14  95.604     2026-05-20  96.483
+2026-05-15  95.803     2026-05-21  96.037
+2026-05-18  96.276     2026-05-22  95.552
+2026-05-19  96.718     2026-05-25  95.256   ← source: tradingeconomics.com/india/currency</div>
+  <p class="fix"><b>Suggested fix:</b> Human eyeball against a second source (RBI reference rate, XE, Google). If 95 is wrong, the <code>te_inr_v1</code> selector is grabbing the wrong figure — a wrong headline FX rate is instant credibility death in a demo. If 95 is intentional crisis-fiction, leave it but be ready to explain.</p>
+</div>
+
+<div class="finding p0">
+  <div class="fh"><span class="tag p0">P0</span><span class="id">DATA-03</span><h3>GST unit inconsistency — lakh-crore vs crore mixed in history</h3></div>
+  <p>The GST history mixes units: earlier rows are in lakh-crore (<code>1.89</code> = ₹1.89 lakh cr) and the latest is in crore (<code>243000</code> = ₹2.43 lakh cr). Any MoM/YoY/sparkline computed across this jump is mathematically garbage (1.89 → 243000 = +12.8 million %). Also 243,000 cr monthly is high vs the typical 170–210K — possibly a stale or annual figure (the parser was previously failing on "GSTN xlsx 71 days old").</p>
+  <div class="ev">2026-01-30  1.9932      (lakh-crore)
+2026-02-28  1.89        (lakh-crore)
+2026-05-01  243000      (crore)   ← unit switch · breaks trend math</div>
+  <p class="fix"><b>Suggested fix:</b> Normalise the history to one unit (crore), backfill-convert the lakh-crore rows, and confirm 243,000 is a real monthly figure not an annual/cumulative. Re-run sparkline sanitiser after.</p>
+</div>
+
+<h2>P1 · High (fix before a serious / public showcase)</h2>
+
+<div class="finding p1">
+  <div class="fh"><span class="tag p1">P1</span><span class="id">DATA-04</span><h3>27 of 60 metrics stale (cascade from INFRA-01)</h3></div>
+  <p>Every Daily/Live-cadence metric is 2.8–3.4 days stale because CI hasn't completed a run in ~46h. This resolves automatically once INFRA-01 is fixed and ingest runs again — but it's the visible symptom a viewer would notice.</p>
+  <table>
+    <tr><th>Stale cluster</th><th>Examples</th><th>Age</th></tr>
+    <tr><td>Market (Live)</td><td class="m">nifty_50 · bank_nifty · india_vix · inr_usd · dxy</td><td class="m">3.4d</td></tr>
+    <tr><td>Flows (Daily)</td><td class="m">fii_equity_* · dii_* · absorption_ratio · block_deals</td><td class="m">3.4d</td></tr>
+    <tr><td>Oil/freight</td><td class="m">brent · hormuz · vlcc · baltic_dry · india_crude_basket</td><td class="m">2.8d</td></tr>
+    <tr><td>Rates</td><td class="m">gsec_curve · wacr_repo_spread · real_10y_yield</td><td class="m">3.4d</td></tr>
+  </table>
+</div>
+
+<div class="finding p1">
+  <div class="fh"><span class="tag p1">P1</span><span class="id">DATA-05</span><h3>fno_oi_buildup — severely stale (6.4d) + chronically broken</h3></div>
+  <p>All 3 tiers fail: moneycontrol_v1 + playwright_render_v1 (cooldown/Playwright) and google_news_llm (no value). 19 consecutive failures historically. Last good value May 22.</p>
+  <p class="fix"><b>Suggested fix:</b> Add an NSE option-chain tier via the CF Worker proxy (NSE blocks foreign IPs directly but the worker reaches the India edge). The <code>nse_api_v1</code> parser already exists for block-deals — extend it to option-chain OI.</p>
+</div>
+
+<div class="finding p1">
+  <div class="fh"><span class="tag p1">P1</span><span class="id">DATA-06</span><h3>rail_freight + gst_gross source pipelines broken</h3></div>
+  <p><code>rail_freight</code>: all 4 tiers fail — Gmail IMAP finds no PIB emails (subscription may not have delivered), news-LLM yields no value. <code>gst_gross</code>: GSTN xlsx is 71+ days stale at source; no working fallback. These are Monthly-cadence so they don't break IRS (cadence-aware threshold tolerates them), but they're stale data shown as current.</p>
+  <p class="fix"><b>Suggested fix:</b> Confirm the PIB email subscription actually delivers (the Gmail pipeline was wired but never validated end-to-end with a real PIB email). Build the PIB-press-release fallback for GST that's been TODO'd in <code>pib_press_v1.mjs</code>.</p>
+</div>
+
+<h2>P2 · Design (none of the 14 prior findings implemented)</h2>
+<p>The earlier <code>AUDIT_AND_IMPROVEMENTS.html</code> 14 findings are all still open — we pivoted to data incidents instead. For showcase, the most visible:</p>
+
+<div class="finding p2">
+  <div class="fh"><span class="tag p2">P2</span><span class="id">DESIGN</span><h3>Confirmed still-open design gaps</h3></div>
+  <ul>
+    <li><b>No semantic <code>&lt;h1&gt;</code></b> — grep confirms 0 H1 elements in <code>main.mjs</code>. No typography hierarchy anchor.</li>
+    <li><b>Dark-only</b> — <code>--bg: #0a0d12</code>. Light default (the agreed direction for Indian retail) not shipped.</li>
+    <li><b>~70 metrics visible</b> — information overload unaddressed. No "what changed" surfacing on home.</li>
+    <li><b>Color overload</b> — 6+ semantic hues simultaneously; status pills lose meaning.</li>
+    <li><b>Good news:</b> font is already <code>Manrope</code> (a Design-OS-recommended choice), and <code>prefers-reduced-motion</code> is honoured.</li>
+  </ul>
+  <p class="fix"><b>Note:</b> Design is a v2 conversation. None of these are showcase <i>blockers</i> if you frame the demo as "data engine + methodology." But if the demo is about the <i>product experience</i>, the dark-only 70-metric wall undercuts it. Decide which story the showcase tells.</p>
+</div>
+
+<h2 style="color:var(--ok);border-color:var(--ok)">What's working (validated this audit)</h2>
+<div class="finding ok">
+  <div class="fh"><span class="tag ok">OK</span><h3>The systems built to prevent silent rot are working</h3></div>
+  <ul>
+    <li><b>Freshness-audit monitor fired correctly</b> — auto-opened issue #13 "🔴 Freshness audit alert" on 2026-05-27 when staleness crossed threshold. The system is now self-aware of staleness (the exact gap that hid the May-15 rot). This is the single biggest reliability win.</li>
+    <li><b>Cadence-aware staleness threshold works</b> — IRS computes correctly at 40 (was null), monthly metrics no longer falsely flagged.</li>
+    <li><b>Scoring v2 engine live + correct</b> — drivers, correlation-adjustment, reference events all populating.</li>
+    <li><b>fri_17 cron collision fixed</b> — Weekly metrics will refresh Friday 13:30 IST going forward (was never firing).</li>
+    <li><b>Schema validation green</b> — 70/70 metrics pass structural validation.</li>
+    <li><b>Most values sane</b> — Brent 93, Nifty 24031, VIX 16.7, CPI 3.48, FX 688.9, 10Y 7.03, Repo 5.25, PE 20.71 all plausible.</li>
+  </ul>
+</div>
+
+<h2>Suggested fix order (≈1 day to demo-ready)</h2>
+<table>
+  <tr><th>#</th><th>Fix</th><th>Effort</th><th>Why this order</th></tr>
+  <tr><td>1</td><td>INFRA-01 · remove concurrency block (keep rebase-retry)</td><td class="m">15min</td><td>Unblocks everything — ingest runs again, 27 stale metrics refresh automatically</td></tr>
+  <tr><td>2</td><td>Trigger one <code>slot=all</code> ingest after #1</td><td class="m">10min</td><td>Force-refresh all metrics immediately rather than wait for crons</td></tr>
+  <tr><td>3</td><td>DATA-02 · verify INR 95.26 vs RBI/XE</td><td class="m">10min</td><td>Headline credibility. Fix te_inr selector if wrong</td></tr>
+  <tr><td>4</td><td>DATA-01 · re-issue Hormuz override (longer expiry)</td><td class="m">5min</td><td>Prevent revert to bad value on next ingest</td></tr>
+  <tr><td>5</td><td>DATA-03 · normalise GST units + verify 243K</td><td class="m">30min</td><td>Fix broken trend math</td></tr>
+  <tr><td>6</td><td>Re-run freshness audit → confirm GREEN, close issue #13</td><td class="m">5min</td><td>Proof of demo-readiness</td></tr>
+  <tr><td>7</td><td>DATA-05/06 · fno_oi, rail_freight, gst parsers</td><td class="m">3-4h</td><td>Real parser fixes · can follow the demo if time-boxed</td></tr>
+  <tr><td>8</td><td>Design P2s</td><td class="m">days</td><td>Separate v2 track</td></tr>
+</table>
+
+<p style="margin-top:28px;font-size:13px;color:var(--mute)">No changes were made during this audit. Everything above is diagnosis + suggestion. Approve the fix order (or a subset) and I'll execute — starting with INFRA-01, which is the single highest-leverage fix.</p>
+
+</div>
+</body>
+</html>

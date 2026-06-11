@@ -1,0 +1,53 @@
+{
+  "value": 13,
+  "as_of": "2026-06-08T12:46:36.000Z",
+  "as_of_period": "monthly",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    13
+  ],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "source_crosscheck": [
+    {
+      "name": "PIB EPFO payroll release",
+      "url": "https://www.pib.gov.in/",
+      "type": "Official"
+    }
+  ],
+  "verification_state": "verified",
+  "last_verified_at": "2026-06-11T13:05:19.441Z",
+  "linked_metrics": [
+    "gst_gross",
+    "auto_pv"
+  ],
+  "notes": "Created 2026-06-11 (approved metric set). Value populates on first live ingest.",
+  "metric_id": "epfo_payrolls",
+  "display_name": "EPFO net payroll additions",
+  "display_subtitle": "formal-sector hiring · lakh net members/month",
+  "section": "economy",
+  "sub_cluster": "discretionary",
+  "unit": "lakh members",
+  "value_format": "decimal_1",
+  "why_it_matters": "Official formal-job creation. Sustained drops signal corporate caution before it shows in earnings; rises confirm the consumption story has income behind it.",
+  "formula": "EPFO monthly payroll release — net new members (lakh)",
+  "source_primary": {
+    "name": "EPFO payroll release (PIB)",
+    "url": "https://www.epfindia.gov.in/",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "rss:google_news_rss_v1",
+      "llm:google_news_llm_v1",
+      "rss:pib_rss_v1"
+    ]
+  },
+  "data_origin": "primary",
+  "last_live_fetch_at": "2026-06-11T13:05:19.441Z",
+  "_source_count_actual": 1,
+  "_history_state": "accruing"
+}

@@ -1,0 +1,47 @@
+{
+  "value": null,
+  "as_of": "2026-06-11T13:17:42.604Z",
+  "as_of_period": "24h",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "verification_state": "source_pending",
+  "last_verified_at": "2026-06-11T13:17:42.604Z",
+  "linked_metrics": [
+    "nifty_50",
+    "dxy"
+  ],
+  "notes": "Created 2026-06-11 (approved metric set). Populates on first live ingest.",
+  "metric_id": "gift_nifty",
+  "display_name": "GIFT Nifty",
+  "display_subtitle": "NSE IX · what global money says while India sleeps",
+  "section": "market",
+  "sub_cluster": "equity",
+  "unit": "index",
+  "value_format": "index",
+  "why_it_matters": "Trades nearly 21 hours — the pre-open gap signal. A GIFT Nifty 150 points below the Nifty close means the open is already decided.",
+  "formula": "GIFT Nifty futures level (NSE International Exchange), via quote-page render",
+  "source_primary": {
+    "name": "NSE IX GIFT Nifty (via Moneycontrol/Groww quote pages)",
+    "url": "https://www.nseix.com/",
+    "type": "Exchange",
+    "frequency": "Daily",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "html_render:web_llm_v1",
+      "llm:google_news_llm_v1"
+    ]
+  },
+  "source_crosscheck": [
+    {
+      "name": "Second quote page (Groww)",
+      "url": "https://groww.in/indices/gift-nifty",
+      "type": "Aggregator"
+    }
+  ],
+  "_history_state": "accruing"
+}

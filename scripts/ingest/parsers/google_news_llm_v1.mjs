@@ -140,23 +140,9 @@ const CONFIGS = {
     maxAgeDays: 90
   },
 
-  india_port_dwell_time: {
-    queryFn: () => 'India major ports turnaround time vessel dwell days 2026',
-    target: 'average vessel turnaround time or container dwell time at Indian major ports in days. Most recent monthly or quarterly figure.',
-    headlineFilter: (t) => /(dwell|turnaround|port\s+performance|vessel)/i.test(t),
-    plausible: (v) => v > 0.5 && v < 10,
-    maxArticles: 4,
-    maxAgeDays: 120
-  },
 
-  fno_oi_buildup: {
-    queryFn: () => 'Nifty open interest',
-    target: 'Nifty futures/options Open Interest (OI) build-up percentage change or absolute count for recent trading days. Sign matters: negative = OI declining, positive = OI building. Prefer % change figure if both available.',
-    headlineFilter: null,
-    plausible: (v) => Math.abs(v) < 1000000,
-    maxArticles: 5,
-    maxAgeDays: 30
-  },
+
+
 
   block_deals_notional: {
     queryFn: () => 'NSE block deals',
@@ -174,6 +160,42 @@ const CONFIGS = {
     plausible: (v) => Math.abs(v) < 200000,
     maxArticles: 4,
     maxAgeDays: 30
+  },
+
+  gift_nifty: {
+    queryFn: () => 'GIFT Nifty today level points',
+    target: 'The current/latest GIFT Nifty level (index futures price, a number between 15000 and 35000). Headlines/stories say things like "GIFT Nifty trading at 23,150" or "GIFT Nifty signals flat start at 23,200". Return only the level.',
+    headlineFilter: (t) => /GIFT\s*Nifty/i.test(t),
+    plausible: (v) => v > 15000 && v < 35000,
+    maxArticles: 4,
+    maxAgeDays: 2
+  },
+
+  net_sip_inflows: {
+    queryFn: () => 'AMFI SIP contribution monthly crore',
+    target: 'The monthly SIP (Systematic Investment Plan) contribution/inflow amount for Indian mutual funds in INR crore for the most recent month, as per AMFI data. Typical range 25000-40000 crore. Example: "SIP inflows slip 1% to Rs 30,954 crore in May" -> return 30954. EXCLUDE annual/cumulative totals (300000+ crore) and SIP AUM figures (lakhs of crores).',
+    headlineFilter: (t) => /SIP/i.test(t),
+    plausible: (v) => v > 15000 && v < 60000,
+    maxArticles: 5,
+    maxAgeDays: 40
+  },
+
+  core_cpi: {
+    queryFn: () => 'India CPI core inflation monthly data',
+    target: 'India\'s ACTUAL released core CPI inflation (CPI excluding food and fuel) year-on-year percentage for the most recent month. Typical range 3-6%. STRICT EXCLUSIONS: (1) RBI projections/forecasts/targets ("pegged at", "projected at", "FY27 forecast"); (2) Reuters/economist poll expectations; (3) headline CPI (the overall number — CORE only); (4) other countries. Example: "core inflation eased to 4.2% in May" -> return 4.2. If only headline CPI is given, return null.',
+    headlineFilter: (t) => /inflation|CPI/i.test(t),
+    plausible: (v) => v > 1.5 && v < 9,
+    maxArticles: 6,
+    maxAgeDays: 40
+  },
+
+  epfo_payrolls: {
+    queryFn: () => 'EPFO payroll net members added',
+    target: 'The number of NET new members added to EPFO (Employees Provident Fund Organisation) in lakh for the most recent monthly payroll release. Typical range 10-25 lakh per month. Example: "EPFO added 19.14 lakh net members in March 2026" -> return 19.14. EXCLUDE: cumulative annual additions (200+ lakh), total subscriber base (crores), pension/interest-rate stories. Return monthly net addition in lakh only.',
+    headlineFilter: (t) => /EPFO/i.test(t),
+    plausible: (v) => v > 5 && v < 35,
+    maxArticles: 5,
+    maxAgeDays: 75
   },
 
   vlcc_tanker_rates: {
@@ -271,32 +293,9 @@ const CONFIGS = {
     maxAgeDays: 14
   },
 
-  foreign_tourist_arrivals: {
-    queryFn: () => 'India foreign tourist arrivals',
-    target: 'India monthly Foreign Tourist Arrivals (FTA) in LAKH (1 lakh = 100,000). Typical monthly range 5-12 lakh. ' +
-      'Reported monthly by the Ministry of Tourism. ' +
-      'STRICT EXCLUSIONS: (1) annual/FY cumulative totals (those are 70-100 lakh range); ' +
-      '(2) domestic tourist visits (different, far larger); (3) foreign exchange earnings from tourism (that is rupees, not arrivals). ' +
-      'UNIT HANDLING: if the figure is given in millions, convert to lakh (1 million = 10 lakh). ' +
-      'If the article gives no monthly absolute FTA count, return null.',
-    headlineFilter: null,   // niche metric — few articles match a strict headline filter; let LLM judge from body
-    plausible: (v) => v > 2 && v < 20,
-    maxArticles: 6,
-    maxAgeDays: 120
-  },
 
-  baltic_dry_index: {
-    queryFn: () => 'Baltic Dry Index BDI dry bulk shipping',
-    target: 'The Baltic Dry Index (BDI) — a daily index tracking dry-bulk (iron ore, coal, grain) shipping rates. ' +
-      'Typical range 800-4000. ' +
-      'STRICT EXCLUSIONS: (1) the Baltic DIRTY Tanker Index (BDTI) — that is for crude oil tankers, different index; ' +
-      '(2) a percentage change; (3) individual vessel-class indices (Capesize/Panamax/Supramax) — return the headline BDI composite. ' +
-      'Return the BDI index value.',
-    headlineFilter: (t) => /(baltic dry|BDI|dry bulk)/i.test(t),
-    plausible: (v) => v > 400 && v < 8000,
-    maxArticles: 5,
-    maxAgeDays: 21
-  }
+
+
 };
 
 function stripHtml(html) {

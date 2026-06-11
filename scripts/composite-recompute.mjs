@@ -132,9 +132,10 @@ function zScoreToRiskScore(metric, { inverse = false } = {}) {
 const INVERSE_FEEDERS = new Set([
   'hormuz_throughput', 'absorption_ratio', 'fx_reserves',
   'gst_gross', 'pmi_combined', 'iip_growth', 'auto_2w', 'auto_pv', 'auto_cv',
-  'eway_bills', 'upi_value', 'fastag_toll', 'rail_freight', 'pol_demand',
+  'eway_bills', 'fastag_toll', 'rail_freight', 'pol_demand',
   'steel_consumption', 'power_demand', 'fpi_debt_flows',
-  'fii_equity_daily', 'fii_equity_mtd', 'dii_daily', 'dii_mtd'
+  'fii_equity_daily', 'fii_equity_mtd', 'dii_daily', 'dii_mtd',
+  'net_sip_inflows', 'mf_net_equity_flows', 'epfo_payrolls', 'eight_core_industries', 'fii_index_fut_positioning'
 ]);
 
 function feederScore(metric) {
@@ -318,9 +319,9 @@ function applyManualOverride(metric) {
 
 const DRIVER_DEFS = [
   { id: 'driver_oil_physical',        ids: ['brent_crude','india_crude_basket','hormuz_throughput','vlcc_tanker_rates'], weights: [3,2,3,2] },
-  { id: 'driver_freight',             ids: ['drewry_wci','baltic_dry_index','vlcc_tanker_rates','india_port_dwell_time'], weights: [3,2,3,2] },
+  { id: 'driver_freight',             ids: ['drewry_wci','baltic_dirty_tanker','vlcc_tanker_rates'], weights: [3,2,3] },
   { id: 'driver_institutional_flows', ids: ['fii_equity_daily','fii_equity_mtd','dii_daily','dii_mtd','absorption_ratio'], weights: [2,2,2,2,3] },
-  { id: 'driver_india_macro',         ids: ['inr_usd','cpi_inflation','wpi_inflation','iip_growth','fiscal_deficit_pct','cad_pct_gdp'], weights: [3,3,2,2,2,2] },
+  { id: 'driver_india_macro',         ids: ['inr_usd','cpi_inflation','core_cpi','iip_growth','fiscal_deficit_pct','cad_pct_gdp'], weights: [3,3,2,2,2,2] },
   { id: 'driver_real_economy',        ids: ['gst_gross','pmi_combined','iip_growth','steel_consumption','auto_2w','rail_freight'], weights: [3,2,2,2,2,2] }
 ];
 

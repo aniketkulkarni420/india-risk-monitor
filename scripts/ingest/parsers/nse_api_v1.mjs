@@ -102,38 +102,31 @@ const CONFIGS = {
     plausible: (v) => v >= 0 && v < 100000
   },
 
-  fno_oi_buildup: {
-    // OI-weighted aggregate % change in open interest for NIFTY + BANKNIFTY
-    // (current vs previous trading session), from NSE's OI-spurts feed.
-    // changeInOI is absolute Δ contracts; avgInOI is the per-symbol % change.
-    // We aggregate the two index books: (ΣΔOI / ΣprevOI) × 100 — an OI-weighted
-    // build-up that treats Nifty + Bank Nifty as one positioning book.
-    api: 'https://www.nseindia.com/api/live-analysis-oi-spurts-underlyings',
-    referer: 'https://www.nseindia.com/market-data/oi-spurts',
+  nifty_pcr: {
+    // Put-Call Ratio from the Nifty option chain — total put OI / total call OI
+    // across all strikes/expiries returned. Contrarian extremes: <0.7 / >1.4.
+    api: 'https://www.nseindia.com/api/option-chain-v3?type=Indices&symbol=NIFTY',
+    referer: 'https://www.nseindia.com/option-chain',
     extract: (j) => {
-      const rows = Array.isArray(j.data) ? j.data : [];
+      const rows = j?.records?.data || [];
       if (!rows.length) return null;
-      const wanted = new Set(['NIFTY', 'BANKNIFTY']);
-      let sumChg = 0, sumPrev = 0, found = 0;
+      let putOI = 0, callOI = 0;
       for (const r of rows) {
-        if (!wanted.has(r.symbol)) continue;
-        const prev = Number(r.prevOI), chg = Number(r.changeInOI);
-        if (!Number.isFinite(prev) || !Number.isFinite(chg) || prev <= 0) continue;
-        sumPrev += prev; sumChg += chg; found++;
+        if (r.PE && typeof r.PE.openInterest === 'number') putOI += r.PE.openInterest;
+        if (r.CE && typeof r.CE.openInterest === 'number') callOI += r.CE.openInterest;
       }
-      if (found === 0 || sumPrev <= 0) return null;
-      return +((sumChg / sumPrev) * 100).toFixed(2);
+      if (callOI <= 0) return null;
+      return +(putOI / callOI).toFixed(2);
     },
     asOf: (j) => {
-      const ts = j.timestamp || j.currTradingDate;
-      if (!ts) return new Date().toISOString();
-      // "29-May-2026 10:16:02" or "29-May-2026"
-      const m = String(ts).match(/(\d{2})-(\w{3})-(\d{4})/);
+      const t = j?.records?.timestamp;
+      const m = t && String(t).match(/(\d{2})-(\w{3})-(\d{4})/);
       if (!m) return new Date().toISOString();
       return new Date(`${m[2]} ${m[1]}, ${m[3]}`).toISOString();
     },
-    plausible: (v) => Math.abs(v) < 500
-  }
+    plausible: (v) => v > 0.3 && v < 3
+  },
+
 };
 
 export async function fetchPrimary(metric) {

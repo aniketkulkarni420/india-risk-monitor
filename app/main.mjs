@@ -72,7 +72,7 @@ function inferenceLine(panelId) {
     }
     case 'inflation': {
       const cpi = DATA.metrics.cpi_inflation;
-      const wpi = DATA.metrics.wpi_inflation;
+      const wpi = DATA.metrics.core_cpi;
       if (!cpi || !wpi) return null;
       const both4 = cpi.value < 4 && wpi.value < 4;
       const wpiHotter = wpi.value > cpi.value;
@@ -794,7 +794,7 @@ const fiiCytdH = M('fii_equity_cytd');
 const diiDay = M('dii_daily');
 const diiMtdH = M('dii_mtd');
 const absorpM = M('absorption_ratio');
-const fnoOi = M('fno_oi_buildup');
+const fnoOi = M('fii_index_fut_positioning');
 const blockDeals = M('block_deals_notional');
 const _absRatio = absorpM?.value;
 const _absPct = _absRatio != null ? Math.round(_absRatio * 100) : null;
@@ -906,7 +906,7 @@ flowsBody.appendChild(cumDetails);
 
 // Supporting composite (auto-promote anomalies + summary + change hint built-in)
 flowsBody.appendChild(renderSupportingTier(
-  ['fpi_debt_flows', 'fno_oi_buildup', 'block_deals_notional', 'fii_equity_mtd', 'dii_mtd', 'fii_equity_cytd'],
+  ['fpi_debt_flows', 'fii_index_fut_positioning', 'block_deals_notional', 'fii_equity_mtd', 'dii_mtd', 'fii_equity_cytd'],
   M,
   { sectionId: 'flows', title: 'Supporting metrics' }
 ));
@@ -959,7 +959,7 @@ if (yieldInf) macroBody.appendChild(yieldInf);
 const inflationCurrencyRow = el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '18px' } });
 // Inflation bars — live where metric exists; Core/Food are MoSPI sub-series we don't yet ingest separately
 const cpiM = M('cpi_inflation');
-const wpiM = M('wpi_inflation');
+const wpiM = M('core_cpi');
 const inflationItems = [
   { label: 'CPI Headline', value: cpiM?.value ?? 3.40 },
   { label: 'WPI', value: wpiM?.value ?? 3.88 }
@@ -1040,7 +1040,7 @@ macroBody.appendChild(fiscalLeadingRow);
 // Supporting metrics row (the rest)
 macroBody.appendChild(renderSupportingTier(
   ['trade_deficit', 'cad_pct_gdp', 'banking_liquidity', 'wacr_repo_spread',
-   'repo_rate', 'credit_deposit_growth', 'iip_growth', 'wpi_inflation',
+   'repo_rate', 'credit_deposit_growth', 'iip_growth', 'core_cpi',
    'real_10y_yield', 'pmi_combined', 'fiscal_deficit_pct', 'govt_capex_runrate'],
   M,
   { sectionId: 'macro', title: 'Supporting metrics' }
@@ -1077,18 +1077,18 @@ function clusterHeadline(metricIds) {
 }
 const clusters = [
   { id: 'tax', label: 'Tax & demand', sub: 'GST · UPI · e-way',
-    metrics: ['gst_gross', 'eway_bills', 'upi_value'],
+    metrics: ['gst_gross', 'eway_bills'],
     feature: 'gst_gross', featureLabel: 'GST gross · ₹ L Cr' },
   { id: 'movement', label: 'Movement', sub: 'FASTag · Rail · Ports · Air',
     metrics: ['fastag_toll', 'rail_freight', 'port_cargo', 'air_pax'],
     feature: 'rail_freight', featureLabel: 'Rail freight · Mn tonnes' },
   { id: 'production', label: 'Production', sub: 'POL · power · cement · steel',
-    metrics: ['pol_demand', 'power_demand', 'cement_dispatches', 'steel_consumption'],
+    metrics: ['pol_demand', 'power_demand', 'cement_dispatches', 'steel_consumption', 'eight_core_industries'],
     feature: 'power_demand', featureLabel: 'Power demand · GW peak' },
   { id: 'auto', label: 'Auto retail', sub: 'FADA · 5 segments',
     metrics: ['auto_2w', 'auto_3w', 'auto_pv', 'auto_cv', 'auto_tractor'] },
   { id: 'discretionary', label: 'Discretionary', sub: 'Naukri · reservoir · tourists',
-    metrics: ['naukri_jobspeak', 'reservoir_levels', 'foreign_tourist_arrivals'],
+    metrics: ['epfo_payrolls', 'reservoir_levels'],
     feature: 'reservoir_levels', featureLabel: 'Reservoir · % capacity' }
 ].map(c => ({ ...c, value: clusterHeadline(c.metrics) }));
 
@@ -1175,7 +1175,7 @@ function buildClusterSynthesis(c, metrics) {
 
   // DISCRETIONARY · Naukri is the leading signal
   if (c.id === 'discretionary') {
-    const naukri = metrics.find(m => m.metric_id === 'naukri_jobspeak');
+    const naukri = metrics.find(m => m.metric_id === 'epfo_payrolls');
     if (naukri && naukri.dod_pct != null) {
       return `Naukri JobSpeak ${naukri.dod_pct >= 0 ? '+' : ''}${naukri.dod_pct.toFixed(2)}% DoD at ${naukri.value} · white-collar hiring ${naukri.dod_pct >= 0 ? 'firming' : 'softening'}.`;
     }
@@ -1413,7 +1413,7 @@ freightBody.appendChild(renderSmallMultiples([
 
 // Port dwell as supporting row
 freightBody.appendChild(renderSupportingTier(
-  ['india_port_dwell_time', 'india_crude_basket', 'baltic_dry_index', 'drewry_wci'],
+  ['india_crude_basket', 'baltic_dirty_tanker', 'drewry_wci'],
   M,
   { sectionId: 'freight', title: 'Supporting metrics' }
 ));

@@ -34,11 +34,6 @@ const EXTRACTORS = {
     extractRe: /Industrial Production in India\s+(?:increased|decreased|fell|rose|grew|contracted)[^0-9-]*?(-?\d+\.\d{1,2})\s*percent\s+in\s+(\w+)(?:\s+of\s+(\d{4}))?/i,
     plausible: (v) => v > -15 && v < 25
   },
-  wpi_inflation: {
-    url: 'https://tradingeconomics.com/india/producer-prices-change',
-    extractRe: /(?:wholesale|producer)\s+prices\s+(?:increased|decreased|rose|fell)[^0-9-]*?(-?\d+\.\d{1,2})\s*%?\s*yoy\s+in\s+(\w+)(?:\s+(\d{4}))?/i,
-    plausible: (v) => v > -10 && v < 25
-  },
   gst_gross: {
     mode: 'xlsx_gstn',
     // Authoritative GSTN-published gross collection xlsx. Sheets named

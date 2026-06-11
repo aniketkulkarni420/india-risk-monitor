@@ -44,6 +44,32 @@ export function recordTierOutcome(metric_id, parser_id, success) {
 export function getTierStats() { return loadTierStats(); }
 
 // ──────────────────────────────────────────────────────────────
+// Data-vintage guard · rejects parser results whose as_of is older than any
+// plausible publication lag for the metric's cadence. Stops the failure class
+// observed 2026-06-10: fastag_toll's LLM tier kept re-extracting a Jan-2024
+// figure from a stale page and stamping it "verified" for 2.4 years.
+// A rejected result = tier failure → next tier tries → or ingest fails
+// HONESTLY (stale badge + parser-health red + self-heal) instead of lying.
+// ──────────────────────────────────────────────────────────────
+const VINTAGE_ALLOWANCE_DAYS = {
+  'Live': 7, 'Daily': 7, 'Weekly': 21, 'Fortnightly': 35,
+  'Monthly': 75, 'Quarterly': 160, 'Per release': 270
+};
+const VINTAGE_DEFAULT_DAYS = 75;
+
+export function checkVintage(metric, asOfIso) {
+  if (!asOfIso) return { ok: true };                       // no as_of claimed — other gates handle
+  const freq = metric?.source_primary?.frequency || 'Daily';
+  const allow = VINTAGE_ALLOWANCE_DAYS[freq] ?? VINTAGE_DEFAULT_DAYS;
+  const ageDays = (Date.now() - new Date(asOfIso).getTime()) / 86400000;
+  if (!Number.isFinite(ageDays)) return { ok: true };      // unparseable date — don't block on it
+  if (ageDays > allow) {
+    return { ok: false, ageDays: +ageDays.toFixed(0), allowDays: allow, cadence: freq };
+  }
+  return { ok: true, ageDays: +ageDays.toFixed(0) };
+}
+
+// ──────────────────────────────────────────────────────────────
 // Source cooldown
 // ──────────────────────────────────────────────────────────────
 // When a source (URL host) fails N times in a row across runs, mark it

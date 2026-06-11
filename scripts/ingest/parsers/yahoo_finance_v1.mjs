@@ -23,11 +23,6 @@ const BASE_QUOTE   = 'https://query1.finance.yahoo.com/v10/finance/quoteSummary/
 //
 // fno_oi_buildup as approximation: sum of OI across Nifty 50 nearest-expiry calls + puts.
 const CONFIGS = {
-  fno_oi_buildup: {
-    mode: 'options_oi',
-    symbol: '^NSEI',  // Nifty 50 index
-    plausible: (v) => v > 1000 && v < 200000000  // raw OI count
-  },
 
   // Block deals proxy: daily volume of Nifty 50 stocks (rough — OI not direct match)
   block_deals_notional: {

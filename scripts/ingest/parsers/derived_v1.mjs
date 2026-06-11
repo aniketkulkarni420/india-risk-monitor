@@ -87,28 +87,49 @@ const DERIVERS = {
 
   // Real 10Y yield = G-sec 10Y - CPI YoY
   // Positive = positive carry vs inflation
+  // 2026-06-10 accuracy fix: use the MEASURED gsec_curve 10Y (live metric,
+  // refreshed daily) instead of the old repo+150bps estimate. Vintage is bound
+  // by CPI (monthly release) — metric frequency relabelled Monthly to match.
   real_10y_yield: () => {
-    // We don't have a separate gsec_10y metric; estimate as repo + 1.5
-    // until CCIL parser ships. For now derive from cpi_inflation only as
-    // sanity check vs the static value already in the JSON.
     const cpi = readPeer('cpi_inflation');
-    const repo = readPeer('repo_rate');
-    if (!cpi || !repo) throw new Error('real_10y_yield needs cpi_inflation + repo_rate');
-    const gsec10y = repo.value + 1.5;  // ~150bps term premium typical
-    const real = +(gsec10y - cpi.value).toFixed(2);
+    const gsec = readPeer('gsec_curve');
+    if (!cpi || !gsec) throw new Error('real_10y_yield needs cpi_inflation + gsec_curve');
+    const real = +(gsec.value - cpi.value).toFixed(2);
+    // Binding vintage = CPI release date (the slower component).
     return { value: real, asof: cpi.as_of };
   },
 
   // India 10Y vs US 10Y spread in bps
   // Positive = India trades wider than US
-  ind_us_10y_spread: () => {
-    // India 10Y = repo + ~150 bps term premium
-    const repo = readPeer('repo_rate');
-    if (!repo) throw new Error('ind_us_10y_spread needs repo_rate');
-    const india10y = repo.value + 1.5;
-    const us10y = 4.45;  // FRED DGS10 typical when this dashboard ships; replaced by FRED parser
-    const spread = +((india10y - us10y) * 100).toFixed(0);  // to bps
-    return { value: spread, asof: repo.as_of };
+  // 2026-06-10 accuracy fix: previously India10Y was estimated (repo+1.5) and
+  // US10Y was a HARDCODED 4.45 — the spread never moved with markets. Now:
+  // India 10Y = measured gsec_curve; US 10Y = Yahoo ^TNX (CBOE 10Y yield index,
+  // same keyless Yahoo chart API the repo already uses for Nifty/VIX).
+  // fetchResilient gives retry + source-cache fallback on Yahoo hiccups.
+  ind_us_10y_spread: async () => {
+    const gsec = readPeer('gsec_curve');
+    if (!gsec) throw new Error('ind_us_10y_spread needs gsec_curve');
+    const url = 'https://query1.finance.yahoo.com/v8/finance/chart/%5ETNX?range=5d&interval=1d';
+    const { fetchResilient } = await import('../fetch-resilient.mjs');
+    const res = await fetchResilient(url, { timeoutMs: 20000, retries: 1, wayback: false, browserUa: true });
+    const j = JSON.parse(res.body);
+    const r0 = j?.chart?.result?.[0];
+    const closes = r0?.indicators?.quote?.[0]?.close || [];
+    const ts = r0?.timestamp || [];
+    // Latest non-null close (nulls on US market holidays)
+    let us10y = null, usEpoch = null;
+    for (let i = closes.length - 1; i >= 0; i--) {
+      if (typeof closes[i] === 'number' && Number.isFinite(closes[i])) { us10y = closes[i]; usEpoch = ts[i]; break; }
+    }
+    if (us10y === null) us10y = r0?.meta?.regularMarketPrice ?? null;
+    if (us10y === null || us10y < 1 || us10y > 10) {
+      throw new Error(`ind_us_10y_spread: no plausible US10Y from ^TNX (got ${us10y})`);
+    }
+    const spread = +((gsec.value - us10y) * 100).toFixed(0);  // to bps
+    // Vintage = older of the two components, so the gate sees true data age.
+    const usIso = usEpoch ? new Date(usEpoch * 1000).toISOString() : new Date().toISOString();
+    const asof = (gsec.as_of < usIso ? gsec.as_of : usIso);
+    return { value: spread, asof, extra: { _us10y_used: us10y, _us10y_date: usIso.slice(0, 10) } };
   },
 
   // High-yield credit spread — DERIVED PROXY.
@@ -136,7 +157,7 @@ const DERIVERS = {
     return { value: score, asof: new Date().toISOString() };
   },
   driver_freight: () => {
-    const score = avgFromMetrics(['drewry_wci','baltic_dry_index','vlcc_tanker_rates','india_port_dwell_time'], [3,2,3,2]);
+    const score = avgFromMetrics(['drewry_wci','baltic_dirty_tanker','vlcc_tanker_rates'], [3,2,3]);
     return { value: score, asof: new Date().toISOString() };
   },
   driver_institutional_flows: () => {
@@ -144,7 +165,7 @@ const DERIVERS = {
     return { value: score, asof: new Date().toISOString() };
   },
   driver_india_macro: () => {
-    const score = avgFromMetrics(['inr_usd','cpi_inflation','wpi_inflation','iip_growth','fiscal_deficit_pct','cad_pct_gdp'], [3,3,2,2,2,2]);
+    const score = avgFromMetrics(['inr_usd','cpi_inflation','core_cpi','iip_growth','fiscal_deficit_pct','cad_pct_gdp'], [3,3,2,2,2,2]);
     return { value: score, asof: new Date().toISOString() };
   },
   driver_real_economy: () => {
@@ -192,7 +213,7 @@ const DERIVERS = {
     return { value: state, asof: new Date().toISOString() };
   },
   supply_chain_state: () => {
-    const score = avgFromMetrics(['hormuz_throughput','brent_crude','vlcc_tanker_rates','drewry_wci','baltic_dry_index'], [3,3,2,2,2]);
+    const score = avgFromMetrics(['hormuz_throughput','brent_crude','vlcc_tanker_rates','drewry_wci','baltic_dirty_tanker'], [3,3,2,2,2]);
     let state = 'Functioning';
     if (score >= 75) state = 'Stress';
     else if (score >= 60) state = 'Watch';
@@ -205,11 +226,12 @@ export async function fetchPrimary(metric) {
   if (!deriver) throw new Error(`No deriver mapped for ${metric.metric_id}`);
   // Force fresh index read on each ingest tick
   _index = null;
-  const result = deriver();
+  const result = await deriver();   // some derivers are async (live US10Y fetch)
   return {
     value: result.value,
     as_of: result.asof || new Date().toISOString(),
     parse_meta: { source: 'derived', metric_id: metric.metric_id },
+    ...(result.extra ? { extra: result.extra } : {}),
     raw: `derived from peer metrics`
   };
 }

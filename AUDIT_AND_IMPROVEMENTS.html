@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IRM · Design + Data Presentation Audit · proposed improvements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafbfc;
+    --surface: #ffffff;
+    --surface-2: #f4f5f7;
+    --line: #e5e7eb;
+    --line-soft: #f0f1f4;
+    --ink: #0a0e14;
+    --ink-2: #1f2733;
+    --mute: #5c6471;
+    --dim: #8b95a3;
+    --accent: #b45309;          /* burnt amber — WCAG AA on white */
+    --accent-soft: #fef3c7;
+    --bad: #b91c1c;
+    --bad-soft: #fef2f2;
+    --good: #15803d;
+    --good-soft: #f0fdf4;
+    --info: #1d4ed8;
+    --info-soft: #eff6ff;
+
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--ink); margin: 0; padding: 0; }
+  body { font-family: var(--sans); font-size: 15px; line-height: 1.6; font-feature-settings: 'cv11', 'ss01'; -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
+  .doc { max-width: 980px; margin: 0 auto; padding: 64px 32px 120px; }
+  ::selection { background: var(--accent-soft); }
+
+  /* ─── Typography system: itself a demonstration ─── */
+  h1, h2, h3, h4 { letter-spacing: -0.015em; font-weight: 600; color: var(--ink); }
+  h1 { font-size: 40px; line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.025em; }
+  h2 { font-size: 26px; line-height: 1.2; margin: 64px 0 16px; padding-top: 32px; border-top: 1px solid var(--line); }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  h3 { font-size: 17px; line-height: 1.3; margin: 32px 0 10px; }
+  h4 { font-size: 13px; line-height: 1.4; margin: 20px 0 8px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute); font-weight: 600; }
+  p { margin: 0 0 14px; color: var(--ink-2); }
+  p.lede { font-size: 17px; color: var(--mute); line-height: 1.55; max-width: 720px; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; color: var(--ink-2); }
+  ul li, ol li { margin-bottom: 4px; }
+  b, strong { font-weight: 600; color: var(--ink); }
+  i, em { font-style: italic; color: var(--ink-2); }
+  code { font-family: var(--mono); font-size: 12.5px; background: var(--surface-2); padding: 1px 5px; border-radius: 3px; color: var(--ink); }
+  a { color: var(--info); text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { border-bottom-color: var(--info); }
+
+  /* ─── Eyebrow / meta ─── */
+  .eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 12px; }
+  .meta { font-family: var(--mono); font-size: 12px; color: var(--mute); margin: 0 0 32px; }
+
+  /* ─── Severity badges ─── */
+  .sev { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; vertical-align: middle; margin-left: 8px; }
+  .sev.critical { background: var(--bad-soft); color: var(--bad); border: 1px solid #fecaca; }
+  .sev.high { background: var(--accent-soft); color: var(--accent); border: 1px solid #fed7aa; }
+  .sev.medium { background: var(--info-soft); color: var(--info); border: 1px solid #bfdbfe; }
+  .sev.low { background: var(--surface-2); color: var(--mute); border: 1px solid var(--line); }
+
+  /* ─── Finding block ─── */
+  .finding { margin: 40px 0; padding: 32px 36px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+  .finding-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .finding-num { font-family: var(--mono); font-size: 11px; color: var(--dim); }
+  .finding h3 { margin: 0; }
+  .finding .verdict { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .finding .verdict .effort { font-size: 12px; color: var(--mute); font-family: var(--mono); }
+  .finding .verdict .effort b { color: var(--ink); font-weight: 500; }
+
+  /* ─── Approval controls ─── */
+  .approve { display: inline-flex; gap: 6px; align-items: center; }
+  .approve label { font-size: 12px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; color: var(--mute); font-weight: 500; transition: all 120ms ease; }
+  .approve label:hover { background: var(--surface-2); color: var(--ink); }
+  .approve label.recommended { border-color: var(--accent); color: var(--accent); }
+  .approve label .marker { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid currentColor; margin-right: 6px; vertical-align: -1px; }
+
+  /* ─── Tables ─── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--mute); border-bottom-color: var(--ink-2); }
+  td .mono { font-family: var(--mono); font-size: 12px; }
+  td.r { text-align: right; }
+  tr:hover td { background: var(--surface-2); }
+
+  /* ─── Demos / before-after ─── */
+  .demo { border: 1px solid var(--line); border-radius: 8px; margin: 16px 0; overflow: hidden; }
+  .demo-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .demo-grid { grid-template-columns: 1fr; } }
+  .demo-cell { padding: 24px; background: var(--surface); }
+  .demo-cell.before { background: #f5f3f0; border-right: 1px solid var(--line); }
+  .demo-cell.after { background: var(--surface); }
+  .demo-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--mute); margin-bottom: 14px; }
+  .demo-label.before { color: var(--bad); }
+  .demo-label.after { color: var(--good); }
+
+  /* ─── Devil's advocate boxes ─── */
+  .devil { background: #f7f4ef; border-left: 3px solid var(--accent); padding: 14px 18px; margin: 16px 0; border-radius: 0 6px 6px 0; }
+  .devil .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 6px; }
+  .devil p { font-size: 13.5px; color: var(--ink-2); margin: 0 0 6px; }
+  .devil p:last-child { margin: 0; color: var(--ink); font-weight: 500; }
+
+  /* ─── Typography demo ─── */
+  .type-scale { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 24px 28px; }
+  .type-row { padding: 12px 0; border-bottom: 1px solid var(--line-soft); display: grid; grid-template-columns: 110px 1fr 180px; gap: 16px; align-items: baseline; }
+  .type-row:last-child { border-bottom: none; }
+  .type-row .key { font-family: var(--mono); font-size: 10.5px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.06em; }
+  .type-row .sample { color: var(--ink); }
+  .type-row .specs { font-family: var(--mono); font-size: 10px; color: var(--dim); text-align: right; }
+  .ts-display { font-size: 72px; line-height: 1; letter-spacing: -0.03em; font-weight: 500; color: var(--ink); }
+  .ts-h1 { font-size: 32px; line-height: 1.1; letter-spacing: -0.025em; font-weight: 600; }
+  .ts-h2 { font-size: 22px; line-height: 1.2; letter-spacing: -0.015em; font-weight: 600; }
+  .ts-h3 { font-size: 17px; line-height: 1.3; letter-spacing: -0.005em; font-weight: 600; }
+  .ts-label { font-size: 11px; line-height: 1.3; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; color: var(--mute); }
+  .ts-body { font-size: 15px; line-height: 1.6; font-weight: 400; }
+  .ts-meta { font-size: 11px; line-height: 1.4; color: var(--mute); font-weight: 400; }
+  .ts-metric { font-size: 32px; line-height: 1; letter-spacing: -0.015em; font-weight: 500; font-feature-settings: 'tnum'; }
+
+  /* ─── Color palette demo ─── */
+  .palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin: 12px 0; }
+  .swatch { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .swatch .chip { height: 50px; }
+  .swatch .meta { padding: 8px 10px; font-size: 10px; font-family: var(--mono); }
+  .swatch .meta .role { font-size: 10.5px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.06em; }
+  .swatch .meta .hex { color: var(--ink); }
+
+  /* ─── Executive summary ─── */
+  .exec { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 24px 28px; margin: 24px 0 56px; }
+  .exec h3 { margin-top: 0; }
+
+  /* ─── Final approval ─── */
+  .final { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 32px 36px; margin: 56px 0 0; }
+  .final h2 { padding-top: 0; border-top: none; margin-top: 0; }
+  .final ol { font-size: 14px; line-height: 1.8; }
+  .final ol li { margin-bottom: 8px; }
+
+  /* ─── Mini metric card demo (used in before/after) ─── */
+  .mini-card { padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+  .mini-card.dark { background: #131820; border-color: #1f2733; color: #e4e7eb; }
+  .mini-card .row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .mini-card .name { font-size: 12px; }
+  .mini-card.dark .name { color: #c4c7cc; }
+  .mini-card .pill { font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; letter-spacing: 0.08em; }
+  .mini-card .pill.shock { background: #fef2f2; color: #b91c1c; }
+  .mini-card.dark .pill.shock { background: rgba(239,68,68,0.18); color: #fca5a5; }
+  .mini-card .val { font-family: var(--mono); font-size: 26px; font-weight: 500; line-height: 1; font-feature-settings: 'tnum'; color: var(--ink); }
+  .mini-card.dark .val { color: #e4e7eb; }
+  .mini-card .spark { height: 22px; margin-top: 8px; }
+  .mini-card .meta { font-size: 10.5px; color: var(--mute); margin-top: 6px; font-family: var(--mono); }
+  .mini-card.dark .meta { color: #8b95a3; }
+
+  /* ─── Compact info-density visualisation ─── */
+  .density-bar { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
+  .density-bar .row { display: flex; align-items: center; gap: 12px; margin: 4px 0; font-size: 13px; }
+  .density-bar .label { width: 130px; color: var(--mute); font-size: 12px; }
+  .density-bar .bar { flex: 1; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .density-bar .bar-fill { height: 100%; }
+  .density-bar .n { width: 60px; font-family: var(--mono); font-size: 12px; text-align: right; }
+</style>
+</head>
+<body>
+
+<div class="doc">
+
+  <div class="eyebrow">Design + Data Presentation Audit</div>
+  <h1>What's wrong with IRM today, and how to fix it without a full rebuild.</h1>
+  <p class="meta">For Aniket Kulkarni · 17 May 2026 · 14 findings · brutal, devil's-advocate · approval-pending</p>
+
+  <p class="lede">
+    The complaint is real. The dashboard has 70 metrics, no typography hierarchy, six competing colours, and no
+    answer to "what do I look at first?" — so users see everything and absorb nothing. This audit covers the
+    eight failure modes underneath that complaint, proposes a specific fix for each, and shows the trade-off
+    you'd be approving. You decide what to fix and in what order — nothing changes in the live code until you do.
+  </p>
+
+  <!-- ════════════ EXECUTIVE SUMMARY ════════════ -->
+  <div class="exec">
+    <h3>Three findings that, if fixed, eliminate ~80% of the overload complaint</h3>
+    <ol>
+      <li><b>Install a typography hierarchy (Finding 1)</b> — there is currently no H1, weak H2, no scale ratio above ~1.6×. Premium tools live at 8–14× ratios. This is a <i>CSS-only fix</i> with disproportionate impact.</li>
+      <li><b>Cut the home view from ~70 visible metrics to 5–8 (Finding 3)</b> — most metrics on the live home don't drive a decision and shouldn't be there. They should still exist, just inside drill-downs or search.</li>
+      <li><b>Reduce the visible colour palette from 6+ to 3 grays + 1 accent (Finding 4)</b> — colour is currently noise, not signal. Restore semantic meaning by using colour <i>sparingly</i>.</li>
+    </ol>
+    <p style="margin: 16px 0 0; font-size: 13px; color: var(--mute);">
+      Estimated effort to ship all three: <b>~14 hours</b>. Everything else in this audit can be sequenced after.
+    </p>
+  </div>
+
+  <!-- ════════════ FINDING 1: Typography ════════════ -->
+  <div class="finding" id="f1">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 01</span>
+      <h3>No typography hierarchy. Everything is the same size.</h3>
+      <span class="sev critical">Critical</span>
+    </div>
+
+    <h4>Current state</h4>
+    <p>
+      Looking at the live screenshots: page title (where? there isn't really one), section headings, metric
+      labels, and metric values all live in a 12–22px range. The ratio between the largest and smallest meaningful
+      type is roughly <b>1.6×</b>. Premium products use <b>8× to 14×</b>. Users have no visual cue for what to read first.
+      The system font also lacks tabular numerals, so columns of numbers don't align vertically — even <i>that</i>
+      adds load.
+    </p>
+
+    <h4>Why this is the root cause of "everything feels like noise"</h4>
+    <p>
+      Visual hierarchy is the primary mechanism the brain uses to skip 95% of a page and find the 5% that matters.
+      Without hierarchy, the brain has to <i>read</i> every element to decide whether it matters. That's the
+      cognitive overload. Colour, density, and content are downstream of typography.
+    </p>
+
+    <h4>Proposed type scale · demonstrated by this document</h4>
+    <div class="type-scale">
+      <div class="type-row">
+        <span class="key">Display</span>
+        <span class="sample ts-display">50</span>
+        <span class="specs">72px · −3% · 1.0 · 500 · tabular</span>
+      </div>
+      <div class="type-row">
+        <span class="key">H1</span>
+        <span class="sample ts-h1">India Risk · 17 May 2026</span>
+        <span class="specs">32px · −2.5% · 1.1 · 600</span>
+      </div>
+      <div class="type-row">
+        <span class="key">H2 / section</span>
+        <span class="sample ts-h2">Institutional flows</span>
+        <span class="specs">22px · −1.5% · 1.2 · 600</span>
+      </div>
+      <div class="type-row">
+        <span class="key">H3 / sub</span>
+        <span class="sample ts-h3">What changed since yesterday</span>
+        <span class="specs">17px · −0.5% · 1.3 · 600</span>
+      </div>
+      <div class="type-row">
+        <span class="key">Metric value</span>
+        <span class="sample ts-metric">691 bn</span>
+        <span class="specs">32px · −1.5% · 1.0 · 500 · tabular</span>
+      </div>
+      <div class="type-row">
+        <span class="key">Body</span>
+        <span class="sample ts-body">9-session weak streak in INR — third-longest in 18 months.</span>
+        <span class="specs">15px · 0% · 1.6 · 400</span>
+      </div>
+      <div class="type-row">
+        <span class="key">Label</span>
+        <span class="sample ts-label">FX reserves · as on 16 May</span>
+        <span class="specs">11px · 0.08em · 1.3 · 600 · upper</span>
+      </div>
+      <div class="type-row">
+        <span class="key">Meta</span>
+        <span class="sample ts-meta">Source · RBI Weekly Statistical Supplement · last verified 4 min ago</span>
+        <span class="specs">11px · 0% · 1.4 · 400 · muted</span>
+      </div>
+    </div>
+
+    <p style="margin-top: 16px;">
+      <b>Ratio: 72 / 11 = 6.5×.</b> Premium territory. The score (display) and labels (meta) cannot be confused.
+      Font family: <code>Inter</code> with the <code>tabular-nums</code> feature flag globally — costs ~12KB
+      from Google Fonts CDN.
+    </p>
+
+    <div class="devil">
+      <div class="label">Devil's advocate</div>
+      <p>"Aren't 72px scores for a dashboard excessive? Bloomberg doesn't do that."</p>
+      <p>Bloomberg is for users staring at 12 panels simultaneously — that's a different use case. IRM is read in 5-second glances by users coming from Twitter. The hero score is the headline; treat it like one.</p>
+    </div>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 2–4h · CSS-only · no JS change · low risk</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 2: No H1/H2 structural anchors ════════════ -->
+  <div class="finding" id="f2">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 02</span>
+      <h3>No semantic H1. Section headings are visual chrome, not structural anchors.</h3>
+      <span class="sev critical">Critical</span>
+    </div>
+
+    <h4>Current state</h4>
+    <p>
+      Inspecting <code>SectionFrame.mjs</code> — section anchors are set on the <code>&lt;h2&gt;</code> element
+      directly (the heading text itself carries <code>id="flows"</code>). There is <b>no <code>&lt;h1&gt;</code>
+      anywhere on the page</b>. Screen readers, SEO, and browser jump-to-anchor all fail. Worse, the visual
+      hierarchy follows: without a structural H1, designers and users alike have no anchor for "what is this page
+      about?".
+    </p>
+
+    <h4>Proposed fix</h4>
+    <ul>
+      <li>One <code>&lt;h1&gt;</code> per page: <i>"India Risk · 17 May 2026"</i> at the top of the home view. Specific, dated, content-bearing — not "Dashboard" or "Overview" (per Design OS: avoid vague labels).</li>
+      <li><code>&lt;h2&gt;</code> for each of the 6 sections: <i>Flows · Macro · Real Economy · Freight · Market · Sectors</i>.</li>
+      <li><code>&lt;h3&gt;</code> for sub-clusters within sections (e.g. "Equity flows" + "Debt flows" inside Flows).</li>
+      <li>Move section anchor IDs to a wrapping <code>&lt;section id="..."&gt;</code> element — not the heading text. Lets the screenshot/audit tooling, scroll-to-section, and a11y all work correctly.</li>
+    </ul>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 1–2h · markup + a11y fixes · zero visual change · low risk</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 3: Info density ════════════ -->
+  <div class="finding" id="f3">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 03</span>
+      <h3>~70 metrics visible. The home view is data dumped, not curated.</h3>
+      <span class="sev critical">Critical</span>
+    </div>
+
+    <h4>Current state · counts from your actual data</h4>
+    <table>
+      <tr><th>Section</th><th>Metric count</th><th>Avg "actionability" (1-5)</th><th>Real-economy decisional?</th></tr>
+      <tr><td>Flows</td><td class="r">9</td><td class="r">4</td><td>Yes (FII/DII core)</td></tr>
+      <tr><td>Macro</td><td class="r">15</td><td class="r">3</td><td>Partly (INR, CPI, repo yes; WPI, debt details no)</td></tr>
+      <tr><td>Real economy</td><td class="r">19</td><td class="r">2.5</td><td>Mostly no (auto sub-categories, eway, fastag, upi — collectively yes, individually no)</td></tr>
+      <tr><td>Freight</td><td class="r">7</td><td class="r">3.5</td><td>Partly (Hormuz, Brent yes; port dwell, drewry — niche)</td></tr>
+      <tr><td>Market</td><td class="r">9</td><td class="r">4</td><td>Yes</td></tr>
+      <tr><td>Sectors</td><td class="r">15</td><td class="r">2</td><td>Aggregate yes; per-sector tile rarely actionable</td></tr>
+      <tr><td>Composites + Hero</td><td class="r">10</td><td class="r">4.5</td><td>Yes</td></tr>
+      <tr><td><b>Total visible</b></td><td class="r"><b>~84</b></td><td class="r"></td><td></td></tr>
+    </table>
+
+    <h4>The 80/20 reality</h4>
+    <p>
+      Look at your own daily check-in habit. If you're honest, you scan <b>8–12 metrics</b> in the first 30 seconds:
+      IRS, INR, Brent, Hormuz, FII MTD, DII, Nifty, VIX, CPI, repo. Everything else is "I'll look if I have time" or
+      "show me if it broke." That's 84% of the visible surface area carrying ~20% of the daily decision value.
+    </p>
+
+    <h4>Proposed fix · the "5 / 15 / 50" home rule</h4>
+    <div class="density-bar">
+      <div class="row"><span class="label">Above fold</span><div class="bar"><div class="bar-fill" style="width:6%; background: var(--good)"></div></div><span class="n">5</span></div>
+      <div class="row"><span class="label">Below fold</span><div class="bar"><div class="bar-fill" style="width:18%; background: var(--accent)"></div></div><span class="n">15</span></div>
+      <div class="row"><span class="label">Drill-down only</span><div class="bar"><div class="bar-fill" style="width:60%; background: var(--info)"></div></div><span class="n">50</span></div>
+      <div class="row"><span class="label">Search-only</span><div class="bar"><div class="bar-fill" style="width:14%; background: var(--dim)"></div></div><span class="n">~14</span></div>
+    </div>
+    <ul>
+      <li><b>Above fold (5):</b> IRS score, 6 drivers (compact row), 1 "what changed" callout, freshness dot, search.</li>
+      <li><b>Below fold (15):</b> The decisional 12 — INR, Brent, Hormuz, FII MTD, DII MTD, Nifty, VIX, CPI, repo, FX reserves, GST, plus 3 "elevated today" cards.</li>
+      <li><b>Drill-down only (50):</b> Sub-cluster detail, sparklines per metric, all the auto sub-categories, eway/fastag/upi, debt flows, etc. Reachable by clicking a section heading.</li>
+      <li><b>Search-only (~14):</b> Power-user metrics with low daily relevance — port dwell time, reservoir levels, foreign tourist arrivals, etc. Listed in the cmd-K palette but never on a section page.</li>
+    </ul>
+
+    <div class="devil">
+      <div class="label">Devil's advocate</div>
+      <p>"Removing visible metrics signals a weaker product. The 70 metrics are the selling point — 'we track everything.'"</p>
+      <p>Bloomberg tracks ~500,000 fields and shows you ~30 at a time. Restraint is the credibility signal — the user knows they CAN access all 70, but doesn't have to look at all 70 every morning. Power is inversely correlated with visible noise.</p>
+    </div>
+
+    <h4>Approval is needed metric-by-metric</h4>
+    <p>
+      The above is the principle. The actual cut list — which specific metrics move to drill-down, which to search,
+      which stay visible — is a separate document. I'd produce it as <b>Finding 3.1</b> after you approve the
+      principle here. Approving Finding 3 is approving <i>"yes, ruthlessly cut"</i>; it doesn't commit to a specific
+      cut list yet.
+    </p>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort to approve principle:</b> 0h · just say yes · the cut-list spec follows separately (~4h)</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve principle</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 4: Color overload ════════════ -->
+  <div class="finding" id="f4">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 04</span>
+      <h3>Six colours visible simultaneously. Colour is noise, not signal.</h3>
+      <span class="sev critical">Critical</span>
+    </div>
+
+    <h4>Current state · count the colours on a single live screen</h4>
+    <p>
+      Looking at the desktop-1440 screenshot of the live home: I count <b>red</b> (shock pills, heatmap negatives),
+      <b>amber</b> (high status), <b>green</b> (low status, heatmap positives), <b>blue</b> (the "info"/active state),
+      <b>cyan</b> (some chart accents), plus the heatmap intermediates which add 3–4 more steps. That's <b>8–10
+      distinguishable hues</b> across the screen.
+    </p>
+    <p>
+      The brain can hold ~4 colour categories in working memory before treating them as undifferentiated decoration.
+      Once you have 8+ hues, the user stops reading them as semantic — they're just "visual texture." Which means
+      <b>the status pills stop conveying status</b>.
+    </p>
+
+    <h4>Proposed palette · 3 grays + 1 accent (with semantic exceptions)</h4>
+    <div class="palette">
+      <div class="swatch"><div class="chip" style="background:#fafbfc"></div><div class="meta"><div class="role">Surface</div><div class="hex">#fafbfc</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#ffffff;border-bottom:1px solid var(--line)"></div><div class="meta"><div class="role">Card</div><div class="hex">#ffffff</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#e5e7eb"></div><div class="meta"><div class="role">Line</div><div class="hex">#e5e7eb</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#5c6471"></div><div class="meta"><div class="role">Mute</div><div class="hex">#5c6471</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#0a0e14"></div><div class="meta"><div class="role">Ink</div><div class="hex">#0a0e14</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#b45309"></div><div class="meta"><div class="role">Accent</div><div class="hex">#b45309</div></div></div>
+    </div>
+    <p>
+      Semantic exceptions used <b>sparingly</b>:
+    </p>
+    <ul>
+      <li><b>Shock red</b> (<code>#b91c1c</code>) — only for SHOCK status. If 3 cards show shock, something's wrong with the system.</li>
+      <li><b>Safe green</b> (<code>#15803d</code>) — only for "verified positive" (e.g. the freshness dot). Not for "low risk" status (that's just neutral — absence of risk).</li>
+      <li><b>Evidence blue</b> (<code>#1d4ed8</code>) — for methodology, source links, "show me how" affordances.</li>
+    </ul>
+    <p>
+      Heatmap collapses from 8 steps to <b>3 steps</b>: better than baseline · baseline · worse than baseline.
+      Removes the "is this 7% better or 9% better?" cognitive question — humans can't read that off colour anyway.
+    </p>
+
+    <h4>Before / after — same metric card</h4>
+    <div class="demo">
+      <div class="demo-grid">
+        <div class="demo-cell before">
+          <div class="demo-label before">▶ Current · 5 colours in one card</div>
+          <div class="mini-card dark">
+            <div class="row">
+              <span class="name" style="color:#fca5a5">▲ Hormuz throughput</span>
+              <span class="pill shock">SHOCK</span>
+            </div>
+            <div class="val" style="color:#ef4444">12</div>
+            <div class="spark" style="background: linear-gradient(90deg, #4ade80 0%, #4ade80 20%, #f59e0b 60%, #ef4444 100%); border-radius: 2px;"></div>
+            <div class="meta" style="color:#60a5fa">−91% · was 140 · MarineTraffic ▼</div>
+          </div>
+        </div>
+        <div class="demo-cell after">
+          <div class="demo-label after">▶ Proposed · 1 accent + grays</div>
+          <div class="mini-card">
+            <div class="row">
+              <span class="name">Hormuz throughput</span>
+              <span class="pill shock">SHOCK</span>
+            </div>
+            <div class="val" style="color: var(--ink)">12</div>
+            <div class="spark" style="background: var(--surface-2); position: relative;">
+              <div style="position:absolute;top:0;bottom:0;width:2px;background:var(--accent);left:97%;"></div>
+            </div>
+            <div class="meta">−91% vs baseline · 140 normal · Lloyd's + Windward · as on 16 May</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:12.5px; color: var(--mute); margin-top:8px;">
+      Right card uses one accent and three greys. The SHOCK pill carries the urgency; the value is the focus;
+      the sparkline shows "you are here" without rainbow gradients. Same information, less work to parse.
+    </p>
+
+    <div class="devil">
+      <div class="label">Devil's advocate</div>
+      <p>"Less colour will feel less 'alive' or 'real-time'. Trading platforms are colourful for a reason."</p>
+      <p>Trading platforms (TradingView, Bloomberg) have one screen the user lives on for 8h. IRM is a 5-second glance from a phone. The two have opposite colour needs: TradingView signals "every tick matters" by using colour everywhere; IRM should signal "here's what actually changed" by using colour rarely.</p>
+    </div>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 4–6h · CSS token swap + component review · medium risk (existing users may feel "muted")</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 5: Visual hierarchy / focal point ════════════ -->
+  <div class="finding" id="f5">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 05</span>
+      <h3>No focal point. Everything competes for attention equally.</h3>
+      <span class="sev high">High</span>
+    </div>
+    <h4>Current state</h4>
+    <p>
+      The hero shows the IRS score, but it's roughly the same visual weight as the section header below it, the
+      driver tiles around it, and the topbar logo above it. Premium dashboards have <b>one element 4–10×
+      larger than everything else</b> — the focal point. IRM has no focal point.
+    </p>
+
+    <h4>Proposed</h4>
+    <p>
+      Make the IRS score the unambiguous focal point: 72–96px display number, centered top, with one short
+      sentence of human-language context underneath. Everything below is supporting evidence. The 6 drivers
+      become a compact row, not 6 hero-weight tiles.
+    </p>
+    <p>
+      <b>Eye-tracking rule of thumb:</b> if you blur the page and squint, you should see one bright object first.
+      The current home view has 6–8 bright objects. The proposed has one.
+    </p>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 3–4h · component restructure of Hero + Driver row · low risk</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 6: Data presentation -- "MoM% on bounded scores" ════════════ -->
+  <div class="finding" id="f6">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 06</span>
+      <h3>Data presentation: misleading deltas, missing sources, unit-less numbers.</h3>
+      <span class="sev high">High</span>
+    </div>
+    <ul>
+      <li><b>MoM% on bounded composites is mathematically misleading.</b> "+20% MoM" on a 50→60 score reads as "fund up 20%" — but the score is bounded 0-100. <b>Show point-change instead</b>: "+10 pts · 1mo".</li>
+      <li><b>Sources visible only inside drawers</b>, not on the metric face. Per the Design OS, financial-product trust requires source + "as on" date on every data point. Move source to the metric card itself (small, muted, but visible).</li>
+      <li><b>Unit suffixes inconsistent.</b> "₹ 100 cr", "Rs 100 Cr", "₹100 crore", "100 cr" all appear. Pick one canonical: <i>"₹100 cr"</i> with thin space.</li>
+      <li><b>Percentages and decimals mixed without tabular alignment.</b> 7.05% next to 86.4 next to 12 in the same column without right-alignment + tabular nums = visual scrambling.</li>
+      <li><b>"As on" timestamps absent on individual metrics.</b> The user sees a number with no idea if it's from 4 min ago or 4 days ago.</li>
+    </ul>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 6–8h · formatter rewrite + per-metric layout edits · low risk</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 7: Mode mismatch ════════════ -->
+  <div class="finding" id="f7">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 07</span>
+      <h3>Mode-fit error: IRM is built like Mode 4 (marketing) but should be Mode 3 (cockpit).</h3>
+      <span class="sev high">High</span>
+    </div>
+    <p>
+      Per the Aniket Design OS, Mode 3 dashboards prioritise: <i>compact, signal-first, timestamped, source-backed,
+      calm-but-alert, cockpit-like.</i> Mode 4 marketing pages prioritise: <i>persuasive, decorative, atmospheric, broad-stroke.</i>
+    </p>
+    <p>
+      Today's IRM has marketing patterns: prominent score, decorative gauges, large sparkline shapes,
+      atmospheric dark theme, narrative paragraphs in the hero. It's missing cockpit patterns: <b>"what changed" panel</b>,
+      <b>severity badges with text</b> (not just colour), <b>confidence dots</b> (separate from severity), <b>watchlist
+      visible</b>, <b>per-card source + as-on</b>, <b>action classifier</b> ("monitor / watch / act").
+    </p>
+    <p>
+      The fix is structural, not cosmetic. The home should be a "what needs your attention this morning" panel
+      (the Mode-3 cockpit pattern), with the score as <i>context</i> below — not the other way around.
+      This connects to Findings 1, 3, and 5: solving them together actually flips the mode.
+    </p>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 8–12h · architectural · medium-high risk (changes the mental model)</span>
+      <span class="approve">
+        <label><span class="marker"></span> Approve</label>
+        <label class="recommended"><span class="marker"></span> Defer until F1, F3, F5 ship</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 8: Status pills + sparklines noise ════════════ -->
+  <div class="finding" id="f8">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 08</span>
+      <h3>Status pills + sparklines on every metric = 50+ tiny attention-magnets.</h3>
+      <span class="sev high">High</span>
+    </div>
+    <p>
+      With ~70 metrics on the home, you have ~70 status pills and ~70 sparklines. Each is "claim to attention" — eye
+      darts across the page collecting them. None gets read as semantic. Status pills become decoration; sparklines
+      become wallpaper.
+    </p>
+
+    <h4>Proposed</h4>
+    <ul>
+      <li><b>Status pills only on the metric face if status is non-neutral.</b> 50 of 70 metrics are LOW/MED on a typical day — show the pill only for HIGH/SHOCK. Calm pills disappear. The page goes from 70 pills to 5–10.</li>
+      <li><b>Sparklines move to drill-down by default.</b> Replaced on the home with a single point-change number ("+0.6 wk", "−2 pts mo") — same information, 95% less ink.</li>
+      <li><b>Exception:</b> the 8 watchlist + signal cards keep their sparkline as part of the card body (high-value space).</li>
+    </ul>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 3–4h · conditional render + component prop · low risk</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 9: Interaction model ════════════ -->
+  <div class="finding" id="f9">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 09</span>
+      <h3>Drawers exist but are invisible. Users don't know they can click.</h3>
+      <span class="sev medium">Medium</span>
+    </div>
+    <p>
+      The 9D inline-expand pattern is shipped — every metric row is clickable. But there's no visible affordance.
+      No chevron, no hover-state hint, no subtle "→" on hover. Users who don't know about the drawer pattern see
+      a static page. The data behind the rows might as well not exist.
+    </p>
+    <h4>Proposed</h4>
+    <ul>
+      <li>Add a <i>tiny</i> chevron (▸) at the end of every expandable row. Light grey, 11px. Rotates to ▾ when expanded.</li>
+      <li>On hover: the row background shifts to <code>surface-2</code> and the chevron darkens. Cheap, clear, no animation overhead.</li>
+      <li>First-time-user only: a single tooltip on the IRS score saying "Click any metric for details" — dismissable, never shown again.</li>
+    </ul>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 2h · CSS-only + one-time onboarding tooltip · low risk</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 10: Mobile reality ════════════ -->
+  <div class="finding" id="f10">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 10</span>
+      <h3>Mobile is reflowed desktop, not mobile-native. 360px is broken.</h3>
+      <span class="sev medium">Medium</span>
+    </div>
+    <p>
+      Looking at the mobile-360 screenshots: section headers truncate, sparklines compress to unreadability,
+      status pills wrap, and the page is 11,672px tall — that's ~16 viewport-heights of vertical scroll.
+      Mobile-first per Design OS, and 80% of users in India probably open this on a phone first.
+    </p>
+
+    <h4>Proposed (mobile-first, not "mobile fix")</h4>
+    <ul>
+      <li><b>Tab-based section navigation</b> instead of vertical stack. Each section a single screen of content — no scroll between sections, swipe-left for next section.</li>
+      <li><b>Card layouts replace tables.</b> Each metric a card, full-width, scannable in one fixation.</li>
+      <li><b>Hero score takes the full first screen on phone.</b> Below: 3 "what changed" cards. Section tabs at bottom (thumb-reachable).</li>
+      <li><b>360px tested as the default</b>, not the edge case.</li>
+    </ul>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 12–16h · separate mobile pass after desktop redesign · medium risk</span>
+      <span class="approve">
+        <label><span class="marker"></span> Approve</label>
+        <label class="recommended"><span class="marker"></span> Defer until F1, F3, F5 ship for desktop</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 11: "What changed" missing ════════════ -->
+  <div class="finding" id="f11">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 11</span>
+      <h3>No "what changed since I last looked" panel. Every visit is a fresh full-scan.</h3>
+      <span class="sev high">High</span>
+    </div>
+    <p>
+      The Design OS lists this as <i>the #1 priority for Mode-3 cockpits</i> and IRM has nothing for it.
+      Every time a user opens IRM, they have to re-scan all 70 metrics to figure out what's different from
+      yesterday. This is the single biggest cognitive-load lever.
+    </p>
+    <h4>Proposed</h4>
+    <p>
+      A "what changed" panel at the top of the home view. Driven by data the system already has —
+      <code>_composite_was</code> (prior values) and timestamps. Shows 3–5 cards: which metrics moved most
+      meaningfully since the user's last visit (stored in localStorage). Each card is a Mode-3 signal card
+      (fact / interpretation / severity / source / suggested action).
+    </p>
+    <p>
+      <b>Side effect:</b> calm days show 0–2 cards; chaos days show 5+. The home view's "weight" naturally tracks
+      the state of the world. No visual redesign required — content density automatically reflects reality.
+    </p>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 6–8h · localStorage "last visit", change-detection logic, signal-card component · medium risk</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 12: Theme decision ════════════ -->
+  <div class="finding" id="f12">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 12</span>
+      <h3>Dark theme is wrong default for Indian retail/HNI audience.</h3>
+      <span class="sev medium">Medium</span>
+    </div>
+    <p>
+      We already discussed this in detail and you saw the side-by-side comparison. Summary: light default + dark
+      opt-in toggle, because every other Indian finance platform (Moneycontrol, Tickertape, Zerodha, Groww,
+      Smallcase, NSE/BSE) is light. Context-switching from any of those tabs into IRM's dark mode creates a 50ms
+      visual jolt that hurts perceived quality.
+    </p>
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 6–8h · token system + theme toggle + localStorage persist · medium risk</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve (light default + dark toggle)</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject (keep dark only)</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 13: Hero copy / narrative ════════════ -->
+  <div class="finding" id="f13">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 13</span>
+      <h3>Hero narrative is news-journalism, not tool-language.</h3>
+      <span class="sev low">Low</span>
+    </div>
+    <p>
+      The current hero has a paragraph or two of narrative ("Strait of Hormuz still closed. Oil pressure easing
+      as tanker rates retreat. India risk holds at medium."). That's a news intro. Tools state numbers
+      and trust the user to interpret. The narrative belongs in a "today's note" sidebar or a daily-brief
+      email, not the home screen of a real-time dashboard.
+    </p>
+    <h4>Proposed</h4>
+    <ul>
+      <li>Replace the narrative paragraph with <b>one short clause</b> tied to the score: <i>"Medium · Hormuz crisis driving oil pressure."</i> 8 words max.</li>
+      <li>Move the full narrative to a "morning brief" link in the footer — opens an editorial-style daily note (Mode 1/2 aesthetic, not Mode 3).</li>
+      <li>Numbers speak; the tool doesn't editorialise.</li>
+    </ul>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 1h · copy edit + layout · zero risk</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ FINDING 14: Sectors view ════════════ -->
+  <div class="finding" id="f14">
+    <div class="finding-head">
+      <span class="finding-num">FINDING 14</span>
+      <h3>Sectors section is a 15-row ranked list. Unscannable. Unactionable.</h3>
+      <span class="sev medium">Medium</span>
+    </div>
+    <p>
+      15 sectors in a vertical list with status pills — the user has to read all 15 to know which 3 matter.
+      Phase 3 picker had this as an open decision: <i>"4D color grid (treemap-like) + 'Show as table' toggle"</i>
+      — already designed in principle, not yet built.
+    </p>
+    <h4>Proposed</h4>
+    <ul>
+      <li><b>Default view: 4D color grid</b> (one tile per sector, sized by index weight, coloured by 4D pressure: macro/flows/freight/real-econ).</li>
+      <li><b>Toggle to ranked-list view</b> for power users who want to scan top-to-bottom.</li>
+      <li>9D drawer per sector for detail.</li>
+      <li>Below the grid: a one-line summary — <i>"3 sectors red (Banks, IT, Realty) · 9 amber · 3 green."</i></li>
+    </ul>
+
+    <div class="verdict">
+      <span class="effort"><b>Effort:</b> 5h · per Phase 3 picker estimate · medium risk (new component)</span>
+      <span class="approve">
+        <label class="recommended"><span class="marker"></span> Approve (per Phase 3 picker decision)</label>
+        <label><span class="marker"></span> Defer</label>
+        <label><span class="marker"></span> Reject</label>
+      </span>
+    </div>
+  </div>
+
+  <!-- ════════════ DEVIL'S ADVOCATE GLOBAL ════════════ -->
+  <h2>Devil's-advocate counter-arguments to the whole audit</h2>
+
+  <div class="devil">
+    <div class="label">Counter 1 · "You're telling me to throw away 70 metrics of hard work."</div>
+    <p>No metric is thrown away. They move to drill-down, search, or section-level pages. The work is preserved; only the home view changes. A user who wants <code>fastag_toll</code> can still get to it in ≤3 clicks — they just don't see it in the first 5 seconds.</p>
+    <p style="font-weight: 500;">The metrics aren't the product. The decision-velocity is the product.</p>
+  </div>
+
+  <div class="devil">
+    <div class="label">Counter 2 · "Simplification will make it feel less like a 'serious institutional tool' and more like a 'consumer app'."</div>
+    <p>The opposite is true in 2026. Bloomberg's web product, Refinitiv, even Goldman's GS Marquee — all moved toward restraint, fewer pixels per square inch, premium typography, single accents. The "more visible data = more serious" instinct is from 2012. Today, restraint signals confidence; clutter signals "we don't know what's important."</p>
+    <p style="font-weight: 500;">Premium institutional in 2026 looks like Linear, not like a Bloomberg circa-2008 screenshot.</p>
+  </div>
+
+  <div class="devil">
+    <div class="label">Counter 3 · "What if users don't actually feel overloaded? Maybe Aniket is overcorrecting."</div>
+    <p>Possible. But the audit isn't only validated by user complaints; it's validated by design-OS-level principles you already wrote down — one job per screen, one CTA, the 5-second rule, max 3 visual emphasis levels, max 7 metrics. The current product fails all of these. Even if no user has said "overload" out loud, the design is structurally overloaded by its own author's standards.</p>
+    <p style="font-weight: 500;">The audit is grading against your own rubric, not mine.</p>
+  </div>
+
+  <div class="devil">
+    <div class="label">Counter 4 · "Why not just A/B test instead of redesigning?"</div>
+    <p>A/B testing on a free public dashboard with no auth and ~unknown user count gives weak signal. You'd need ~10k users per variant per week to read out anything. IRM probably has under 1k MAU at this stage. A/B is the right tool when traffic is dense; principles are the right tool when traffic is sparse.</p>
+    <p style="font-weight: 500;">Ship the simplification; measure (via session-length, repeat-visit, scroll-depth) after.</p>
+  </div>
+
+  <div class="devil">
+    <div class="label">Counter 5 · "Why is the audit document itself so long? Isn't that hypocritical?"</div>
+    <p>Sharp point. The audit doc is long because each finding needs a defensible position and a counter-argument — and because you asked for ultrathink and brutal. The product itself should be the opposite. Audit doc = essay. Product = haiku.</p>
+    <p style="font-weight: 500;">Different artefacts, different constraints. (And yes, this doc could be 40% shorter and lose nothing.)</p>
+  </div>
+
+  <!-- ════════════ SEQUENCING ════════════ -->
+  <h2>Recommended sequencing if you approve multiple</h2>
+  <p>
+    Not all findings should ship at once. Here's the order I'd recommend, with reasoning:
+  </p>
+
+  <table>
+    <tr><th>#</th><th>Finding</th><th>Effort</th><th>Why this order</th></tr>
+    <tr><td>1</td><td>F02 · Semantic H1/H2</td><td class="r mono">1–2h</td><td>Zero visual change. A11y baseline. Unblocks F01.</td></tr>
+    <tr><td>2</td><td>F01 · Typography hierarchy</td><td class="r mono">2–4h</td><td>Foundation for everything else. Disproportionate impact.</td></tr>
+    <tr><td>3</td><td>F04 · Colour palette reduction</td><td class="r mono">4–6h</td><td>Combined with F01, ships the "feels different" moment.</td></tr>
+    <tr><td>4</td><td>F12 · Light theme default + dark toggle</td><td class="r mono">6–8h</td><td>Cleanest moment to do this — token system in place from F04.</td></tr>
+    <tr><td>5</td><td>F08 · Hide neutral pills + sparklines off home</td><td class="r mono">3–4h</td><td>Cuts visible noise by ~60% with little risk.</td></tr>
+    <tr><td>6</td><td>F09 · Visible drawer affordance</td><td class="r mono">2h</td><td>Unlocks all the drill-down work that already exists.</td></tr>
+    <tr><td>7</td><td>F13 · Replace narrative with one clause</td><td class="r mono">1h</td><td>Tiny risk, tiny effort, removes the news-paragraph dissonance.</td></tr>
+    <tr><td>8</td><td>F05 · Focal point (single hero score)</td><td class="r mono">3–4h</td><td>Requires F01 + F04 done. Now everything else can be sized correctly.</td></tr>
+    <tr><td>9</td><td>F06 · Data presentation (units, sources, deltas)</td><td class="r mono">6–8h</td><td>Trust layer. Can ship in parallel with later items.</td></tr>
+    <tr><td>10</td><td>F11 · "What changed" panel</td><td class="r mono">6–8h</td><td>The big Mode-3 cockpit feature. Build only when F01-F08 are done.</td></tr>
+    <tr><td>11</td><td>F03 · Metric cut-list (the principle is approval; the spec is separate)</td><td class="r mono">~4h to spec</td><td>Needs explicit metric-by-metric approval. Spec separately.</td></tr>
+    <tr><td>12</td><td>F14 · Sectors 4D grid</td><td class="r mono">5h</td><td>Per Phase 3 picker.</td></tr>
+    <tr><td>13</td><td>F10 · Mobile-first pass</td><td class="r mono">12–16h</td><td>After desktop redesign stabilises.</td></tr>
+    <tr><td>14</td><td>F07 · Full mode-3 cockpit restructure</td><td class="r mono">8–12h</td><td>Defer — F01–F11 collectively achieve 80% of this without restructuring.</td></tr>
+  </table>
+
+  <p>
+    <b>If you approve only the top 4 (F02, F01, F04, F12):</b> ~13–20h of work. Ships within a week. Visible
+    perceptual jump for every user on the next deploy.
+  </p>
+  <p>
+    <b>If you approve the top 8:</b> ~22–32h. Two weeks of focused work. Solves the overload complaint substantively.
+  </p>
+  <p>
+    <b>If you approve everything:</b> ~60–80h. Six weeks. Effectively a full redesign — at which point F07 (full
+    cockpit) should probably be reopened, because most of its prerequisites will already be done.
+  </p>
+
+  <!-- ════════════ FINAL APPROVAL ════════════ -->
+  <div class="final">
+    <h2>Your turn — tell me what to ship</h2>
+    <p>
+      Reply with the finding numbers you approve, defer, or reject. Example:
+    </p>
+    <p style="font-family: var(--mono); font-size: 13px; background: var(--surface-2); padding: 16px 20px; border-radius: 6px; color: var(--ink); margin: 8px 0 24px;">
+      Approve: F01, F02, F04, F08, F09, F12, F13<br>
+      Defer:   F03 (want to see cut-list first), F05, F11<br>
+      Reject:  F07, F10 (later), F14 (later)<br>
+      Question: <i>any clarifying questions per finding</i>
+    </p>
+    <p>
+      Once you respond, I'll produce two artefacts:
+    </p>
+    <ol>
+      <li>For approved findings — a focused implementation plan: file paths to touch, token changes, component edits, deploy order. We agree on it before any code changes.</li>
+      <li>For F03 (metric cuts, if approved) — a separate document: every metric of the ~84 with proposed tier (home / section / drill-down / search-only) and the reasoning. <b>You approve metric by metric</b>, not in bulk.</li>
+    </ol>
+    <p style="margin: 16px 0 0; color: var(--mute); font-size: 13px;">
+      Nothing in the live <code>app/main.mjs</code> changes until you approve. This document, the screenshots
+      package, and the audit are the entire output of this turn.
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

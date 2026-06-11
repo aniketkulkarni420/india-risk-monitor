@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IRM · V5 Cockpit · Mode 3 (Aniket Design OS-compliant)</title>
+<style>
+  /* ─────────────── DESIGN TOKENS · Mode 3 cockpit ───────────────
+     OS rule: every color has a role. No random hex. */
+  :root {
+    /* Surface */
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --surface-2: #fafbfc;
+    --line: #e6e8ed;
+    --line-soft: #f0f2f5;
+
+    /* Text — OS recommends contrast over decoration */
+    --ink: #0a0e14;
+    --ink-2: #2b3340;
+    --mute: #5c6471;
+    --dim: #8b95a3;
+
+    /* Status — semantic per OS; not used decoratively */
+    --shock: #b91c1c;     /* dark red — material risk only */
+    --shock-bg: #fef2f2;
+    --high: #c2410c;      /* burnt orange — accessible on white */
+    --high-bg: #fff7ed;
+    --med: #b45309;       /* amber-brown — softer warning */
+    --med-bg: #fefce8;
+    --low: #15803d;       /* dark green — verified positive only */
+    --low-bg: #f0fdf4;
+    --info: #1d4ed8;      /* blue — for evidence / methodology */
+    --info-bg: #eff6ff;
+
+    /* Confidence (separate from severity per OS) */
+    --conf-high: #15803d;
+    --conf-med: #b45309;
+    --conf-low: #5c6471;
+
+    /* Type */
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; font-feature-settings: 'cv11', 'ss01'; }
+
+  /* ─────────────── TOP STATUS STRIP · OS Mode 3 required ─────────────── */
+  .strip {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 24px;
+    display: flex; align-items: center; gap: 20px;
+    font-size: 12px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .strip .brand { font-weight: 600; letter-spacing: -0.01em; color: var(--ink); }
+  .strip .brand .tag { color: var(--mute); font-weight: 400; margin-left: 6px; }
+  .strip .nav { display: flex; gap: 2px; margin-left: 16px; }
+  .strip .nav a { padding: 6px 10px; border-radius: 5px; color: var(--mute); text-decoration: none; font-size: 12.5px; letter-spacing: -0.005em; transition: background 150ms ease; }
+  .strip .nav a.active { background: var(--surface-2); color: var(--ink); font-weight: 500; }
+  .strip .nav a:hover:not(.active) { color: var(--ink-2); }
+  .strip .spacer { flex: 1; }
+  .strip .health { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--low-bg); border: 1px solid #d1fae5; border-radius: 999px; color: var(--low); font-weight: 500; font-size: 11px; letter-spacing: 0.01em; }
+  .strip .health .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--low); }
+  .strip .meta { color: var(--mute); font-family: var(--mono); }
+  .strip .icon-btn { width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--mute); cursor: pointer; font-size: 14px; transition: background 150ms ease; }
+  .strip .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+  .strip .icon-btn.alert { color: var(--high); }
+  .strip .icon-btn.alert::after { content: ""; position: absolute; }
+
+  /* ─────────────── LAYOUT ─────────────── */
+  .page { max-width: 1320px; margin: 0 auto; padding: 28px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ─────────────── SECTION HEADERS · OS rule: specific, not generic ─────────────── */
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+  .sec-head h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--mute); margin: 0; }
+  .sec-head h2 b { color: var(--ink); font-weight: 600; }
+  .sec-head .right { font-size: 11px; color: var(--dim); font-family: var(--mono); letter-spacing: 0.02em; }
+
+  /* ─────────────── PRIMARY: "WHAT CHANGED" SIGNAL CARDS ─────────────── */
+  .signals { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+
+  .signal {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 6px minmax(0, 1fr);
+    gap: 16px;
+    transition: border-color 150ms ease;
+  }
+  .signal:hover { border-color: #d1d5db; }
+  .signal .stripe { background: var(--line); border-radius: 3px; }
+  .signal.sev-shock .stripe { background: var(--shock); }
+  .signal.sev-high .stripe { background: var(--high); }
+  .signal.sev-med .stripe { background: var(--med); }
+  .signal.sev-low .stripe { background: var(--low); }
+
+  .signal-body { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.5fr) 140px; gap: 20px; align-items: start; }
+  @media (max-width: 800px) { .signal-body { grid-template-columns: 1fr; } }
+
+  /* Card column 1 — fact + heading */
+  .card-head { }
+  .card-head .row1 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+  .card-head .title { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+  .card-head .badge {
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em;
+    padding: 2px 6px; border-radius: 3px; text-transform: uppercase;
+  }
+  .badge.shock { background: var(--shock-bg); color: var(--shock); border: 1px solid #fecaca; }
+  .badge.high { background: var(--high-bg); color: var(--high); border: 1px solid #fed7aa; }
+  .badge.med { background: var(--med-bg); color: var(--med); border: 1px solid #fde68a; }
+  .badge.low { background: var(--low-bg); color: var(--low); border: 1px solid #bbf7d0; }
+  .badge.dir { background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); font-family: var(--mono); letter-spacing: 0.02em; padding: 2px 5px; }
+
+  .card-head .fact { font-size: 13px; color: var(--ink-2); margin: 4px 0 8px; }
+  .card-head .fact .val { font-family: var(--mono); font-feature-settings: 'tnum'; color: var(--ink); font-weight: 500; }
+  .card-head .meta { font-size: 11px; color: var(--mute); font-family: var(--mono); letter-spacing: 0.01em; }
+  .card-head .meta b { color: var(--ink-2); font-weight: 500; }
+
+  /* Card column 2 — interpretation + why-matters (SEPARATED from fact per OS) */
+  .card-mid { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+  .card-mid .interp-label { font-size: 9.5px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 4px; }
+  .card-mid .interp { margin-bottom: 10px; }
+  .card-mid .why-label { font-size: 9.5px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 4px; }
+  .card-mid .why { color: var(--mute); }
+
+  /* Card column 3 — confidence + action (RECOMMENDATION separated per OS) */
+  .card-action { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .conf-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--mute); }
+  .conf-row .dots { display: inline-flex; gap: 2px; }
+  .conf-row .dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--line); display: inline-block; }
+  .conf-row .dots i.on { background: var(--conf-high); }
+
+  .action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-2);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .action-btn.monitor { color: var(--info); border-color: #bfdbfe; background: var(--info-bg); }
+  .action-btn.watch { color: var(--high); border-color: #fed7aa; background: var(--high-bg); }
+  .action-btn.act { color: var(--shock); border-color: #fecaca; background: var(--shock-bg); }
+  .action-btn.ignore { color: var(--mute); }
+
+  .drill-link {
+    font-size: 11px; color: var(--mute); text-decoration: none;
+    border-bottom: 1px dotted var(--line);
+    padding-bottom: 1px;
+  }
+  .drill-link:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+  /* ─────────────── SECONDARY: COMPOSITE REFERENCE STRIP ─────────────── */
+  .composite {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .composite .score-block { display: flex; flex-direction: column; gap: 2px; }
+  .composite .score-block .lbl { font-size: 9.5px; color: var(--mute); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; }
+  .composite .score-block .n { font-size: 36px; font-weight: 600; line-height: 1; color: var(--ink); font-feature-settings: 'tnum'; letter-spacing: -0.02em; }
+  .composite .score-block .delta { font-size: 11px; color: var(--high); font-family: var(--mono); font-weight: 500; }
+
+  .composite .level { display: flex; flex-direction: column; gap: 4px; }
+  .composite .level .badge { background: var(--high-bg); color: var(--high); padding: 4px 9px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; border: 1px solid #fed7aa; text-transform: uppercase; align-self: flex-start; }
+  .composite .level .reg { font-size: 11px; color: var(--mute); font-family: var(--mono); }
+
+  .composite .drivers { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; }
+  .composite .drivers .d { padding: 2px 12px; border-right: 1px solid var(--line-soft); cursor: pointer; }
+  .composite .drivers .d:last-child { border-right: none; }
+  .composite .drivers .d .name { font-size: 9.5px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; }
+  .composite .drivers .d .n { font-family: var(--mono); font-size: 16px; font-feature-settings: 'tnum'; color: var(--ink); font-weight: 500; margin-top: 2px; }
+  .composite .drivers .d .n.elev { color: var(--high); }
+
+  .composite .methodology { font-size: 11px; color: var(--mute); text-decoration: none; border-bottom: 1px dotted var(--line); align-self: center; }
+  .composite .methodology:hover { color: var(--ink); }
+
+  /* ─────────────── RIGHT RAIL ─────────────── */
+  .rail { display: flex; flex-direction: column; gap: 20px; }
+  .rail-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+
+  .watchlist-row { display: grid; grid-template-columns: 16px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line-soft); font-size: 13px; }
+  .watchlist-row:last-child { border-bottom: none; }
+  .watchlist-row:first-of-type { padding-top: 0; }
+  .watchlist-row .star { color: var(--med); font-size: 12px; }
+  .watchlist-row .name { color: var(--ink-2); }
+  .watchlist-row .val { font-family: var(--mono); font-feature-settings: 'tnum'; color: var(--ink); font-size: 13px; font-weight: 500; }
+  .watchlist-row .delta { font-size: 10px; font-family: var(--mono); margin-top: 2px; }
+  .watchlist-row .delta.down { color: var(--low); }
+  .watchlist-row .delta.up { color: var(--shock); }
+
+  .source-list .row { display: grid; grid-template-columns: 8px 1fr auto; gap: 10px; align-items: center; padding: 6px 0; font-size: 12px; color: var(--mute); border-bottom: 1px solid var(--line-soft); }
+  .source-list .row:last-child { border-bottom: none; }
+  .source-list .row .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--low); }
+  .source-list .row .dot.stale { background: var(--med); }
+  .source-list .row .name { color: var(--ink-2); }
+  .source-list .row .age { font-family: var(--mono); font-size: 10.5px; color: var(--dim); }
+
+  /* ─────────────── COMPLIANCE FOOTER · OS required for financial products ─────────────── */
+  .compliance {
+    margin: 32px 0 0;
+    padding: 16px 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 11.5px;
+    color: var(--mute);
+    line-height: 1.55;
+  }
+  .compliance b { color: var(--ink-2); font-weight: 500; }
+
+  /* ─────────────── ANNOTATIONS ─────────────── */
+  .annotate { background: var(--info-bg); border: 1px solid #bfdbfe; border-left: 3px solid var(--info); border-radius: 6px; padding: 14px 18px; margin: 32px 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.55; max-width: 1264px; }
+  .annotate b { color: var(--info); }
+
+  .hdr-page { max-width: 1320px; margin: 24px auto 8px; padding: 0 28px; }
+  .hdr-page h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; margin: 0; }
+  .hdr-page .sub { font-size: 13px; color: var(--mute); margin: 4px 0 0; }
+</style>
+</head>
+<body>
+
+<!-- ─────────── TOP STATUS STRIP (OS Mode 3 required) ─────────── -->
+<header class="strip">
+  <div class="brand">IRM <span class="tag">· KamayaKya</span></div>
+  <nav class="nav">
+    <a href="#" class="active">Home</a>
+    <a href="#">Flows</a>
+    <a href="#">Macro</a>
+    <a href="#">Real Econ</a>
+    <a href="#">Freight</a>
+    <a href="#">Market</a>
+    <a href="#">Sectors</a>
+  </nav>
+  <span class="spacer"></span>
+  <span class="health"><span class="dot"></span>All sources live · updated 4 min ago</span>
+  <span class="meta">17 May 2026 · 09:12 IST</span>
+  <span class="icon-btn alert" title="3 unread alerts">⚠</span>
+  <span class="icon-btn" title="Search Cmd+K">⌕</span>
+  <span class="icon-btn" title="Theme">◐</span>
+</header>
+
+<div class="hdr-page">
+  <h1>What needs your attention this morning</h1>
+  <p class="sub">4 changed signals · 1 SHOCK · 1 HIGH · 2 MEDIUM</p>
+</div>
+
+<!-- ─────────── ANNOTATION: explaining the OS structure ─────────── -->
+<div class="annotate" style="margin-top: 18px; max-width: 1264px; margin-left: auto; margin-right: auto;">
+  <b>OS hierarchy applied:</b> 1. What changed → 2. Why it matters → 3. Severity → 4. Direction → 5. Confidence → 6. Source → 7. Action → 8. Detail. Each card answers all 8. The risk score sits BELOW as reference context, not above as a focal point. Each card separates <i>fact</i>, <i>interpretation</i>, and <i>recommendation</i> visually.
+</div>
+
+<div class="page">
+
+  <div class="grid">
+    <!-- ─────────── LEFT: SIGNAL CARDS ─────────── -->
+    <main>
+
+      <div class="sec-head">
+        <h2><b>What changed</b> · since you last looked</h2>
+        <div class="right">last visit: 16 May 14:22 IST · 18h 50m ago</div>
+      </div>
+
+      <div class="signals">
+
+        <!-- ━━━━━ Card 1: HORMUZ SHOCK ━━━━━ -->
+        <article class="signal sev-shock">
+          <div class="stripe"></div>
+          <div class="signal-body">
+            <div class="card-head">
+              <div class="row1">
+                <span class="title">Strait of Hormuz</span>
+                <span class="badge shock">Shock</span>
+                <span class="badge dir">→ flat 11 wk</span>
+              </div>
+              <div class="fact"><b>Fact:</b> <span class="val">12</span> transits / day · baseline <span class="val">140</span> · −91% from normal</div>
+              <div class="meta">Source <b>Windward · RBI WSS · Lloyd's List</b> · as on 16 May 17:00 IST</div>
+            </div>
+            <div class="card-mid">
+              <div class="interp-label">Interpretation</div>
+              <div class="interp">Strait effectively closed for 11 consecutive weeks. Tanker rates easing this week (BDTI 2429 → 2350) is the first positive sign — but only at the supply side, not transit volume.</div>
+              <div class="why-label">Why it matters</div>
+              <div class="why">~40% of India's crude imports route through here. SPR covers ~9.5 days. Sustained closure pressures import bill, INR, and inflation.</div>
+            </div>
+            <div class="card-action">
+              <div class="conf-row">
+                Confidence
+                <span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span>
+                High
+              </div>
+              <a href="#" class="action-btn monitor">● Monitor</a>
+              <a href="#" class="drill-link">Drill into Hormuz →</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- ━━━━━ Card 2: INR HIGH ━━━━━ -->
+        <article class="signal sev-high">
+          <div class="stripe"></div>
+          <div class="signal-body">
+            <div class="card-head">
+              <div class="row1">
+                <span class="title">INR / USD</span>
+                <span class="badge high">High</span>
+                <span class="badge dir">↑ +0.6 / 9 sessions</span>
+              </div>
+              <div class="fact"><b>Fact:</b> <span class="val">86.4</span> · was <span class="val">85.8</span> last Friday · weakest since Aug 2024</div>
+              <div class="meta">Source <b>RBI reference rate · TradingEconomics</b> · as on 17 May 09:00 IST</div>
+            </div>
+            <div class="card-mid">
+              <div class="interp-label">Interpretation</div>
+              <div class="interp">9-session weakness is the third-longest streak in 18 months. FX reserves at $691 bn give RBI material ammunition for intervention.</div>
+              <div class="why-label">Why it matters</div>
+              <div class="why">Sustained INR weakness compounds with Hormuz import-bill pressure → drives macro driver up. Watch for RBI dollar-selling around 86.5–87.0.</div>
+            </div>
+            <div class="card-action">
+              <div class="conf-row">
+                Confidence
+                <span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span>
+                High
+              </div>
+              <a href="#" class="action-btn watch">⚠ Watch</a>
+              <a href="#" class="drill-link">Drill into Macro →</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- ━━━━━ Card 3: FII MED ━━━━━ -->
+        <article class="signal sev-med">
+          <div class="stripe"></div>
+          <div class="signal-body">
+            <div class="card-head">
+              <div class="row1">
+                <span class="title">FII equity flows</span>
+                <span class="badge med">Medium</span>
+                <span class="badge dir">↓ outflow widening</span>
+              </div>
+              <div class="fact"><b>Fact:</b> MTD <span class="val">−15,200 cr</span> · was <span class="val">−11,200 cr</span> last week · 7th consecutive selling week</div>
+              <div class="meta">Source <b>NSE · NSDL FPI monitor</b> · as on 16 May 18:30 IST</div>
+            </div>
+            <div class="card-mid">
+              <div class="interp-label">Interpretation</div>
+              <div class="interp">Outflow accelerated. DII absorption ratio dropped from 1.4 to 1.1 — domestic buyers no longer fully offsetting foreign selling.</div>
+              <div class="why-label">Why it matters</div>
+              <div class="why">If MTD passes −₹20K cr <i>and</i> absorption ratio falls below 1.0, triple-jeopardy condition (oil + macro + flows all elevated) likely activates.</div>
+            </div>
+            <div class="card-action">
+              <div class="conf-row">
+                Confidence
+                <span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span>
+                High
+              </div>
+              <a href="#" class="action-btn monitor">● Monitor</a>
+              <a href="#" class="drill-link">Drill into Flows →</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- ━━━━━ Card 4: OIL EASING (low severity good news) ━━━━━ -->
+        <article class="signal sev-low">
+          <div class="stripe"></div>
+          <div class="signal-body">
+            <div class="card-head">
+              <div class="row1">
+                <span class="title">Brent crude · BDTI tanker rates</span>
+                <span class="badge low">Low</span>
+                <span class="badge dir">↓ easing</span>
+              </div>
+              <div class="fact"><b>Fact:</b> Brent <span class="val">$82</span> (was $84) · BDTI <span class="val">2,350</span> (was 2,429)</div>
+              <div class="meta">Source <b>TradingEconomics · hormuz-watch BDTI</b> · as on 16 May 23:00 IST</div>
+            </div>
+            <div class="card-mid">
+              <div class="interp-label">Interpretation</div>
+              <div class="interp">First easing in 3 weeks. Supply side is finding workarounds (Cape route, longer voyages priced in) — but Hormuz transit volume itself has not improved.</div>
+              <div class="why-label">Why it matters</div>
+              <div class="why">Oil driver dropped 92 → 84 → 79 in 2 weeks. If easing continues and Brent crosses $80, expect macro driver to ease in 5-7 trading sessions.</div>
+            </div>
+            <div class="card-action">
+              <div class="conf-row">
+                Confidence
+                <span class="dots"><i class="on"></i><i class="on"></i><i class=""></i></span>
+                Med
+              </div>
+              <a href="#" class="action-btn ignore">○ Ignore for now</a>
+              <a href="#" class="drill-link">Drill into Freight →</a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ─────────── COMPOSITE REFERENCE (secondary, not focal) ─────────── -->
+      <div class="sec-head">
+        <h2><b>Composite reference</b> · India Risk Score · methodology v2</h2>
+        <div class="right">recomputed 4 min ago</div>
+      </div>
+
+      <div class="composite">
+        <div class="score-block">
+          <div class="lbl">IRS</div>
+          <div class="n">50</div>
+          <div class="delta">↑ 5 · 7d</div>
+        </div>
+        <div class="level">
+          <span class="badge">Medium</span>
+          <span class="reg">regime 58 · spot 50</span>
+        </div>
+        <div class="drivers">
+          <div class="d"><div class="name">Oil</div><div class="n elev">84</div></div>
+          <div class="d"><div class="name">Freight</div><div class="n">66</div></div>
+          <div class="d"><div class="name">Macro</div><div class="n">47</div></div>
+          <div class="d"><div class="name">Flows</div><div class="n">35</div></div>
+          <div class="d"><div class="name">Real Ec</div><div class="n">30</div></div>
+          <div class="d"><div class="name">Breadth</div><div class="n">40</div></div>
+        </div>
+        <a href="#" class="methodology">Methodology ?</a>
+      </div>
+
+      <!-- ─────────── COMPLIANCE BLOCK (OS Mode 2/3 required) ─────────── -->
+      <div class="compliance">
+        <b>Methodology + caveats.</b> India Risk Score is a composite of 6 drivers, weighted and correlation-adjusted (methodology v2, May 2026). Scores are interpretations of underlying data, not personalised investment advice. Sources are publicly available and timestamped per metric. SEBI RA registration INH000009843. Past patterns are not guarantees of future outcomes; assumptions and limitations are documented in the methodology page.
+      </div>
+
+    </main>
+
+    <!-- ─────────── RIGHT RAIL ─────────── -->
+    <aside class="rail">
+
+      <div class="rail-card">
+        <div class="sec-head" style="margin-bottom: 10px;">
+          <h2><b>Your watchlist</b></h2>
+          <div class="right">5 pinned</div>
+        </div>
+        <div class="watchlist-row">
+          <span class="star">★</span>
+          <div>
+            <div class="name">Hormuz throughput</div>
+            <div class="delta up">−2 wk · still shock</div>
+          </div>
+          <div class="val">12</div>
+        </div>
+        <div class="watchlist-row">
+          <span class="star">★</span>
+          <div>
+            <div class="name">INR / USD</div>
+            <div class="delta up">+0.6 wk · weak 9d</div>
+          </div>
+          <div class="val">86.4</div>
+        </div>
+        <div class="watchlist-row">
+          <span class="star">★</span>
+          <div>
+            <div class="name">FII MTD</div>
+            <div class="delta up">−4K wk</div>
+          </div>
+          <div class="val">−15.2K</div>
+        </div>
+        <div class="watchlist-row">
+          <span class="star">★</span>
+          <div>
+            <div class="name">Brent crude</div>
+            <div class="delta down">−$2 wk</div>
+          </div>
+          <div class="val">$82</div>
+        </div>
+        <div class="watchlist-row">
+          <span class="star">★</span>
+          <div>
+            <div class="name">Bank Nifty</div>
+            <div class="delta down">+0.5% d</div>
+          </div>
+          <div class="val">52,840</div>
+        </div>
+      </div>
+
+      <div class="rail-card">
+        <div class="sec-head" style="margin-bottom: 10px;">
+          <h2><b>Source freshness</b></h2>
+          <div class="right">61/61</div>
+        </div>
+        <div class="source-list">
+          <div class="row"><span class="dot"></span><span class="name">RBI</span><span class="age">4m</span></div>
+          <div class="row"><span class="dot"></span><span class="name">NSE / NSDL</span><span class="age">6m</span></div>
+          <div class="row"><span class="dot"></span><span class="name">PIB · GST · IIP</span><span class="age">2h</span></div>
+          <div class="row"><span class="dot"></span><span class="name">TradingEconomics</span><span class="age">12m</span></div>
+          <div class="row"><span class="dot stale"></span><span class="name">CWC reservoirs</span><span class="age">2d</span></div>
+          <div class="row"><span class="dot"></span><span class="name">Hormuz-watch</span><span class="age">3m</span></div>
+          <div class="row"><span class="dot"></span><span class="name">Multi-tracker</span><span class="age">8m</span></div>
+        </div>
+      </div>
+
+      <div class="rail-card">
+        <div class="sec-head" style="margin-bottom: 10px;">
+          <h2><b>Quick actions</b></h2>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="#" class="drill-link" style="border-bottom: none; font-size: 13px; color: var(--ink-2); padding: 6px 0;">+ Pin a metric to watchlist</a>
+          <a href="#" class="drill-link" style="border-bottom: none; font-size: 13px; color: var(--ink-2); padding: 6px 0;">↗ Export today's signals as PDF</a>
+          <a href="#" class="drill-link" style="border-bottom: none; font-size: 13px; color: var(--ink-2); padding: 6px 0;">⚙ Configure alerts (Telegram)</a>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+</div>
+
+<!-- ─────────── Final principles annotation ─────────── -->
+<div class="annotate" style="max-width: 1264px; margin: 0 auto 40px;">
+  <b>What the OS forced me to add (and V4 was missing):</b> top status strip · "what changed" signal cards as primary content · severity badges separate from color · explicit direction badges · confidence dots · per-card source + "as on" timestamp · action classifier (Monitor / Watch / Act / Ignore) · separate fact/interpretation/why-matters/recommendation regions · watchlist visible · source-freshness panel · compliance disclaimer block · methodology affordance next to scores. <br><br>
+  <b>What V4 was correct about (kept here):</b> single accent color discipline · sidebar/edge nav · light theme · tabular numerals · max-1-chart-on-home · restrained typography. <br><br>
+  <b>The trade-off:</b> V5 is denser than V4 — but it's <i>prioritized density</i> (signal cards in severity order), not flat density. The first card is the only thing that needs to be read; the rest is progressively available.
+</div>
+
+</body>
+</html>

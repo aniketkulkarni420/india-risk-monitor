@@ -189,74 +189,146 @@ function renderContent(metric) {
     pad.appendChild(trendsRow);
   }
 
-  // Period selector + chart — Phase 8 wired to data/history/{metric_id}.csv
+  // Period selector + chart — wired to data/history/{metric_id}.csv.
+  // 2026-06-11 honesty rules:
+  //  · Only SOURCE-TAGGED rows render (untagged = unprovable; the launch-era
+  //    synthetic seeds have been purged, this guards against regressions).
+  //  · Below a cadence-aware minimum of real points: no chart, an honest
+  //    "history accruing" note instead.
+  //  · Period buttons appear only when their window actually has data.
+  //  · Monthly metrics with ≥13 monthly points get a raw ↔ YoY% toggle
+  //    (YoY default — absolute monthly values are mostly seasonality).
   pad.appendChild(el('div', { class: 'md-section-head' }, 'History chart'));
-  const periodRow = el('div', { class: 'md-period-row' },
-    PERIOD_OPTIONS.map(p => el('button', {
-      class: 'md-period' + (p === '1Y' ? ' active' : ''),
-      'data-period': p,
-      onclick: (e) => {
-        pad.querySelectorAll('.md-period').forEach(b => b.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        renderChart(p);
-      }
-    }, p))
-  );
-  pad.appendChild(periodRow);
-
+  const chartControls = el('div', { class: 'md-period-row' });
+  pad.appendChild(chartControls);
   const chartHost = el('div', { class: 'md-chart' });
   pad.appendChild(chartHost);
 
-  // Lazy-load historical CSV; cache by metric_id on the closure
-  let historyCache = null;
+  const freq = (metric.source_primary && metric.source_primary.frequency) || '';
+  const isMonthlyRelease = /Monthly|Quarterly|Per release/i.test(freq);
+  const minPoints = /Live|Daily/i.test(freq) ? 8 : /Weekly|Fortnightly/i.test(freq) ? 6 : 4;
+
+  // Lazy-load historical CSV; cache on the closure
+  let historyCache;
   async function loadHistory() {
-    if (historyCache) return historyCache;
+    if (historyCache !== undefined) return historyCache;
     try {
       const res = await fetch(`../data/history/${metric.metric_id}.csv`);
       if (!res.ok) throw new Error('no history file');
       const text = await res.text();
-      const lines = text.trim().split('\n').slice(1); // skip header
-      historyCache = lines.map(line => {
-        const [date, value] = line.split(',');
-        return { date, value: parseFloat(value) };
-      }).filter(p => !isNaN(p.value));
+      historyCache = text.trim().split('\n').slice(1).map(line => {
+        const parts = line.split(',');
+        return { date: parts[0], value: parseFloat(parts[1]), source: (parts[2] || '').trim() };
+      }).filter(p => !isNaN(p.value) && p.source !== '');  // real rows only
       return historyCache;
     } catch {
+      historyCache = null;
       return null;
     }
   }
 
+  const PERIOD_DAYS = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365, '5Y': 365 * 5 };
   function filterByPeriod(history, period) {
-    if (!history || history.length === 0) return [];
-    const now = new Date();
-    const cutoffDays = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365, '5Y': 365 * 5 }[period] || 365;
-    const cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - cutoffDays);
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - (PERIOD_DAYS[period] || 365));
     return history.filter(p => new Date(p.date) >= cutoff);
+  }
+
+  // YoY% series: each point vs the point closest to one year earlier (±45d)
+  function yoySeries(history) {
+    const out = [];
+    for (const p of history) {
+      const target = new Date(p.date); target.setDate(target.getDate() - 365);
+      let best = null, bestGap = Infinity;
+      for (const q of history) {
+        const gap = Math.abs(new Date(q.date) - target) / 86400000;
+        if (gap < bestGap) { bestGap = gap; best = q; }
+      }
+      if (best && bestGap <= 45 && best.value !== 0) {
+        out.push({ date: p.date, value: +(((p.value - best.value) / Math.abs(best.value)) * 100).toFixed(2) });
+      }
+    }
+    return out;
+  }
+
+  let chartMode = 'raw';
+
+  async function buildControls() {
+    const history = await loadHistory();
+    chartControls.innerHTML = '';
+    if (!history || history.length < minPoints) return null;
+
+    // Only periods whose window holds ≥2 real points earn a button
+    const available = PERIOD_OPTIONS.filter(p => filterByPeriod(history, p).length >= 2);
+    if (!available.length) return null;
+    const initial = available.includes('1Y') ? '1Y' : available[available.length - 1];
+
+    for (const p of available) {
+      chartControls.appendChild(el('button', {
+        class: 'md-period' + (p === initial ? ' active' : ''),
+        'data-period': p,
+        onclick: (e) => {
+          chartControls.querySelectorAll('.md-period').forEach(b => b.classList.remove('active'));
+          e.currentTarget.classList.add('active');
+          renderChart(p);
+        }
+      }, p));
+    }
+
+    // YoY toggle for monthly releases with enough depth
+    if (isMonthlyRelease && yoySeries(history).length >= 4) {
+      chartMode = 'yoy';
+      chartControls.appendChild(el('button', {
+        class: 'md-period md-yoy-toggle active',
+        style: { marginLeft: 'auto' },
+        onclick: (e) => {
+          chartMode = chartMode === 'yoy' ? 'raw' : 'yoy';
+          e.currentTarget.classList.toggle('active', chartMode === 'yoy');
+          const act = chartControls.querySelector('.md-period.active:not(.md-yoy-toggle)');
+          renderChart(act ? act.dataset.period : initial);
+        }
+      }, 'YoY %'));
+    }
+    return initial;
   }
 
   async function renderChart(period) {
     chartHost.innerHTML = '';
     const history = await loadHistory();
-    const data = history ? filterByPeriod(history, period).map(p => p.value) : (metric.sparkline_12m || []);
-    if (data.length === 0) {
+    const realCount = history ? history.length : 0;
+
+    if (!history || realCount < minPoints) {
+      const since = realCount ? new Date(history[0].date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
       chartHost.appendChild(el('div', { style: { color: 'var(--ink-3)', fontSize: '12px', fontStyle: 'italic', textAlign: 'center', padding: '40px 0' } },
-        history === null ? 'history pending — backfill not yet run for this metric' : `no data in ${period} window`));
+        realCount
+          ? `History accruing · ${realCount} real point${realCount === 1 ? '' : 's'} · since ${since}`
+          : 'History accruing — chart appears after the first few live captures'));
+      return;
+    }
+
+    const base = chartMode === 'yoy' ? yoySeries(history) : history;
+    const data = filterByPeriod(base, period).map(p => p.value);
+    if (data.length < 2) {
+      chartHost.appendChild(el('div', { style: { color: 'var(--ink-3)', fontSize: '12px', fontStyle: 'italic', textAlign: 'center', padding: '40px 0' } },
+        `no data in ${period} window`));
       return;
     }
     chartHost.appendChild(renderSparkline({
       data, width: 540, height: 160, fill: true, trend_direction: dir
     }));
-    // Show range under chart
     const min = Math.min(...data), max = Math.max(...data);
+    const suffix = chartMode === 'yoy' ? '% YoY' : '';
     chartHost.appendChild(el('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '4px' } }, [
-      el('span', {}, `min ${min.toFixed(2)}`),
-      el('span', {}, `${data.length} pts`),
-      el('span', {}, `max ${max.toFixed(2)}`)
+      el('span', {}, `min ${min.toFixed(2)}${suffix}`),
+      el('span', {}, `${data.length} pts · real data only`),
+      el('span', {}, `max ${max.toFixed(2)}${suffix}`)
     ]));
   }
 
   // Initial render — defer to next tick so DOM is mounted
-  setTimeout(() => renderChart('1Y'), 0);
+  setTimeout(async () => {
+    const initial = await buildControls();
+    renderChart(initial || '1Y');
+  }, 0);
 
   // Risk score band (only if 0-100 indexed)
   if (metric.value_format === 'integer' && metric.unit && metric.unit.includes('100')) {

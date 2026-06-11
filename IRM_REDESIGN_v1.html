@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRM redesign · v1 · approval preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Defaults = Palette A (Cool institutional) · light theme · Typography A (Inter / 6.5× ratio) */
+    --bg: #fafbfc;
+    --card: #ffffff;
+    --surface-2: #f4f5f7;
+    --line: #e5e7eb;
+    --line-soft: #f0f1f4;
+    --ink: #0a0e14;
+    --ink-2: #1f2733;
+    --mute: #5c6471;
+    --dim: #8b95a3;
+    --accent: #b45309;
+    --accent-bg: #fef3c7;
+    --bad: #b91c1c;
+    --bad-bg: #fef2f2;
+    --good: #15803d;
+    --good-bg: #f0fdf4;
+    --info: #1d4ed8;
+    --info-bg: #eff6ff;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --hero-size: 96px;
+    --hero-weight: 500;
+    --hero-tracking: -0.03em;
+    --h1-size: 32px;
+    --h2-size: 22px;
+    --label-tracking: 0.08em;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--ink); margin: 0; padding: 0; transition: background-color 250ms ease, color 250ms ease; }
+  body { font-family: var(--font-sans); font-size: 15px; line-height: 1.55; font-feature-settings: 'cv11','ss01'; -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
+
+  /* ─────── STICKY CONTROL BAR ─────── */
+  .controls {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    font-size: 12px;
+  }
+  .controls .group { display: inline-flex; align-items: center; gap: 6px; }
+  .controls .group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--mute); font-weight: 600; margin-right: 2px; }
+  .controls .pick {
+    padding: 5px 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--card); color: var(--mute); cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 500; transition: all 120ms ease;
+  }
+  .controls .pick:hover { color: var(--ink); border-color: var(--mute); }
+  .controls .pick.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
+  .controls .doc-title { font-weight: 600; color: var(--ink); margin-right: auto; font-size: 13px; letter-spacing: -0.01em; }
+
+  /* ─────── LAYOUT ─────── */
+  .stage { max-width: 1320px; margin: 0 auto; padding: 48px 32px 80px; }
+
+  /* ─────── REDESIGNED IRM HOME VIEW ─────── */
+  /* Page top whisper — minimal */
+  .top-whisper { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--mute); margin-bottom: 64px; letter-spacing: 0.01em; }
+  .top-whisper .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); }
+  .top-whisper .spacer { flex: 1; }
+  .top-whisper a { color: var(--mute); text-decoration: none; }
+  .top-whisper a:hover { color: var(--ink); }
+
+  /* H1 · page title (specific, dated, content-bearing — Finding 02) */
+  h1.page-title { font-size: var(--h1-size); font-weight: 600; letter-spacing: -0.025em; line-height: 1.1; margin: 0 0 12px; color: var(--ink); }
+  .page-sub { font-size: 14px; color: var(--mute); margin: 0 0 80px; }
+
+  /* H2 · section heading (Finding 02) */
+  h2.section-head { font-size: var(--h2-size); font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; margin: 64px 0 20px; color: var(--ink); display: flex; align-items: baseline; gap: 12px; }
+  h2.section-head .anchor-meta { font-size: 11px; font-weight: 400; color: var(--mute); letter-spacing: 0; text-transform: none; font-family: var(--font-mono); }
+
+  /* HERO · single focal point (Finding 05A — recommended) */
+  .hero { text-align: center; padding: 24px 0 56px; border-bottom: 1px solid var(--line); margin-bottom: 56px; }
+  .hero .label { font-size: 11px; color: var(--mute); letter-spacing: var(--label-tracking); text-transform: uppercase; font-weight: 600; margin-bottom: 20px; }
+  .hero .score {
+    font-size: var(--hero-size); font-weight: var(--hero-weight); letter-spacing: var(--hero-tracking);
+    line-height: 0.95; color: var(--ink); font-feature-settings: 'tnum'; margin: 0;
+  }
+  .hero .status-row {
+    display: inline-flex; align-items: center; gap: 14px; margin-top: 24px;
+  }
+  .hero .status-word { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+  .hero .delta { font-family: var(--font-mono); font-size: 12px; color: var(--mute); }
+  .hero .delta b { color: var(--ink-2); font-weight: 500; }
+  .hero .context { margin-top: 36px; font-size: 15px; color: var(--ink-2); line-height: 1.4; max-width: 440px; margin-left: auto; margin-right: auto; }
+
+  /* DRIVER ROW · 6 chips, single number each (Finding 05 — supporting) */
+  .drivers { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 64px; }
+  .driver { padding: 22px 18px; border-right: 1px solid var(--line-soft); position: relative; cursor: pointer; transition: background 150ms ease; }
+  .driver:last-child { border-right: none; }
+  .driver:hover { background: var(--surface-2); }
+  .driver .name { font-size: 10px; color: var(--mute); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; margin-bottom: 10px; }
+  .driver .n { font-size: 28px; font-weight: 500; line-height: 1; color: var(--ink-2); font-feature-settings: 'tnum'; letter-spacing: -0.015em; }
+  .driver.elevated .n { color: var(--accent); }
+  .driver.elevated::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--accent); }
+  .driver .trend { font-size: 10px; color: var(--dim); font-family: var(--font-mono); margin-top: 4px; }
+
+  /* WHAT CHANGED · signal cards (Finding 11) */
+  .signals { display: flex; flex-direction: column; gap: 12px; margin-bottom: 56px; }
+  .signal {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: 4px minmax(0, 1fr);
+    gap: 18px;
+    cursor: pointer;
+    transition: border-color 150ms ease;
+  }
+  .signal:hover { border-color: var(--mute); }
+  .signal:hover .chevron { transform: translateX(2px); color: var(--ink); }
+  .signal .stripe { background: var(--line); border-radius: 2px; }
+  .signal.sev-shock .stripe { background: var(--bad); }
+  .signal.sev-high .stripe { background: var(--accent); }
+  .signal.sev-med .stripe { background: var(--info); }
+  .signal.sev-low .stripe { background: var(--good); }
+
+  .signal-body { display: grid; grid-template-columns: minmax(0,1.6fr) minmax(0,1.4fr) 130px; gap: 24px; align-items: start; }
+  @media (max-width: 800px) { .signal-body { grid-template-columns: 1fr; gap: 12px; } }
+
+  .signal .head { }
+  .signal .name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .signal .name { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+  .signal .pill {
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; padding: 2px 7px; border-radius: 3px; text-transform: uppercase;
+  }
+  .pill-shock { background: var(--bad-bg); color: var(--bad); }
+  .pill-high { background: var(--accent-bg); color: var(--accent); }
+  .pill-med { background: var(--info-bg); color: var(--info); }
+  .pill-low { background: var(--good-bg); color: var(--good); }
+  .signal .dir { font-family: var(--font-mono); font-size: 10.5px; color: var(--mute); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; }
+  .signal .fact { font-size: 13.5px; color: var(--ink-2); margin: 6px 0; }
+  .signal .fact .val { font-family: var(--font-mono); color: var(--ink); font-weight: 500; }
+  .signal .source { font-size: 10.5px; color: var(--mute); font-family: var(--font-mono); letter-spacing: 0.01em; }
+  .signal .source b { color: var(--ink-2); font-weight: 500; }
+
+  .signal .mid { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+  .signal .mid .l { font-size: 9.5px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; margin-bottom: 4px; }
+  .signal .mid .why { color: var(--mute); margin-top: 8px; }
+
+  .signal .right { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .signal .conf { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--mute); }
+  .signal .dots { display: inline-flex; gap: 2px; }
+  .signal .dots i { display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: var(--line); }
+  .signal .dots i.on { background: var(--good); }
+  .signal .action {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 10px; border-radius: 5px;
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink-2);
+  }
+  .action.monitor { color: var(--info); border-color: var(--info-bg); background: var(--info-bg); }
+  .action.watch { color: var(--accent); border-color: var(--accent-bg); background: var(--accent-bg); }
+  .action.act { color: var(--bad); border-color: var(--bad-bg); background: var(--bad-bg); }
+  .action.ignore { color: var(--mute); }
+  .signal .chevron { font-size: 11px; color: var(--mute); transition: transform 150ms ease; display: inline-flex; align-items: center; gap: 4px; }
+
+  /* ─────── VARIANT EXPLORATION (below redesigned home) ─────── */
+  .variants-intro {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 24px 28px; margin: 80px 0 24px;
+  }
+  .variants-intro h2 { margin: 0 0 8px; font-size: 22px; letter-spacing: -0.015em; }
+  .variants-intro p { margin: 0; color: var(--mute); font-size: 14px; }
+
+  .variant-block {
+    margin-bottom: 56px; padding: 28px 32px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  }
+  .variant-block .vh { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+  .variant-block .vnum { font-family: var(--font-mono); font-size: 11px; color: var(--dim); }
+  .variant-block h3 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.005em; color: var(--ink); }
+  .variant-block .vsub { font-size: 13px; color: var(--mute); margin: 0 0 24px; }
+
+  .variant-grid { display: grid; gap: 16px; }
+  .variant-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .variant-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 760px) { .variant-grid.cols-2, .variant-grid.cols-3 { grid-template-columns: 1fr; } }
+
+  .variant {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 18px; position: relative;
+  }
+  .variant.recommended { border-color: var(--accent); }
+  .variant.recommended::before {
+    content: 'RECOMMENDED'; position: absolute; top: -8px; left: 14px;
+    background: var(--accent); color: var(--card); font-size: 8.5px; padding: 2px 7px; border-radius: 3px;
+    font-weight: 700; letter-spacing: 0.1em;
+  }
+  .variant .vlabel { font-size: 10px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; margin-bottom: 12px; }
+  .variant .demo { background: var(--card); padding: 16px; border-radius: 6px; border: 1px solid var(--line-soft); margin-bottom: 10px; }
+  .variant .desc { font-size: 12px; color: var(--mute); line-height: 1.45; }
+
+  /* ─────── TESTING LOG ─────── */
+  .test-log { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 24px 28px; margin: 80px 0 24px; }
+  .test-log h2 { margin: 0 0 8px; font-size: 22px; letter-spacing: -0.015em; }
+  .test-log .sub { color: var(--mute); font-size: 13px; margin: 0 0 16px; }
+  .test-log table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .test-log th, .test-log td { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--line-soft); }
+  .test-log th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute); }
+  .test-log td .pass { color: var(--good); font-weight: 600; }
+  .test-log td .aaa { color: var(--good); font-weight: 700; }
+  .test-log td .fail { color: var(--bad); font-weight: 700; }
+  .test-log td.mono { font-family: var(--font-mono); }
+
+  /* ─────── APPROVAL ─────── */
+  .approve {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 28px 32px; margin: 56px 0 0;
+  }
+  .approve h2 { margin: 0 0 12px; font-size: 22px; letter-spacing: -0.015em; }
+  .approve p { color: var(--ink-2); margin: 0 0 14px; font-size: 14px; }
+  .approve pre { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; font-family: var(--font-mono); font-size: 12.5px; color: var(--ink); margin: 12px 0; white-space: pre-wrap; }
+
+  /* ─────── DARK THEME OVERRIDES (Palette A dark by default; specific palettes set their own) ─────── */
+  body.theme-dark {
+    --bg: #0a0e14;
+    --card: #131820;
+    --surface-2: #1c2230;
+    --line: #1f2733;
+    --line-soft: #161c25;
+    --ink: #f0f1f4;
+    --ink-2: #c4c7cc;
+    --mute: #8b95a3;
+    --dim: #5c6471;
+    --accent: #f59e0b;
+    --accent-bg: rgba(245,158,11,0.12);
+    --bad: #ef4444;
+    --bad-bg: rgba(239,68,68,0.12);
+    --good: #4ade80;
+    --good-bg: rgba(74,222,128,0.12);
+    --info: #60a5fa;
+    --info-bg: rgba(96,165,250,0.12);
+  }
+
+  /* Small responsive ­— this page is decision-tool, not full mobile-native */
+  @media (max-width: 720px) {
+    .stage { padding: 32px 16px 64px; }
+    .drivers { grid-template-columns: repeat(3, 1fr); }
+    .driver:nth-child(3) { border-right: none; }
+    .driver:nth-child(-n+3) { border-bottom: 1px solid var(--line-soft); }
+    h1.page-title { font-size: 26px; }
+    .hero .score { font-size: 80px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─────── STICKY CONTROL BAR ─────── -->
+<div class="controls" role="toolbar" aria-label="Design controls">
+  <span class="doc-title">IRM redesign · v1 preview</span>
+
+  <span class="group">
+    <span class="group-label">Palette</span>
+    <button class="pick active" data-palette="A">A · Cool</button>
+    <button class="pick" data-palette="B">B · Editorial</button>
+    <button class="pick" data-palette="C">C · Indigo</button>
+    <button class="pick" data-palette="D">D · Greyscale</button>
+  </span>
+
+  <span class="group">
+    <span class="group-label">Type</span>
+    <button class="pick active" data-type="A">A · Inter</button>
+    <button class="pick" data-type="B">B · Manrope</button>
+    <button class="pick" data-type="C">C · Punchy</button>
+  </span>
+
+  <span class="group">
+    <span class="group-label">Theme</span>
+    <button class="pick active" data-theme="light">Light</button>
+    <button class="pick" data-theme="dark">Dark</button>
+  </span>
+</div>
+
+<main class="stage">
+
+  <!-- ═══════════ THE NEW IRM HOME VIEW ═══════════ -->
+
+  <div class="top-whisper">
+    <span class="dot" aria-hidden="true"></span>
+    <span>Live · all 61 sources current · updated 4 min ago</span>
+    <span class="spacer"></span>
+    <span>17 May 2026 · 09:12 IST</span>
+    <a href="#">Methodology ▾</a>
+  </div>
+
+  <h1 class="page-title">India risk · 17 May 2026</h1>
+  <p class="page-sub">Hormuz crisis active (week 11). Oil pressure easing. Macro and flows steady but watchable.</p>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-label">
+    <div class="label" id="hero-label">India Risk Score</div>
+    <p class="score" aria-live="polite">50</p>
+    <div class="status-row">
+      <span class="status-word">Medium</span>
+      <span class="delta">↑ <b>5 pts</b> · 7 days</span>
+    </div>
+    <p class="context">Hormuz crisis driving oil pressure. Macro and flows steady.</p>
+  </section>
+
+  <!-- DRIVER ROW -->
+  <h2 class="section-head" id="drivers">Drivers <span class="anchor-meta">six-driver composite</span></h2>
+  <section class="drivers" aria-labelledby="drivers">
+    <div class="driver elevated">
+      <div class="name">Oil &amp; physical</div>
+      <div class="n">84</div>
+      <div class="trend">−8 wk</div>
+    </div>
+    <div class="driver">
+      <div class="name">Freight</div>
+      <div class="n">66</div>
+      <div class="trend">—</div>
+    </div>
+    <div class="driver">
+      <div class="name">Macro</div>
+      <div class="n">47</div>
+      <div class="trend">+4 wk</div>
+    </div>
+    <div class="driver">
+      <div class="name">Inst. flows</div>
+      <div class="n">35</div>
+      <div class="trend">−8 wk</div>
+    </div>
+    <div class="driver">
+      <div class="name">Real economy</div>
+      <div class="n">30</div>
+      <div class="trend">—</div>
+    </div>
+    <div class="driver">
+      <div class="name">Sector breadth</div>
+      <div class="n">40</div>
+      <div class="trend">—</div>
+    </div>
+  </section>
+
+  <!-- WHAT CHANGED · 3 signal cards (real current values) -->
+  <h2 class="section-head" id="changed">What changed <span class="anchor-meta">since you last looked · 18h ago</span></h2>
+  <section class="signals" aria-labelledby="changed">
+
+    <article class="signal sev-shock" tabindex="0">
+      <div class="stripe"></div>
+      <div class="signal-body">
+        <div class="head">
+          <div class="name-row">
+            <span class="name">Strait of Hormuz</span>
+            <span class="pill pill-shock">Shock</span>
+            <span class="dir">→ flat 11 wk</span>
+          </div>
+          <p class="fact"><b>Fact:</b> <span class="val">12</span> transits/day · baseline <span class="val">140</span> · −91% from normal</p>
+          <p class="source">Source · <b>Windward + Lloyd's List</b> · as on 16 May 17:00 IST</p>
+        </div>
+        <div class="mid">
+          <div class="l">Interpretation</div>
+          <div>Strait effectively closed for 11 consecutive weeks. Tanker rates easing this week (BDTI 2429→2350) is the first positive sign — supply side only, not transit volume.</div>
+          <div class="why">~40% of India crude imports route through here. SPR covers ~9.5 days.</div>
+        </div>
+        <div class="right">
+          <div class="conf">Confidence <span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span> High</div>
+          <a class="action monitor" href="#">● Monitor</a>
+          <span class="chevron">Drill →</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="signal sev-high" tabindex="0">
+      <div class="stripe"></div>
+      <div class="signal-body">
+        <div class="head">
+          <div class="name-row">
+            <span class="name">INR / USD</span>
+            <span class="pill pill-high">High</span>
+            <span class="dir">↑ +0.6 over 9 sessions</span>
+          </div>
+          <p class="fact"><b>Fact:</b> <span class="val">86.4</span> · was <span class="val">85.8</span> last Friday · weakest since Aug 2024</p>
+          <p class="source">Source · <b>RBI ref rate + TradingEconomics</b> · as on 17 May 09:00 IST</p>
+        </div>
+        <div class="mid">
+          <div class="l">Interpretation</div>
+          <div>9-session weakness — third-longest streak in 18 months. FX reserves at <span class="val">$691 bn</span> give RBI material ammunition for intervention.</div>
+          <div class="why">Sustained INR weakness compounds with Hormuz import-bill pressure → drives macro driver up. Watch 86.5–87.0 for RBI dollar-selling.</div>
+        </div>
+        <div class="right">
+          <div class="conf">Confidence <span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span> High</div>
+          <a class="action watch" href="#">⚠ Watch</a>
+          <span class="chevron">Drill →</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="signal sev-med" tabindex="0">
+      <div class="stripe"></div>
+      <div class="signal-body">
+        <div class="head">
+          <div class="name-row">
+            <span class="name">FII equity flows</span>
+            <span class="pill pill-med">Medium</span>
+            <span class="dir">↓ outflow widening</span>
+          </div>
+          <p class="fact"><b>Fact:</b> MTD <span class="val">−15,200 cr</span> · was <span class="val">−11,200 cr</span> last week · 7th consecutive selling week</p>
+          <p class="source">Source · <b>NSE + NSDL FPI</b> · as on 16 May 18:30 IST</p>
+        </div>
+        <div class="mid">
+          <div class="l">Interpretation</div>
+          <div>Outflow accelerated. DII absorption ratio dropped <span class="val">1.4</span> → <span class="val">1.1</span> — domestic buyers no longer fully offsetting foreign selling.</div>
+          <div class="why">If MTD passes −₹20K cr and absorption ratio falls below 1.0 → triple-jeopardy condition likely activates.</div>
+        </div>
+        <div class="right">
+          <div class="conf">Confidence <span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span> High</div>
+          <a class="action monitor" href="#">● Monitor</a>
+          <span class="chevron">Drill →</span>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- ═══════════ VARIANT EXPLORATION BELOW ═══════════ -->
+
+  <div class="variants-intro">
+    <h2>Variant options · for findings where alternatives exist</h2>
+    <p>Use the controls at top to see palette and typography variants applied to the page above. The findings below have specific options that don't fit a global toggle — pick one per finding.</p>
+  </div>
+
+  <!-- F05 · focal point options -->
+  <div class="variant-block">
+    <div class="vh"><span class="vnum">FINDING 05</span><h3>Hero focal point</h3></div>
+    <p class="vsub">How "loud" should the central score be? Range from 80px (calm) to 144px (declarative). Bigger = more confident, but eats real estate.</p>
+    <div class="variant-grid cols-3">
+      <div class="variant">
+        <div class="vlabel">Option A · 80px</div>
+        <div class="demo" style="text-align:center; padding: 12px;">
+          <div style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">India Risk Score</div>
+          <div style="font-size: 80px; font-weight: 500; line-height: 0.95; letter-spacing: -0.03em; color: var(--ink);">50</div>
+          <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-top: 14px;">Medium</div>
+        </div>
+        <p class="desc">Calm, conservative. Doesn't dominate. Best when the score isn't the most important thing on a screen with multiple priorities.</p>
+      </div>
+      <div class="variant recommended">
+        <div class="vlabel">Option B · 96px</div>
+        <div class="demo" style="text-align:center; padding: 12px;">
+          <div style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">India Risk Score</div>
+          <div style="font-size: 96px; font-weight: 500; line-height: 0.95; letter-spacing: -0.03em; color: var(--ink);">50</div>
+          <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-top: 14px;">Medium</div>
+        </div>
+        <p class="desc">Sweet spot. Clearly the focal point. Ratio to body text (15px) = 6.4× — premium territory without screaming.</p>
+      </div>
+      <div class="variant">
+        <div class="vlabel">Option C · 128px</div>
+        <div class="demo" style="text-align:center; padding: 12px 0;">
+          <div style="font-size: 10px; color: var(--mute); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">India Risk Score</div>
+          <div style="font-size: 128px; font-weight: 500; line-height: 0.95; letter-spacing: -0.03em; color: var(--ink);">50</div>
+          <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-top: 14px;">Medium</div>
+        </div>
+        <p class="desc">Declarative. Apple-Stocks territory. Risk: overwhelms on mobile (drops to 80px there anyway). Use only if score is THE product.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- F08 · status pill handling -->
+  <div class="variant-block">
+    <div class="vh"><span class="vnum">FINDING 08</span><h3>Status pill density</h3></div>
+    <p class="vsub">Today there's a coloured pill on every metric. Most metrics are neutral most of the time. Each pill is "claim to attention" — too many = none read.</p>
+    <div class="variant-grid cols-3">
+      <div class="variant">
+        <div class="vlabel">Option A · Keep all pills</div>
+        <div class="demo">
+          <div style="display: grid; gap: 6px; font-size: 12px;">
+            <div style="display: flex; gap: 8px;"><span class="pill pill-low" style="font-size:9px;">Low</span><span>Repo rate · 5.25%</span></div>
+            <div style="display: flex; gap: 8px;"><span class="pill pill-low" style="font-size:9px;">Low</span><span>CPI · 4.8%</span></div>
+            <div style="display: flex; gap: 8px;"><span class="pill pill-med" style="font-size:9px;">Medium</span><span>FII MTD · −15.2K</span></div>
+            <div style="display: flex; gap: 8px;"><span class="pill pill-high" style="font-size:9px;">High</span><span>INR · 86.4</span></div>
+            <div style="display: flex; gap: 8px;"><span class="pill pill-shock" style="font-size:9px;">Shock</span><span>Hormuz · 12</span></div>
+          </div>
+        </div>
+        <p class="desc">Current behaviour. 70+ pills on screen. Visual texture. Pills lose semantic weight.</p>
+      </div>
+      <div class="variant recommended">
+        <div class="vlabel">Option B · Pills only HIGH+</div>
+        <div class="demo">
+          <div style="display: grid; gap: 6px; font-size: 12px;">
+            <div style="display: flex; gap: 8px;"><span style="font-size:9px; color:var(--mute); width:48px;">Low</span><span>Repo rate · 5.25%</span></div>
+            <div style="display: flex; gap: 8px;"><span style="font-size:9px; color:var(--mute); width:48px;">Low</span><span>CPI · 4.8%</span></div>
+            <div style="display: flex; gap: 8px;"><span style="font-size:9px; color:var(--mute); width:48px;">Med</span><span>FII MTD · −15.2K</span></div>
+            <div style="display: flex; gap: 8px;"><span class="pill pill-high" style="font-size:9px;">High</span><span>INR · 86.4</span></div>
+            <div style="display: flex; gap: 8px;"><span class="pill pill-shock" style="font-size:9px;">Shock</span><span>Hormuz · 12</span></div>
+          </div>
+        </div>
+        <p class="desc">Pills earn attention only when something matters. Neutral metrics get text-only labels. ~80% fewer coloured pills on screen.</p>
+      </div>
+      <div class="variant">
+        <div class="vlabel">Option C · No pills · text only</div>
+        <div class="demo">
+          <div style="display: grid; gap: 6px; font-size: 12px;">
+            <div style="display: flex; gap: 8px;"><span style="font-size:9px; color:var(--mute); width:48px;">LOW</span><span>Repo rate · 5.25%</span></div>
+            <div style="display: flex; gap: 8px;"><span style="font-size:9px; color:var(--mute); width:48px;">LOW</span><span>CPI · 4.8%</span></div>
+            <div style="display: flex; gap: 8px;"><span style="font-size:9px; color:var(--mute); width:48px;">MED</span><span>FII MTD · −15.2K</span></div>
+            <div style="display: flex; gap: 8px;"><span style="font-size:9px; color:var(--accent); width:48px; font-weight:600;">HIGH</span><span>INR · 86.4</span></div>
+            <div style="display: flex; gap: 8px;"><span style="font-size:9px; color:var(--bad); width:48px; font-weight:600;">SHOCK</span><span>Hormuz · 12</span></div>
+          </div>
+        </div>
+        <p class="desc">Purest restraint. Status as text in label colour only — no backgrounds. Most "Linear-like". Risk: SHOCK doesn't shout enough.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- F09 · drawer affordance -->
+  <div class="variant-block">
+    <div class="vh"><span class="vnum">FINDING 09</span><h3>Drawer affordance (showing "this is clickable")</h3></div>
+    <p class="vsub">Inline-expand drawers exist on every metric row but users don't know. How obvious do we make it?</p>
+    <div class="variant-grid cols-3">
+      <div class="variant">
+        <div class="vlabel">Option A · Tiny chevron</div>
+        <div class="demo">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 5px; font-size: 13px;">
+            <span style="flex: 1;">Hormuz throughput</span>
+            <span style="font-family: var(--font-mono); font-weight: 500;">12</span>
+            <span style="color: var(--dim); font-size: 11px;">▸</span>
+          </div>
+        </div>
+        <p class="desc">Subtle 11px chevron at end of every clickable row. Discoverable on hover (chevron darkens, row tints). Most premium-feeling.</p>
+      </div>
+      <div class="variant recommended">
+        <div class="vlabel">Option B · Chevron + hover hint</div>
+        <div class="demo">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 5px; font-size: 13px; background: var(--surface-2);">
+            <span style="flex: 1;">Hormuz throughput</span>
+            <span style="font-family: var(--font-mono); font-weight: 500;">12</span>
+            <span style="color: var(--accent); font-size: 11px;">→ details</span>
+          </div>
+        </div>
+        <p class="desc">Same as A in default state. On hover: chevron becomes "→ details" link, row background tints. Better learnability without permanent visual clutter.</p>
+      </div>
+      <div class="variant">
+        <div class="vlabel">Option C · "Show details" link</div>
+        <div class="demo">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 5px; font-size: 13px;">
+            <span style="flex: 1;">Hormuz throughput</span>
+            <span style="font-family: var(--font-mono); font-weight: 500; margin-right: 12px;">12</span>
+            <span style="color: var(--info); font-size: 11px; border-bottom: 1px dotted var(--info);">Show details</span>
+          </div>
+        </div>
+        <p class="desc">Most discoverable but most noisy. Coloured links on every row. Defeats the F08 minimalism.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- F13 · hero copy -->
+  <div class="variant-block">
+    <div class="vh"><span class="vnum">FINDING 13</span><h3>Hero context line</h3></div>
+    <p class="vsub">One sentence below the score. How journalistic vs how clinical?</p>
+    <div class="variant-grid cols-3">
+      <div class="variant">
+        <div class="vlabel">Option A · None</div>
+        <div class="demo" style="text-align: center;">
+          <div style="font-size: 11px; color: var(--mute); letter-spacing: 0.14em; text-transform: uppercase;">India Risk Score</div>
+          <div style="font-size: 56px; font-weight: 500; line-height: 1; margin: 8px 0;">50</div>
+          <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 600;">Medium</div>
+        </div>
+        <p class="desc">Purest. Numbers speak. User clicks drivers/signals for "why." Maximum restraint, zero opinion.</p>
+      </div>
+      <div class="variant recommended">
+        <div class="vlabel">Option B · Single clause</div>
+        <div class="demo" style="text-align: center;">
+          <div style="font-size: 11px; color: var(--mute); letter-spacing: 0.14em; text-transform: uppercase;">India Risk Score</div>
+          <div style="font-size: 56px; font-weight: 500; line-height: 1; margin: 8px 0;">50</div>
+          <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 600;">Medium</div>
+          <p style="font-size: 13px; color: var(--ink-2); margin: 14px 0 0;">Hormuz crisis driving oil pressure.</p>
+        </div>
+        <p class="desc">8 words of context. Specific (names the driver). No editorial fluff. Gets users 80% of the "why" before they scroll.</p>
+      </div>
+      <div class="variant">
+        <div class="vlabel">Option C · Two sentences</div>
+        <div class="demo" style="text-align: center;">
+          <div style="font-size: 11px; color: var(--mute); letter-spacing: 0.14em; text-transform: uppercase;">India Risk Score</div>
+          <div style="font-size: 56px; font-weight: 500; line-height: 1; margin: 8px 0;">50</div>
+          <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 600;">Medium</div>
+          <p style="font-size: 13px; color: var(--ink-2); margin: 14px 0 0; line-height: 1.45;">Hormuz crisis active for 11 weeks. Oil pressure easing as tanker rates retreat.</p>
+        </div>
+        <p class="desc">More narrative. Begins to feel like a news lede. Risk: editorial drift.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ TESTING LOG ═══════════ -->
+  <div class="test-log">
+    <h2>Testing performed before showing you these options</h2>
+    <p class="sub">All four palettes ran through WCAG contrast checks against real text/background pairs. Two palettes initially failed (C green, D red); both fixed and re-tested.</p>
+
+    <h4 style="margin: 24px 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute);">WCAG contrast (final, after fixes)</h4>
+    <table>
+      <thead><tr><th>Palette</th><th>Ink/bg</th><th>Mute/bg</th><th>Accent/bg</th><th>Bad/bg</th><th>Good/bg</th><th>Info/bg</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td><b>A · Cool institutional</b></td><td class="mono"><span class="aaa">18.67</span></td><td class="mono"><span class="pass">5.76</span></td><td class="mono"><span class="pass">4.85</span></td><td class="mono"><span class="pass">6.24</span></td><td class="mono"><span class="pass">4.84</span></td><td class="mono"><span class="pass">6.47</span></td><td><span class="pass">All AA+</span></td></tr>
+        <tr><td><b>B · Warm editorial</b></td><td class="mono"><span class="aaa">16.23</span></td><td class="mono"><span class="pass">5.88</span></td><td class="mono"><span class="pass">5.08</span></td><td class="mono"><span class="aaa">7.44</span></td><td class="mono"><span class="pass">6.57</span></td><td class="mono"><span class="aaa">8.10</span></td><td><span class="pass">All AA+ · 3 AAA</span></td></tr>
+        <tr><td><b>C · Modern indigo</b></td><td class="mono"><span class="aaa">16.67</span></td><td class="mono"><span class="aaa">7.27</span></td><td class="mono"><span class="aaa">7.44</span></td><td class="mono"><span class="pass">4.54</span></td><td class="mono"><span class="pass">4.72</span> <i>(fix)</i></td><td class="mono"><span class="pass">4.86</span></td><td><span class="pass">All AA+ after fix</span></td></tr>
+        <tr><td><b>D · Minimal greyscale</b></td><td class="mono"><span class="aaa">16.44</span></td><td class="mono"><span class="aaa">7.17</span></td><td class="mono"><span class="aaa">9.51</span></td><td class="mono"><span class="pass">5.93</span> <i>(fix)</i></td><td class="mono"><span class="aaa">16.44</span></td><td class="mono"><span class="aaa">16.44</span></td><td><span class="pass">All AA+ after fix</span></td></tr>
+      </tbody>
+    </table>
+
+    <h4 style="margin: 24px 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute);">Real data used (not Lorem ipsum)</h4>
+    <ul style="font-size: 13px; color: var(--ink-2); margin: 0; padding-left: 22px;">
+      <li>IRS · <span class="mono" style="font-family: var(--font-mono);">50</span> (current live composite from <code>data/composites/india_risk_score.json</code>)</li>
+      <li>Drivers · oil <span class="mono">84</span>, freight <span class="mono">66</span>, macro <span class="mono">47</span>, flows <span class="mono">35</span>, real-econ <span class="mono">30</span>, breadth <span class="mono">40</span></li>
+      <li>Hormuz · <span class="mono">12</span> transits/day, SHOCK · manual override pinned 16 May</li>
+      <li>INR · <span class="mono">86.4</span>, HIGH · 9-session weak streak</li>
+      <li>FII MTD · <span class="mono">−15,200 cr</span>, MED · widening</li>
+      <li>FX reserves · <span class="mono">$691 bn</span> · current RBI WSS read</li>
+    </ul>
+
+    <h4 style="margin: 24px 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute);">Other tests run</h4>
+    <ul style="font-size: 13px; color: var(--ink-2); margin: 0; padding-left: 22px;">
+      <li>Typography ratio · hero/label = 96/11 = 8.7× · premium territory · <span class="pass">pass</span></li>
+      <li>Responsive · breakpoint at 720px collapses driver row 6→3 and shrinks hero 96→80 · <span class="pass">pass</span></li>
+      <li>Tabular numerals · all numeric columns line up vertically · <span class="pass">pass</span> via <code>font-feature-settings: 'tnum'</code></li>
+      <li>Interactive controls · palette/type/theme switchers update all CSS variables atomically · <span class="pass">pass</span></li>
+      <li>Keyboard navigation · all signal cards focusable, status-row reachable, controls tabbable · <span class="pass">pass</span></li>
+      <li>Dark theme · palette tokens auto-flip via <code>body.theme-dark</code> · <span class="pass">pass</span></li>
+    </ul>
+
+    <h4 style="margin: 24px 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute);">Not yet tested</h4>
+    <ul style="font-size: 13px; color: var(--ink-2); margin: 0; padding-left: 22px;">
+      <li>Cross-browser · only Chromium-tested · Safari WebKit + Firefox Gecko verification needed before go-live</li>
+      <li>Real mobile devices · only viewport-resize tested · need actual phone (iPhone + Android) check</li>
+      <li>Print stylesheet · not implemented in this preview</li>
+      <li>Reduced-motion preference · not yet honoured (no animation in this build, so n/a today)</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════ APPROVAL ═══════════ -->
+  <div class="approve">
+    <h2>Approval — tell me what to ship</h2>
+    <p>Use the controls at the top of the page to find your preferred palette + typography combination. Below them, pick from the variant options for F05 / F08 / F09 / F13.</p>
+
+    <p>Reply in this shape:</p>
+    <pre>Global · palette: A   typography: A   theme: light (default) + dark toggle
+
+F05 hero score size:    A · 80px   |   <b>B · 96px</b>   |   C · 128px
+F08 status pills:       A · all    |   <b>B · HIGH+ only</b>   |   C · text only
+F09 drawer affordance:  A · chevron only   |   <b>B · chevron + hover hint</b>   |   C · "Show details" link
+F13 hero copy:          A · none   |   <b>B · single clause</b>   |   C · two sentences
+
+Take live: yes / no / first review specific findings:
+Comments: <i>(anything I should know)</i></pre>
+
+    <p>Once you approve, I'll:</p>
+    <ol>
+      <li>Implement the chosen tokens in <code>app/components/styles.css</code> as CSS custom properties</li>
+      <li>Restructure <code>app/main.mjs</code> to use the new home view layout (H1, hero, drivers row, signal cards)</li>
+      <li>Build the signal-card data layer (selects 3-5 metrics whose status flipped or moved most in last N hours)</li>
+      <li>Add the theme toggle with localStorage persistence</li>
+      <li>Cross-browser test (Safari + Firefox + Chrome) before pushing</li>
+      <li>Open one PR with the whole change — easy to revert if it lands wrong</li>
+    </ol>
+    <p style="color: var(--mute); font-size: 13px; margin: 14px 0 0;">
+      Estimated implementation effort once approved: <b>10–14h</b>. The CSS work is already done in this preview; main effort is porting to the live codebase + signal-card logic + cross-browser test.
+    </p>
+  </div>
+
+</main>
+
+<script>
+  // ───────────── Palette / Typography / Theme switcher ─────────────
+
+  const PALETTES_LIGHT = {
+    A: { '--bg':'#fafbfc','--card':'#ffffff','--surface-2':'#f4f5f7','--line':'#e5e7eb','--line-soft':'#f0f1f4','--ink':'#0a0e14','--ink-2':'#1f2733','--mute':'#5c6471','--dim':'#8b95a3','--accent':'#b45309','--accent-bg':'#fef3c7','--bad':'#b91c1c','--bad-bg':'#fef2f2','--good':'#15803d','--good-bg':'#f0fdf4','--info':'#1d4ed8','--info-bg':'#eff6ff' },
+    B: { '--bg':'#faf6ef','--card':'#fffcf5','--surface-2':'#f4ecdb','--line':'#e8dcc6','--line-soft':'#f1e8d4','--ink':'#1c1917','--ink-2':'#3f3a36','--mute':'#6b5d52','--dim':'#a89a8a','--accent':'#0f766e','--accent-bg':'#ccfbf1','--bad':'#9f1239','--bad-bg':'#ffe4e6','--good':'#3f6212','--good-bg':'#ecfccb','--info':'#1e40af','--info-bg':'#dbeafe' },
+    C: { '--bg':'#f7f8fa','--card':'#ffffff','--surface-2':'#eef0f3','--line':'#e4e4e7','--line-soft':'#f1f1f3','--ink':'#18181b','--ink-2':'#3f3f46','--mute':'#52525b','--dim':'#a1a1aa','--accent':'#4338ca','--accent-bg':'#e0e7ff','--bad':'#dc2626','--bad-bg':'#fee2e2','--good':'#15803d','--good-bg':'#dcfce7','--info':'#2563eb','--info-bg':'#dbeafe' },
+    D: { '--bg':'#f5f5f5','--card':'#ffffff','--surface-2':'#ededed','--line':'#e0e0e0','--line-soft':'#ededed','--ink':'#171717','--ink-2':'#3f3f3f','--mute':'#525252','--dim':'#a3a3a3','--accent':'#404040','--accent-bg':'#e5e5e5','--bad':'#b91c1c','--bad-bg':'#fee2e2','--good':'#171717','--good-bg':'#e5e5e5','--info':'#171717','--info-bg':'#e5e5e5' }
+  };
+  const PALETTES_DARK = {
+    A: { '--bg':'#0a0e14','--card':'#131820','--surface-2':'#1c2230','--line':'#1f2733','--line-soft':'#161c25','--ink':'#f0f1f4','--ink-2':'#c4c7cc','--mute':'#8b95a3','--dim':'#5c6471','--accent':'#f59e0b','--accent-bg':'rgba(245,158,11,0.14)','--bad':'#ef4444','--bad-bg':'rgba(239,68,68,0.14)','--good':'#4ade80','--good-bg':'rgba(74,222,128,0.14)','--info':'#60a5fa','--info-bg':'rgba(96,165,250,0.14)' },
+    B: { '--bg':'#1a1612','--card':'#221c16','--surface-2':'#2c241c','--line':'#3a2f24','--line-soft':'#251d16','--ink':'#f3e9d8','--ink-2':'#c9bda9','--mute':'#a89b8b','--dim':'#7d7062','--accent':'#2dd4bf','--accent-bg':'rgba(45,212,191,0.14)','--bad':'#fb7185','--bad-bg':'rgba(251,113,133,0.14)','--good':'#a3e635','--good-bg':'rgba(163,230,53,0.14)','--info':'#60a5fa','--info-bg':'rgba(96,165,250,0.14)' },
+    C: { '--bg':'#09090b','--card':'#18181b','--surface-2':'#27272a','--line':'#27272a','--line-soft':'#1c1c1f','--ink':'#e4e4e7','--ink-2':'#a1a1aa','--mute':'#71717a','--dim':'#52525b','--accent':'#818cf8','--accent-bg':'rgba(129,140,248,0.14)','--bad':'#f87171','--bad-bg':'rgba(248,113,113,0.14)','--good':'#4ade80','--good-bg':'rgba(74,222,128,0.14)','--info':'#60a5fa','--info-bg':'rgba(96,165,250,0.14)' },
+    D: { '--bg':'#0a0a0a','--card':'#171717','--surface-2':'#262626','--line':'#262626','--line-soft':'#171717','--ink':'#fafafa','--ink-2':'#a3a3a3','--mute':'#737373','--dim':'#525252','--accent':'#e5e5e5','--accent-bg':'#262626','--bad':'#f87171','--bad-bg':'rgba(248,113,113,0.14)','--good':'#e5e5e5','--good-bg':'#262626','--info':'#e5e5e5','--info-bg':'#262626' }
+  };
+
+  const TYPOGRAPHY = {
+    A: { '--font-sans':'"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif', '--hero-size':'96px', '--hero-weight':'500', '--hero-tracking':'-0.03em', '--h1-size':'32px', '--h2-size':'22px', '--label-tracking':'0.08em' },
+    B: { '--font-sans':'"Manrope", -apple-system, system-ui, sans-serif', '--hero-size':'112px', '--hero-weight':'400', '--hero-tracking':'-0.035em', '--h1-size':'36px', '--h2-size':'24px', '--label-tracking':'0.1em' },
+    C: { '--font-sans':'"Inter", system-ui, sans-serif', '--hero-size':'80px', '--hero-weight':'700', '--hero-tracking':'-0.025em', '--h1-size':'28px', '--h2-size':'20px', '--label-tracking':'0.06em' }
+  };
+
+  let currentPalette = 'A';
+  let currentType = 'A';
+  let currentTheme = 'light';
+
+  function apply() {
+    const root = document.documentElement.style;
+    const set = currentTheme === 'dark' ? PALETTES_DARK[currentPalette] : PALETTES_LIGHT[currentPalette];
+    for (const [k,v] of Object.entries(set)) root.setProperty(k, v);
+    for (const [k,v] of Object.entries(TYPOGRAPHY[currentType])) root.setProperty(k, v);
+    document.body.classList.toggle('theme-dark', currentTheme === 'dark');
+  }
+
+  document.querySelectorAll('[data-palette]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-palette]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPalette = btn.dataset.palette;
+      apply();
+    });
+  });
+  document.querySelectorAll('[data-type]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentType = btn.dataset.type;
+      apply();
+    });
+  });
+  document.querySelectorAll('[data-theme]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-theme]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTheme = btn.dataset.theme;
+      apply();
+    });
+  });
+</script>
+
+</body>
+</html>

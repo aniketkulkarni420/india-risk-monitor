@@ -4,7 +4,7 @@
   "display_subtitle": "Baltic Dirty Tanker Index · daily",
   "section": "freight",
   "sub_cluster": "tanker",
-  "value": 2041,
+  "value": null,
   "unit": "Index",
   "value_format": "integer",
   "as_of": "2026-06-10T00:00:00.000Z",
@@ -12,20 +12,7 @@
   "mom_pct": -15.97,
   "yoy_pct": 9.56,
   "vs_5y_avg_pct": 142.8,
-  "sparkline_12m": [
-    2110,
-    2110,
-    2110,
-    2099,
-    2099,
-    2099,
-    2075,
-    2075,
-    2075,
-    2041,
-    2041,
-    2041
-  ],
+  "sparkline_12m": [],
   "baseline_30d": 575,
   "deviation_from_baseline_pct": 255,
   "status": "shock",
@@ -39,7 +26,6 @@
     "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "html_scrape:hormuz_v1",
       "llm:google_news_llm_v1"
     ]
   },
@@ -55,8 +41,8 @@
       "type": "Aggregator"
     }
   ],
-  "verification_state": "verified",
-  "last_verified_at": "2026-06-11T06:43:57.218Z",
+  "verification_state": "source_pending",
+  "last_verified_at": "2026-06-11T12:52:11.051Z",
   "why_it_matters": "VLCC = Very Large Crude Carrier. India's primary crude import vessel class. Rates +220% on Hormuz forces re-routing via Cape — adds $4-6/bbl to delivered cost.",
   "trigger_thresholds": [
     {
@@ -75,5 +61,8 @@
     "trade_deficit"
   ],
   "data_origin": "live",
-  "last_live_fetch_at": "2026-06-11T06:43:57.218Z"
+  "last_live_fetch_at": "2026-06-11T12:52:11.051Z",
+  "_source_count_actual": 1,
+  "_history_state": "accruing",
+  "notes": " 2026-06-11: previous value was actually the BDTI index scraped from the Hormuz page (wrong series). Reset to null; news-LLM tier captures real VLCC $/day or WS figures from tanker coverage. BDTI now lives in baltic_dirty_tanker."
 }

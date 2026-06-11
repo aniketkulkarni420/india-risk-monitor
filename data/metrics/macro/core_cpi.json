@@ -1,0 +1,48 @@
+{
+  "value": null,
+  "as_of": "2026-06-11T13:02:11.016Z",
+  "as_of_period": "monthly",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "source_crosscheck": [
+    {
+      "name": "Multi-publisher CPI coverage",
+      "url": "https://news.google.com/",
+      "type": "Reputable media"
+    }
+  ],
+  "verification_state": "source_pending",
+  "last_verified_at": "2026-06-11T13:02:11.016Z",
+  "linked_metrics": [
+    "cpi_inflation",
+    "repo_rate",
+    "gsec_curve"
+  ],
+  "notes": "Created 2026-06-11 (approved metric set). Value populates on first live ingest.",
+  "metric_id": "core_cpi",
+  "display_name": "Core CPI inflation",
+  "display_subtitle": "ex food & fuel · YoY · the stickiness RBI watches",
+  "section": "macro",
+  "sub_cluster": "inflation",
+  "unit": "% YoY",
+  "value_format": "percent",
+  "why_it_matters": "Headline CPI swings with vegetables; core CPI is the underlying trend. Sticky core = rates stay high regardless of food prices. Markets re-price the rate path on this number.",
+  "formula": "CPI excluding food & fuel, YoY %, as quoted in the monthly MOSPI release coverage",
+  "source_primary": {
+    "name": "MOSPI CPI release (via press coverage)",
+    "url": "https://www.mospi.gov.in/",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "rss:google_news_rss_v1",
+      "llm:google_news_llm_v1"
+    ]
+  },
+  "_history_state": "accruing"
+}

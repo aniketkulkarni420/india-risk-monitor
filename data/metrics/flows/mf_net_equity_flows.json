@@ -1,0 +1,55 @@
+{
+  "value": 22907.77,
+  "as_of": "2026-05-31T00:00:00.000Z",
+  "as_of_period": "monthly",
+  "mom_pct": null,
+  "yoy_pct": null,
+  "vs_5y_avg_pct": null,
+  "sparkline_12m": [
+    22907.77
+  ],
+  "status": "med",
+  "shock_eligible": false,
+  "trend_direction": "neutral",
+  "verification_state": "verified",
+  "last_verified_at": "2026-06-11T13:19:32.545Z",
+  "linked_metrics": [
+    "net_sip_inflows",
+    "dii_daily"
+  ],
+  "notes": "Created 2026-06-11 (approved metric set). Populates on first live ingest.",
+  "metric_id": "mf_net_equity_flows",
+  "display_name": "MF net equity flows",
+  "display_subtitle": "AMFI MCR · open-ended equity schemes net inflow",
+  "section": "flows",
+  "sub_cluster": "headline",
+  "unit": "₹ Cr",
+  "value_format": "currency_inr_cr",
+  "why_it_matters": "When lumpsum money panics while SIPs hold, retail fear is starting. The gap between SIP inflows and total equity net flows is the retail-sentiment signal.",
+  "formula": "AMFI MCR: Growth/Equity Oriented Schemes (open-ended) net inflow = funds mobilized − repurchases",
+  "source_primary": {
+    "name": "AMFI Monthly Cumulative Report",
+    "url": "https://portal.amfiindia.com/spages/",
+    "type": "Official",
+    "frequency": "Monthly",
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "xlsx:amfi_mcr_v1",
+      "rss:google_news_rss_v1"
+    ]
+  },
+  "source_crosscheck": [
+    {
+      "name": "News coverage of AMFI release",
+      "url": "https://news.google.com/",
+      "type": "Reputable media"
+    }
+  ],
+  "data_origin": "live",
+  "last_live_fetch_at": "2026-06-11T13:19:32.545Z",
+  "period_label": "May 2026",
+  "equity_mobilized_cr": 57603.83,
+  "equity_repurchase_cr": 34696.05,
+  "_source_count_actual": 1,
+  "_history_state": "accruing"
+}

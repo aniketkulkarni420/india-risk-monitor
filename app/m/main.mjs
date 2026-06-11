@@ -114,7 +114,7 @@ const flowsBody = el('div', {}, [
     renderHorizonCard('CYTD', 52820, 'net ₹ Cr', -42180, 95000)
   ]),
   el('div', { class: 'sub-head' }, 'Supporting'),
-  buildTable(['fpi_debt_flows', 'fno_oi_buildup', 'block_deals_notional', 'sectoral_fii_mtd'])
+  buildTable(['net_sip_inflows', 'mf_net_equity_flows', 'fpi_debt_flows', 'fii_index_fut_positioning', 'block_deals_notional'])
 ]);
 sectionsEl.appendChild(pill('flows', 'Flows', 'Absorption 1.30× · 8-sess streak', flowsBody));
 
@@ -123,7 +123,7 @@ sectionsEl.appendChild(pill('macro', 'Macro',
   `INR ${M('inr_usd')?.value || '—'} · 10Y ${M('gsec_curve')?.value || '—'}% · CPI ${M('cpi_inflation')?.value || '—'}%`,
   buildTable(['inr_usd', 'fx_reserves', 'trade_deficit', 'cad_pct_gdp',
               'banking_liquidity', 'wacr_repo_spread', 'repo_rate', 'gsec_curve',
-              'real_10y_yield', 'cpi_inflation', 'wpi_inflation', 'pmi_combined',
+              'real_10y_yield', 'cpi_inflation', 'core_cpi', 'pmi_combined',
               'iip_growth', 'fiscal_deficit_pct', 'govt_capex_runrate', 'credit_deposit_growth'])
 ));
 
@@ -147,9 +147,9 @@ const econBody = el('div', {}, [
     {}
   ),
   el('div', { class: 'sub-head' }, 'All metrics'),
-  buildTable(['gst_gross', 'eway_bills', 'upi_value', 'fastag_toll', 'rail_freight',
+  buildTable(['gst_gross', 'eway_bills', 'eight_core_industries', 'fastag_toll', 'rail_freight',
               'port_cargo', 'air_pax', 'pol_demand', 'power_demand', 'cement_dispatches',
-              'steel_consumption', 'naukri_jobspeak', 'reservoir_levels'])
+              'steel_consumption', 'epfo_payrolls', 'reservoir_levels'])
 ]);
 sectionsEl.appendChild(pill('economy', 'Real economy', 'GST +11.5% YoY · 18 metrics', econBody));
 
@@ -157,13 +157,13 @@ sectionsEl.appendChild(pill('economy', 'Real economy', 'GST +11.5% YoY · 18 met
 sectionsEl.appendChild(pill('freight', 'Freight & supply chain',
   `Hormuz ${M('hormuz_throughput')?.value} ships · Brent $${M('brent_crude')?.value}`,
   buildTable(['hormuz_throughput', 'brent_crude', 'india_crude_basket', 'drewry_wci',
-              'baltic_dry_index', 'vlcc_tanker_rates', 'india_port_dwell_time'])
+              'baltic_dirty_tanker', 'vlcc_tanker_rates'])
 ));
 
 // Market
 sectionsEl.appendChild(pill('market', 'Market context',
   `Nifty ${M('nifty_50')?.value?.toFixed(0)} · India VIX ${M('india_vix')?.value}`,
-  buildTable(['nifty_50', 'bank_nifty', 'nifty_pe_5y', 'india_vix',
+  buildTable(['nifty_50', 'bank_nifty', 'gift_nifty', 'nifty_pe_5y', 'india_vix', 'nifty_pcr',
               'gold_usd', 'dxy', 'ind_us_10y_spread', 'high_yield_credit_spread'])
 ));
 

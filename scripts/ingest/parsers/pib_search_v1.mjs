@@ -91,13 +91,7 @@ const CONFIGS = {
     maxArticles: 4
   },
 
-  india_port_dwell_time: {
-    ministryCodes: [63, 16],
-    headlineFilter: /(dwell|turnaround|port\s+performance)/i,
-    target: 'average vessel turnaround time or container dwell time at Indian major ports in days. Most recent monthly or quarterly figure.',
-    plausible: (v) => v > 0.5 && v < 10,
-    maxArticles: 4
-  }
+
 };
 
 // Multiple URL patterns for PIB RSS (format has changed over the years)

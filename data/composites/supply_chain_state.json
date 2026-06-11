@@ -34,7 +34,7 @@
   "verification_state": "verified",
   "last_verified_at": "2026-05-05T15:36:12.583Z",
   "why_it_matters": "Composite supply-chain stress read. Currently dominated by Hormuz shock (the input in shock state), which mechanically promotes the entire tile. Headline shows the shock metric in this state.",
-  "formula": "Default: weighted (Hormuz, BDI, WCI, port_dwell). Shock override: if any input has status=shock, this tile inherits shock + displays that metric's headline value.",
+  "formula": "Default: weighted (Hormuz, BDI, WCI). Shock override: if any input has status=shock, this tile inherits shock + displays that metric's headline value.",
   "trigger_thresholds": [
     {
       "level": "med",
@@ -52,8 +52,7 @@
   "linked_metrics": [
     "hormuz_throughput",
     "drewry_wci",
-    "baltic_dry_index",
-    "vlcc_tanker_rates",
-    "india_port_dwell_time"
+    "baltic_dirty_tanker",
+    "vlcc_tanker_rates"
   ]
 }

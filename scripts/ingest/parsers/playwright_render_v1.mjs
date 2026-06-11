@@ -65,16 +65,7 @@ const CONFIGS = {
     valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
     timeoutMs: 60000
   },
-  fno_oi_buildup: {
-    warmupUrl: 'https://www.nseindia.com/',
-    urls: ['https://www.nseindia.com/option-chain'],
-    waitSelector: 'table',
-    waitMs: 7000,
-    extractRe: /(?:OI\s+Build[- ]?up|Net\s+OI)[\s\S]{0,300}?(-?[\d,]+(?:\.\d+)?)/i,
-    plausible: (v) => Math.abs(v) < 100000000,
-    valueParser: (s) => parseInt(String(s).replace(/,/g, ''), 10),
-    timeoutMs: 60000
-  },
+
   block_deals_notional: {
     warmupUrl: 'https://www.nseindia.com/',
     urls: ['https://www.nseindia.com/market-data/large-deals'],
@@ -86,17 +77,7 @@ const CONFIGS = {
     timeoutMs: 60000
   },
 
-  // NPCI UPI product statistics — value rendered into a table by JS
-  upi_value_pw: {
-    urls: ['https://www.npci.org.in/what-we-do/upi/product-statistics'],
-    waitSelector: 'table',
-    waitMs: 3000,
-    // Page shows a row "Value (in Cr)" with monthly columns; regex catches latest
-    extractRe: /Value\s*\(in\s+Cr\)[\s\S]{0,500}?(\d{2,3},\d{3,}(?:\.\d+)?)/i,
-    plausible: (v) => v > 500000 && v < 5000000,  // in crore
-    valueParser: (s) => +(parseFloat(s.replace(/,/g, '')) / 100000).toFixed(2),  // crore → lakh crore
-    timeoutMs: 45000
-  },
+
 
   // NSE India VIX — JS-rendered widget on market data page
   india_vix_pw: {

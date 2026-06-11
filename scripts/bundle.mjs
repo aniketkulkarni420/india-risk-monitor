@@ -200,7 +200,7 @@ for (const file of walk(DATA)) {
     // The freshness rule (is_stale) checks age vs cadence but misses parsers that
     // re-publish the same number every cycle.
     if (Array.isArray(data.sparkline_12m) && data.sparkline_12m.length >= 3) {
-      const slowMoving = ['repo_rate', 'cad_pct_gdp', 'fiscal_deficit_pct', 'cpi_inflation', 'wpi_inflation', 'iip_growth', 'pmi_combined'];
+      const slowMoving = ['repo_rate', 'cad_pct_gdp', 'fiscal_deficit_pct', 'cpi_inflation', 'core_cpi', 'iip_growth', 'pmi_combined'];
       if (!slowMoving.includes(data.metric_id)) {
         const tail = data.sparkline_12m.slice(-7).filter(v => typeof v === 'number');
         const allSame = tail.length >= 3 && tail.every(v => v === data.value);
@@ -223,21 +223,34 @@ for (const file of walk(DATA)) {
         data.verification_state = 'source_pending';
         data._verification_demoted_reason = 'static_source';
       }
-    } else if (typeof data._source_count_actual === 'number' && data._source_count_actual < 2 && data.verification_state === 'verified') {
-      // Authoritative single-source metrics that genuinely have only one canonical source
-      // are exempted by inclusion in this whitelist.
-      const singleSourceAuthoritative = ['repo_rate', 'cpi_inflation', 'wpi_inflation', 'india_risk_score'];
-      if (!singleSourceAuthoritative.includes(data.metric_id)) {
+    } else if (data.verification_state === 'verified') {
+      // Honesty rule (2026-06-10): "verified" requires PROOF of ≥2 independent
+      // sources. _source_count_actual is stamped by ingest (1 + real non-stub
+      // crosschecks). Most parsers' crosschecks were stubs echoing the primary
+      // back — self-confirmation displayed as verification. No proof → demote.
+      // Exempt: derived metrics (computations over already-displayed inputs,
+      // no external source exists) and authoritative single-source releases.
+      const singleSourceAuthoritative = ['repo_rate', 'cpi_inflation', 'india_risk_score'];
+      const isDerived = /derived_v1/.test(data.source_primary?.parser || '');
+      const cnt = typeof data._source_count_actual === 'number' ? data._source_count_actual : 1;
+      if (cnt < 2 && !singleSourceAuthoritative.includes(data.metric_id) && !isDerived) {
         data._verification_state_original = data.verification_state;
         data.verification_state = 'source_pending';
-        data._verification_demoted_reason = 'single_source';
+        data._verification_demoted_reason = typeof data._source_count_actual === 'number' ? 'single_source' : 'no_real_crosscheck_proof';
       }
     }
 
     // Plausibility guard · runs BEFORE dod compute. If today's value is wildly
     // off from yesterday's (e.g. INR/USD jumping 14% in a day), roll back to
     // yesterday's value to avoid showing a screenshot-bait number on the live site.
-    const prev = previousDayValue(data.metric_id, data.as_of);
+    // A "previous" row older than 45 days is not a day-over-day baseline — a large
+    // move vs a months-old number is expected, not anomalous (2026-06-11: FASTag's
+    // fresh ₹7.6k Cr was rolled back to a stale ₹4.5k Cr seed row by this guard).
+    let prev = previousDayValue(data.metric_id, data.as_of);
+    if (prev && data.as_of) {
+      const prevAgeDays = (new Date(data.as_of) - new Date(prev.date)) / 86400000;
+      if (prevAgeDays > 45) prev = null;
+    }
     const anomaly = prev ? applyPlausibilityGuard(data, prev.value) : null;
     if (anomaly) {
       anomalyCount++;

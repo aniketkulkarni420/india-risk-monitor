@@ -13,18 +13,9 @@
   "yoy_pct": 9.06,
   "vs_5y_avg_pct": 24,
   "sparkline_12m": [
+    256,
     257,
-    257,
-    257,
-    257,
-    257,
-    257,
-    257,
-    257,
-    257,
-    257,
-    257,
-    257
+    242
   ],
   "baseline_30d": 220,
   "deviation_from_baseline_pct": 16.8,
@@ -36,7 +27,11 @@
     "url": "https://posoco.in/",
     "type": "Official",
     "frequency": "Live",
-    "parser": "rss:google_news_rss_v1"
+    "parser": "tiered:tiered_v1",
+    "tier_chain": [
+      "json_api:gridindia_v1",
+      "rss:google_news_rss_v1"
+    ]
   },
   "source_crosscheck": [
     {
@@ -46,7 +41,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-06-11T06:43:57.957Z",
+  "last_verified_at": "2026-06-10T10:40:24.867Z",
   "why_it_matters": "Peak power demand is the cleanest real-time real-economy gauge. No lag, free, daily. Strong YoY growth = industrial + AC load both holding.",
   "linked_metrics": [
     "iip_growth",
@@ -55,5 +50,6 @@
   ],
   "notes": "Drawer shows: peak demand met (232.4 GW), peak demand requirement (234.2 GW), shortfall (1.8 GW), 7-day total energy (47,860 MU).",
   "data_origin": "primary",
-  "last_live_fetch_at": "2026-06-11T06:43:57.957Z"
+  "last_live_fetch_at": "2026-06-10T10:40:24.867Z",
+  "_history_state": "accruing"
 }
