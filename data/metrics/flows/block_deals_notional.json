@@ -36,10 +36,10 @@
     "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
+      "llm:google_news_llm_v1",
       "json_api:nse_api_v1",
       "html_render:bse_v1",
-      "html_render:moneycontrol_v1",
-      "llm:google_news_llm_v1"
+      "html_render:moneycontrol_v1"
     ]
   },
   "source_crosscheck": [
@@ -57,5 +57,6 @@
     "sectoral_fii_mtd"
   ],
   "data_origin": "primary",
-  "last_live_fetch_at": "2026-06-10T18:17:58.887Z"
+  "last_live_fetch_at": "2026-06-10T18:17:58.887Z",
+  "_reliability_optimized_at": "2026-06-11T05:24:50.048Z"
 }

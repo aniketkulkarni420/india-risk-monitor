@@ -126,7 +126,26 @@
         "llm:google_news_llm_v1"
       ],
       "reason": "rbi_mmo_daily_v1=confident(0.46), google_news_llm_v1=dead(0.65)"
+    },
+    {
+      "ts": "2026-06-11T05:24:50.048Z",
+      "metric_id": "block_deals_notional",
+      "action": "reorder",
+      "from": [
+        "json_api:nse_api_v1",
+        "html_render:bse_v1",
+        "html_render:moneycontrol_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "to": [
+        "llm:google_news_llm_v1",
+        "json_api:nse_api_v1",
+        "html_render:bse_v1",
+        "html_render:moneycontrol_v1"
+      ],
+      "quarantined": [],
+      "reason": "google_news_llm_v1=confident(1.00), nse_api_v1=confident(0.81), bse_v1=unknown(0.00), moneycontrol_v1=unknown(0.00)"
     }
   ],
-  "last_run": "2026-06-09T04:59:56.666Z"
+  "last_run": "2026-06-11T05:24:50.048Z"
 }
