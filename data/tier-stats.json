@@ -1511,5 +1511,47 @@
       "last_success_at": "2026-06-12T06:29:25.316Z",
       "success_rate": 1
     }
+  },
+  "net_sip_inflows": {
+    "rss:google_news_rss_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-12T08:45:49.342Z",
+      "success_rate": 1
+    }
+  },
+  "mf_net_equity_flows": {
+    "xlsx:amfi_mcr_v1": {
+      "attempts": 1,
+      "successes": 1,
+      "recent": [
+        1
+      ],
+      "last_success_at": "2026-06-12T08:45:50.777Z",
+      "success_rate": 1
+    }
+  },
+  "core_cpi": {
+    "rss:google_news_rss_v1": {
+      "attempts": 1,
+      "successes": 0,
+      "recent": [
+        0
+      ],
+      "last_failure_at": "2026-06-12T08:45:51.232Z",
+      "success_rate": 0
+    },
+    "llm:google_news_llm_v1": {
+      "attempts": 1,
+      "successes": 0,
+      "recent": [
+        0
+      ],
+      "last_failure_at": "2026-06-12T08:45:51.631Z",
+      "success_rate": 0
+    }
   }
 }

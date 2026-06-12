@@ -483,13 +483,34 @@
       "last_success_value": 23487,
       "consecutive_failures": 0,
       "status": "green"
+    },
+    "net_sip_inflows": {
+      "last_attempted_at": "2026-06-12T08:45:49.344Z",
+      "last_success_at": "2026-06-12T08:45:49.344Z",
+      "last_success_value": 30954,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "mf_net_equity_flows": {
+      "last_attempted_at": "2026-06-12T08:45:50.778Z",
+      "last_success_at": "2026-06-12T08:45:50.778Z",
+      "last_success_value": 22907.77,
+      "consecutive_failures": 0,
+      "status": "green"
+    },
+    "core_cpi": {
+      "last_attempted_at": "2026-06-12T08:45:51.631Z",
+      "last_failure_at": "2026-06-12T08:45:51.631Z",
+      "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: google_news_rss: 67 items, none matched · tried: May Inflation Hits 4.2%: Why The Core Data Matters  | llm:google_news_llm_v1: google_news_llm: 69 items, none passed filters",
+      "consecutive_failures": 1,
+      "status": "red"
     }
   },
   "summary": {
-    "green": 58,
+    "green": 60,
     "amber": 1,
-    "red": 3,
-    "total": 62
+    "red": 4,
+    "total": 65
   },
-  "generated_at": "2026-06-12T06:29:31.254Z"
+  "generated_at": "2026-06-12T08:45:51.631Z"
 }
