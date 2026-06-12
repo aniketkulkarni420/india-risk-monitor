@@ -30,8 +30,8 @@
     "frequency": "Live",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "json_api:hormuz_watch_v1",
       "json_api:public_oil_v1",
+      "json_api:hormuz_watch_v1",
       "json_api:dbnomics_v1",
       "html_scrape:tradingeconomics_v1"
     ]
@@ -77,5 +77,6 @@
   "_brent_sources": "yahoo+oilpriceapi-demo",
   "_brent_confidence": "high",
   "_brent_min": 88.74,
-  "_brent_max": 88.75
+  "_brent_max": 88.75,
+  "_reliability_optimized_at": "2026-06-12T05:27:31.933Z"
 }
