@@ -202,7 +202,37 @@
       ],
       "quarantined": [],
       "reason": "nse_api_v1=confident(0.73), google_news_llm_v1=confident(0.67), bse_v1=unknown(0.00), moneycontrol_v1=unknown(0.00)"
+    },
+    {
+      "ts": "2026-06-14T05:27:10.943Z",
+      "metric_id": "power_demand",
+      "action": "reorder",
+      "from": [
+        "json_api:gridindia_v1",
+        "rss:google_news_rss_v1"
+      ],
+      "to": [
+        "rss:google_news_rss_v1",
+        "json_api:gridindia_v1"
+      ],
+      "quarantined": [],
+      "reason": "google_news_rss_v1=confident(1.00), gridindia_v1=confident(0.00)"
+    },
+    {
+      "ts": "2026-06-14T05:27:10.943Z",
+      "metric_id": "gift_nifty",
+      "action": "reorder",
+      "from": [
+        "html_render:web_llm_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "to": [
+        "llm:google_news_llm_v1",
+        "html_render:web_llm_v1"
+      ],
+      "quarantined": [],
+      "reason": "google_news_llm_v1=confident(0.86), web_llm_v1=confident(0.00)"
     }
   ],
-  "last_run": "2026-06-13T05:16:55.668Z"
+  "last_run": "2026-06-14T05:27:10.943Z"
 }

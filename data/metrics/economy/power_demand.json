@@ -36,8 +36,8 @@
     "frequency": "Live",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "json_api:gridindia_v1",
-      "rss:google_news_rss_v1"
+      "rss:google_news_rss_v1",
+      "json_api:gridindia_v1"
     ]
   },
   "source_crosscheck": [
@@ -59,5 +59,6 @@
   "data_origin": "primary",
   "last_live_fetch_at": "2026-06-14T05:14:20.558Z",
   "_history_state": "accruing",
-  "_source_count_actual": 1
+  "_source_count_actual": 1,
+  "_reliability_optimized_at": "2026-06-14T05:27:10.943Z"
 }

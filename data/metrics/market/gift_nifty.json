@@ -39,8 +39,8 @@
     "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "html_render:web_llm_v1",
-      "llm:google_news_llm_v1"
+      "llm:google_news_llm_v1",
+      "html_render:web_llm_v1"
     ]
   },
   "source_crosscheck": [
@@ -53,5 +53,6 @@
   "_history_state": "accruing",
   "data_origin": "primary",
   "last_live_fetch_at": "2026-06-13T06:11:44.751Z",
-  "_source_count_actual": 1
+  "_source_count_actual": 1,
+  "_reliability_optimized_at": "2026-06-14T05:27:10.943Z"
 }
