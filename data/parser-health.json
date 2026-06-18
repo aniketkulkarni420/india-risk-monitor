@@ -1,11 +1,11 @@
 {
   "parsers": {
     "hormuz_throughput": {
-      "last_success_at": "2026-06-18T06:10:35.835Z",
+      "last_success_at": "2026-06-18T06:47:03.924Z",
       "last_success_value": 12,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-18T06:10:35.835Z"
+      "last_attempted_at": "2026-06-18T06:47:03.924Z"
     },
     "baltic_dry_index": {
       "last_success_at": "2026-06-11T06:43:56.677Z",
@@ -17,29 +17,29 @@
       "last_failure_reason": "tiered: all 3 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/commodity/baltic → 405 | json_api:dbnomics_v1: No dbnomics config for baltic_dry_index | llm:google_news_llm_v1: google_news_llm: 27 items, none pass"
     },
     "brent_crude": {
-      "last_success_at": "2026-06-18T06:10:36.180Z",
-      "last_success_value": 74.34,
+      "last_success_at": "2026-06-18T06:47:04.282Z",
+      "last_success_value": 74.82,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-18T06:10:36.180Z",
+      "last_attempted_at": "2026-06-18T06:47:04.282Z",
       "last_failure_at": "2026-06-06T05:49:41.139Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:public_oil_v1: https://tradingeconomics.com/commodity/brent-crude-oil → 405 | json_api:dbnomics_v1: No dbnomics config for brent_crude | html_scrape:tradingeconomics_v1: No TE extractor mapped for brent"
     },
     "gold_usd": {
-      "last_success_at": "2026-06-18T06:10:36.203Z",
-      "last_success_value": 4309.68,
+      "last_success_at": "2026-06-18T06:47:04.302Z",
+      "last_success_value": 4301.37,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-18T06:10:36.203Z",
+      "last_attempted_at": "2026-06-18T06:47:04.302Z",
       "last_failure_at": "2026-06-17T12:56:36.640Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:public_gold_v1: https://tradingeconomics.com/commodity/gold: pattern not matched (selector tuning needed) | json_api:dbnomics_v1: No dbnomics config for gold_usd | llm:google_news_llm_v1: No google_news"
     },
     "dxy": {
-      "last_success_at": "2026-06-18T06:10:36.228Z",
-      "last_success_value": 100.334,
+      "last_success_at": "2026-06-18T06:47:04.328Z",
+      "last_success_value": 100.267,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-18T06:10:36.228Z",
+      "last_attempted_at": "2026-06-18T06:47:04.328Z",
       "last_failure_at": "2026-06-06T05:49:41.178Z",
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:public_dxy_v1: https://tradingeconomics.com/united-states/currency → 405 | json_api:dbnomics_v1: No dbnomics config for dxy"
     },
@@ -48,9 +48,9 @@
       "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: OLD DATA rejected (as_of 2026-06-09 · 7d > 7d for Live) | json_api:gridindia_v1: fetch failed",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-06-18T06:10:36.740Z",
+      "last_success_at": "2026-06-18T06:47:04.759Z",
       "last_success_value": 237,
-      "last_attempted_at": "2026-06-18T06:10:36.740Z"
+      "last_attempted_at": "2026-06-18T06:47:04.759Z"
     },
     "fii_equity_daily": {
       "last_success_at": "2026-06-17T16:07:32.116Z",
@@ -196,11 +196,11 @@
       "last_attempted_at": "2026-06-11T11:58:11.498Z"
     },
     "india_crude_basket": {
-      "last_success_at": "2026-06-18T06:10:56.343Z",
+      "last_success_at": "2026-06-18T06:47:24.094Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-18T06:10:56.343Z"
+      "last_attempted_at": "2026-06-18T06:47:24.094Z"
     },
     "gst_gross": {
       "last_failure_at": "2026-05-11T05:00:21.341Z",
@@ -430,13 +430,13 @@
       "last_attempted_at": "2026-06-17T17:23:11.645Z"
     },
     "vlcc_tanker_rates": {
-      "last_failure_at": "2026-06-18T06:10:36.079Z",
+      "last_failure_at": "2026-06-18T06:47:04.153Z",
       "last_failure_reason": "tiered: all 1 tiers failed · llm:google_news_llm_v1: in cooldown",
-      "consecutive_failures": 23,
+      "consecutive_failures": 24,
       "status": "red",
       "last_success_at": "2026-06-11T06:43:57.219Z",
       "last_success_value": 2041,
-      "last_attempted_at": "2026-06-18T06:10:36.079Z"
+      "last_attempted_at": "2026-06-18T06:47:04.153Z"
     },
     "fx_reserves": {
       "last_failure_at": "2026-05-14T11:31:00.916Z",
@@ -471,15 +471,15 @@
       "status": "red"
     },
     "baltic_dirty_tanker": {
-      "last_attempted_at": "2026-06-18T06:10:36.078Z",
-      "last_success_at": "2026-06-18T06:10:36.078Z",
+      "last_attempted_at": "2026-06-18T06:47:04.152Z",
+      "last_success_at": "2026-06-18T06:47:04.152Z",
       "last_success_value": 1953,
       "consecutive_failures": 0,
       "status": "green"
     },
     "gift_nifty": {
-      "last_attempted_at": "2026-06-18T06:10:50.019Z",
-      "last_success_at": "2026-06-18T06:10:50.019Z",
+      "last_attempted_at": "2026-06-18T06:47:17.143Z",
+      "last_success_at": "2026-06-18T06:47:17.143Z",
       "last_success_value": 24083,
       "consecutive_failures": 0,
       "status": "green",
@@ -528,5 +528,5 @@
     "red": 3,
     "total": 67
   },
-  "generated_at": "2026-06-18T06:10:56.343Z"
+  "generated_at": "2026-06-18T06:47:24.094Z"
 }
