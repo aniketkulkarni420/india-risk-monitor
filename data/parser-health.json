@@ -171,20 +171,20 @@
       "last_attempted_at": "2026-06-18T17:29:30.112Z"
     },
     "high_yield_credit_spread": {
-      "last_success_at": "2026-06-18T12:33:20.157Z",
+      "last_success_at": "2026-06-19T12:11:05.148Z",
       "last_success_value": 159,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-05-14T11:31:00.945Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:crisil_v1: https://tradingeconomics.com/india/government-bond-yield: pattern not matched (selector tuning neede | llm:google_news_llm_v1: No google_news_llm config for high_yield_credit_spread",
-      "last_attempted_at": "2026-06-18T12:33:20.157Z"
+      "last_attempted_at": "2026-06-19T12:11:05.148Z"
     },
     "drewry_wci": {
-      "last_success_at": "2026-06-18T12:34:05.717Z",
-      "last_success_value": 3433,
+      "last_success_at": "2026-06-19T12:12:29.834Z",
+      "last_success_value": 3969,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-18T12:34:05.717Z"
+      "last_attempted_at": "2026-06-19T12:12:29.834Z"
     },
     "india_port_dwell_time": {
       "last_failure_at": "2026-05-14T11:31:24.057Z",
@@ -443,18 +443,18 @@
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:rbi_wss_v1: not registered | json_api:dbnomics_v1: No dbnomics config for fx_reserves",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-06-18T12:33:20.153Z",
-      "last_success_value": 681.6,
-      "last_attempted_at": "2026-06-18T12:33:20.153Z"
+      "last_success_at": "2026-06-19T12:11:05.142Z",
+      "last_success_value": 671.6,
+      "last_attempted_at": "2026-06-19T12:11:05.142Z"
     },
     "reservoir_levels": {
       "last_failure_at": "2026-06-12T11:47:22.969Z",
       "last_failure_reason": "tiered: all 1 tiers failed · llm:google_news_llm_v1: reservoir_levels: 1 candidates, none yielded value · https://news.google.com/rss/articles/CBMitgFBVV",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-06-18T12:34:12.913Z",
+      "last_success_at": "2026-06-19T12:12:40.870Z",
       "last_success_value": 28,
-      "last_attempted_at": "2026-06-18T12:34:12.913Z"
+      "last_attempted_at": "2026-06-19T12:12:40.870Z"
     },
     "fii_index_fut_positioning": {
       "last_attempted_at": "2026-06-18T15:55:43.589Z",
@@ -530,5 +530,5 @@
     "red": 2,
     "total": 67
   },
-  "generated_at": "2026-06-19T07:00:33.214Z"
+  "generated_at": "2026-06-19T12:12:40.870Z"
 }
