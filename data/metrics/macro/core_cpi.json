@@ -42,12 +42,13 @@
     "frequency": "Monthly",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "rss:google_news_rss_v1",
-      "llm:google_news_llm_v1"
+      "llm:google_news_llm_v1",
+      "rss:google_news_rss_v1"
     ]
   },
   "_history_state": "accruing",
   "data_origin": "primary",
   "last_live_fetch_at": "2026-06-18T12:36:37.835Z",
-  "_source_count_actual": 1
+  "_source_count_actual": 1,
+  "_reliability_optimized_at": "2026-06-19T06:11:27.905Z"
 }

@@ -32,10 +32,10 @@
     "frequency": "Monthly",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "email:email_pipeline_v1",
       "rss:google_news_rss_v1",
       "rss:publisher_rss_v1",
-      "llm:google_news_llm_v1"
+      "llm:google_news_llm_v1",
+      "email:email_pipeline_v1"
     ]
   },
   "source_crosscheck": [
@@ -65,5 +65,6 @@
   "data_origin": "primary",
   "last_live_fetch_at": "2026-06-18T12:34:15.274Z",
   "_history_state": "accruing",
-  "_source_count_actual": 1
+  "_source_count_actual": 1,
+  "_reliability_optimized_at": "2026-06-19T06:11:27.905Z"
 }
