@@ -123,52 +123,52 @@
       "last_attempted_at": "2026-06-22T17:14:20.822Z"
     },
     "gsec_curve": {
-      "last_success_at": "2026-06-22T14:51:50.692Z",
+      "last_success_at": "2026-06-22T18:04:42.993Z",
       "last_success_value": 6.85,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-05-14T20:18:34.039Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:ccil_v1: in cooldown | json_api:dbnomics_v1: in cooldown | html_scrape:tradingeconomics_v1: in cooldown",
-      "last_attempted_at": "2026-06-22T14:51:50.692Z"
+      "last_attempted_at": "2026-06-22T18:04:42.993Z"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-06-22T14:51:50.697Z",
+      "last_success_at": "2026-06-22T18:04:42.998Z",
       "last_success_value": 2.92,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-22T14:51:50.697Z"
+      "last_attempted_at": "2026-06-22T18:04:42.998Z"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-06-22T14:51:50.717Z",
+      "last_success_at": "2026-06-22T18:04:43.237Z",
       "last_success_value": 313620.5,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-22T14:51:50.717Z",
+      "last_attempted_at": "2026-06-22T18:04:43.237Z",
       "last_failure_at": "2026-06-10T16:49:11.320Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:rbi_mmo_v1: https://tradingeconomics.com/india/money-supply-m3 → 405 | json_api:dbnomics_v1: No dbnomics config for banking_liquidity | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/indi"
     },
     "wacr_repo_spread": {
-      "last_failure_at": "2026-06-22T14:51:53.378Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 2 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=62 | llm:google_news_llm_v1: in cooldown",
-      "consecutive_failures": 2,
-      "status": "amber",
+      "last_failure_at": "2026-06-22T18:04:52.040Z",
+      "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 2 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=62 | llm:google_news_llm_v1: wacr_repo_spread: 1 candidates, none yielded value · h",
+      "consecutive_failures": 3,
+      "status": "red",
       "last_success_at": "2026-06-21T16:16:49.293Z",
       "last_success_value": -17,
-      "last_attempted_at": "2026-06-22T14:51:53.378Z"
+      "last_attempted_at": "2026-06-22T18:04:52.040Z"
     },
     "inr_usd": {
-      "last_success_at": "2026-06-22T14:51:53.485Z",
-      "last_success_value": 94.676,
+      "last_success_at": "2026-06-22T18:04:52.132Z",
+      "last_success_value": 94.673,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-22T14:51:53.485Z"
+      "last_attempted_at": "2026-06-22T18:04:52.132Z"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-06-22T14:51:53.605Z",
-      "last_success_value": 235,
+      "last_success_at": "2026-06-22T18:04:52.352Z",
+      "last_success_value": 234,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-22T14:51:53.605Z"
+      "last_attempted_at": "2026-06-22T18:04:52.352Z"
     },
     "high_yield_credit_spread": {
       "last_success_at": "2026-06-22T14:51:54.687Z",
@@ -421,13 +421,13 @@
       "last_attempted_at": "2026-06-22T17:14:20.065Z"
     },
     "fpi_debt_flows": {
-      "last_failure_at": "2026-05-29T18:21:22.354Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · html_render:moneycontrol_v1: moneycontrol_v1: all 1 URLs failed · https://www.moneycontrol.com/stocks/marketstats/fii_fpi.php: Al | html_render:bse_v1: bse_v1: all 1 URLs failed · https://www.bseindia.com/market",
-      "consecutive_failures": 0,
-      "status": "green",
+      "last_failure_at": "2026-06-22T18:04:42.807Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | html_render:moneycontrol_v1: moneycontrol_v1: all 1 URLs failed · https://",
+      "consecutive_failures": 1,
+      "status": "amber",
       "last_success_at": "2026-06-22T14:51:50.484Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-06-22T14:51:50.484Z"
+      "last_attempted_at": "2026-06-22T18:04:42.807Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-06-22T14:50:13.338Z",
@@ -525,10 +525,10 @@
     }
   },
   "summary": {
-    "green": 61,
+    "green": 60,
     "amber": 1,
-    "red": 5,
+    "red": 6,
     "total": 67
   },
-  "generated_at": "2026-06-22T17:14:20.823Z"
+  "generated_at": "2026-06-22T18:04:52.352Z"
 }
