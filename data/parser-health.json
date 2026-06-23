@@ -123,27 +123,27 @@
       "last_attempted_at": "2026-06-23T15:26:43.646Z"
     },
     "gsec_curve": {
-      "last_success_at": "2026-06-23T12:15:04.867Z",
-      "last_success_value": 6.84,
+      "last_success_at": "2026-06-23T16:10:33.509Z",
+      "last_success_value": 6.83,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-05-14T20:18:34.039Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:ccil_v1: in cooldown | json_api:dbnomics_v1: in cooldown | html_scrape:tradingeconomics_v1: in cooldown",
-      "last_attempted_at": "2026-06-23T12:15:04.867Z"
+      "last_attempted_at": "2026-06-23T16:10:33.509Z"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-06-23T12:15:04.871Z",
-      "last_success_value": 2.91,
+      "last_success_at": "2026-06-23T16:10:33.514Z",
+      "last_success_value": 2.9,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-23T12:15:04.871Z"
+      "last_attempted_at": "2026-06-23T16:10:33.514Z"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-06-23T12:15:05.007Z",
+      "last_success_at": "2026-06-23T16:10:33.708Z",
       "last_success_value": 313620.5,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-23T12:15:05.007Z",
+      "last_attempted_at": "2026-06-23T16:10:33.708Z",
       "last_failure_at": "2026-06-10T16:49:11.320Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:rbi_mmo_v1: https://tradingeconomics.com/india/money-supply-m3 → 405 | json_api:dbnomics_v1: No dbnomics config for banking_liquidity | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/indi"
     },
@@ -152,23 +152,23 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-06-23T12:15:07.084Z",
+      "last_success_at": "2026-06-23T16:10:35.529Z",
       "last_success_value": -17,
-      "last_attempted_at": "2026-06-23T12:15:07.084Z"
+      "last_attempted_at": "2026-06-23T16:10:35.529Z"
     },
     "inr_usd": {
-      "last_success_at": "2026-06-23T12:15:07.192Z",
-      "last_success_value": 94.893,
+      "last_success_at": "2026-06-23T16:10:35.573Z",
+      "last_success_value": 94.843,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-23T12:15:07.192Z"
+      "last_attempted_at": "2026-06-23T16:10:35.573Z"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-06-23T12:15:07.288Z",
-      "last_success_value": 239,
+      "last_success_at": "2026-06-23T16:10:35.638Z",
+      "last_success_value": 235,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-06-23T12:15:07.288Z"
+      "last_attempted_at": "2026-06-23T16:10:35.638Z"
     },
     "high_yield_credit_spread": {
       "last_success_at": "2026-06-23T12:15:08.609Z",
@@ -425,9 +425,9 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | html_render:moneycontrol_v1: in cooldown | html_render:bse_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-06-23T12:15:04.757Z",
+      "last_success_at": "2026-06-23T16:10:20.321Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-06-23T12:15:04.757Z"
+      "last_attempted_at": "2026-06-23T16:10:20.321Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-06-23T12:13:13.477Z",
@@ -530,5 +530,5 @@
     "red": 3,
     "total": 67
   },
-  "generated_at": "2026-06-23T15:26:43.647Z"
+  "generated_at": "2026-06-23T16:10:35.638Z"
 }
