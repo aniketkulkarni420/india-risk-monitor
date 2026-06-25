@@ -36,8 +36,8 @@
     "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "json_api:nse_api_v1",
-      "html_render:web_llm_v1"
+      "html_render:web_llm_v1",
+      "json_api:nse_api_v1"
     ]
   },
   "source_crosscheck": [
@@ -64,5 +64,6 @@
   "_history_state": "accruing",
   "data_origin": "live",
   "last_live_fetch_at": "2026-06-24T15:10:40.242Z",
-  "_source_count_actual": 1
+  "_source_count_actual": 1,
+  "_reliability_optimized_at": "2026-06-25T04:59:26.896Z"
 }
