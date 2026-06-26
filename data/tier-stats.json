@@ -1025,9 +1025,10 @@
   },
   "fx_reserves": {
     "json_api:rbi_wss_v1": {
-      "attempts": 17,
-      "successes": 17,
+      "attempts": 18,
+      "successes": 18,
       "recent": [
+        1,
         1,
         1,
         1,
@@ -1046,7 +1047,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-25T11:49:54.957Z",
+      "last_success_at": "2026-06-26T10:55:05.120Z",
       "success_rate": 1
     }
   },
@@ -1066,9 +1067,10 @@
       "last_failure_at": "2026-06-16T14:28:15.773Z"
     },
     "llm:google_news_llm_v1": {
-      "attempts": 15,
-      "successes": 15,
+      "attempts": 16,
+      "successes": 16,
       "recent": [
+        1,
         1,
         1,
         1,
@@ -1085,14 +1087,14 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-25T11:50:08.546Z",
+      "last_success_at": "2026-06-26T10:55:17.860Z",
       "success_rate": 1
     }
   },
   "reservoir_levels": {
     "llm:google_news_llm_v1": {
-      "attempts": 17,
-      "successes": 15,
+      "attempts": 18,
+      "successes": 16,
       "recent": [
         1,
         0,
@@ -1110,10 +1112,11 @@
         1,
         1,
         1,
+        1,
         1
       ],
-      "last_success_at": "2026-06-25T11:50:25.302Z",
-      "success_rate": 0.882,
+      "last_success_at": "2026-06-26T10:55:29.433Z",
+      "success_rate": 0.889,
       "last_failure_at": "2026-06-12T11:47:22.969Z"
     }
   },
