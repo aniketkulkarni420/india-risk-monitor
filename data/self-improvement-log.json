@@ -313,7 +313,26 @@
         "json_api:nse_api_v1"
       ],
       "reason": "web_llm_v1=confident(0.19), nse_api_v1=dead(0.00)"
+    },
+    {
+      "ts": "2026-06-27T04:46:48.580Z",
+      "metric_id": "fpi_debt_flows",
+      "action": "reorder",
+      "from": [
+        "html_render:playwright_render_v1",
+        "html_render:moneycontrol_v1",
+        "html_render:bse_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "to": [
+        "html_render:playwright_render_v1",
+        "llm:google_news_llm_v1",
+        "html_render:moneycontrol_v1",
+        "html_render:bse_v1"
+      ],
+      "quarantined": [],
+      "reason": "playwright_render_v1=confident(0.90), google_news_llm_v1=unknown(0.00), moneycontrol_v1=confident(0.00), bse_v1=confident(0.00)"
     }
   ],
-  "last_run": "2026-06-25T04:59:26.896Z"
+  "last_run": "2026-06-27T04:46:48.580Z"
 }
