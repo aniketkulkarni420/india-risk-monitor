@@ -72,11 +72,10 @@
   },
   "wacr_repo_spread": {
     "html_scrape:rbi_mmo_daily_v1": {
-      "attempts": 72,
-      "successes": 56,
+      "attempts": 73,
+      "successes": 57,
       "recent": [
         1,
-        1,
         0,
         0,
         0,
@@ -102,13 +101,14 @@
         0,
         0,
         0,
+        1,
         1,
         1,
         1
       ],
       "last_failure_at": "2026-06-29T16:46:42.044Z",
-      "success_rate": 0.778,
-      "last_success_at": "2026-06-30T16:06:26.211Z"
+      "success_rate": 0.781,
+      "last_success_at": "2026-06-30T16:31:42.591Z"
     },
     "llm:google_news_llm_v1": {
       "attempts": 24,
@@ -686,11 +686,10 @@
       "success_rate": 0
     },
     "html_render:playwright_render_v1": {
-      "attempts": 84,
-      "successes": 80,
+      "attempts": 85,
+      "successes": 81,
       "recent": [
         1,
-        1,
         0,
         0,
         1,
@@ -705,6 +704,7 @@
         1,
         1,
         0,
+        1,
         1,
         1,
         1,
@@ -720,8 +720,8 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-30T16:06:23.234Z",
-      "success_rate": 0.952,
+      "last_success_at": "2026-06-30T16:31:40.683Z",
+      "success_rate": 0.953,
       "last_failure_at": "2026-06-26T15:41:43.932Z"
     },
     "llm:google_news_llm_v1": {
@@ -1546,8 +1546,8 @@
   },
   "gsec_curve": {
     "html_scrape:tradingeconomics_v1": {
-      "attempts": 64,
-      "successes": 62,
+      "attempts": 65,
+      "successes": 63,
       "recent": [
         1,
         1,
@@ -1580,7 +1580,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-30T16:06:23.377Z",
+      "last_success_at": "2026-06-30T16:31:40.941Z",
       "success_rate": 0.969,
       "last_failure_at": "2026-06-10T16:48:57.346Z"
     },
@@ -1597,8 +1597,8 @@
   },
   "banking_liquidity": {
     "json_api:rbi_mmo_v1": {
-      "attempts": 64,
-      "successes": 62,
+      "attempts": 65,
+      "successes": 63,
       "recent": [
         1,
         1,
@@ -1631,7 +1631,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-30T16:06:23.723Z",
+      "last_success_at": "2026-06-30T16:31:41.143Z",
       "success_rate": 0.969,
       "last_failure_at": "2026-06-10T16:49:11.286Z"
     },
@@ -1658,8 +1658,8 @@
   },
   "inr_usd": {
     "html_scrape:te_inr_v1": {
-      "attempts": 64,
-      "successes": 62,
+      "attempts": 65,
+      "successes": 63,
       "recent": [
         1,
         1,
@@ -1692,7 +1692,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-06-30T16:06:26.333Z",
+      "last_success_at": "2026-06-30T16:31:42.651Z",
       "success_rate": 0.969,
       "last_failure_at": "2026-06-10T16:49:14.596Z"
     },
