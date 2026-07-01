@@ -123,27 +123,27 @@
       "last_attempted_at": "2026-07-01T15:14:26.490Z"
     },
     "gsec_curve": {
-      "last_success_at": "2026-07-01T12:16:46.171Z",
-      "last_success_value": 6.74,
-      "consecutive_failures": 1,
-      "status": "amber",
-      "last_failure_at": "2026-07-01T16:07:41.069Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/india/government-bond-yield → 405 | llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters",
-      "last_attempted_at": "2026-07-01T16:07:41.069Z"
-    },
-    "real_10y_yield": {
-      "last_success_at": "2026-07-01T16:07:41.075Z",
-      "last_success_value": 2.81,
+      "last_success_at": "2026-07-01T16:41:47.055Z",
+      "last_success_value": 6.75,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-01T16:07:41.075Z"
+      "last_failure_at": "2026-07-01T16:07:41.069Z",
+      "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/india/government-bond-yield → 405 | llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters",
+      "last_attempted_at": "2026-07-01T16:41:47.055Z"
+    },
+    "real_10y_yield": {
+      "last_success_at": "2026-07-01T16:41:47.061Z",
+      "last_success_value": 2.82,
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_attempted_at": "2026-07-01T16:41:47.061Z"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-07-01T12:16:46.371Z",
+      "last_success_at": "2026-07-01T16:41:47.296Z",
       "last_success_value": 312207.37,
-      "consecutive_failures": 1,
-      "status": "amber",
-      "last_attempted_at": "2026-07-01T16:07:41.096Z",
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_attempted_at": "2026-07-01T16:41:47.296Z",
       "last_failure_at": "2026-07-01T16:07:41.096Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:rbi_mmo_v1: https://tradingeconomics.com/india/money-supply-m3 → 405 | json_api:dbnomics_v1: No dbnomics config for banking_liquidity | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/indi"
     },
@@ -152,23 +152,23 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-01T16:07:42.826Z",
+      "last_success_at": "2026-07-01T16:41:49.197Z",
       "last_success_value": -7,
-      "last_attempted_at": "2026-07-01T16:07:42.826Z"
+      "last_attempted_at": "2026-07-01T16:41:49.197Z"
     },
     "inr_usd": {
-      "last_success_at": "2026-07-01T16:07:43.502Z",
-      "last_success_value": 94.7323,
+      "last_success_at": "2026-07-01T16:41:49.227Z",
+      "last_success_value": 95.203,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-01T16:07:43.502Z"
+      "last_attempted_at": "2026-07-01T16:41:49.227Z"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-07-01T16:07:43.554Z",
-      "last_success_value": 228,
+      "last_success_at": "2026-07-01T16:41:49.554Z",
+      "last_success_value": 229,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-01T16:07:43.554Z"
+      "last_attempted_at": "2026-07-01T16:41:49.554Z"
     },
     "high_yield_credit_spread": {
       "last_success_at": "2026-07-01T12:16:49.961Z",
@@ -421,13 +421,13 @@
       "last_attempted_at": "2026-07-01T15:14:25.117Z"
     },
     "fpi_debt_flows": {
-      "last_failure_at": "2026-06-26T15:43:09.790Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | html_render:moneycontrol_v1: moneycontrol_v1: all 1 URLs failed · https://",
-      "consecutive_failures": 0,
-      "status": "green",
+      "last_failure_at": "2026-07-01T16:41:46.979Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: google_news_llm: empty feed for \"India FPI FII deb",
+      "consecutive_failures": 1,
+      "status": "amber",
       "last_success_at": "2026-07-01T16:07:40.370Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-07-01T16:07:40.370Z"
+      "last_attempted_at": "2026-07-01T16:41:46.979Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-07-01T12:14:54.335Z",
@@ -527,10 +527,10 @@
     }
   },
   "summary": {
-    "green": 59,
-    "amber": 3,
+    "green": 60,
+    "amber": 2,
     "red": 5,
     "total": 67
   },
-  "generated_at": "2026-07-01T16:07:43.554Z"
+  "generated_at": "2026-07-01T16:41:49.554Z"
 }

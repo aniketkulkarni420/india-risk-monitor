@@ -72,10 +72,9 @@
   },
   "wacr_repo_spread": {
     "html_scrape:rbi_mmo_daily_v1": {
-      "attempts": 76,
-      "successes": 60,
+      "attempts": 77,
+      "successes": 61,
       "recent": [
-        0,
         1,
         1,
         1,
@@ -98,6 +97,7 @@
         0,
         0,
         0,
+        1,
         1,
         1,
         1,
@@ -107,8 +107,8 @@
         1
       ],
       "last_failure_at": "2026-06-29T16:46:42.044Z",
-      "success_rate": 0.789,
-      "last_success_at": "2026-07-01T16:07:42.825Z"
+      "success_rate": 0.792,
+      "last_success_at": "2026-07-01T16:41:49.196Z"
     },
     "llm:google_news_llm_v1": {
       "attempts": 24,
@@ -669,33 +669,35 @@
   },
   "fpi_debt_flows": {
     "html_render:moneycontrol_v1": {
-      "attempts": 5,
+      "attempts": 6,
       "successes": 0,
       "recent": [
         0,
         0,
         0,
         0,
+        0,
         0
       ],
-      "last_failure_at": "2026-06-26T15:41:52.307Z",
+      "last_failure_at": "2026-07-01T16:41:38.102Z",
       "success_rate": 0
     },
     "html_render:bse_v1": {
-      "attempts": 5,
+      "attempts": 6,
       "successes": 0,
       "recent": [
         0,
         0,
         0,
         0,
+        0,
         0
       ],
-      "last_failure_at": "2026-06-26T15:43:09.478Z",
+      "last_failure_at": "2026-07-01T16:41:46.978Z",
       "success_rate": 0
     },
     "html_render:playwright_render_v1": {
-      "attempts": 88,
+      "attempts": 89,
       "successes": 84,
       "recent": [
         1,
@@ -708,7 +710,6 @@
         1,
         1,
         1,
-        1,
         0,
         1,
         1,
@@ -727,22 +728,24 @@
         1,
         1,
         1,
-        1
+        1,
+        0
       ],
       "last_success_at": "2026-07-01T16:07:40.368Z",
-      "success_rate": 0.955,
-      "last_failure_at": "2026-06-26T15:41:43.932Z"
+      "success_rate": 0.944,
+      "last_failure_at": "2026-07-01T16:41:24.567Z"
     },
     "llm:google_news_llm_v1": {
-      "attempts": 4,
+      "attempts": 5,
       "successes": 0,
       "recent": [
         0,
         0,
         0,
+        0,
         0
       ],
-      "last_failure_at": "2026-06-26T15:43:09.789Z",
+      "last_failure_at": "2026-07-01T16:41:24.911Z",
       "success_rate": 0
     }
   },
@@ -1558,8 +1561,8 @@
   },
   "gsec_curve": {
     "html_scrape:tradingeconomics_v1": {
-      "attempts": 67,
-      "successes": 64,
+      "attempts": 68,
+      "successes": 65,
       "recent": [
         1,
         1,
@@ -1589,11 +1592,11 @@
         1,
         1,
         1,
-        1,
-        0
+        0,
+        1
       ],
-      "last_success_at": "2026-07-01T12:16:46.170Z",
-      "success_rate": 0.955,
+      "last_success_at": "2026-07-01T16:41:47.053Z",
+      "success_rate": 0.956,
       "last_failure_at": "2026-07-01T16:07:40.481Z"
     },
     "llm:google_news_llm_v1": {
@@ -1611,8 +1614,8 @@
   },
   "banking_liquidity": {
     "json_api:rbi_mmo_v1": {
-      "attempts": 67,
-      "successes": 64,
+      "attempts": 68,
+      "successes": 65,
       "recent": [
         1,
         1,
@@ -1642,11 +1645,11 @@
         1,
         1,
         1,
-        1,
-        0
+        0,
+        1
       ],
-      "last_success_at": "2026-07-01T12:16:46.369Z",
-      "success_rate": 0.955,
+      "last_success_at": "2026-07-01T16:41:47.294Z",
+      "success_rate": 0.956,
       "last_failure_at": "2026-07-01T16:07:41.081Z"
     },
     "json_api:dbnomics_v1": {
@@ -1674,8 +1677,8 @@
   },
   "inr_usd": {
     "html_scrape:te_inr_v1": {
-      "attempts": 67,
-      "successes": 64,
+      "attempts": 68,
+      "successes": 65,
       "recent": [
         1,
         1,
@@ -1705,11 +1708,11 @@
         1,
         1,
         1,
-        1,
-        0
+        0,
+        1
       ],
-      "last_success_at": "2026-07-01T12:16:48.724Z",
-      "success_rate": 0.955,
+      "last_success_at": "2026-07-01T16:41:49.222Z",
+      "success_rate": 0.956,
       "last_failure_at": "2026-07-01T16:07:42.833Z"
     },
     "json_api:rbi_refrate_v1": {
