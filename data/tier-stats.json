@@ -72,11 +72,10 @@
   },
   "wacr_repo_spread": {
     "html_scrape:rbi_mmo_daily_v1": {
-      "attempts": 75,
-      "successes": 59,
+      "attempts": 76,
+      "successes": 60,
       "recent": [
         0,
-        0,
         1,
         1,
         1,
@@ -99,6 +98,7 @@
         0,
         0,
         0,
+        1,
         1,
         1,
         1,
@@ -107,8 +107,8 @@
         1
       ],
       "last_failure_at": "2026-06-29T16:46:42.044Z",
-      "success_rate": 0.787,
-      "last_success_at": "2026-07-01T12:16:48.696Z"
+      "success_rate": 0.789,
+      "last_success_at": "2026-07-01T16:07:42.825Z"
     },
     "llm:google_news_llm_v1": {
       "attempts": 24,
@@ -695,10 +695,9 @@
       "success_rate": 0
     },
     "html_render:playwright_render_v1": {
-      "attempts": 87,
-      "successes": 83,
+      "attempts": 88,
+      "successes": 84,
       "recent": [
-        0,
         1,
         1,
         1,
@@ -711,6 +710,7 @@
         1,
         1,
         0,
+        1,
         1,
         1,
         1,
@@ -729,8 +729,8 @@
         1,
         1
       ],
-      "last_success_at": "2026-07-01T12:16:46.099Z",
-      "success_rate": 0.954,
+      "last_success_at": "2026-07-01T16:07:40.368Z",
+      "success_rate": 0.955,
       "last_failure_at": "2026-06-26T15:41:43.932Z"
     },
     "llm:google_news_llm_v1": {
@@ -1558,7 +1558,7 @@
   },
   "gsec_curve": {
     "html_scrape:tradingeconomics_v1": {
-      "attempts": 66,
+      "attempts": 67,
       "successes": 64,
       "recent": [
         1,
@@ -1590,26 +1590,28 @@
         1,
         1,
         1,
-        1
+        0
       ],
       "last_success_at": "2026-07-01T12:16:46.170Z",
-      "success_rate": 0.97,
-      "last_failure_at": "2026-06-10T16:48:57.346Z"
+      "success_rate": 0.955,
+      "last_failure_at": "2026-07-01T16:07:40.481Z"
     },
     "llm:google_news_llm_v1": {
-      "attempts": 2,
+      "attempts": 3,
       "successes": 2,
       "recent": [
         1,
-        1
+        1,
+        0
       ],
       "last_success_at": "2026-06-10T16:49:11.229Z",
-      "success_rate": 1
+      "success_rate": 0.667,
+      "last_failure_at": "2026-07-01T16:07:41.068Z"
     }
   },
   "banking_liquidity": {
     "json_api:rbi_mmo_v1": {
-      "attempts": 66,
+      "attempts": 67,
       "successes": 64,
       "recent": [
         1,
@@ -1641,36 +1643,38 @@
         1,
         1,
         1,
-        1
+        0
       ],
       "last_success_at": "2026-07-01T12:16:46.369Z",
-      "success_rate": 0.97,
-      "last_failure_at": "2026-06-10T16:49:11.286Z"
+      "success_rate": 0.955,
+      "last_failure_at": "2026-07-01T16:07:41.081Z"
     },
     "json_api:dbnomics_v1": {
-      "attempts": 2,
+      "attempts": 3,
       "successes": 0,
       "recent": [
         0,
+        0,
         0
       ],
-      "last_failure_at": "2026-06-10T16:49:11.299Z",
+      "last_failure_at": "2026-07-01T16:07:41.082Z",
       "success_rate": 0
     },
     "html_scrape:tradingeconomics_v1": {
-      "attempts": 2,
+      "attempts": 3,
       "successes": 0,
       "recent": [
         0,
+        0,
         0
       ],
-      "last_failure_at": "2026-06-10T16:49:11.319Z",
+      "last_failure_at": "2026-07-01T16:07:41.095Z",
       "success_rate": 0
     }
   },
   "inr_usd": {
     "html_scrape:te_inr_v1": {
-      "attempts": 66,
+      "attempts": 67,
       "successes": 64,
       "recent": [
         1,
@@ -1702,20 +1706,21 @@
         1,
         1,
         1,
-        1
+        0
       ],
       "last_success_at": "2026-07-01T12:16:48.724Z",
-      "success_rate": 0.97,
-      "last_failure_at": "2026-06-10T16:49:14.596Z"
+      "success_rate": 0.955,
+      "last_failure_at": "2026-07-01T16:07:42.833Z"
     },
     "json_api:rbi_refrate_v1": {
-      "attempts": 2,
-      "successes": 2,
+      "attempts": 3,
+      "successes": 3,
       "recent": [
+        1,
         1,
         1
       ],
-      "last_success_at": "2026-06-10T16:49:15.456Z",
+      "last_success_at": "2026-07-01T16:07:43.499Z",
       "success_rate": 1
     }
   },
