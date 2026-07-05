@@ -276,11 +276,11 @@
       "last_attempted_at": "2026-07-04T15:45:03.990Z"
     },
     "iip_growth": {
-      "last_success_at": "2026-07-04T15:45:04.250Z",
+      "last_success_at": "2026-07-05T07:42:46.794Z",
       "last_success_value": 5.1,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-04T15:45:04.250Z"
+      "last_attempted_at": "2026-07-05T07:42:46.794Z"
     },
     "wpi_inflation": {
       "last_success_at": "2026-06-05T14:08:46.466Z",
@@ -290,11 +290,11 @@
       "last_attempted_at": "2026-06-05T14:08:46.466Z"
     },
     "cpi_inflation": {
-      "last_success_at": "2026-07-04T15:45:04.333Z",
+      "last_success_at": "2026-07-05T07:42:46.894Z",
       "last_success_value": 3.93,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-04T15:45:04.333Z"
+      "last_attempted_at": "2026-07-05T07:42:46.894Z"
     },
     "naukri_jobspeak": {
       "last_success_at": "2026-06-11T12:00:34.465Z",
@@ -308,80 +308,80 @@
       "last_failure_reason": "cement_dispatches: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMiggFBVV95cUxPNFplNDZ: 3.89 out of band | https://news.google.com/rss/articles/CBMimAFBVV95cUxPOXA0S2l: All LLM providers failed: groq: returned no",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-04T15:45:06.769Z",
+      "last_success_at": "2026-07-05T07:42:49.173Z",
       "last_success_value": 40.7,
-      "last_attempted_at": "2026-07-04T15:45:06.769Z"
+      "last_attempted_at": "2026-07-05T07:42:49.173Z"
     },
     "steel_consumption": {
-      "last_success_at": "2026-07-04T15:45:06.939Z",
+      "last_success_at": "2026-07-05T07:42:49.351Z",
       "last_success_value": 14.1,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-04T15:45:06.939Z"
+      "last_attempted_at": "2026-07-05T07:42:49.351Z"
     },
     "pmi_combined": {
-      "last_success_at": "2026-07-04T15:45:07.124Z",
+      "last_success_at": "2026-07-05T07:42:49.532Z",
       "last_success_value": 57.1,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-04T15:45:07.124Z"
+      "last_attempted_at": "2026-07-05T07:42:49.532Z"
     },
     "eway_bills": {
       "last_failure_at": "2026-06-13T10:14:08.521Z",
       "last_failure_reason": "eway_bills: 3 candidates, none yielded value · https://news.google.com/rss/articles/CBMigAFBVV95cUxQMnpkNHJ: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a | https://news.google.com/rss/articles/CBMixwFBVV9",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-04T15:45:18.908Z",
+      "last_success_at": "2026-07-05T07:43:01.414Z",
       "last_success_value": 133.4,
-      "last_attempted_at": "2026-07-04T15:45:18.908Z"
+      "last_attempted_at": "2026-07-05T07:43:01.414Z"
     },
     "fastag_toll": {
       "last_failure_at": "2026-07-04T15:45:36.487Z",
       "last_failure_reason": "tiered: all 3 tiers failed · xlsx:npci_rps_v1: NPCI RPS list API HTTP 503 | rss:google_news_rss_v1: google_news_rss: 52 items, none matched · tried:  | llm:google_news_llm_v1: fastag_toll: 6 candidates, none yielded value · https://news.goo",
-      "consecutive_failures": 1,
-      "status": "amber",
-      "last_success_at": "2026-07-04T11:01:48.387Z",
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-07-05T07:43:03.916Z",
       "last_success_value": 7627.55,
-      "last_attempted_at": "2026-07-04T15:45:36.487Z"
+      "last_attempted_at": "2026-07-05T07:43:03.916Z"
     },
     "rail_freight": {
       "last_failure_at": "2026-05-15T13:32:47.963Z",
       "last_failure_reason": "tiered: all 4 tiers failed · email:email_pipeline_v1: email_pipeline: no matching emails for rail_freight (subscription may not have delivered yet) | llm:google_news_llm_v1: rail_freight: 6 candidates, none yielded value · https://news.goog",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-04T15:45:37.062Z",
+      "last_success_at": "2026-07-05T07:43:04.446Z",
       "last_success_value": 142.21,
-      "last_attempted_at": "2026-07-04T15:45:37.062Z"
+      "last_attempted_at": "2026-07-05T07:43:04.446Z"
     },
     "port_cargo": {
       "last_failure_at": "2026-07-02T11:44:03.781Z",
       "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: in cooldown | html_render:web_llm_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-04T15:45:46.515Z",
+      "last_success_at": "2026-07-05T07:43:07.876Z",
       "last_success_value": 60,
-      "last_attempted_at": "2026-07-04T15:45:46.515Z"
+      "last_attempted_at": "2026-07-05T07:43:07.876Z"
     },
     "fiscal_deficit_pct": {
-      "last_success_at": "2026-07-04T15:45:46.626Z",
+      "last_success_at": "2026-07-05T07:43:07.980Z",
       "last_success_value": 97.8,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-04T15:45:46.626Z"
+      "last_attempted_at": "2026-07-05T07:43:07.980Z"
     },
     "govt_capex_runrate": {
-      "last_success_at": "2026-07-04T15:45:46.641Z",
+      "last_success_at": "2026-07-05T07:43:07.999Z",
       "last_success_value": 102.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-04T15:45:46.641Z"
+      "last_attempted_at": "2026-07-05T07:43:07.999Z"
     },
     "credit_deposit_growth": {
-      "last_success_at": "2026-07-04T15:45:46.909Z",
+      "last_success_at": "2026-07-05T07:43:08.284Z",
       "last_success_value": 17.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-04T15:45:46.909Z"
+      "last_attempted_at": "2026-07-05T07:43:08.284Z"
     },
     "repo_rate": {
       "last_success_at": "2026-07-04T15:46:36.303Z",
@@ -529,10 +529,10 @@
     }
   },
   "summary": {
-    "green": 60,
-    "amber": 1,
+    "green": 61,
+    "amber": 0,
     "red": 6,
     "total": 67
   },
-  "generated_at": "2026-07-05T05:58:46.663Z"
+  "generated_at": "2026-07-05T07:43:08.285Z"
 }
