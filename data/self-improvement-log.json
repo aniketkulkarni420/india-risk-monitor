@@ -347,7 +347,22 @@
       ],
       "quarantined": [],
       "reason": "google_news_llm_v1=confident(0.57), google_news_rss_v1=confident(0.50)"
+    },
+    {
+      "ts": "2026-07-07T04:44:57.590Z",
+      "metric_id": "net_sip_inflows",
+      "action": "reorder",
+      "from": [
+        "rss:google_news_rss_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "to": [
+        "llm:google_news_llm_v1",
+        "rss:google_news_rss_v1"
+      ],
+      "quarantined": [],
+      "reason": "google_news_llm_v1=confident(0.86), google_news_rss_v1=confident(0.80)"
     }
   ],
-  "last_run": "2026-07-05T04:52:27.187Z"
+  "last_run": "2026-07-07T04:44:57.590Z"
 }
