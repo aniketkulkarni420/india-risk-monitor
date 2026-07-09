@@ -2,12 +2,20 @@
   "day": "2026-07-09",
   "providers": {
     "groq": {
-      "calls": 12,
-      "successes": 12,
-      "failures": 0,
-      "success_rate": 1,
+      "calls": 56,
+      "successes": 30,
+      "failures": 26,
+      "success_rate": 0.536,
       "daily_limit": 14400,
-      "headroom_pct": 99.9
+      "headroom_pct": 99.6
+    },
+    "gemini": {
+      "calls": 33,
+      "successes": 0,
+      "failures": 33,
+      "success_rate": 0,
+      "daily_limit": 1500,
+      "headroom_pct": 97.8
     }
   }
 }
