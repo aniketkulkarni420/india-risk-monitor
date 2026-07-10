@@ -152,9 +152,9 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 2 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63 | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-09T16:40:06.812Z",
-      "last_success_value": -23,
-      "last_attempted_at": "2026-07-09T16:40:06.812Z"
+      "last_success_at": "2026-07-10T10:35:10.256Z",
+      "last_success_value": -16,
+      "last_attempted_at": "2026-07-10T10:35:10.256Z"
     },
     "inr_usd": {
       "last_success_at": "2026-07-09T16:40:06.893Z",
@@ -198,11 +198,11 @@
       "last_attempted_at": "2026-06-11T11:58:11.498Z"
     },
     "india_crude_basket": {
-      "last_success_at": "2026-07-10T05:58:21.494Z",
+      "last_success_at": "2026-07-10T10:41:53.143Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-07-10T05:58:21.494Z"
+      "last_attempted_at": "2026-07-10T10:41:53.143Z"
     },
     "gst_gross": {
       "last_failure_at": "2026-05-11T05:00:21.341Z",
@@ -260,22 +260,22 @@
       "last_attempted_at": "2026-06-11T12:00:26.546Z"
     },
     "pol_demand": {
-      "last_failure_at": "2026-07-09T12:18:19.188Z",
+      "last_failure_at": "2026-07-10T10:35:14.025Z",
       "last_failure_reason": "ppac_v1: PT_Consumption PDF link not found on index",
-      "consecutive_failures": 39,
+      "consecutive_failures": 40,
       "status": "red",
       "last_success_at": "2026-06-16T14:30:11.738Z",
       "last_success_value": 19.47,
-      "last_attempted_at": "2026-07-09T12:18:19.188Z"
+      "last_attempted_at": "2026-07-10T10:35:14.025Z"
     },
     "air_pax": {
       "last_failure_at": "2026-07-07T12:08:30.991Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:dgca_v1: air_pax: all sources failed [https://www.business-standard.com/topic/domestic-air-passenger-traffic: | llm:google_news_llm_v1: air_pax: 4 candidates, none yielded value · https://news.goog",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-09T12:18:23.419Z",
+      "last_success_at": "2026-07-10T10:35:16.046Z",
       "last_success_value": 132.67,
-      "last_attempted_at": "2026-07-09T12:18:23.419Z"
+      "last_attempted_at": "2026-07-10T10:35:16.046Z"
     },
     "iip_growth": {
       "last_success_at": "2026-07-09T12:18:23.547Z",
@@ -310,9 +310,9 @@
       "last_failure_reason": "cement_dispatches: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMiggFBVV95cUxPNFplNDZ: 3.89 out of band | https://news.google.com/rss/articles/CBMimAFBVV95cUxPOXA0S2l: All LLM providers failed: groq: returned no",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-09T12:18:25.758Z",
+      "last_success_at": "2026-07-10T10:41:48.077Z",
       "last_success_value": 40.7,
-      "last_attempted_at": "2026-07-09T12:18:25.758Z"
+      "last_attempted_at": "2026-07-10T10:41:48.077Z"
     },
     "steel_consumption": {
       "last_success_at": "2026-07-09T12:18:25.923Z",
@@ -333,36 +333,36 @@
       "last_failure_reason": "eway_bills: 3 candidates, none yielded value · https://news.google.com/rss/articles/CBMigAFBVV95cUxQMnpkNHJ: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a | https://news.google.com/rss/articles/CBMixwFBVV9",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-09T12:18:32.360Z",
+      "last_success_at": "2026-07-10T10:35:28.970Z",
       "last_success_value": 136.76999999999998,
-      "last_attempted_at": "2026-07-09T12:18:32.360Z"
+      "last_attempted_at": "2026-07-10T10:35:28.970Z"
     },
     "fastag_toll": {
-      "last_failure_at": "2026-07-09T12:18:49.479Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · xlsx:npci_rps_v1: NPCI RPS: implausible FASTag value ₹752169.624634 Cr | rss:google_news_rss_v1: google_news_rss: 51 items, none matched · tried: Innovision Bags ₹9.23 Cr NHAI Toll Collection Contr | llm:google_",
-      "consecutive_failures": 3,
+      "last_failure_at": "2026-07-10T10:36:30.191Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · xlsx:npci_rps_v1: NPCI RPS: implausible FASTag value ₹752169.624634 Cr | rss:google_news_rss_v1: google_news_rss: 51 items, none matched · tried:  | llm:google_news_llm_v1: fastag_toll: 6 candidates, none yielde",
+      "consecutive_failures": 4,
       "status": "red",
       "last_success_at": "2026-07-06T13:00:30.686Z",
       "last_success_value": 7627.55,
-      "last_attempted_at": "2026-07-09T12:18:49.479Z"
+      "last_attempted_at": "2026-07-10T10:36:30.191Z"
     },
     "rail_freight": {
       "last_failure_at": "2026-05-15T13:32:47.963Z",
       "last_failure_reason": "tiered: all 4 tiers failed · email:email_pipeline_v1: email_pipeline: no matching emails for rail_freight (subscription may not have delivered yet) | llm:google_news_llm_v1: rail_freight: 6 candidates, none yielded value · https://news.goog",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-09T12:18:50.062Z",
+      "last_success_at": "2026-07-10T10:36:31.311Z",
       "last_success_value": 142.21,
-      "last_attempted_at": "2026-07-09T12:18:50.062Z"
+      "last_attempted_at": "2026-07-10T10:36:31.311Z"
     },
     "port_cargo": {
-      "last_failure_at": "2026-07-09T12:20:16.147Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: publisher_rss_v1: no matching articles across 3 feeds | html_render:web_llm_v1: web_llm_v1: all 3 sources failed · https://www.adaniports.com/Investors/Investor-Information: All LL | llm:go",
-      "consecutive_failures": 3,
+      "last_failure_at": "2026-07-10T10:41:45.469Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: publisher_rss_v1: 4 articles tried · https://www.maritimegateway.com/deendayal-port-sets-bentonit: A | html_render:web_llm_v1: web_llm_v1: all 3 sources failed · https://www.adaniports.com/",
+      "consecutive_failures": 4,
       "status": "red",
       "last_success_at": "2026-07-06T13:00:32.530Z",
       "last_success_value": 60,
-      "last_attempted_at": "2026-07-09T12:20:16.147Z"
+      "last_attempted_at": "2026-07-10T10:41:45.469Z"
     },
     "fiscal_deficit_pct": {
       "last_success_at": "2026-07-09T12:20:16.275Z",
@@ -416,22 +416,22 @@
       "last_attempted_at": "2026-06-11T12:00:35.421Z"
     },
     "block_deals_notional": {
-      "last_failure_at": "2026-07-09T15:35:41.932Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: nse_api_v1: block_deals_notional — no extractable value from https://www.nseindia.com/api/block-deal | llm:google_news_llm_v1: in cooldown | html_render:bse_v1: in cooldown",
-      "consecutive_failures": 3,
+      "last_failure_at": "2026-07-10T10:43:07.779Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: nse_api_v1: block_deals_notional — no extractable value from https://www.nseindia.com/api/block-deal | llm:google_news_llm_v1: block_deals_notional: 5 candidates, none yielded value · https:",
+      "consecutive_failures": 4,
       "status": "red",
       "last_success_at": "2026-07-08T14:42:40.289Z",
       "last_success_value": 2207.1,
-      "last_attempted_at": "2026-07-09T15:35:41.932Z"
+      "last_attempted_at": "2026-07-10T10:43:07.779Z"
     },
     "fpi_debt_flows": {
       "last_failure_at": "2026-07-01T16:41:46.979Z",
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: google_news_llm: empty feed for \"India FPI FII deb",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-09T16:40:03.862Z",
+      "last_success_at": "2026-07-10T10:44:26.641Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-07-09T16:40:03.862Z"
+      "last_attempted_at": "2026-07-10T10:44:26.641Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-07-10T05:58:01.622Z",
@@ -538,5 +538,5 @@
     "red": 7,
     "total": 67
   },
-  "generated_at": "2026-07-10T05:58:21.494Z"
+  "generated_at": "2026-07-10T10:44:26.642Z"
 }
