@@ -520,8 +520,8 @@
   },
   "india_crude_basket": {
     "press_release:ppac_v1": {
-      "attempts": 182,
-      "successes": 182,
+      "attempts": 183,
+      "successes": 183,
       "recent": [
         1,
         1,
@@ -554,7 +554,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-07-10T10:41:53.141Z",
+      "last_success_at": "2026-07-11T03:50:46.147Z",
       "success_rate": 1
     }
   },
@@ -912,8 +912,8 @@
       "success_rate": 1
     },
     "llm:google_news_llm_v1": {
-      "attempts": 53,
-      "successes": 0,
+      "attempts": 54,
+      "successes": 1,
       "recent": [
         0,
         0,
@@ -944,16 +944,17 @@
         0,
         0,
         0,
-        0
+        1
       ],
       "last_failure_at": "2026-07-10T04:30:43.395Z",
-      "success_rate": 0
+      "success_rate": 0.019,
+      "last_success_at": "2026-07-11T03:50:25.273Z"
     }
   },
   "brent_crude": {
     "json_api:public_oil_v1": {
-      "attempts": 155,
-      "successes": 152,
+      "attempts": 156,
+      "successes": 153,
       "recent": [
         1,
         1,
@@ -986,7 +987,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-07-10T05:58:01.755Z",
+      "last_success_at": "2026-07-11T03:50:25.458Z",
       "success_rate": 0.981,
       "last_failure_at": "2026-06-06T05:49:41.137Z"
     },
@@ -1024,10 +1025,9 @@
   },
   "gold_usd": {
     "json_api:public_gold_v1": {
-      "attempts": 156,
-      "successes": 150,
+      "attempts": 157,
+      "successes": 151,
       "recent": [
-        1,
         1,
         1,
         1,
@@ -1056,9 +1056,10 @@
         1,
         1,
         1,
+        1,
         1
       ],
-      "last_success_at": "2026-07-10T05:58:01.843Z",
+      "last_success_at": "2026-07-11T03:50:25.529Z",
       "success_rate": 0.962,
       "last_failure_at": "2026-07-09T05:58:53.596Z"
     },
@@ -1093,8 +1094,8 @@
   },
   "dxy": {
     "json_api:public_dxy_v1": {
-      "attempts": 156,
-      "successes": 153,
+      "attempts": 157,
+      "successes": 154,
       "recent": [
         1,
         1,
@@ -1127,7 +1128,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-07-10T05:58:01.930Z",
+      "last_success_at": "2026-07-11T03:50:25.601Z",
       "success_rate": 0.981,
       "last_failure_at": "2026-06-06T05:49:41.177Z"
     },
@@ -2431,8 +2432,8 @@
   },
   "baltic_dirty_tanker": {
     "json_api:hormuz_bdti_v1": {
-      "attempts": 116,
-      "successes": 116,
+      "attempts": 117,
+      "successes": 117,
       "recent": [
         1,
         1,
@@ -2465,13 +2466,13 @@
         1,
         1
       ],
-      "last_success_at": "2026-07-10T05:58:01.619Z",
+      "last_success_at": "2026-07-11T03:50:18.549Z",
       "success_rate": 1
     }
   },
   "power_demand": {
     "json_api:gridindia_v1": {
-      "attempts": 25,
+      "attempts": 26,
       "successes": 0,
       "recent": [
         0,
@@ -2498,13 +2499,14 @@
         0,
         0,
         0,
+        0,
         0
       ],
-      "last_failure_at": "2026-07-10T04:30:45.369Z",
+      "last_failure_at": "2026-07-11T03:50:27.914Z",
       "success_rate": 0
     },
     "rss:google_news_rss_v1": {
-      "attempts": 95,
+      "attempts": 96,
       "successes": 72,
       "recent": [
         1,
@@ -2517,7 +2519,7 @@
         1,
         1,
         1,
-        1,
+        0,
         0,
         0,
         0,
@@ -2539,8 +2541,8 @@
         0
       ],
       "last_success_at": "2026-06-30T11:49:51.269Z",
-      "success_rate": 0.758,
-      "last_failure_at": "2026-07-10T04:30:44.246Z"
+      "success_rate": 0.75,
+      "last_failure_at": "2026-07-11T03:50:26.273Z"
     }
   },
   "gift_nifty": {
@@ -2564,11 +2566,10 @@
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 114,
-      "successes": 99,
+      "attempts": 115,
+      "successes": 100,
       "recent": [
         1,
-        1,
         0,
         1,
         0,
@@ -2578,6 +2579,7 @@
         0,
         0,
         0,
+        1,
         1,
         1,
         1,
@@ -2598,8 +2600,8 @@
         1,
         1
       ],
-      "last_success_at": "2026-07-10T05:58:15.590Z",
-      "success_rate": 0.868,
+      "last_success_at": "2026-07-11T03:50:40.179Z",
+      "success_rate": 0.87,
       "last_failure_at": "2026-07-05T15:46:24.924Z"
     }
   },
