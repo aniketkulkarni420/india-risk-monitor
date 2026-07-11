@@ -15,6 +15,7 @@
   "sparkline_12m": [
     1939,
     1939,
+    1939,
     1939
   ],
   "baseline_30d": 575,
@@ -46,7 +47,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-07-11T04:59:08.485Z",
+  "last_verified_at": "2026-07-11T15:30:30.876Z",
   "why_it_matters": "VLCC = Very Large Crude Carrier. India's primary crude import vessel class. Rates +220% on Hormuz forces re-routing via Cape — adds $4-6/bbl to delivered cost.",
   "trigger_thresholds": [
     {
@@ -65,7 +66,7 @@
     "trade_deficit"
   ],
   "data_origin": "primary",
-  "last_live_fetch_at": "2026-07-11T04:59:08.485Z",
+  "last_live_fetch_at": "2026-07-11T15:30:30.876Z",
   "_source_count_actual": 1,
   "_history_state": "accruing",
   "notes": " 2026-06-11: previous value was actually the BDTI index scraped from the Hormuz page (wrong series). Reset to null; news-LLM tier captures real VLCC $/day or WS figures from tanker coverage. BDTI now lives in baltic_dirty_tanker."
