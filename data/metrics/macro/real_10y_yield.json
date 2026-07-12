@@ -13,13 +13,13 @@
   "yoy_pct": -0.95,
   "vs_5y_avg_pct": 24.1,
   "sparkline_12m": [
-    2.77,
     2.8,
     2.84,
     2.84,
     2.83,
     2.82,
     2.82,
+    2.78,
     2.78,
     2.78,
     2.78,
@@ -44,7 +44,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-07-12T10:42:16.263Z",
+  "last_verified_at": "2026-07-12T15:35:55.598Z",
   "why_it_matters": "Real yield is what fund managers actually price off — nominal yield minus inflation. Currently elevated (~3.6%) — attractive carry, supports debt FPI inflows.",
   "formula": "gsec_curve_10y - cpi_inflation_yoy. Updates daily on G-sec close; re-pegs monthly when CPI prints.",
   "linked_metrics": [
@@ -54,7 +54,7 @@
     "fpi_debt_flows"
   ],
   "data_origin": "live",
-  "last_live_fetch_at": "2026-07-12T10:42:16.263Z",
+  "last_live_fetch_at": "2026-07-12T15:35:55.598Z",
   "_source_count_actual": 2,
   "_history_state": "accruing"
 }
