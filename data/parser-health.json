@@ -495,29 +495,29 @@
       "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters | html_render:web_llm_v1: in cooldown"
     },
     "net_sip_inflows": {
-      "last_attempted_at": "2026-07-11T15:37:20.962Z",
-      "last_success_at": "2026-07-11T15:37:20.962Z",
-      "last_success_value": 31781,
+      "last_attempted_at": "2026-07-12T07:08:19.468Z",
+      "last_success_at": "2026-07-12T07:08:19.468Z",
+      "last_success_value": 30953.83,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-07-05T15:52:30.535Z",
       "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: in cooldown | llm:google_news_llm_v1: net_sip_inflows: 3 candidates, none yielded value · https://news.google.com/rss/articles/CBMiygFBVV9"
     },
     "mf_net_equity_flows": {
-      "last_attempted_at": "2026-07-11T15:37:22.380Z",
-      "last_success_at": "2026-07-11T15:37:22.380Z",
+      "last_attempted_at": "2026-07-12T07:08:21.065Z",
+      "last_success_at": "2026-07-12T07:08:21.065Z",
       "last_success_value": 28973.41,
       "consecutive_failures": 0,
       "status": "green"
     },
     "core_cpi": {
-      "last_attempted_at": "2026-07-11T15:37:34.914Z",
+      "last_attempted_at": "2026-07-12T07:08:38.941Z",
       "last_failure_at": "2026-07-11T10:30:35.526Z",
       "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: core_cpi: 3 candidates, none yielded value · https://news.google.com/rss/articles/CBMilAFBVV95cUxQSW | rss:google_news_rss_v1: google_news_rss: 66 items, none matched · tried: Global Mark",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-11T15:37:34.914Z",
-      "last_success_value": 3.7
+      "last_success_at": "2026-07-12T07:08:38.941Z",
+      "last_success_value": 3.9
     },
     "eight_core_industries": {
       "last_attempted_at": "2026-07-11T15:37:37.942Z",
@@ -540,5 +540,5 @@
     "red": 7,
     "total": 67
   },
-  "generated_at": "2026-07-12T05:22:19.099Z"
+  "generated_at": "2026-07-12T07:08:38.941Z"
 }
