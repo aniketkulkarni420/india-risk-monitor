@@ -36,9 +36,9 @@
     "frequency": "Monthly",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
+      "llm:google_news_llm_v1",
       "rss:publisher_rss_v1",
-      "html_render:web_llm_v1",
-      "llm:google_news_llm_v1"
+      "html_render:web_llm_v1"
     ]
   },
   "source_crosscheck": [
@@ -59,7 +59,7 @@
   ],
   "data_origin": "primary",
   "last_live_fetch_at": "2026-07-14T09:28:46.877Z",
-  "_reliability_optimized_at": "2026-06-03T18:12:43.657Z",
+  "_reliability_optimized_at": "2026-07-15T03:54:26.036Z",
   "_history_state": "accruing",
   "_source_count_actual": 1
 }

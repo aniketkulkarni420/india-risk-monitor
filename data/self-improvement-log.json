@@ -377,7 +377,27 @@
       ],
       "quarantined": [],
       "reason": "google_news_rss_v1=confident(0.81), google_news_llm_v1=confident(0.81)"
+    },
+    {
+      "ts": "2026-07-15T03:54:26.036Z",
+      "metric_id": "port_cargo",
+      "action": "reorder+quarantine",
+      "from": [
+        "rss:publisher_rss_v1",
+        "html_render:web_llm_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "to": [
+        "llm:google_news_llm_v1",
+        "rss:publisher_rss_v1",
+        "html_render:web_llm_v1"
+      ],
+      "quarantined": [
+        "rss:publisher_rss_v1",
+        "html_render:web_llm_v1"
+      ],
+      "reason": "google_news_llm_v1=confident(0.03), publisher_rss_v1=dead(0.43), web_llm_v1=dead(0.00)"
     }
   ],
-  "last_run": "2026-07-14T03:52:53.815Z"
+  "last_run": "2026-07-15T03:54:26.036Z"
 }
