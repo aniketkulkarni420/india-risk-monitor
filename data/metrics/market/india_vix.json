@@ -4,16 +4,15 @@
   "display_subtitle": "NSE volatility index",
   "section": "market",
   "sub_cluster": "sentiment",
-  "value": 12.98,
+  "value": 12.6,
   "unit": "Index",
   "value_format": "decimal_2",
-  "as_of": "2026-07-20T14:34:58.856Z",
+  "as_of": "2026-07-21T11:16:14.226Z",
   "as_of_period": "live",
-  "mom_pct": 0.08,
-  "yoy_pct": 15.89,
+  "mom_pct": -2.85,
+  "yoy_pct": 12.5,
   "vs_5y_avg_pct": 8.4,
   "sparkline_12m": [
-    13.28,
     13.75,
     13.75,
     13.75,
@@ -24,7 +23,8 @@
     13.15,
     13.15,
     12.98,
-    12.98
+    12.98,
+    12.6
   ],
   "status": "med",
   "shock_eligible": true,
@@ -49,7 +49,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-07-20T14:34:58.858Z",
+  "last_verified_at": "2026-07-21T11:16:14.228Z",
   "why_it_matters": "Fear gauge. Sub-15 = complacency, 15-25 = normal, 25-30 = nervous, >30 = panic. Currently elevated on Hormuz event but no panic.",
   "trigger_thresholds": [
     {
@@ -70,6 +70,6 @@
     "fii_index_fut_positioning"
   ],
   "data_origin": "live",
-  "last_live_fetch_at": "2026-07-20T14:34:58.858Z",
+  "last_live_fetch_at": "2026-07-21T11:16:14.228Z",
   "_source_count_actual": 1
 }
