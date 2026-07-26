@@ -4,10 +4,10 @@
   "display_subtitle": "NPCI NETC · official · QoQ + YoY tracked (latest month shown)",
   "section": "economy",
   "sub_cluster": "movement",
-  "value": 7627.55,
+  "value": 6500,
   "unit": "₹ Cr",
   "value_format": "currency_inr_cr",
-  "as_of": "2026-05-31T00:00:00.000Z",
+  "as_of": "2026-07-25T13:17:16.000Z",
   "as_of_period": "monthly",
   "mom_pct": 4.2,
   "yoy_pct": null,
@@ -24,7 +24,7 @@
     7627.55,
     7627.55,
     7627.55,
-    7627.55
+    6500
   ],
   "status": "low",
   "shock_eligible": false,
@@ -49,7 +49,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-07-06T13:00:30.686Z",
+  "last_verified_at": "2026-07-26T15:40:45.963Z",
   "why_it_matters": "FASTag toll = highway commercial + passenger movement. Complementary to e-way bills (which capture only inter-state goods).",
   "linked_metrics": [
     "eway_bills",
@@ -58,8 +58,8 @@
     "pol_demand"
   ],
   "notes": "Switched to official NPCI RPS XLSX 2026-06-11. File carries quarterly series (FY22-23→) plus current-FY monthly columns; parser prefers latest month. QoQ + YoY (same quarter prev FY) in extras.",
-  "data_origin": "live",
-  "last_live_fetch_at": "2026-07-06T13:00:30.686Z",
+  "data_origin": "primary",
+  "last_live_fetch_at": "2026-07-26T15:40:45.963Z",
   "_reliability_optimized_at": "2026-06-03T18:12:43.657Z",
   "period_label": "May 2026",
   "period_basis": "monthly",
