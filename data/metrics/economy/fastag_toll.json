@@ -36,9 +36,9 @@
     "frequency": "Quarterly",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
+      "llm:google_news_llm_v1",
       "xlsx:npci_rps_v1",
-      "rss:google_news_rss_v1",
-      "llm:google_news_llm_v1"
+      "rss:google_news_rss_v1"
     ]
   },
   "source_crosscheck": [
@@ -60,7 +60,7 @@
   "notes": "Switched to official NPCI RPS XLSX 2026-06-11. File carries quarterly series (FY22-23→) plus current-FY monthly columns; parser prefers latest month. QoQ + YoY (same quarter prev FY) in extras.",
   "data_origin": "primary",
   "last_live_fetch_at": "2026-07-26T15:40:45.963Z",
-  "_reliability_optimized_at": "2026-06-03T18:12:43.657Z",
+  "_reliability_optimized_at": "2026-07-27T04:32:13.202Z",
   "period_label": "May 2026",
   "period_basis": "monthly",
   "latest_quarter": "F.Y-2025-26 Q4",
