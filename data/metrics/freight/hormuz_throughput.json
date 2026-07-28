@@ -4,10 +4,10 @@
   "display_subtitle": "Ships passing per day · 24h average",
   "section": "freight",
   "sub_cluster": null,
-  "value": 17,
+  "value": 6,
   "unit": "ships/day",
   "value_format": "integer",
-  "as_of": "2026-07-28T04:59:13.715Z",
+  "as_of": "2026-07-28T11:25:31.080Z",
   "as_of_period": "24h",
   "mom_pct": -85.71,
   "yoy_pct": 528.8,
@@ -21,15 +21,15 @@
     12,
     12,
     12,
-    12,
     17,
     17,
-    17
+    17,
+    6
   ],
   "_history_state": "accruing",
   "_history_note": "Prior sparkline was polluted with static-snapshot seed values (84) and incorrect Gulf-port-count readings (141, 148) from the retired hormuz-watch endpoint. Reset 2026-05-14 to [pre-crisis baseline 140, current 12]. Real history rebuilds from here as the layered Google-News + multi-tracker parser runs.",
   "baseline_30d": 140,
-  "deviation_from_baseline_pct": -87.9,
+  "deviation_from_baseline_pct": -95.7,
   "status": "shock",
   "shock_eligible": true,
   "shock_rule": "value < 50% baseline_30d",
@@ -60,7 +60,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-07-28T04:59:13.717Z",
+  "last_verified_at": "2026-07-28T11:25:31.082Z",
   "_source_static": true,
   "_snapshot_payload": {
     "vessel_count_inbound": 38,
@@ -99,25 +99,25 @@
   ],
   "notes": "AIS data has a ~2hr lag. Manual cross-check vs Reuters wire daily during shock periods. 2026-06-11: canonical source switched to Hormuz Watch /api/snapshot (near-real-time AIS); manual override retired — live tool data outranks a hand-pinned value.",
   "data_origin": "primary",
-  "last_live_fetch_at": "2026-07-28T04:59:13.717Z",
+  "last_live_fetch_at": "2026-07-28T11:25:31.082Z",
   "pct_of_normal": 236.4,
   "throughput_mbd_est": 49.6,
   "incidents_30d": 11,
   "ukmto_attacks_30d": 3,
   "_hormuz_multitracker": {
-    "median": 17,
+    "median": 6,
     "n_sources": 1,
     "n_total": 4,
     "spread": 0,
     "per_source": [
       {
         "name": "straits.live",
-        "value": 17,
+        "value": 6,
         "confidence": "dated"
       }
     ],
     "dropped": [
-      "hormuztracker.com: stale (150.2d old)",
+      "hormuztracker.com: stale (150.5d old)",
       "hormuzstraitmonitor.com: no text content",
       "hormuzmonitor.com: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a"
     ]
