@@ -4,10 +4,10 @@
   "display_subtitle": "Ships passing per day · 24h average",
   "section": "freight",
   "sub_cluster": null,
-  "value": 12,
+  "value": 17,
   "unit": "ships/day",
   "value_format": "integer",
-  "as_of": "2026-05-29T00:00:00.000Z",
+  "as_of": "2026-07-28T03:44:37.709Z",
   "as_of_period": "24h",
   "mom_pct": -85.71,
   "yoy_pct": 528.8,
@@ -24,12 +24,12 @@
     12,
     12,
     12,
-    12
+    17
   ],
   "_history_state": "accruing",
   "_history_note": "Prior sparkline was polluted with static-snapshot seed values (84) and incorrect Gulf-port-count readings (141, 148) from the retired hormuz-watch endpoint. Reset 2026-05-14 to [pre-crisis baseline 140, current 12]. Real history rebuilds from here as the layered Google-News + multi-tracker parser runs.",
   "baseline_30d": 140,
-  "deviation_from_baseline_pct": -91.4,
+  "deviation_from_baseline_pct": -87.9,
   "status": "shock",
   "shock_eligible": true,
   "shock_rule": "value < 50% baseline_30d",
@@ -59,8 +59,8 @@
       "type": "Public"
     }
   ],
-  "verification_state": "manual_override",
-  "last_verified_at": "2026-07-27T12:34:00.353Z",
+  "verification_state": "verified",
+  "last_verified_at": "2026-07-28T03:44:38.478Z",
   "_source_static": true,
   "_snapshot_payload": {
     "vessel_count_inbound": 38,
@@ -98,10 +98,28 @@
     "Mumbai port arrivals 7-day moving avg"
   ],
   "notes": "AIS data has a ~2hr lag. Manual cross-check vs Reuters wire daily during shock periods. 2026-06-11: canonical source switched to Hormuz Watch /api/snapshot (near-real-time AIS); manual override retired — live tool data outranks a hand-pinned value.",
-  "data_origin": "manual_override",
-  "last_live_fetch_at": "2026-07-27T12:34:00.353Z",
+  "data_origin": "primary",
+  "last_live_fetch_at": "2026-07-28T03:44:38.478Z",
   "pct_of_normal": 236.4,
   "throughput_mbd_est": 49.6,
   "incidents_30d": 11,
-  "ukmto_attacks_30d": 3
+  "ukmto_attacks_30d": 3,
+  "_hormuz_multitracker": {
+    "median": 17,
+    "n_sources": 1,
+    "n_total": 4,
+    "spread": 0,
+    "per_source": [
+      {
+        "name": "straits.live",
+        "value": 17,
+        "confidence": "dated"
+      }
+    ],
+    "dropped": [
+      "hormuztracker.com: stale (150.2d old)",
+      "hormuzstraitmonitor.com: no text content",
+      "hormuzmonitor.com: no text content"
+    ]
+  }
 }
