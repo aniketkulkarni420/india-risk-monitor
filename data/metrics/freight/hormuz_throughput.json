@@ -7,7 +7,7 @@
   "value": 17,
   "unit": "ships/day",
   "value_format": "integer",
-  "as_of": "2026-07-28T03:44:37.709Z",
+  "as_of": "2026-07-28T04:30:22.748Z",
   "as_of_period": "24h",
   "mom_pct": -85.71,
   "yoy_pct": 528.8,
@@ -23,7 +23,7 @@
     12,
     12,
     12,
-    12,
+    17,
     17
   ],
   "_history_state": "accruing",
@@ -60,7 +60,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-07-28T03:44:38.478Z",
+  "last_verified_at": "2026-07-28T04:30:22.750Z",
   "_source_static": true,
   "_snapshot_payload": {
     "vessel_count_inbound": 38,
@@ -99,7 +99,7 @@
   ],
   "notes": "AIS data has a ~2hr lag. Manual cross-check vs Reuters wire daily during shock periods. 2026-06-11: canonical source switched to Hormuz Watch /api/snapshot (near-real-time AIS); manual override retired — live tool data outranks a hand-pinned value.",
   "data_origin": "primary",
-  "last_live_fetch_at": "2026-07-28T03:44:38.478Z",
+  "last_live_fetch_at": "2026-07-28T04:30:22.750Z",
   "pct_of_normal": 236.4,
   "throughput_mbd_est": 49.6,
   "incidents_30d": 11,
@@ -119,7 +119,7 @@
     "dropped": [
       "hormuztracker.com: stale (150.2d old)",
       "hormuzstraitmonitor.com: no text content",
-      "hormuzmonitor.com: no text content"
+      "hormuzmonitor.com: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a"
     ]
   }
 }
