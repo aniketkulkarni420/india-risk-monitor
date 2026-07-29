@@ -41,10 +41,10 @@
     "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "json_api:hormuz_watch_v1",
-      "llm:google_news_llm_v1",
       "html_scrape:hormuz_multitracker_v1",
-      "html_scrape:hormuz_v1"
+      "html_scrape:hormuz_v1",
+      "json_api:hormuz_watch_v1",
+      "llm:google_news_llm_v1"
     ]
   },
   "source_crosscheck": [
@@ -121,5 +121,6 @@
       "hormuzstraitmonitor.com: no text content",
       "hormuzmonitor.com: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a"
     ]
-  }
+  },
+  "_reliability_optimized_at": "2026-07-29T04:00:07.038Z"
 }
