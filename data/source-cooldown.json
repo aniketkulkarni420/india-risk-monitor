@@ -148,22 +148,22 @@
     "_cleared": "2026-05-27 · post-fix re-test after May 25 race"
   },
   "block_deals_notional:html_render:bse_v1": {
-    "consecutive_failures": 35,
-    "last_failure_at": "2026-07-28T09:21:01.612Z",
+    "consecutive_failures": 36,
+    "last_failure_at": "2026-07-31T13:17:34.877Z",
     "_cleared": "2026-05-27 · post-fix re-test after May 25 race",
-    "cooled_until": "2026-07-28T15:21:01.612Z"
+    "cooled_until": "2026-07-31T19:17:34.877Z"
   },
   "block_deals_notional:html_render:moneycontrol_v1": {
-    "consecutive_failures": 35,
-    "last_failure_at": "2026-07-28T09:21:08.829Z",
+    "consecutive_failures": 36,
+    "last_failure_at": "2026-07-31T13:17:42.421Z",
     "_cleared": "2026-05-27 · post-fix re-test after May 25 race",
-    "cooled_until": "2026-07-28T15:21:08.829Z"
+    "cooled_until": "2026-07-31T19:17:42.421Z"
   },
   "block_deals_notional:llm:google_news_llm_v1": {
-    "consecutive_failures": 7,
-    "last_failure_at": "2026-07-28T09:20:45.187Z",
+    "consecutive_failures": 8,
+    "last_failure_at": "2026-07-31T13:17:18.444Z",
     "last_success_at": "2026-07-21T14:25:47.731Z",
-    "cooled_until": "2026-07-28T15:20:45.187Z"
+    "cooled_until": "2026-07-31T19:17:18.444Z"
   },
   "fpi_debt_flows:html_render:moneycontrol_v1": {
     "consecutive_failures": 8,
@@ -190,39 +190,39 @@
   },
   "fii_equity_daily:csv_download:nse_fii_dii_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-07-30T14:34:32.037Z"
+    "last_success_at": "2026-07-31T13:15:50.680Z"
   },
   "fii_equity_mtd:csv_download:nse_fii_dii_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-07-30T14:34:32.192Z"
+    "last_success_at": "2026-07-31T13:15:50.764Z"
   },
   "fii_equity_cytd:csv_download:nse_fii_dii_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-07-30T14:34:32.410Z"
+    "last_success_at": "2026-07-31T13:15:50.816Z"
   },
   "dii_daily:csv_download:nse_fii_dii_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-07-30T14:34:32.546Z"
+    "last_success_at": "2026-07-31T13:15:50.891Z"
   },
   "dii_mtd:csv_download:nse_fii_dii_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-07-30T14:34:32.650Z"
+    "last_success_at": "2026-07-31T13:15:50.955Z"
   },
   "nifty_50:csv_download:nse_indices_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-07-30T14:34:47.889Z"
+    "last_success_at": "2026-07-31T13:17:43.203Z"
   },
   "bank_nifty:csv_download:nse_indices_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-07-30T14:34:48.244Z"
+    "last_success_at": "2026-07-31T13:17:43.370Z"
   },
   "nifty_pe_5y:csv_download:nse_pe_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-07-30T14:34:48.367Z"
+    "last_success_at": "2026-07-31T13:17:43.486Z"
   },
   "india_vix:csv_download:nse_vix_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-07-30T14:34:48.569Z"
+    "last_success_at": "2026-07-31T13:17:43.570Z"
   },
   "gsec_curve:json_api:ccil_v1": {
     "consecutive_failures": 0,
@@ -368,8 +368,8 @@
     "last_success_at": "2026-06-11T06:43:57.215Z"
   },
   "block_deals_notional:json_api:nse_api_v1": {
-    "consecutive_failures": 0,
-    "last_failure_at": "2026-07-28T09:20:33.267Z",
+    "consecutive_failures": 1,
+    "last_failure_at": "2026-07-31T13:15:52.167Z",
     "last_success_at": "2026-07-30T14:34:33.432Z"
   },
   "fx_reserves:json_api:rbi_wss_v1": {
@@ -441,7 +441,7 @@
   },
   "fii_index_fut_positioning:csv_download:nse_participant_oi_v1": {
     "consecutive_failures": 0,
-    "last_success_at": "2026-07-30T14:34:33.091Z"
+    "last_success_at": "2026-07-31T13:15:51.866Z"
   },
   "nifty_pcr:json_api:nse_api_v1": {
     "consecutive_failures": 19,
@@ -449,9 +449,9 @@
     "cooled_until": "2026-07-30T19:08:26.556Z"
   },
   "nifty_pcr:html_render:web_llm_v1": {
-    "consecutive_failures": 2,
+    "consecutive_failures": 0,
     "last_failure_at": "2026-07-30T14:35:49.974Z",
-    "last_success_at": "2026-07-30T11:17:59.701Z"
+    "last_success_at": "2026-07-31T13:17:56.593Z"
   },
   "baltic_dirty_tanker:json_api:hormuz_bdti_v1": {
     "consecutive_failures": 0,
