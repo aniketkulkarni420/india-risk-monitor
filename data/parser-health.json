@@ -211,53 +211,53 @@
       "last_failure_reason": "gst_gross: GSTN xlsx latest sheet \"Feb-26\" is 71d old (>70d threshold). Refusing stale value. PIB fallback needed — see TODO in pib_press_v1.mjs.",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-30T11:19:47.419Z",
-      "last_success_value": 195000,
-      "last_attempted_at": "2026-07-30T11:19:47.419Z"
+      "last_success_at": "2026-08-01T07:03:39.175Z",
+      "last_success_value": 200000,
+      "last_attempted_at": "2026-08-01T07:03:39.175Z"
     },
     "auto_2w": {
       "last_success_at": "2026-07-23T11:20:31.547Z",
       "last_success_value": 1828458,
-      "consecutive_failures": 8,
+      "consecutive_failures": 9,
       "status": "red",
-      "last_attempted_at": "2026-07-30T11:19:48.745Z",
-      "last_failure_at": "2026-07-30T11:19:48.745Z",
+      "last_attempted_at": "2026-08-01T07:03:40.511Z",
+      "last_failure_at": "2026-08-01T07:03:40.511Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: https://www.fada.in/images/press-release/16a4b2243edbfbFADA%20Releases%20June%202026%20Vehicle%20Ret | llm:google_news_llm_v1: No google_news_llm config for auto_2w"
     },
     "auto_3w": {
       "last_success_at": "2026-07-05T15:49:09.632Z",
       "last_success_value": 111526,
-      "consecutive_failures": 21,
+      "consecutive_failures": 22,
       "status": "red",
-      "last_attempted_at": "2026-07-30T11:19:49.785Z",
-      "last_failure_at": "2026-07-30T11:19:49.785Z",
+      "last_attempted_at": "2026-08-01T07:03:41.573Z",
+      "last_failure_at": "2026-08-01T07:03:41.573Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: https://www.fada.in/images/press-release/16a4b2243edbfbFADA%20Releases%20June%202026%20Vehicle%20Ret | llm:google_news_llm_v1: No google_news_llm config for auto_3w"
     },
     "auto_pv": {
       "last_success_at": "2026-07-23T11:20:31.553Z",
       "last_success_value": 410853,
-      "consecutive_failures": 8,
+      "consecutive_failures": 9,
       "status": "red",
-      "last_attempted_at": "2026-07-30T11:19:50.762Z",
-      "last_failure_at": "2026-07-30T11:19:50.762Z",
+      "last_attempted_at": "2026-08-01T07:03:41.939Z",
+      "last_failure_at": "2026-08-01T07:03:41.939Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: https://www.fada.in/images/press-release/16a4b2243edbfbFADA%20Releases%20June%202026%20Vehicle%20Ret | llm:google_news_llm_v1: No google_news_llm config for auto_pv"
     },
     "auto_cv": {
       "last_success_at": "2026-07-23T11:20:31.555Z",
       "last_success_value": 90972,
-      "consecutive_failures": 8,
+      "consecutive_failures": 9,
       "status": "red",
-      "last_attempted_at": "2026-07-30T11:19:51.130Z",
-      "last_failure_at": "2026-07-30T11:19:51.130Z",
+      "last_attempted_at": "2026-08-01T07:03:42.295Z",
+      "last_failure_at": "2026-08-01T07:03:42.295Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: https://www.fada.in/images/press-release/16a4b2243edbfbFADA%20Releases%20June%202026%20Vehicle%20Ret | llm:google_news_llm_v1: No google_news_llm config for auto_cv"
     },
     "auto_tractor": {
       "last_success_at": "2026-07-23T11:20:31.557Z",
       "last_success_value": 100818,
-      "consecutive_failures": 8,
+      "consecutive_failures": 9,
       "status": "red",
-      "last_attempted_at": "2026-07-30T11:19:51.484Z",
-      "last_failure_at": "2026-07-30T11:19:51.484Z",
+      "last_attempted_at": "2026-08-01T07:03:42.663Z",
+      "last_failure_at": "2026-08-01T07:03:42.663Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: https://www.fada.in/images/press-release/16a4b2243edbfbFADA%20Releases%20June%202026%20Vehicle%20Ret | llm:google_news_llm_v1: No google_news_llm config for auto_tractor"
     },
     "upi_value": {
@@ -270,22 +270,22 @@
       "last_attempted_at": "2026-06-11T12:00:26.546Z"
     },
     "pol_demand": {
-      "last_failure_at": "2026-07-30T11:19:54.242Z",
+      "last_failure_at": "2026-08-01T07:03:45.999Z",
       "last_failure_reason": "ppac_v1: PT_Consumption PDF link not found on index",
-      "consecutive_failures": 68,
+      "consecutive_failures": 69,
       "status": "red",
       "last_success_at": "2026-06-16T14:30:11.738Z",
       "last_success_value": 19.47,
-      "last_attempted_at": "2026-07-30T11:19:54.242Z"
+      "last_attempted_at": "2026-08-01T07:03:45.999Z"
     },
     "air_pax": {
       "last_failure_at": "2026-07-15T09:30:43.469Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:dgca_v1: air_pax: all sources failed [https://www.business-standard.com/topic/domestic-air-passenger-traffic: | llm:google_news_llm_v1: air_pax: 4 candidates, none yielded value · https://news.goog",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-07-30T11:19:56.841Z",
+      "last_success_at": "2026-08-01T07:03:47.914Z",
       "last_success_value": 132.67,
-      "last_attempted_at": "2026-07-30T11:19:56.841Z"
+      "last_attempted_at": "2026-08-01T07:03:47.914Z"
     },
     "iip_growth": {
       "last_success_at": "2026-07-30T11:19:57.108Z",
@@ -552,5 +552,5 @@
     "red": 11,
     "total": 67
   },
-  "generated_at": "2026-08-01T05:22:08.799Z"
+  "generated_at": "2026-08-01T07:03:47.914Z"
 }
