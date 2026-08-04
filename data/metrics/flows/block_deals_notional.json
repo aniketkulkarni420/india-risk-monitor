@@ -36,8 +36,8 @@
     "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "llm:google_news_llm_v1",
       "json_api:nse_api_v1",
+      "llm:google_news_llm_v1",
       "html_render:bse_v1",
       "html_render:moneycontrol_v1"
     ]
@@ -60,5 +60,5 @@
   "last_live_fetch_at": "2026-08-03T15:19:09.468Z",
   "_source_count_actual": 1,
   "_history_state": "accruing",
-  "_reliability_optimized_at": "2026-08-03T04:25:21.743Z"
+  "_reliability_optimized_at": "2026-08-04T04:07:15.588Z"
 }
