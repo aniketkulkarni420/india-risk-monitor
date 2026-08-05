@@ -4,12 +4,12 @@
   "display_subtitle": "Weighted average call rate vs repo",
   "section": "macro",
   "sub_cluster": "rates",
-  "value": -40,
+  "value": -44,
   "unit": "bps",
   "value_format": "bps",
-  "as_of": "2026-08-04T16:22:38.892Z",
+  "as_of": "2026-08-05T07:59:40.650Z",
   "as_of_period": "live",
-  "mom_pct": 73.91,
+  "mom_pct": -540,
   "yoy_pct": 17.47,
   "vs_5y_avg_pct": -28.4,
   "sparkline_12m": [
@@ -20,11 +20,11 @@
     -21,
     -21,
     -21,
-    -21,
     -40,
     -40,
     -40,
-    -40
+    -40,
+    -44
   ],
   "status": "low",
   "shock_eligible": false,
@@ -48,7 +48,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-08-04T16:22:38.893Z",
+  "last_verified_at": "2026-08-05T07:59:40.652Z",
   "why_it_matters": "Negative spread = surplus liquidity, call rate below repo. Spread compression toward 0 signals tightening — often precedes RBI action.",
   "linked_metrics": [
     "banking_liquidity",
@@ -56,7 +56,7 @@
     "gsec_curve"
   ],
   "data_origin": "primary",
-  "last_live_fetch_at": "2026-08-04T16:22:38.893Z",
+  "last_live_fetch_at": "2026-08-05T07:59:40.652Z",
   "_reliability_optimized_at": "2026-06-09T04:59:56.666Z",
   "_source_count_actual": 1,
   "_history_state": "accruing"
