@@ -288,11 +288,11 @@
       "last_attempted_at": "2026-08-04T11:34:32.410Z"
     },
     "iip_growth": {
-      "last_success_at": "2026-08-04T11:34:32.706Z",
+      "last_success_at": "2026-08-05T07:08:27.735Z",
       "last_success_value": 7.3,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-04T11:34:32.706Z"
+      "last_attempted_at": "2026-08-05T07:08:27.735Z"
     },
     "wpi_inflation": {
       "last_success_at": "2026-06-05T14:08:46.466Z",
@@ -302,11 +302,11 @@
       "last_attempted_at": "2026-06-05T14:08:46.466Z"
     },
     "cpi_inflation": {
-      "last_success_at": "2026-08-04T11:34:32.758Z",
+      "last_success_at": "2026-08-05T07:08:27.827Z",
       "last_success_value": 4.38,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-04T11:34:32.758Z"
+      "last_attempted_at": "2026-08-05T07:08:27.827Z"
     },
     "naukri_jobspeak": {
       "last_success_at": "2026-06-11T12:00:34.465Z",
@@ -320,80 +320,80 @@
       "last_failure_reason": "cement_dispatches: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMiggFBVV95cUxPNFplNDZ: 3.89 out of band | https://news.google.com/rss/articles/CBMimAFBVV95cUxPOXA0S2l: All LLM providers failed: groq: returned no",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-04T11:34:35.313Z",
-      "last_success_value": 40.7,
-      "last_attempted_at": "2026-08-04T11:34:35.313Z"
+      "last_success_at": "2026-08-05T07:09:14.421Z",
+      "last_success_value": 54.7,
+      "last_attempted_at": "2026-08-05T07:09:14.421Z"
     },
     "steel_consumption": {
-      "last_success_at": "2026-08-04T11:34:35.441Z",
+      "last_success_at": "2026-08-05T07:09:14.630Z",
       "last_success_value": 14.1,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-04T11:34:35.441Z"
+      "last_attempted_at": "2026-08-05T07:09:14.630Z"
     },
     "pmi_combined": {
-      "last_success_at": "2026-08-04T11:34:35.569Z",
+      "last_success_at": "2026-08-05T07:09:14.801Z",
       "last_success_value": 54.3,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-04T11:34:35.569Z"
+      "last_attempted_at": "2026-08-05T07:09:14.801Z"
     },
     "eway_bills": {
       "last_failure_at": "2026-08-02T10:52:13.837Z",
       "last_failure_reason": "eway_bills: 3 candidates, none yielded value · https://news.google.com/rss/articles/CBMiigFBVV95cUxNXzhYeVg: All LLM providers failed: groq: returned no value (raw: {\n  \"value\": null,\n   \"a | https://news.google.com/rss/articles/CBMinAFBVV9",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-04T11:35:15.746Z",
+      "last_success_at": "2026-08-05T07:09:22.686Z",
       "last_success_value": 136.76999999999998,
-      "last_attempted_at": "2026-08-04T11:35:15.746Z"
+      "last_attempted_at": "2026-08-05T07:09:22.686Z"
     },
     "fastag_toll": {
-      "last_failure_at": "2026-08-04T11:37:04.743Z",
+      "last_failure_at": "2026-08-05T07:10:30.476Z",
       "last_failure_reason": "tiered: all 3 tiers failed · llm:google_news_llm_v1: fastag_toll: 6 candidates, none yielded value · https://news.google.com/rss/articles/CBMi0gFBVV95cUx | xlsx:npci_rps_v1: NPCI RPS XLSX HTTP 504 | rss:google_news_rss_v1: google_news_rss: ",
-      "consecutive_failures": 1,
+      "consecutive_failures": 2,
       "status": "amber",
       "last_success_at": "2026-08-04T07:59:25.189Z",
       "last_success_value": 7143,
-      "last_attempted_at": "2026-08-04T11:37:04.743Z"
+      "last_attempted_at": "2026-08-05T07:10:30.476Z"
     },
     "rail_freight": {
       "last_failure_at": "2026-05-15T13:32:47.963Z",
       "last_failure_reason": "tiered: all 4 tiers failed · email:email_pipeline_v1: email_pipeline: no matching emails for rail_freight (subscription may not have delivered yet) | llm:google_news_llm_v1: rail_freight: 6 candidates, none yielded value · https://news.goog",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-04T11:37:05.305Z",
+      "last_success_at": "2026-08-05T07:10:30.957Z",
       "last_success_value": 141,
-      "last_attempted_at": "2026-08-04T11:37:05.305Z"
+      "last_attempted_at": "2026-08-05T07:10:30.957Z"
     },
     "port_cargo": {
-      "last_failure_at": "2026-08-04T11:37:05.306Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: in cooldown | llm:google_news_llm_v1: in cooldown | html_render:web_llm_v1: in cooldown",
-      "consecutive_failures": 6,
+      "last_failure_at": "2026-08-05T07:12:05.772Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: publisher_rss_v1: 1 articles tried · https://www.maritimegateway.com/voc-port-vinfast-ev-dispatch: A | llm:google_news_llm_v1: port_cargo: 6 candidates, none yielded value · https://news.go",
+      "consecutive_failures": 7,
       "status": "red",
       "last_success_at": "2026-08-02T07:44:12.706Z",
       "last_success_value": 60,
-      "last_attempted_at": "2026-08-04T11:37:05.306Z"
+      "last_attempted_at": "2026-08-05T07:12:05.772Z"
     },
     "fiscal_deficit_pct": {
-      "last_success_at": "2026-08-04T11:37:05.409Z",
+      "last_success_at": "2026-08-05T07:12:09.857Z",
       "last_success_value": 97.8,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-04T11:37:05.409Z"
+      "last_attempted_at": "2026-08-05T07:12:09.857Z"
     },
     "govt_capex_runrate": {
-      "last_success_at": "2026-08-04T11:37:05.437Z",
+      "last_success_at": "2026-08-05T07:12:09.942Z",
       "last_success_value": 102.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-04T11:37:05.437Z"
+      "last_attempted_at": "2026-08-05T07:12:09.942Z"
     },
     "credit_deposit_growth": {
-      "last_success_at": "2026-08-04T11:37:05.762Z",
+      "last_success_at": "2026-08-05T07:12:10.034Z",
       "last_success_value": 17.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-04T11:37:05.762Z"
+      "last_attempted_at": "2026-08-05T07:12:10.034Z"
     },
     "repo_rate": {
       "last_success_at": "2026-08-04T11:37:48.837Z",
@@ -552,5 +552,5 @@
     "red": 13,
     "total": 67
   },
-  "generated_at": "2026-08-05T05:00:30.457Z"
+  "generated_at": "2026-08-05T07:12:10.034Z"
 }
