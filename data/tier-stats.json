@@ -1233,8 +1233,8 @@
   },
   "fx_reserves": {
     "json_api:rbi_wss_v1": {
-      "attempts": 64,
-      "successes": 64,
+      "attempts": 65,
+      "successes": 65,
       "recent": [
         1,
         1,
@@ -1267,7 +1267,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-06T11:32:12.351Z",
+      "last_success_at": "2026-08-07T09:03:18.498Z",
       "success_rate": 1
     }
   },
@@ -1291,11 +1291,10 @@
       "last_failure_at": "2026-07-13T12:20:55.362Z"
     },
     "llm:google_news_llm_v1": {
-      "attempts": 62,
-      "successes": 58,
+      "attempts": 63,
+      "successes": 59,
       "recent": [
         1,
-        1,
         0,
         1,
         1,
@@ -1323,16 +1322,17 @@
         1,
         1,
         0,
+        1,
         1
       ],
-      "last_success_at": "2026-08-06T11:32:17.489Z",
-      "success_rate": 0.935,
+      "last_success_at": "2026-08-07T09:03:25.842Z",
+      "success_rate": 0.937,
       "last_failure_at": "2026-08-05T11:32:29.885Z"
     }
   },
   "reservoir_levels": {
     "llm:google_news_llm_v1": {
-      "attempts": 60,
+      "attempts": 61,
       "successes": 35,
       "recent": [
         1,
@@ -1344,9 +1344,9 @@
         1,
         1,
         1,
-        1,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -1367,8 +1367,8 @@
         0
       ],
       "last_success_at": "2026-07-14T10:56:50.630Z",
-      "success_rate": 0.583,
-      "last_failure_at": "2026-08-06T11:32:17.905Z"
+      "success_rate": 0.574,
+      "last_failure_at": "2026-08-07T09:03:26.226Z"
     }
   },
   "fii_equity_daily": {
