@@ -123,27 +123,27 @@
       "last_attempted_at": "2026-08-07T13:41:20.099Z"
     },
     "gsec_curve": {
-      "last_success_at": "2026-08-06T11:32:09.208Z",
-      "last_success_value": 6.76,
+      "last_success_at": "2026-08-07T14:33:10.683Z",
+      "last_success_value": 6.78,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-07-01T16:07:41.069Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/india/government-bond-yield → 405 | llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters",
-      "last_attempted_at": "2026-08-06T11:32:09.208Z"
+      "last_attempted_at": "2026-08-07T14:33:10.683Z"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-08-06T11:32:09.213Z",
-      "last_success_value": 2.38,
+      "last_success_at": "2026-08-07T14:33:10.690Z",
+      "last_success_value": 2.4,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-06T11:32:09.213Z"
+      "last_attempted_at": "2026-08-07T14:33:10.690Z"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-08-06T11:32:09.269Z",
+      "last_success_at": "2026-08-07T14:33:10.791Z",
       "last_success_value": 316464.26,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-06T11:32:09.269Z",
+      "last_attempted_at": "2026-08-07T14:33:10.791Z",
       "last_failure_at": "2026-07-01T16:07:41.096Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:rbi_mmo_v1: https://tradingeconomics.com/india/money-supply-m3 → 405 | json_api:dbnomics_v1: No dbnomics config for banking_liquidity | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/indi"
     },
@@ -152,23 +152,23 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-06T11:32:11.216Z",
-      "last_success_value": -45,
-      "last_attempted_at": "2026-08-06T11:32:11.216Z"
+      "last_success_at": "2026-08-07T14:33:18.138Z",
+      "last_success_value": -32,
+      "last_attempted_at": "2026-08-07T14:33:18.138Z"
     },
     "inr_usd": {
-      "last_success_at": "2026-08-06T11:32:11.244Z",
-      "last_success_value": 95.259,
+      "last_success_at": "2026-08-07T14:33:18.247Z",
+      "last_success_value": 95.132,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-06T11:32:11.244Z"
+      "last_attempted_at": "2026-08-07T14:33:18.247Z"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-08-06T11:32:11.295Z",
+      "last_success_at": "2026-08-07T14:33:18.322Z",
       "last_success_value": 214,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-06T11:32:11.295Z",
+      "last_attempted_at": "2026-08-07T14:33:18.322Z",
       "last_failure_at": "2026-07-04T15:44:33.274Z",
       "last_failure_reason": "OLD DATA rejected: as_of 2026-06-26 is 8d old (> 7d allowance for Daily) — refusing to verify stale release"
     },
@@ -439,9 +439,9 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: google_news_llm: empty feed for \"India FPI FII deb",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-06T11:32:09.059Z",
+      "last_success_at": "2026-08-07T14:33:10.551Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-08-06T11:32:09.059Z"
+      "last_attempted_at": "2026-08-07T14:33:10.551Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-08-07T04:21:46.673Z",
@@ -552,5 +552,5 @@
     "red": 8,
     "total": 67
   },
-  "generated_at": "2026-08-07T13:41:33.644Z"
+  "generated_at": "2026-08-07T14:33:18.322Z"
 }
