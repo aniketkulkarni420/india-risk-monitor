@@ -4,16 +4,15 @@
   "display_subtitle": "Front-month · USD per barrel",
   "section": "freight",
   "sub_cluster": "oil",
-  "value": 78.14,
+  "value": 78.05,
   "unit": "$/bbl",
   "value_format": "decimal_2",
-  "as_of": "2026-08-07T03:24:57.773Z",
+  "as_of": "2026-08-07T04:04:15.114Z",
   "as_of_period": "live",
-  "mom_pct": 8.09,
+  "mom_pct": 7.97,
   "yoy_pct": -6.57,
   "vs_5y_avg_pct": 32.4,
   "sparkline_12m": [
-    81.07,
     81.23,
     79.77,
     74.49,
@@ -24,10 +23,11 @@
     74.72,
     74.86,
     75.83,
-    78.14
+    78.14,
+    78.05
   ],
   "baseline_30d": 84,
-  "deviation_from_baseline_pct": -7,
+  "deviation_from_baseline_pct": -7.1,
   "status": "shock",
   "shock_eligible": true,
   "shock_rule": "value > $95 sustained 7d OR daily move > 8%",
@@ -58,7 +58,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-08-07T03:24:57.774Z",
+  "last_verified_at": "2026-08-07T04:04:15.115Z",
   "why_it_matters": "India imports 80%+ of crude. Brent is the price benchmark. Currently in shock state on Hormuz disruption — direct CAD + WPI + INR feed-through.",
   "trigger_thresholds": [
     {
@@ -79,7 +79,7 @@
     "inr_usd"
   ],
   "data_origin": "live",
-  "last_live_fetch_at": "2026-08-07T03:24:57.774Z",
+  "last_live_fetch_at": "2026-08-07T04:04:15.115Z",
   "_source_count_actual": 1,
   "_history_state": "accruing",
   "notes": " 2026-06-11: tier 1 switched to Hormuz Watch /api/oil — cross-verified 2-source brent beats the single TE scrape.",
