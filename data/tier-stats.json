@@ -72,7 +72,7 @@
   },
   "wacr_repo_spread": {
     "html_scrape:rbi_mmo_daily_v1": {
-      "attempts": 184,
+      "attempts": 185,
       "successes": 154,
       "recent": [
         1,
@@ -87,7 +87,6 @@
         1,
         1,
         1,
-        1,
         0,
         0,
         0,
@@ -104,14 +103,15 @@
         1,
         1,
         1,
-        1
+        1,
+        0
       ],
-      "last_failure_at": "2026-08-03T16:03:41.248Z",
-      "success_rate": 0.837,
+      "last_failure_at": "2026-08-10T08:58:06.217Z",
+      "success_rate": 0.832,
       "last_success_at": "2026-08-09T15:03:13.769Z"
     },
     "llm:google_news_llm_v1": {
-      "attempts": 32,
+      "attempts": 33,
       "successes": 13,
       "recent": [
         1,
@@ -121,11 +121,11 @@
         1,
         1,
         1,
-        1,
         0,
         1,
         1,
         1,
+        0,
         0,
         0,
         0,
@@ -146,14 +146,14 @@
         0
       ],
       "last_success_at": "2026-06-03T22:37:10.313Z",
-      "success_rate": 0.406,
-      "last_failure_at": "2026-08-03T16:03:41.685Z"
+      "success_rate": 0.394,
+      "last_failure_at": "2026-08-10T08:58:06.546Z"
     }
   },
   "air_pax": {
     "press_release:dgca_v1": {
-      "attempts": 102,
-      "successes": 90,
+      "attempts": 103,
+      "successes": 91,
       "recent": [
         1,
         1,
@@ -168,7 +168,6 @@
         1,
         1,
         1,
-        1,
         0,
         1,
         1,
@@ -184,10 +183,11 @@
         1,
         1,
         0,
+        1,
         1
       ],
-      "last_success_at": "2026-08-09T15:03:35.892Z",
-      "success_rate": 0.882,
+      "last_success_at": "2026-08-10T08:58:13.668Z",
+      "success_rate": 0.883,
       "last_failure_at": "2026-08-09T09:52:58.903Z"
     },
     "llm:google_news_llm_v1": {
@@ -322,8 +322,8 @@
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 43,
-      "successes": 8,
+      "attempts": 44,
+      "successes": 9,
       "recent": [
         0,
         0,
@@ -332,7 +332,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         1,
@@ -354,11 +353,12 @@
         1,
         1,
         1,
-        0
+        0,
+        1
       ],
       "last_failure_at": "2026-08-09T15:06:30.594Z",
-      "success_rate": 0.186,
-      "last_success_at": "2026-08-09T09:53:41.013Z"
+      "success_rate": 0.205,
+      "last_success_at": "2026-08-10T08:58:42.191Z"
     }
   },
   "rail_freight": {
@@ -376,7 +376,178 @@
       "success_rate": 0
     },
     "rss:google_news_rss_v1": {
-      "attempts": 102,
+      "attempts": 103,
+      "successes": 103,
+      "recent": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "last_success_at": "2026-08-10T08:58:43.389Z",
+      "success_rate": 1
+    }
+  },
+  "port_cargo": {
+    "llm:google_news_llm_v1": {
+      "attempts": 50,
+      "successes": 1,
+      "recent": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "last_failure_at": "2026-08-10T08:59:12.790Z",
+      "success_rate": 0.02,
+      "last_success_at": "2026-07-14T09:28:46.876Z"
+    },
+    "html_render:web_llm_v1": {
+      "attempts": 44,
+      "successes": 0,
+      "recent": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "last_failure_at": "2026-08-10T08:59:41.845Z",
+      "success_rate": 0
+    },
+    "rss:publisher_rss_v1": {
+      "attempts": 87,
+      "successes": 37,
+      "recent": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "last_success_at": "2026-08-02T07:44:12.704Z",
+      "success_rate": 0.425,
+      "last_failure_at": "2026-08-10T08:58:52.711Z"
+    }
+  },
+  "cement_dispatches": {
+    "email:email_pipeline_v1": {
+      "attempts": 5,
+      "successes": 0,
+      "recent": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "last_failure_at": "2026-06-02T19:08:23.621Z",
+      "success_rate": 0
+    },
+    "pdf:eaindustry_ieci_v1": {
+      "attempts": 103,
       "successes": 102,
       "recent": [
         1,
@@ -401,179 +572,8 @@
         1,
         1,
         1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      "last_success_at": "2026-08-09T15:06:35.974Z",
-      "success_rate": 1
-    }
-  },
-  "port_cargo": {
-    "llm:google_news_llm_v1": {
-      "attempts": 49,
-      "successes": 1,
-      "recent": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "last_failure_at": "2026-08-09T09:54:12.522Z",
-      "success_rate": 0.02,
-      "last_success_at": "2026-07-14T09:28:46.876Z"
-    },
-    "html_render:web_llm_v1": {
-      "attempts": 43,
-      "successes": 0,
-      "recent": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "last_failure_at": "2026-08-09T09:54:39.440Z",
-      "success_rate": 0
-    },
-    "rss:publisher_rss_v1": {
-      "attempts": 86,
-      "successes": 37,
-      "recent": [
-        0,
-        0,
-        0,
-        1,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "last_success_at": "2026-08-02T07:44:12.704Z",
-      "success_rate": 0.43,
-      "last_failure_at": "2026-08-09T09:53:55.018Z"
-    }
-  },
-  "cement_dispatches": {
-    "email:email_pipeline_v1": {
-      "attempts": 5,
-      "successes": 0,
-      "recent": [
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "last_failure_at": "2026-06-02T19:08:23.621Z",
-      "success_rate": 0
-    },
-    "pdf:eaindustry_ieci_v1": {
-      "attempts": 102,
-      "successes": 101,
-      "recent": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
         1,
         1,
         1,
@@ -581,7 +581,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-09T15:03:38.254Z",
+      "last_success_at": "2026-08-10T08:59:44.625Z",
       "success_rate": 0.99,
       "last_failure_at": "2026-08-05T07:08:37.962Z"
     },
@@ -597,8 +597,8 @@
   },
   "india_crude_basket": {
     "press_release:ppac_v1": {
-      "attempts": 319,
-      "successes": 319,
+      "attempts": 320,
+      "successes": 320,
       "recent": [
         1,
         1,
@@ -631,7 +631,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-10T03:47:24.346Z",
+      "last_success_at": "2026-08-10T08:59:50.230Z",
       "success_rate": 1
     }
   },
@@ -658,14 +658,13 @@
   },
   "block_deals_notional": {
     "json_api:nse_api_v1": {
-      "attempts": 161,
-      "successes": 102,
+      "attempts": 162,
+      "successes": 103,
       "recent": [
         1,
         1,
         1,
         1,
-        1,
         0,
         0,
         0,
@@ -683,6 +682,7 @@
         0,
         0,
         0,
+        1,
         1,
         1,
         1,
@@ -692,8 +692,8 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-09T15:01:39.460Z",
-      "success_rate": 0.634,
+      "last_success_at": "2026-08-10T08:59:51.262Z",
+      "success_rate": 0.636,
       "last_failure_at": "2026-08-05T13:12:23.748Z"
     },
     "html_render:bse_v1": {
@@ -844,8 +844,8 @@
       "success_rate": 0
     },
     "html_render:playwright_render_v1": {
-      "attempts": 199,
-      "successes": 193,
+      "attempts": 200,
+      "successes": 194,
       "recent": [
         1,
         1,
@@ -878,7 +878,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-09T15:03:11.947Z",
+      "last_success_at": "2026-08-10T09:01:07.754Z",
       "success_rate": 0.97,
       "last_failure_at": "2026-07-13T12:19:56.286Z"
     },
