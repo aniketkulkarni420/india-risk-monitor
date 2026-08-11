@@ -127,27 +127,27 @@
       "last_attempted_at": "2026-08-11T13:45:04.608Z"
     },
     "gsec_curve": {
-      "last_success_at": "2026-08-11T14:38:05.021Z",
+      "last_success_at": "2026-08-11T15:16:05.126Z",
       "last_success_value": 6.79,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-07-01T16:07:41.069Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/india/government-bond-yield → 405 | llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters",
-      "last_attempted_at": "2026-08-11T14:38:05.021Z"
+      "last_attempted_at": "2026-08-11T15:16:05.126Z"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-08-11T14:38:05.029Z",
+      "last_success_at": "2026-08-11T15:16:05.132Z",
       "last_success_value": 2.41,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-11T14:38:05.029Z"
+      "last_attempted_at": "2026-08-11T15:16:05.132Z"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-08-11T14:38:05.112Z",
+      "last_success_at": "2026-08-11T15:16:05.150Z",
       "last_success_value": 316464.26,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-11T14:38:05.112Z",
+      "last_attempted_at": "2026-08-11T15:16:05.150Z",
       "last_failure_at": "2026-07-01T16:07:41.096Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:rbi_mmo_v1: https://tradingeconomics.com/india/money-supply-m3 → 405 | json_api:dbnomics_v1: No dbnomics config for banking_liquidity | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/indi"
     },
@@ -156,23 +156,23 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: wacr_repo_spread: 1 candidates, none yielded value · https://news.google.com/rss/articles/CBMibkFVX3",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-11T14:38:06.777Z",
+      "last_success_at": "2026-08-11T15:16:07.572Z",
       "last_success_value": -41,
-      "last_attempted_at": "2026-08-11T14:38:06.777Z"
+      "last_attempted_at": "2026-08-11T15:16:07.572Z"
     },
     "inr_usd": {
-      "last_success_at": "2026-08-11T14:38:06.860Z",
-      "last_success_value": 95.371,
+      "last_success_at": "2026-08-11T15:16:07.659Z",
+      "last_success_value": 95.364,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-11T14:38:06.860Z"
+      "last_attempted_at": "2026-08-11T15:16:07.659Z"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-08-11T14:38:07.054Z",
+      "last_success_at": "2026-08-11T15:16:07.736Z",
       "last_success_value": 211,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-11T14:38:07.054Z",
+      "last_attempted_at": "2026-08-11T15:16:07.736Z",
       "last_failure_at": "2026-07-04T15:44:33.274Z",
       "last_failure_reason": "OLD DATA rejected: as_of 2026-06-26 is 8d old (> 7d allowance for Daily) — refusing to verify stale release"
     },
@@ -443,9 +443,9 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: google_news_llm: empty feed for \"India FPI FII deb",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-11T14:38:04.789Z",
+      "last_success_at": "2026-08-11T15:16:04.940Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-08-11T14:38:04.789Z"
+      "last_attempted_at": "2026-08-11T15:16:04.940Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-08-11T10:06:51.304Z",
@@ -556,5 +556,5 @@
     "red": 7,
     "total": 67
   },
-  "generated_at": "2026-08-11T14:38:07.054Z"
+  "generated_at": "2026-08-11T15:16:07.736Z"
 }
