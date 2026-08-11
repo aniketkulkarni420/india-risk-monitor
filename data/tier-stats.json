@@ -597,8 +597,8 @@
   },
   "india_crude_basket": {
     "press_release:ppac_v1": {
-      "attempts": 321,
-      "successes": 321,
+      "attempts": 322,
+      "successes": 322,
       "recent": [
         1,
         1,
@@ -631,7 +631,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-10T10:26:21.200Z",
+      "last_success_at": "2026-08-11T02:33:34.880Z",
       "success_rate": 1
     }
   },
@@ -1000,7 +1000,7 @@
       "success_rate": 1
     },
     "llm:google_news_llm_v1": {
-      "attempts": 124,
+      "attempts": 125,
       "successes": 26,
       "recent": [
         0,
@@ -1034,15 +1034,15 @@
         0,
         0
       ],
-      "last_failure_at": "2026-08-10T10:25:59.912Z",
-      "success_rate": 0.21,
+      "last_failure_at": "2026-08-11T02:33:15.373Z",
+      "success_rate": 0.208,
       "last_success_at": "2026-07-17T04:58:25.550Z"
     }
   },
   "brent_crude": {
     "json_api:public_oil_v1": {
-      "attempts": 277,
-      "successes": 274,
+      "attempts": 278,
+      "successes": 275,
       "recent": [
         1,
         1,
@@ -1075,7 +1075,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-10T10:26:00.043Z",
+      "last_success_at": "2026-08-11T02:33:15.503Z",
       "success_rate": 0.989,
       "last_failure_at": "2026-06-06T05:49:41.137Z"
     },
@@ -1113,8 +1113,8 @@
   },
   "gold_usd": {
     "json_api:public_gold_v1": {
-      "attempts": 278,
-      "successes": 272,
+      "attempts": 279,
+      "successes": 273,
       "recent": [
         1,
         1,
@@ -1147,7 +1147,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-10T10:26:00.078Z",
+      "last_success_at": "2026-08-11T02:33:15.918Z",
       "success_rate": 0.978,
       "last_failure_at": "2026-07-09T05:58:53.596Z"
     },
@@ -1182,8 +1182,8 @@
   },
   "dxy": {
     "json_api:public_dxy_v1": {
-      "attempts": 278,
-      "successes": 275,
+      "attempts": 279,
+      "successes": 276,
       "recent": [
         1,
         1,
@@ -1216,7 +1216,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-10T10:26:00.114Z",
+      "last_success_at": "2026-08-11T02:33:16.158Z",
       "success_rate": 0.989,
       "last_failure_at": "2026-06-06T05:49:41.177Z"
     },
@@ -2661,8 +2661,8 @@
   },
   "baltic_dirty_tanker": {
     "json_api:hormuz_bdti_v1": {
-      "attempts": 238,
-      "successes": 238,
+      "attempts": 239,
+      "successes": 239,
       "recent": [
         1,
         1,
@@ -2695,7 +2695,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-10T10:25:59.550Z",
+      "last_success_at": "2026-08-11T02:33:15.106Z",
       "success_rate": 1
     }
   },
@@ -2739,15 +2739,14 @@
       "success_rate": 0
     },
     "rss:google_news_rss_v1": {
-      "attempts": 182,
-      "successes": 127,
+      "attempts": 183,
+      "successes": 128,
       "recent": [
         1,
         1,
         1,
         1,
         1,
-        1,
         0,
         0,
         0,
@@ -2771,10 +2770,11 @@
         0,
         0,
         0,
-        0
+        0,
+        1
       ],
-      "last_success_at": "2026-07-29T11:31:46.596Z",
-      "success_rate": 0.698,
+      "last_success_at": "2026-08-11T02:33:16.592Z",
+      "success_rate": 0.699,
       "last_failure_at": "2026-08-10T10:26:00.584Z"
     }
   },
@@ -2811,8 +2811,8 @@
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 232,
-      "successes": 196,
+      "attempts": 233,
+      "successes": 197,
       "recent": [
         1,
         1,
@@ -2836,16 +2836,16 @@
         1,
         1,
         1,
-        1,
         0,
         0,
         0,
         1,
         0,
+        1,
         1,
         1
       ],
-      "last_success_at": "2026-08-10T10:26:15.151Z",
+      "last_success_at": "2026-08-11T02:33:29.916Z",
       "success_rate": 0.845,
       "last_failure_at": "2026-08-10T03:19:38.234Z"
     }
@@ -3379,10 +3379,9 @@
       "success_rate": 0
     },
     "html_scrape:hormuz_multitracker_v1": {
-      "attempts": 57,
-      "successes": 56,
+      "attempts": 58,
+      "successes": 57,
       "recent": [
-        1,
         1,
         1,
         1,
@@ -3411,10 +3410,11 @@
         1,
         1,
         1,
+        1,
         1
       ],
-      "last_success_at": "2026-08-10T10:25:59.321Z",
-      "success_rate": 0.982,
+      "last_success_at": "2026-08-11T02:33:14.882Z",
+      "success_rate": 0.983,
       "last_failure_at": "2026-08-09T03:27:03.675Z"
     },
     "html_scrape:hormuz_v1": {
