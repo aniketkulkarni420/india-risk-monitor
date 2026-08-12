@@ -507,26 +507,26 @@
       "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters | html_render:web_llm_v1: web_llm_v1: all 2 sources failed · https://www.moneycontrol.com/indian-indices/gift-nifty-141.h: All"
     },
     "net_sip_inflows": {
-      "last_attempted_at": "2026-08-11T10:09:45.956Z",
-      "last_success_at": "2026-08-11T10:09:45.956Z",
-      "last_success_value": 29845,
+      "last_attempted_at": "2026-08-12T05:52:22.933Z",
+      "last_success_at": "2026-08-12T05:52:22.933Z",
+      "last_success_value": 31961,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-08-05T11:33:37.758Z",
       "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: net_sip_inflows: 5 candidates, none yielded value · https://news.google.com/rss/articles/CBMiogFBVV9 | rss:google_news_rss_v1: google_news_rss: 51 items, none matched · tried: Mutual fund"
     },
     "mf_net_equity_flows": {
-      "last_attempted_at": "2026-08-11T10:09:47.349Z",
-      "last_success_at": "2026-08-11T10:09:47.349Z",
+      "last_attempted_at": "2026-08-12T05:52:24.268Z",
+      "last_success_at": "2026-08-12T05:52:24.268Z",
       "last_success_value": 24697.39,
       "consecutive_failures": 0,
       "status": "green"
     },
     "core_cpi": {
-      "last_attempted_at": "2026-08-11T10:09:53.131Z",
-      "last_failure_at": "2026-08-11T10:09:53.131Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: google_news_rss: 61 items, none matched · tried:  | llm:google_news_llm_v1: core_cpi: 1 candidates, none yielded value · https://news.google.com/rss/articles/CBMijgFBVV95cUxOeT",
-      "consecutive_failures": 13,
+      "last_attempted_at": "2026-08-12T05:52:30.676Z",
+      "last_failure_at": "2026-08-12T05:52:30.676Z",
+      "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: google_news_rss: 62 items, none matched · tried:  | llm:google_news_llm_v1: core_cpi: 2 candidates, none yielded value · https://news.google.com/rss/articles/CBMijgFBVV95cUxOeT",
+      "consecutive_failures": 14,
       "status": "red",
       "last_success_at": "2026-07-30T11:21:14.872Z",
       "last_success_value": 3
@@ -556,5 +556,5 @@
     "red": 7,
     "total": 67
   },
-  "generated_at": "2026-08-12T03:59:58.369Z"
+  "generated_at": "2026-08-12T05:52:30.676Z"
 }
