@@ -127,27 +127,27 @@
       "last_attempted_at": "2026-08-13T13:50:25.416Z"
     },
     "gsec_curve": {
-      "last_success_at": "2026-08-13T10:20:06.798Z",
-      "last_success_value": 6.77,
+      "last_success_at": "2026-08-13T14:38:02.559Z",
+      "last_success_value": 6.76,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-07-01T16:07:41.069Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/india/government-bond-yield → 405 | llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters",
-      "last_attempted_at": "2026-08-13T10:20:06.798Z"
+      "last_attempted_at": "2026-08-13T14:38:02.559Z"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-08-13T10:20:06.803Z",
-      "last_success_value": 2.39,
+      "last_success_at": "2026-08-13T14:38:02.565Z",
+      "last_success_value": 2.31,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-13T10:20:06.803Z"
+      "last_attempted_at": "2026-08-13T14:38:02.565Z"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-08-13T10:20:06.966Z",
+      "last_success_at": "2026-08-13T14:38:02.836Z",
       "last_success_value": 316464.26,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-13T10:20:06.966Z",
+      "last_attempted_at": "2026-08-13T14:38:02.836Z",
       "last_failure_at": "2026-07-01T16:07:41.096Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:rbi_mmo_v1: https://tradingeconomics.com/india/money-supply-m3 → 405 | json_api:dbnomics_v1: No dbnomics config for banking_liquidity | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/indi"
     },
@@ -156,23 +156,23 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: wacr_repo_spread: 1 candidates, none yielded value · https://news.google.com/rss/articles/CBMibkFVX3",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-13T10:20:08.670Z",
+      "last_success_at": "2026-08-13T14:38:05.491Z",
       "last_success_value": -39,
-      "last_attempted_at": "2026-08-13T10:20:08.670Z"
+      "last_attempted_at": "2026-08-13T14:38:05.491Z"
     },
     "inr_usd": {
-      "last_success_at": "2026-08-13T10:20:08.696Z",
-      "last_success_value": 95.459,
+      "last_success_at": "2026-08-13T14:38:05.569Z",
+      "last_success_value": 95.339,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-13T10:20:08.696Z"
+      "last_attempted_at": "2026-08-13T14:38:05.569Z"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-08-13T10:20:08.780Z",
-      "last_success_value": 209,
+      "last_success_at": "2026-08-13T14:38:05.744Z",
+      "last_success_value": 214,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-13T10:20:08.780Z",
+      "last_attempted_at": "2026-08-13T14:38:05.744Z",
       "last_failure_at": "2026-07-04T15:44:33.274Z",
       "last_failure_reason": "OLD DATA rejected: as_of 2026-06-26 is 8d old (> 7d allowance for Daily) — refusing to verify stale release"
     },
@@ -443,9 +443,9 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: google_news_llm: empty feed for \"India FPI FII deb",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-13T10:20:06.725Z",
+      "last_success_at": "2026-08-13T14:38:02.311Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-08-13T10:20:06.725Z"
+      "last_attempted_at": "2026-08-13T14:38:02.311Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-08-13T10:17:31.547Z",
@@ -556,5 +556,5 @@
     "red": 7,
     "total": 67
   },
-  "generated_at": "2026-08-13T13:50:37.873Z"
+  "generated_at": "2026-08-13T14:38:05.744Z"
 }
