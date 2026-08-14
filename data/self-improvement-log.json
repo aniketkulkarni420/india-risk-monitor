@@ -596,7 +596,24 @@
         "html_render:moneycontrol_v1"
       ],
       "reason": "nse_api_v1=confident(0.67), google_news_llm_v1=confident(0.33), bse_v1=dead(0.00), moneycontrol_v1=dead(0.00)"
+    },
+    {
+      "ts": "2026-08-14T03:21:14.666Z",
+      "metric_id": "drewry_wci",
+      "action": "reorder+quarantine",
+      "from": [
+        "llm:google_news_llm_v1",
+        "html_scrape:drewry_v1"
+      ],
+      "to": [
+        "html_scrape:drewry_v1",
+        "llm:google_news_llm_v1"
+      ],
+      "quarantined": [
+        "llm:google_news_llm_v1"
+      ],
+      "reason": "drewry_v1=confident(0.60), google_news_llm_v1=dead(0.73)"
     }
   ],
-  "last_run": "2026-08-04T04:07:15.588Z"
+  "last_run": "2026-08-14T03:21:14.666Z"
 }
