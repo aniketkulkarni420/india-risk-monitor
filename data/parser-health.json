@@ -55,76 +55,76 @@
       "last_attempted_at": "2026-08-14T04:00:38.133Z"
     },
     "fii_equity_daily": {
-      "last_success_at": "2026-08-14T12:09:29.628Z",
-      "last_success_value": -510.69,
+      "last_success_at": "2026-08-14T13:45:53.996Z",
+      "last_success_value": 508.12,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-14T12:09:29.628Z"
+      "last_attempted_at": "2026-08-14T13:45:53.996Z"
     },
     "fii_equity_mtd": {
-      "last_success_at": "2026-08-14T12:09:29.743Z",
-      "last_success_value": -510.69,
+      "last_success_at": "2026-08-14T13:45:54.122Z",
+      "last_success_value": 508.12,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-14T12:09:29.743Z",
+      "last_attempted_at": "2026-08-14T13:45:54.122Z",
       "last_failure_at": "2026-08-10T12:09:37.119Z",
       "last_failure_reason": "tiered: all 3 tiers failed · csv_download:nse_fii_dii_v1: fetch failed | html_render:moneycontrol_v1: No moneycontrol_v1 config for fii_equity_mtd | llm:google_news_llm_v1: No google_news_llm config for fii_equity_mtd"
     },
     "fii_equity_cytd": {
-      "last_success_at": "2026-08-14T12:09:29.828Z",
-      "last_success_value": -510.69,
+      "last_success_at": "2026-08-14T13:45:54.209Z",
+      "last_success_value": 508.12,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-14T12:09:29.828Z"
+      "last_attempted_at": "2026-08-14T13:45:54.209Z"
     },
     "dii_daily": {
-      "last_success_at": "2026-08-14T12:09:29.939Z",
-      "last_success_value": 4353.09,
+      "last_success_at": "2026-08-14T13:45:54.301Z",
+      "last_success_value": 356.4,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-14T12:09:29.939Z"
+      "last_attempted_at": "2026-08-14T13:45:54.301Z"
     },
     "dii_mtd": {
-      "last_success_at": "2026-08-14T12:09:30.026Z",
-      "last_success_value": 4353.09,
+      "last_success_at": "2026-08-14T13:45:54.391Z",
+      "last_success_value": 356.4,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-14T12:09:30.026Z"
+      "last_attempted_at": "2026-08-14T13:45:54.391Z"
     },
     "absorption_ratio": {
-      "last_success_at": "2026-08-14T12:09:30.031Z",
-      "last_success_value": 8.52,
+      "last_success_at": "2026-08-14T13:45:54.395Z",
+      "last_success_value": 0.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-14T12:09:30.031Z"
+      "last_attempted_at": "2026-08-14T13:45:54.395Z"
     },
     "nifty_50": {
-      "last_success_at": "2026-08-14T12:09:31.795Z",
+      "last_success_at": "2026-08-14T13:45:56.023Z",
       "last_success_value": 24366,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-14T12:09:31.795Z"
+      "last_attempted_at": "2026-08-14T13:45:56.023Z"
     },
     "bank_nifty": {
-      "last_success_at": "2026-08-14T12:09:31.903Z",
+      "last_success_at": "2026-08-14T13:45:56.162Z",
       "last_success_value": 57491.1,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-14T12:09:31.903Z"
+      "last_attempted_at": "2026-08-14T13:45:56.162Z"
     },
     "nifty_pe_5y": {
-      "last_success_at": "2026-08-14T12:09:32.004Z",
-      "last_success_value": 20.59,
+      "last_success_at": "2026-08-14T13:45:56.251Z",
+      "last_success_value": 20.56,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-14T12:09:32.004Z"
+      "last_attempted_at": "2026-08-14T13:45:56.251Z"
     },
     "india_vix": {
-      "last_success_at": "2026-08-14T12:09:32.120Z",
+      "last_success_at": "2026-08-14T13:45:56.410Z",
       "last_success_value": 11.32,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-14T12:09:32.120Z"
+      "last_attempted_at": "2026-08-14T13:45:56.410Z"
     },
     "gsec_curve": {
       "last_success_at": "2026-08-13T15:13:56.885Z",
@@ -430,13 +430,13 @@
       "last_attempted_at": "2026-06-11T12:00:35.421Z"
     },
     "block_deals_notional": {
-      "last_failure_at": "2026-08-14T12:09:31.043Z",
+      "last_failure_at": "2026-08-14T13:45:55.476Z",
       "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: nse_api_v1: block_deals_notional — no extractable value from https://www.nseindia.com/api/block-deal | llm:google_news_llm_v1: in cooldown | html_render:bse_v1: in cooldown",
-      "consecutive_failures": 2,
-      "status": "amber",
+      "consecutive_failures": 3,
+      "status": "red",
       "last_success_at": "2026-08-13T13:50:24.591Z",
       "last_success_value": 1250.1,
-      "last_attempted_at": "2026-08-14T12:09:31.043Z"
+      "last_attempted_at": "2026-08-14T13:45:55.476Z"
     },
     "fpi_debt_flows": {
       "last_failure_at": "2026-07-13T12:20:21.911Z",
@@ -475,19 +475,19 @@
       "last_attempted_at": "2026-08-14T09:11:12.402Z"
     },
     "fii_index_fut_positioning": {
-      "last_attempted_at": "2026-08-14T12:09:30.514Z",
-      "last_success_at": "2026-08-14T12:09:30.514Z",
+      "last_attempted_at": "2026-08-14T13:45:55.003Z",
+      "last_success_at": "2026-08-14T13:45:55.003Z",
       "last_success_value": -168702,
       "consecutive_failures": 0,
       "status": "green"
     },
     "nifty_pcr": {
-      "last_attempted_at": "2026-08-14T12:09:44.055Z",
+      "last_attempted_at": "2026-08-14T13:46:09.286Z",
       "last_failure_at": "2026-08-13T12:12:32.227Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_render:web_llm_v1: web_llm_v1: all 2 sources failed · https://www.niftytrader.in/nse-option-chain/nifty: All LLM provid | json_api:nse_api_v1: nse_api_v1: nifty_pcr — no extractable value from https://www.n",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-14T12:09:44.055Z",
+      "last_success_at": "2026-08-14T13:46:09.286Z",
       "last_success_value": 0.79
     },
     "baltic_dirty_tanker": {
@@ -552,9 +552,9 @@
   },
   "summary": {
     "green": 57,
-    "amber": 3,
-    "red": 7,
+    "amber": 2,
+    "red": 8,
     "total": 67
   },
-  "generated_at": "2026-08-14T12:09:44.055Z"
+  "generated_at": "2026-08-14T13:46:09.286Z"
 }
