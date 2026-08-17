@@ -613,7 +613,30 @@
         "llm:google_news_llm_v1"
       ],
       "reason": "drewry_v1=confident(0.60), google_news_llm_v1=dead(0.73)"
+    },
+    {
+      "ts": "2026-08-17T02:16:38.928Z",
+      "metric_id": "block_deals_notional",
+      "action": "reorder+quarantine",
+      "from": [
+        "json_api:nse_api_v1",
+        "llm:google_news_llm_v1",
+        "html_render:bse_v1",
+        "html_render:moneycontrol_v1"
+      ],
+      "to": [
+        "llm:google_news_llm_v1",
+        "json_api:nse_api_v1",
+        "html_render:bse_v1",
+        "html_render:moneycontrol_v1"
+      ],
+      "quarantined": [
+        "json_api:nse_api_v1",
+        "html_render:bse_v1",
+        "html_render:moneycontrol_v1"
+      ],
+      "reason": "google_news_llm_v1=confident(0.37), nse_api_v1=dead(0.67), bse_v1=dead(0.00), moneycontrol_v1=dead(0.00)"
     }
   ],
-  "last_run": "2026-08-14T03:21:14.666Z"
+  "last_run": "2026-08-17T02:16:38.928Z"
 }
