@@ -597,8 +597,8 @@
   },
   "india_crude_basket": {
     "press_release:ppac_v1": {
-      "attempts": 360,
-      "successes": 360,
+      "attempts": 361,
+      "successes": 361,
       "recent": [
         1,
         1,
@@ -631,7 +631,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-19T02:34:03.227Z",
+      "last_success_at": "2026-08-19T02:53:27.015Z",
       "success_rate": 1
     }
   },
@@ -1041,8 +1041,8 @@
   },
   "brent_crude": {
     "json_api:public_oil_v1": {
-      "attempts": 311,
-      "successes": 308,
+      "attempts": 312,
+      "successes": 309,
       "recent": [
         1,
         1,
@@ -1075,7 +1075,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-19T02:33:43.112Z",
+      "last_success_at": "2026-08-19T02:53:05.155Z",
       "success_rate": 0.99,
       "last_failure_at": "2026-06-06T05:49:41.137Z"
     },
@@ -1113,10 +1113,9 @@
   },
   "gold_usd": {
     "json_api:public_gold_v1": {
-      "attempts": 312,
-      "successes": 305,
+      "attempts": 313,
+      "successes": 306,
       "recent": [
-        1,
         1,
         1,
         1,
@@ -1145,9 +1144,10 @@
         1,
         1,
         1,
+        1,
         1
       ],
-      "last_success_at": "2026-08-19T02:33:43.128Z",
+      "last_success_at": "2026-08-19T02:53:05.216Z",
       "success_rate": 0.978,
       "last_failure_at": "2026-08-13T03:33:34.010Z"
     },
@@ -1184,8 +1184,8 @@
   },
   "dxy": {
     "json_api:public_dxy_v1": {
-      "attempts": 312,
-      "successes": 309,
+      "attempts": 313,
+      "successes": 310,
       "recent": [
         1,
         1,
@@ -1218,7 +1218,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-19T02:33:43.152Z",
+      "last_success_at": "2026-08-19T02:53:05.298Z",
       "success_rate": 0.99,
       "last_failure_at": "2026-06-06T05:49:41.177Z"
     },
@@ -2684,8 +2684,8 @@
   },
   "baltic_dirty_tanker": {
     "json_api:hormuz_bdti_v1": {
-      "attempts": 272,
-      "successes": 272,
+      "attempts": 273,
+      "successes": 273,
       "recent": [
         1,
         1,
@@ -2718,7 +2718,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-19T02:33:43.060Z",
+      "last_success_at": "2026-08-19T02:53:04.963Z",
       "success_rate": 1
     }
   },
@@ -2838,7 +2838,7 @@
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 266,
+      "attempts": 267,
       "successes": 224,
       "recent": [
         1,
@@ -2859,7 +2859,6 @@
         1,
         1,
         1,
-        1,
         0,
         0,
         1,
@@ -2869,12 +2868,13 @@
         0,
         1,
         1,
+        0,
         0,
         0
       ],
       "last_success_at": "2026-08-18T09:43:33.167Z",
-      "success_rate": 0.842,
-      "last_failure_at": "2026-08-19T02:33:58.158Z"
+      "success_rate": 0.839,
+      "last_failure_at": "2026-08-19T02:53:20.213Z"
     }
   },
   "net_sip_inflows": {
@@ -3423,7 +3423,7 @@
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 10,
+      "attempts": 11,
       "successes": 1,
       "recent": [
         0,
@@ -3435,14 +3435,15 @@
         0,
         0,
         1,
+        0,
         0
       ],
-      "last_failure_at": "2026-08-19T02:33:42.926Z",
-      "success_rate": 0.1,
+      "last_failure_at": "2026-08-19T02:53:04.619Z",
+      "success_rate": 0.091,
       "last_success_at": "2026-08-18T09:43:06.572Z"
     },
     "html_scrape:hormuz_multitracker_v1": {
-      "attempts": 91,
+      "attempts": 92,
       "successes": 86,
       "recent": [
         1,
@@ -3455,7 +3456,6 @@
         1,
         1,
         1,
-        1,
         0,
         1,
         1,
@@ -3474,11 +3474,12 @@
         1,
         0,
         1,
+        0,
         0
       ],
       "last_success_at": "2026-08-19T02:02:35.411Z",
-      "success_rate": 0.945,
-      "last_failure_at": "2026-08-19T02:33:29.047Z"
+      "success_rate": 0.935,
+      "last_failure_at": "2026-08-19T02:52:52.966Z"
     },
     "html_scrape:hormuz_v1": {
       "attempts": 5,
