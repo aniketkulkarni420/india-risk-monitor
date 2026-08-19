@@ -4,16 +4,15 @@
   "display_subtitle": "NSE banking index",
   "section": "market",
   "sub_cluster": "equity",
-  "value": 57262.4,
+  "value": 57164.1,
   "unit": "Index",
   "value_format": "decimal_2",
-  "as_of": "2026-08-18T13:10:32.129Z",
+  "as_of": "2026-08-19T09:44:28.532Z",
   "as_of_period": "live",
-  "mom_pct": -1.18,
-  "yoy_pct": 2.5,
+  "mom_pct": -1.35,
+  "yoy_pct": 2.33,
   "vs_5y_avg_pct": 38.4,
   "sparkline_12m": [
-    57491.1,
     57491.1,
     57491.1,
     57491.1,
@@ -24,10 +23,11 @@
     57497.8,
     57361.55,
     57262.4,
-    57262.4
+    57262.4,
+    57164.1
   ],
   "baseline_30d": 49000,
-  "deviation_from_baseline_pct": 16.9,
+  "deviation_from_baseline_pct": 16.7,
   "status": "med",
   "shock_eligible": true,
   "shock_rule": "drawdown > 10% from rolling 60d high",
@@ -66,7 +66,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-08-18T13:10:32.132Z",
+  "last_verified_at": "2026-08-19T09:44:28.536Z",
   "why_it_matters": "Rate-sensitive lens. PSU + private bank composite. Moves on rate trajectory + credit growth + asset quality news.",
   "linked_metrics": [
     "nifty_50",
@@ -75,6 +75,6 @@
     "real_10y_yield"
   ],
   "data_origin": "live",
-  "last_live_fetch_at": "2026-08-18T13:10:32.132Z",
+  "last_live_fetch_at": "2026-08-19T09:44:28.536Z",
   "_source_count_actual": 1
 }
