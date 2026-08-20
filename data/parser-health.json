@@ -532,29 +532,29 @@
       "last_success_value": 3
     },
     "eight_core_industries": {
-      "last_attempted_at": "2026-08-19T09:48:19.035Z",
+      "last_attempted_at": "2026-08-20T05:06:28.672Z",
       "last_success_at": "2026-07-20T07:42:55.592Z",
       "last_success_value": 0.5,
-      "consecutive_failures": 33,
+      "consecutive_failures": 34,
       "status": "red",
-      "last_failure_at": "2026-08-19T09:48:19.035Z",
+      "last_failure_at": "2026-08-20T05:06:28.672Z",
       "last_failure_reason": "tiered: all 3 tiers failed · xlsx:ici_xlsx_v1: ICI XLSX link not found on eaindustry.nic.in | rss:pib_rss_v1: No pib_rss config for eight_core_industries | llm:google_news_llm_v1: No google_news_llm config for eight_core_industries"
     },
     "epfo_payrolls": {
-      "last_attempted_at": "2026-08-19T09:48:31.808Z",
-      "last_success_at": "2026-08-18T09:49:34.466Z",
-      "last_success_value": 13,
-      "consecutive_failures": 1,
-      "status": "amber",
+      "last_attempted_at": "2026-08-20T05:06:48.587Z",
+      "last_success_at": "2026-08-20T05:06:48.587Z",
+      "last_success_value": 19.29,
+      "consecutive_failures": 0,
+      "status": "green",
       "last_failure_at": "2026-08-19T09:48:31.808Z",
       "last_failure_reason": "tiered: all 3 tiers failed · llm:google_news_llm_v1: epfo_payrolls: 2 candidates, none yielded value · https://news.google.com/rss/articles/CBMikgFBVV95c | rss:google_news_rss_v1: google_news_rss: 76 items, none matched · tried: EPFO net me"
     }
   },
   "summary": {
-    "green": 53,
-    "amber": 1,
+    "green": 54,
+    "amber": 0,
     "red": 13,
     "total": 67
   },
-  "generated_at": "2026-08-20T02:50:56.331Z"
+  "generated_at": "2026-08-20T05:06:48.587Z"
 }
