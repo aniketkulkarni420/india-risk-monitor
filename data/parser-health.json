@@ -1,11 +1,11 @@
 {
   "parsers": {
     "hormuz_throughput": {
-      "last_success_at": "2026-08-19T09:42:23.481Z",
+      "last_success_at": "2026-08-20T01:57:20.030Z",
       "last_success_value": 1,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-19T09:42:23.481Z",
+      "last_attempted_at": "2026-08-20T01:57:20.030Z",
       "last_failure_at": "2026-08-19T02:53:04.620Z",
       "last_failure_reason": "tiered: all 4 tiers failed · html_scrape:hormuz_multitracker_v1: hormuz_multitracker: 0 of 4 trackers usable · hormuztracker.com: stale (172.1d old) | hormuzstraitmo | html_scrape:hormuz_v1: in cooldown | llm:google_news_llm_v1: hormuz_thro"
     },
@@ -19,40 +19,40 @@
       "last_failure_reason": "tiered: all 3 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/commodity/baltic → 405 | json_api:dbnomics_v1: No dbnomics config for baltic_dry_index | llm:google_news_llm_v1: google_news_llm: 27 items, none pass"
     },
     "brent_crude": {
-      "last_success_at": "2026-08-19T09:42:24.500Z",
-      "last_success_value": 85.86,
+      "last_success_at": "2026-08-20T01:57:20.819Z",
+      "last_success_value": 84.69,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-19T09:42:24.500Z",
+      "last_attempted_at": "2026-08-20T01:57:20.819Z",
       "last_failure_at": "2026-06-06T05:49:41.139Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:public_oil_v1: https://tradingeconomics.com/commodity/brent-crude-oil → 405 | json_api:dbnomics_v1: No dbnomics config for brent_crude | html_scrape:tradingeconomics_v1: No TE extractor mapped for brent"
     },
     "gold_usd": {
-      "last_success_at": "2026-08-19T09:42:24.539Z",
-      "last_success_value": 4356.54,
+      "last_success_at": "2026-08-20T01:57:20.873Z",
+      "last_success_value": 4496.56,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-19T09:42:24.539Z",
+      "last_attempted_at": "2026-08-20T01:57:20.873Z",
       "last_failure_at": "2026-08-13T03:33:34.013Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:public_gold_v1: https://tradingeconomics.com/commodity/gold: pattern not matched (selector tuning needed) | json_api:dbnomics_v1: No dbnomics config for gold_usd | llm:google_news_llm_v1: No google_news"
     },
     "dxy": {
-      "last_success_at": "2026-08-19T09:42:24.582Z",
-      "last_success_value": 99.417,
+      "last_success_at": "2026-08-20T01:57:20.914Z",
+      "last_success_value": 98.795,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-19T09:42:24.582Z",
+      "last_attempted_at": "2026-08-20T01:57:20.914Z",
       "last_failure_at": "2026-06-06T05:49:41.178Z",
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:public_dxy_v1: https://tradingeconomics.com/united-states/currency → 405 | json_api:dbnomics_v1: No dbnomics config for dxy"
     },
     "power_demand": {
-      "last_failure_at": "2026-08-19T09:42:26.767Z",
+      "last_failure_at": "2026-08-20T01:57:22.637Z",
       "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: OLD DATA rejected (as_of 2026-08-10 · 9d > 7d for Live) | json_api:gridindia_v1: fetch failed",
-      "consecutive_failures": 7,
+      "consecutive_failures": 8,
       "status": "red",
       "last_success_at": "2026-08-17T09:53:07.475Z",
       "last_success_value": 270.8,
-      "last_attempted_at": "2026-08-19T09:42:26.767Z"
+      "last_attempted_at": "2026-08-20T01:57:22.637Z"
     },
     "fii_equity_daily": {
       "last_success_at": "2026-08-19T13:11:34.149Z",
@@ -204,11 +204,11 @@
       "last_attempted_at": "2026-06-11T11:58:11.498Z"
     },
     "india_crude_basket": {
-      "last_success_at": "2026-08-19T09:43:32.399Z",
+      "last_success_at": "2026-08-20T01:58:05.044Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-19T09:43:32.399Z"
+      "last_attempted_at": "2026-08-20T01:58:05.044Z"
     },
     "gst_gross": {
       "last_failure_at": "2026-05-11T05:00:21.341Z",
@@ -448,13 +448,13 @@
       "last_attempted_at": "2026-08-19T14:54:35.493Z"
     },
     "vlcc_tanker_rates": {
-      "last_failure_at": "2026-08-19T09:42:24.288Z",
+      "last_failure_at": "2026-08-20T01:57:20.669Z",
       "last_failure_reason": "tiered: all 1 tiers failed · llm:google_news_llm_v1: google_news_llm: 9 items, none passed filters",
-      "consecutive_failures": 131,
+      "consecutive_failures": 132,
       "status": "red",
       "last_success_at": "2026-07-17T04:58:25.551Z",
       "last_success_value": 1939,
-      "last_attempted_at": "2026-08-19T09:42:24.288Z"
+      "last_attempted_at": "2026-08-20T01:57:20.669Z"
     },
     "fx_reserves": {
       "last_failure_at": "2026-05-14T11:31:00.916Z",
@@ -491,20 +491,20 @@
       "last_success_value": 0.7937
     },
     "baltic_dirty_tanker": {
-      "last_attempted_at": "2026-08-19T09:42:23.756Z",
-      "last_success_at": "2026-08-19T09:42:23.756Z",
+      "last_attempted_at": "2026-08-20T01:57:20.266Z",
+      "last_success_at": "2026-08-20T01:57:20.266Z",
       "last_success_value": 2631,
       "consecutive_failures": 0,
       "status": "green"
     },
     "gift_nifty": {
-      "last_attempted_at": "2026-08-19T09:43:26.281Z",
+      "last_attempted_at": "2026-08-20T01:57:59.426Z",
       "last_success_at": "2026-08-18T09:43:33.168Z",
       "last_success_value": 24310.5,
-      "consecutive_failures": 4,
+      "consecutive_failures": 5,
       "status": "red",
-      "last_failure_at": "2026-08-19T09:43:26.281Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: gift_nifty: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMigwJBVV95cUxN | html_render:web_llm_v1: web_llm_v1: all 2 sources failed · https://www.moneycontrol."
+      "last_failure_at": "2026-08-20T01:57:59.426Z",
+      "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: gift_nifty: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMi9wFBVV95cUxP | html_render:web_llm_v1: web_llm_v1: all 2 sources failed · https://www.moneycontrol."
     },
     "net_sip_inflows": {
       "last_attempted_at": "2026-08-19T09:48:01.462Z",
@@ -556,5 +556,5 @@
     "red": 13,
     "total": 67
   },
-  "generated_at": "2026-08-19T14:54:37.449Z"
+  "generated_at": "2026-08-20T01:58:05.044Z"
 }
