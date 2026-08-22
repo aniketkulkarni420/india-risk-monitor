@@ -4,16 +4,15 @@
   "display_subtitle": "Ships passing per day · 24h average",
   "section": "freight",
   "sub_cluster": null,
-  "value": 7,
+  "value": 1,
   "unit": "ships/day",
   "value_format": "integer",
-  "as_of": "2026-08-21T10:14:10.000Z",
+  "as_of": "2026-08-22T09:35:21.173Z",
   "as_of_period": "24h",
-  "mom_pct": -58.82,
+  "mom_pct": -94.12,
   "yoy_pct": 528.8,
   "vs_5y_avg_pct": null,
   "sparkline_12m": [
-    1,
     1,
     1,
     0,
@@ -24,12 +23,13 @@
     1,
     1,
     1,
-    7
+    7,
+    1
   ],
   "_history_state": "accruing",
   "_history_note": "Prior sparkline was polluted with static-snapshot seed values (84) and incorrect Gulf-port-count readings (141, 148) from the retired hormuz-watch endpoint. Reset 2026-05-14 to [pre-crisis baseline 140, current 12]. Real history rebuilds from here as the layered Google-News + multi-tracker parser runs.",
   "baseline_30d": 140,
-  "deviation_from_baseline_pct": -95,
+  "deviation_from_baseline_pct": -99.3,
   "status": "shock",
   "shock_eligible": true,
   "shock_rule": "value < 50% baseline_30d",
@@ -60,7 +60,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-08-22T01:57:10.477Z",
+  "last_verified_at": "2026-08-22T09:35:21.175Z",
   "_source_static": true,
   "_snapshot_payload": {
     "vessel_count_inbound": 38,
@@ -99,7 +99,7 @@
   ],
   "notes": "AIS data has a ~2hr lag. Manual cross-check vs Reuters wire daily during shock periods. 2026-06-11: canonical source switched to Hormuz Watch /api/snapshot (near-real-time AIS); manual override retired — live tool data outranks a hand-pinned value.",
   "data_origin": "local_cache",
-  "last_live_fetch_at": "2026-08-22T01:57:10.477Z",
+  "last_live_fetch_at": "2026-08-22T09:35:21.175Z",
   "pct_of_normal": 236.4,
   "throughput_mbd_est": 49.6,
   "incidents_30d": 11,
@@ -117,7 +117,7 @@
       }
     ],
     "dropped": [
-      "hormuztracker.com: stale (174.1d old)",
+      "hormuztracker.com: stale (175.4d old)",
       "hormuzstraitmonitor.com: no text content",
       "hormuzmonitor.com: no text content"
     ]
