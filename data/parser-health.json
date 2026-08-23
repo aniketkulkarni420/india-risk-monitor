@@ -1,11 +1,11 @@
 {
   "parsers": {
     "hormuz_throughput": {
-      "last_success_at": "2026-08-23T02:37:53.216Z",
+      "last_success_at": "2026-08-23T02:56:20.839Z",
       "last_success_value": 1,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-23T02:37:53.216Z",
+      "last_attempted_at": "2026-08-23T02:56:20.839Z",
       "last_failure_at": "2026-08-23T02:08:06.108Z",
       "last_failure_reason": "tiered: all 4 tiers failed · html_scrape:hormuz_multitracker_v1: hormuz_multitracker: 0 of 4 trackers usable · hormuztracker.com: stale (176.1d old) | hormuzstraitmo | llm:google_news_llm_v1: hormuz_throughput: 2 candidates, none yielded va"
     },
@@ -19,40 +19,40 @@
       "last_failure_reason": "tiered: all 3 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/commodity/baltic → 405 | json_api:dbnomics_v1: No dbnomics config for baltic_dry_index | llm:google_news_llm_v1: google_news_llm: 27 items, none pass"
     },
     "brent_crude": {
-      "last_success_at": "2026-08-23T02:37:53.342Z",
+      "last_success_at": "2026-08-23T02:56:20.969Z",
       "last_success_value": 87.06,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-23T02:37:53.342Z",
+      "last_attempted_at": "2026-08-23T02:56:20.969Z",
       "last_failure_at": "2026-06-06T05:49:41.139Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:public_oil_v1: https://tradingeconomics.com/commodity/brent-crude-oil → 405 | json_api:dbnomics_v1: No dbnomics config for brent_crude | html_scrape:tradingeconomics_v1: No TE extractor mapped for brent"
     },
     "gold_usd": {
-      "last_success_at": "2026-08-23T02:37:53.371Z",
+      "last_success_at": "2026-08-23T02:56:21.075Z",
       "last_success_value": 4607.35,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-23T02:37:53.371Z",
+      "last_attempted_at": "2026-08-23T02:56:21.075Z",
       "last_failure_at": "2026-08-13T03:33:34.013Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:public_gold_v1: https://tradingeconomics.com/commodity/gold: pattern not matched (selector tuning needed) | json_api:dbnomics_v1: No dbnomics config for gold_usd | llm:google_news_llm_v1: No google_news"
     },
     "dxy": {
-      "last_success_at": "2026-08-23T02:37:53.413Z",
+      "last_success_at": "2026-08-23T02:56:21.180Z",
       "last_success_value": 98.816,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-23T02:37:53.413Z",
+      "last_attempted_at": "2026-08-23T02:56:21.180Z",
       "last_failure_at": "2026-06-06T05:49:41.178Z",
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:public_dxy_v1: https://tradingeconomics.com/united-states/currency → 405 | json_api:dbnomics_v1: No dbnomics config for dxy"
     },
     "power_demand": {
-      "last_failure_at": "2026-08-23T02:37:53.415Z",
+      "last_failure_at": "2026-08-23T02:56:21.181Z",
       "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: in cooldown | json_api:gridindia_v1: in cooldown",
-      "consecutive_failures": 21,
+      "consecutive_failures": 22,
       "status": "red",
       "last_success_at": "2026-08-17T09:53:07.475Z",
       "last_success_value": 270.8,
-      "last_attempted_at": "2026-08-23T02:37:53.415Z"
+      "last_attempted_at": "2026-08-23T02:56:21.181Z"
     },
     "fii_equity_daily": {
       "last_success_at": "2026-08-22T14:48:36.389Z",
@@ -204,11 +204,11 @@
       "last_attempted_at": "2026-06-11T11:58:11.498Z"
     },
     "india_crude_basket": {
-      "last_success_at": "2026-08-23T02:37:59.743Z",
+      "last_success_at": "2026-08-23T02:56:26.175Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-08-23T02:37:59.743Z"
+      "last_attempted_at": "2026-08-23T02:56:26.175Z"
     },
     "gst_gross": {
       "last_failure_at": "2026-05-11T05:00:21.341Z",
@@ -448,13 +448,13 @@
       "last_attempted_at": "2026-08-22T14:50:21.862Z"
     },
     "vlcc_tanker_rates": {
-      "last_failure_at": "2026-08-23T02:37:53.219Z",
+      "last_failure_at": "2026-08-23T02:56:20.846Z",
       "last_failure_reason": "tiered: all 1 tiers failed · llm:google_news_llm_v1: in cooldown",
-      "consecutive_failures": 145,
+      "consecutive_failures": 146,
       "status": "red",
       "last_success_at": "2026-07-17T04:58:25.551Z",
       "last_success_value": 1939,
-      "last_attempted_at": "2026-08-23T02:37:53.219Z"
+      "last_attempted_at": "2026-08-23T02:56:20.846Z"
     },
     "fx_reserves": {
       "last_failure_at": "2026-05-14T11:31:00.916Z",
@@ -491,22 +491,22 @@
       "last_success_value": 0.7937
     },
     "baltic_dirty_tanker": {
-      "last_attempted_at": "2026-08-23T02:37:53.218Z",
+      "last_attempted_at": "2026-08-23T02:56:20.841Z",
       "last_success_at": "2026-08-20T09:43:04.410Z",
       "last_success_value": 2631,
-      "consecutive_failures": 10,
+      "consecutive_failures": 11,
       "status": "red",
-      "last_failure_at": "2026-08-23T02:37:53.218Z",
+      "last_failure_at": "2026-08-23T02:56:20.841Z",
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:hormuz_bdti_v1: in cooldown | llm:google_news_llm_v1: in cooldown"
     },
     "gift_nifty": {
-      "last_attempted_at": "2026-08-23T02:37:54.052Z",
+      "last_attempted_at": "2026-08-23T02:56:21.182Z",
       "last_success_at": "2026-08-22T09:35:57.404Z",
       "last_success_value": 24343.5,
-      "consecutive_failures": 3,
+      "consecutive_failures": 4,
       "status": "red",
-      "last_failure_at": "2026-08-23T02:37:54.052Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters | html_render:web_llm_v1: in cooldown"
+      "last_failure_at": "2026-08-23T02:56:21.182Z",
+      "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: in cooldown | html_render:web_llm_v1: in cooldown"
     },
     "net_sip_inflows": {
       "last_attempted_at": "2026-08-22T14:50:48.405Z",
@@ -558,5 +558,5 @@
     "red": 12,
     "total": 67
   },
-  "generated_at": "2026-08-23T02:37:59.743Z"
+  "generated_at": "2026-08-23T02:56:26.175Z"
 }
