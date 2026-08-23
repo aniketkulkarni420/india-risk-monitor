@@ -46,8 +46,8 @@
     "frequency": "Monthly",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "llm:google_news_llm_v1",
-      "rss:google_news_rss_v1"
+      "rss:google_news_rss_v1",
+      "llm:google_news_llm_v1"
     ]
   },
   "source_crosscheck": [
@@ -61,5 +61,5 @@
   "last_live_fetch_at": "2026-08-22T14:50:48.404Z",
   "_source_count_actual": 1,
   "_history_state": "accruing",
-  "_reliability_optimized_at": "2026-08-02T04:20:01.783Z"
+  "_reliability_optimized_at": "2026-08-23T02:20:58.420Z"
 }
