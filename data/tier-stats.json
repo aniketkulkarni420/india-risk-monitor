@@ -72,7 +72,7 @@
   },
   "wacr_repo_spread": {
     "html_scrape:rbi_mmo_daily_v1": {
-      "attempts": 225,
+      "attempts": 226,
       "successes": 189,
       "recent": [
         1,
@@ -86,7 +86,6 @@
         1,
         1,
         1,
-        1,
         0,
         0,
         0,
@@ -104,25 +103,26 @@
         1,
         1,
         1,
-        1
+        1,
+        0
       ],
-      "last_failure_at": "2026-08-17T14:42:57.641Z",
-      "success_rate": 0.84,
+      "last_failure_at": "2026-08-24T14:12:05.788Z",
+      "success_rate": 0.836,
       "last_success_at": "2026-08-23T14:51:42.133Z"
     },
     "llm:google_news_llm_v1": {
-      "attempts": 35,
+      "attempts": 36,
       "successes": 13,
       "recent": [
         1,
         1,
         1,
         1,
-        1,
         0,
         1,
         1,
         1,
+        0,
         0,
         0,
         0,
@@ -146,8 +146,8 @@
         0
       ],
       "last_success_at": "2026-06-03T22:37:10.313Z",
-      "success_rate": 0.371,
-      "last_failure_at": "2026-08-17T09:56:39.475Z"
+      "success_rate": 0.361,
+      "last_failure_at": "2026-08-24T14:12:06.365Z"
     }
   },
   "air_pax": {
@@ -844,8 +844,8 @@
       "success_rate": 0
     },
     "html_render:playwright_render_v1": {
-      "attempts": 241,
-      "successes": 235,
+      "attempts": 242,
+      "successes": 236,
       "recent": [
         1,
         1,
@@ -878,7 +878,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-23T14:51:40.351Z",
+      "last_success_at": "2026-08-24T14:12:01.394Z",
       "success_rate": 0.975,
       "last_failure_at": "2026-07-13T12:19:56.286Z"
     },
@@ -1775,8 +1775,8 @@
   },
   "gsec_curve": {
     "html_scrape:tradingeconomics_v1": {
-      "attempts": 193,
-      "successes": 190,
+      "attempts": 194,
+      "successes": 191,
       "recent": [
         1,
         1,
@@ -1809,8 +1809,8 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-23T14:51:40.433Z",
-      "success_rate": 0.984,
+      "last_success_at": "2026-08-24T14:12:01.701Z",
+      "success_rate": 0.985,
       "last_failure_at": "2026-07-01T16:07:40.481Z"
     },
     "llm:google_news_llm_v1": {
@@ -1828,8 +1828,8 @@
   },
   "banking_liquidity": {
     "json_api:rbi_mmo_v1": {
-      "attempts": 193,
-      "successes": 190,
+      "attempts": 194,
+      "successes": 191,
       "recent": [
         1,
         1,
@@ -1862,8 +1862,8 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-23T14:51:40.501Z",
-      "success_rate": 0.984,
+      "last_success_at": "2026-08-24T14:12:01.933Z",
+      "success_rate": 0.985,
       "last_failure_at": "2026-07-01T16:07:41.081Z"
     },
     "json_api:dbnomics_v1": {
@@ -1891,8 +1891,8 @@
   },
   "inr_usd": {
     "html_scrape:te_inr_v1": {
-      "attempts": 193,
-      "successes": 190,
+      "attempts": 194,
+      "successes": 191,
       "recent": [
         1,
         1,
@@ -1925,8 +1925,8 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-23T14:51:42.157Z",
-      "success_rate": 0.984,
+      "last_success_at": "2026-08-24T14:12:06.538Z",
+      "success_rate": 0.985,
       "last_failure_at": "2026-07-01T16:07:42.833Z"
     },
     "json_api:rbi_refrate_v1": {
