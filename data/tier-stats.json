@@ -597,8 +597,8 @@
   },
   "india_crude_basket": {
     "press_release:ppac_v1": {
-      "attempts": 379,
-      "successes": 379,
+      "attempts": 380,
+      "successes": 380,
       "recent": [
         1,
         1,
@@ -631,7 +631,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-23T14:49:42.605Z",
+      "last_success_at": "2026-08-24T02:05:33.817Z",
       "success_rate": 1
     }
   },
@@ -1000,7 +1000,7 @@
       "success_rate": 1
     },
     "llm:google_news_llm_v1": {
-      "attempts": 148,
+      "attempts": 149,
       "successes": 26,
       "recent": [
         0,
@@ -1034,15 +1034,15 @@
         0,
         0
       ],
-      "last_failure_at": "2026-08-23T09:35:49.185Z",
-      "success_rate": 0.176,
+      "last_failure_at": "2026-08-24T02:05:01.281Z",
+      "success_rate": 0.174,
       "last_success_at": "2026-07-17T04:58:25.550Z"
     }
   },
   "brent_crude": {
     "json_api:public_oil_v1": {
-      "attempts": 330,
-      "successes": 327,
+      "attempts": 331,
+      "successes": 328,
       "recent": [
         1,
         1,
@@ -1075,7 +1075,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-23T14:49:28.741Z",
+      "last_success_at": "2026-08-24T02:05:01.377Z",
       "success_rate": 0.991,
       "last_failure_at": "2026-06-06T05:49:41.137Z"
     },
@@ -1113,8 +1113,8 @@
   },
   "gold_usd": {
     "json_api:public_gold_v1": {
-      "attempts": 331,
-      "successes": 324,
+      "attempts": 332,
+      "successes": 325,
       "recent": [
         1,
         1,
@@ -1147,7 +1147,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-23T14:49:28.764Z",
+      "last_success_at": "2026-08-24T02:05:01.638Z",
       "success_rate": 0.979,
       "last_failure_at": "2026-08-13T03:33:34.010Z"
     },
@@ -1184,8 +1184,8 @@
   },
   "dxy": {
     "json_api:public_dxy_v1": {
-      "attempts": 331,
-      "successes": 328,
+      "attempts": 332,
+      "successes": 329,
       "recent": [
         1,
         1,
@@ -1218,7 +1218,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-08-23T14:49:28.794Z",
+      "last_success_at": "2026-08-24T02:05:01.665Z",
       "success_rate": 0.991,
       "last_failure_at": "2026-06-06T05:49:41.177Z"
     },
@@ -2700,7 +2700,7 @@
   },
   "baltic_dirty_tanker": {
     "json_api:hormuz_bdti_v1": {
-      "attempts": 285,
+      "attempts": 286,
       "successes": 278,
       "recent": [
         1,
@@ -2725,7 +2725,7 @@
         1,
         1,
         1,
-        1,
+        0,
         0,
         0,
         0,
@@ -2735,11 +2735,11 @@
         0
       ],
       "last_success_at": "2026-08-20T09:43:04.409Z",
-      "success_rate": 0.975,
-      "last_failure_at": "2026-08-23T09:35:48.851Z"
+      "success_rate": 0.972,
+      "last_failure_at": "2026-08-24T02:05:00.932Z"
     },
     "llm:google_news_llm_v1": {
-      "attempts": 7,
+      "attempts": 8,
       "successes": 0,
       "recent": [
         0,
@@ -2748,15 +2748,16 @@
         0,
         0,
         0,
+        0,
         0
       ],
-      "last_failure_at": "2026-08-23T09:35:48.853Z",
+      "last_failure_at": "2026-08-24T02:05:00.933Z",
       "success_rate": 0
     }
   },
   "power_demand": {
     "json_api:gridindia_v1": {
-      "attempts": 69,
+      "attempts": 70,
       "successes": 0,
       "recent": [
         0,
@@ -2790,11 +2791,11 @@
         0,
         0
       ],
-      "last_failure_at": "2026-08-23T09:35:50.940Z",
+      "last_failure_at": "2026-08-24T02:05:13.112Z",
       "success_rate": 0
     },
     "rss:google_news_rss_v1": {
-      "attempts": 220,
+      "attempts": 221,
       "successes": 149,
       "recent": [
         1,
@@ -2806,7 +2807,6 @@
         1,
         1,
         1,
-        1,
         0,
         0,
         0,
@@ -2815,6 +2815,7 @@
         1,
         1,
         1,
+        0,
         0,
         0,
         0,
@@ -2829,8 +2830,8 @@
         0
       ],
       "last_success_at": "2026-08-17T09:53:07.474Z",
-      "success_rate": 0.677,
-      "last_failure_at": "2026-08-23T09:35:49.938Z"
+      "success_rate": 0.674,
+      "last_failure_at": "2026-08-24T02:05:02.145Z"
     }
   },
   "gift_nifty": {
@@ -2873,14 +2874,13 @@
       "success_rate": 0
     },
     "llm:google_news_llm_v1": {
-      "attempts": 280,
-      "successes": 228,
+      "attempts": 281,
+      "successes": 229,
       "recent": [
         1,
         1,
         1,
         1,
-        1,
         0,
         0,
         1,
@@ -2905,10 +2905,11 @@
         0,
         0,
         0,
-        0
+        0,
+        1
       ],
-      "last_success_at": "2026-08-22T09:35:57.403Z",
-      "success_rate": 0.814,
+      "last_success_at": "2026-08-24T02:05:28.841Z",
+      "success_rate": 0.815,
       "last_failure_at": "2026-08-23T09:35:51.385Z"
     }
   },
@@ -3504,15 +3505,14 @@
       "last_success_at": "2026-08-22T01:57:09.296Z"
     },
     "html_scrape:hormuz_multitracker_v1": {
-      "attempts": 109,
-      "successes": 96,
+      "attempts": 110,
+      "successes": 97,
       "recent": [
         1,
         1,
         1,
         1,
         1,
-        1,
         0,
         1,
         1,
@@ -3536,10 +3536,11 @@
         1,
         1,
         1,
-        0
+        0,
+        1
       ],
-      "last_success_at": "2026-08-23T09:35:48.643Z",
-      "success_rate": 0.881,
+      "last_success_at": "2026-08-24T02:05:00.715Z",
+      "success_rate": 0.882,
       "last_failure_at": "2026-08-23T14:49:13.130Z"
     },
     "html_scrape:hormuz_v1": {
