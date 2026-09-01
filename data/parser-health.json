@@ -215,52 +215,52 @@
       "last_failure_reason": "gst_gross: GSTN xlsx latest sheet \"Feb-26\" is 71d old (>70d threshold). Refusing stale value. PIB fallback needed — see TODO in pib_press_v1.mjs.",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-31T17:05:02.354Z",
-      "last_success_value": 211000,
-      "last_attempted_at": "2026-08-31T17:05:02.354Z"
+      "last_success_at": "2026-09-01T09:33:05.583Z",
+      "last_success_value": 200000,
+      "last_attempted_at": "2026-09-01T09:33:05.583Z"
     },
     "auto_2w": {
       "last_success_at": "2026-08-30T18:10:25.289Z",
       "last_success_value": 1818289,
-      "consecutive_failures": 1,
+      "consecutive_failures": 2,
       "status": "amber",
-      "last_attempted_at": "2026-08-31T17:05:02.773Z",
-      "last_failure_at": "2026-08-31T17:05:02.773Z",
+      "last_attempted_at": "2026-09-01T09:33:06.633Z",
+      "last_failure_at": "2026-09-01T09:33:06.633Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: FADA: no monthly PDF release link found on homepage or research-publication | llm:google_news_llm_v1: No google_news_llm config for auto_2w"
     },
     "auto_3w": {
-      "last_success_at": "2026-08-30T18:10:25.291Z",
+      "last_success_at": "2026-09-01T09:33:07.744Z",
       "last_success_value": 133778,
-      "consecutive_failures": 1,
-      "status": "amber",
-      "last_attempted_at": "2026-08-31T17:05:02.864Z",
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_attempted_at": "2026-09-01T09:33:07.744Z",
       "last_failure_at": "2026-08-31T17:05:02.864Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: FADA: no monthly PDF release link found on homepage or research-publication | llm:google_news_llm_v1: No google_news_llm config for auto_3w"
     },
     "auto_pv": {
       "last_success_at": "2026-07-23T11:20:31.553Z",
       "last_success_value": 410853,
-      "consecutive_failures": 44,
+      "consecutive_failures": 45,
       "status": "red",
-      "last_attempted_at": "2026-08-31T17:05:02.959Z",
-      "last_failure_at": "2026-08-31T17:05:02.959Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: FADA: no monthly PDF release link found on homepage or research-publication | llm:google_news_llm_v1: No google_news_llm config for auto_pv"
+      "last_attempted_at": "2026-09-01T09:33:07.813Z",
+      "last_failure_at": "2026-09-01T09:33:07.813Z",
+      "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: FADA auto_pv: parsed 1818289 outside plausible range 200000–600000 — likely grabbed wrong column | llm:google_news_llm_v1: No google_news_llm config for auto_pv"
     },
     "auto_cv": {
-      "last_success_at": "2026-08-30T18:10:25.294Z",
+      "last_success_at": "2026-09-01T09:33:07.815Z",
       "last_success_value": 99666,
-      "consecutive_failures": 1,
-      "status": "amber",
-      "last_attempted_at": "2026-08-31T17:05:03.050Z",
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_attempted_at": "2026-09-01T09:33:07.815Z",
       "last_failure_at": "2026-08-31T17:05:03.050Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: FADA: no monthly PDF release link found on homepage or research-publication | llm:google_news_llm_v1: No google_news_llm config for auto_cv"
     },
     "auto_tractor": {
-      "last_success_at": "2026-08-30T18:10:25.296Z",
+      "last_success_at": "2026-09-01T09:33:07.817Z",
       "last_success_value": 117349,
-      "consecutive_failures": 1,
-      "status": "amber",
-      "last_attempted_at": "2026-08-31T17:05:03.147Z",
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_attempted_at": "2026-09-01T09:33:07.817Z",
       "last_failure_at": "2026-08-31T17:05:03.147Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:fada_monthly_v1: FADA: no monthly PDF release link found on homepage or research-publication | llm:google_news_llm_v1: No google_news_llm config for auto_tractor"
     },
@@ -274,22 +274,22 @@
       "last_attempted_at": "2026-06-11T12:00:26.546Z"
     },
     "pol_demand": {
-      "last_failure_at": "2026-08-31T17:05:06.631Z",
+      "last_failure_at": "2026-09-01T09:33:11.274Z",
       "last_failure_reason": "ppac_v1: PT_Consumption PDF link not found on index",
-      "consecutive_failures": 121,
+      "consecutive_failures": 122,
       "status": "red",
       "last_success_at": "2026-06-16T14:30:11.738Z",
       "last_success_value": 19.47,
-      "last_attempted_at": "2026-08-31T17:05:06.631Z"
+      "last_attempted_at": "2026-09-01T09:33:11.274Z"
     },
     "air_pax": {
       "last_failure_at": "2026-08-09T09:53:12.206Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:dgca_v1: air_pax: all sources failed [https://www.business-standard.com/topic/domestic-air-passenger-traffic: | llm:google_news_llm_v1: air_pax: 4 candidates, none yielded value · https://news.goog",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-08-31T17:05:08.857Z",
+      "last_success_at": "2026-09-01T09:33:11.657Z",
       "last_success_value": 132.67,
-      "last_attempted_at": "2026-08-31T17:05:08.857Z"
+      "last_attempted_at": "2026-09-01T09:33:11.657Z"
     },
     "iip_growth": {
       "last_success_at": "2026-08-31T17:05:09.045Z",
@@ -553,10 +553,10 @@
     }
   },
   "summary": {
-    "green": 47,
-    "amber": 5,
+    "green": 50,
+    "amber": 2,
     "red": 15,
     "total": 67
   },
-  "generated_at": "2026-09-01T07:04:27.974Z"
+  "generated_at": "2026-09-01T09:33:11.657Z"
 }
