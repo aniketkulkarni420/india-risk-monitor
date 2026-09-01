@@ -658,13 +658,12 @@
   },
   "block_deals_notional": {
     "json_api:nse_api_v1": {
-      "attempts": 228,
-      "successes": 153,
+      "attempts": 229,
+      "successes": 154,
       "recent": [
         1,
         1,
         1,
-        1,
         0,
         0,
         0,
@@ -680,6 +679,7 @@
         1,
         1,
         0,
+        1,
         1,
         1,
         1,
@@ -692,8 +692,8 @@
         1,
         1
       ],
-      "last_success_at": "2026-09-01T15:31:28.092Z",
-      "success_rate": 0.671,
+      "last_success_at": "2026-09-01T16:42:33.843Z",
+      "success_rate": 0.672,
       "last_failure_at": "2026-08-29T12:53:20.865Z"
     },
     "html_render:bse_v1": {
@@ -1399,7 +1399,47 @@
   },
   "fii_equity_daily": {
     "csv_download:nse_fii_dii_v1": {
-      "attempts": 216,
+      "attempts": 217,
+      "successes": 217,
+      "recent": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "last_success_at": "2026-09-01T16:42:32.440Z",
+      "success_rate": 1
+    }
+  },
+  "fii_equity_mtd": {
+    "csv_download:nse_fii_dii_v1": {
+      "attempts": 217,
       "successes": 216,
       "recent": [
         1,
@@ -1433,47 +1473,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-09-01T15:31:26.271Z",
-      "success_rate": 1
-    }
-  },
-  "fii_equity_mtd": {
-    "csv_download:nse_fii_dii_v1": {
-      "attempts": 216,
-      "successes": 215,
-      "recent": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ],
-      "last_success_at": "2026-09-01T15:31:26.418Z",
+      "last_success_at": "2026-09-01T16:42:32.571Z",
       "success_rate": 0.995,
       "last_failure_at": "2026-08-10T12:09:37.115Z"
     },
@@ -1498,8 +1498,8 @@
   },
   "fii_equity_cytd": {
     "csv_download:nse_fii_dii_v1": {
-      "attempts": 216,
-      "successes": 216,
+      "attempts": 217,
+      "successes": 217,
       "recent": [
         1,
         1,
@@ -1532,14 +1532,14 @@
         1,
         1
       ],
-      "last_success_at": "2026-09-01T15:31:26.586Z",
+      "last_success_at": "2026-09-01T16:42:32.638Z",
       "success_rate": 1
     }
   },
   "dii_daily": {
     "csv_download:nse_fii_dii_v1": {
-      "attempts": 216,
-      "successes": 216,
+      "attempts": 217,
+      "successes": 217,
       "recent": [
         1,
         1,
@@ -1572,14 +1572,14 @@
         1,
         1
       ],
-      "last_success_at": "2026-09-01T15:31:26.791Z",
+      "last_success_at": "2026-09-01T16:42:32.720Z",
       "success_rate": 1
     }
   },
   "dii_mtd": {
     "csv_download:nse_fii_dii_v1": {
-      "attempts": 216,
-      "successes": 216,
+      "attempts": 217,
+      "successes": 217,
       "recent": [
         1,
         1,
@@ -1612,14 +1612,14 @@
         1,
         1
       ],
-      "last_success_at": "2026-09-01T15:31:26.964Z",
+      "last_success_at": "2026-09-01T16:42:32.819Z",
       "success_rate": 1
     }
   },
   "nifty_50": {
     "csv_download:nse_indices_v1": {
-      "attempts": 216,
-      "successes": 216,
+      "attempts": 217,
+      "successes": 217,
       "recent": [
         1,
         1,
@@ -1652,14 +1652,14 @@
         1,
         1
       ],
-      "last_success_at": "2026-09-01T15:31:28.836Z",
+      "last_success_at": "2026-09-01T16:42:34.327Z",
       "success_rate": 1
     }
   },
   "bank_nifty": {
     "csv_download:nse_indices_v1": {
-      "attempts": 216,
-      "successes": 216,
+      "attempts": 217,
+      "successes": 217,
       "recent": [
         1,
         1,
@@ -1692,14 +1692,14 @@
         1,
         1
       ],
-      "last_success_at": "2026-09-01T15:31:29.373Z",
+      "last_success_at": "2026-09-01T16:42:34.493Z",
       "success_rate": 1
     }
   },
   "nifty_pe_5y": {
     "csv_download:nse_pe_v1": {
-      "attempts": 216,
-      "successes": 216,
+      "attempts": 217,
+      "successes": 217,
       "recent": [
         1,
         1,
@@ -1732,14 +1732,14 @@
         1,
         1
       ],
-      "last_success_at": "2026-09-01T15:31:29.739Z",
+      "last_success_at": "2026-09-01T16:42:34.575Z",
       "success_rate": 1
     }
   },
   "india_vix": {
     "csv_download:nse_vix_v1": {
-      "attempts": 216,
-      "successes": 216,
+      "attempts": 217,
+      "successes": 217,
       "recent": [
         1,
         1,
@@ -1772,7 +1772,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-09-01T15:31:29.881Z",
+      "last_success_at": "2026-09-01T16:42:34.743Z",
       "success_rate": 1
     }
   },
@@ -2600,8 +2600,8 @@
   },
   "fii_index_fut_positioning": {
     "csv_download:nse_participant_oi_v1": {
-      "attempts": 198,
-      "successes": 198,
+      "attempts": 199,
+      "successes": 199,
       "recent": [
         1,
         1,
@@ -2634,7 +2634,7 @@
         1,
         1
       ],
-      "last_success_at": "2026-09-01T15:31:27.487Z",
+      "last_success_at": "2026-09-01T16:42:33.214Z",
       "success_rate": 1
     }
   },
