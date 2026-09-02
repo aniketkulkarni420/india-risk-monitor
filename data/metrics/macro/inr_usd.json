@@ -4,16 +4,15 @@
   "display_subtitle": "RBI reference rate",
   "section": "macro",
   "sub_cluster": "external",
-  "value": 94.454,
+  "value": 94.432,
   "unit": "₹/$",
   "value_format": "decimal_2",
-  "as_of": "2026-09-02T17:16:21.856Z",
+  "as_of": "2026-09-02T17:54:39.999Z",
   "as_of_period": "live",
-  "mom_pct": -0.95,
-  "yoy_pct": 7.25,
+  "mom_pct": -0.98,
+  "yoy_pct": 7.22,
   "vs_5y_avg_pct": 12.6,
   "sparkline_12m": [
-    95.575,
     95.575,
     95.575,
     95.575,
@@ -24,10 +23,11 @@
     94.944,
     94.945,
     94.298,
-    94.454
+    94.454,
+    94.432
   ],
   "baseline_30d": 83.1,
-  "deviation_from_baseline_pct": 13.7,
+  "deviation_from_baseline_pct": 13.6,
   "status": "med",
   "shock_eligible": true,
   "shock_rule": "value > 86 OR daily move > 1.5%",
@@ -56,7 +56,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-09-02T17:16:21.860Z",
+  "last_verified_at": "2026-09-02T17:54:40.002Z",
   "why_it_matters": "INR weakness amplifies imported inflation, raises crude bill in INR terms, and pressures FII debt outflows. The carry-trade decider for global allocators looking at India.",
   "formula": null,
   "trigger_thresholds": [
@@ -77,6 +77,6 @@
   ],
   "notes": "RBI publishes 1:30pm IST. Cross-checks fetched within 5 min. Mid-rate; bid-ask not tracked.",
   "data_origin": "live",
-  "last_live_fetch_at": "2026-09-02T17:16:21.860Z",
+  "last_live_fetch_at": "2026-09-02T17:54:40.002Z",
   "_source_count_actual": 1
 }
