@@ -7,13 +7,12 @@
   "value": 2.12,
   "unit": "×",
   "value_format": "ratio_x",
-  "as_of": "2026-09-03T15:08:07.579Z",
+  "as_of": "2026-09-03T16:28:41.429Z",
   "as_of_period": "monthly",
   "mom_pct": null,
   "yoy_pct": null,
   "vs_5y_avg_pct": null,
   "sparkline_12m": [
-    1.03,
     0.57,
     0.57,
     0.57,
@@ -23,6 +22,7 @@
     0.42,
     0.42,
     0.42,
+    2.12,
     2.12,
     2.12
   ],
@@ -44,7 +44,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-09-03T15:08:07.723Z",
+  "last_verified_at": "2026-09-03T16:28:41.641Z",
   "why_it_matters": "Ratio > 1.0 means domestic buying fully cushions foreign outflows. Currently 1.30× — DII strength is the regime-defining variable for India equities.",
   "formula": "max(dii_equity_mtd, 0) / |min(fii_equity_mtd, 0)|. Returns ∞ if FII is net buyer (display 'N/A — FII net buyer').",
   "linked_metrics": [
@@ -52,7 +52,7 @@
     "dii_mtd"
   ],
   "data_origin": "live",
-  "last_live_fetch_at": "2026-09-03T15:08:07.723Z",
+  "last_live_fetch_at": "2026-09-03T16:28:41.641Z",
   "_source_count_actual": 2,
   "_history_state": "accruing"
 }
