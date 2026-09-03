@@ -127,27 +127,27 @@
       "last_attempted_at": "2026-09-03T16:28:43.187Z"
     },
     "gsec_curve": {
-      "last_success_at": "2026-09-03T13:34:25.851Z",
+      "last_success_at": "2026-09-03T17:08:06.581Z",
       "last_success_value": 6.97,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-07-01T16:07:41.069Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/india/government-bond-yield → 405 | llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters",
-      "last_attempted_at": "2026-09-03T13:34:25.851Z"
+      "last_attempted_at": "2026-09-03T17:08:06.581Z"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-09-03T13:34:25.857Z",
+      "last_success_at": "2026-09-03T17:08:06.585Z",
       "last_success_value": 2.52,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:34:25.857Z"
+      "last_attempted_at": "2026-09-03T17:08:06.585Z"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-09-03T13:34:26.101Z",
+      "last_success_at": "2026-09-03T17:08:06.633Z",
       "last_success_value": 316464.26,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:34:26.101Z",
+      "last_attempted_at": "2026-09-03T17:08:06.633Z",
       "last_failure_at": "2026-07-01T16:07:41.096Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:rbi_mmo_v1: https://tradingeconomics.com/india/money-supply-m3 → 405 | json_api:dbnomics_v1: No dbnomics config for banking_liquidity | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/indi"
     },
@@ -156,23 +156,23 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 2 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63 | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-03T13:34:28.728Z",
+      "last_success_at": "2026-09-03T17:08:08.531Z",
       "last_success_value": -48,
-      "last_attempted_at": "2026-09-03T13:34:28.728Z"
+      "last_attempted_at": "2026-09-03T17:08:08.531Z"
     },
     "inr_usd": {
-      "last_success_at": "2026-09-03T13:34:28.765Z",
-      "last_success_value": 94.461,
+      "last_success_at": "2026-09-03T17:08:08.582Z",
+      "last_success_value": 94.526,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:34:28.765Z"
+      "last_attempted_at": "2026-09-03T17:08:08.582Z"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-09-03T13:34:28.838Z",
-      "last_success_value": 223,
+      "last_success_at": "2026-09-03T17:08:08.824Z",
+      "last_success_value": 222,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:34:28.838Z",
+      "last_attempted_at": "2026-09-03T17:08:08.824Z",
       "last_failure_at": "2026-07-04T15:44:33.274Z",
       "last_failure_reason": "OLD DATA rejected: as_of 2026-06-26 is 8d old (> 7d allowance for Daily) — refusing to verify stale release"
     },
@@ -443,9 +443,9 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: google_news_llm: empty feed for \"India FPI FII deb",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-03T13:34:25.695Z",
+      "last_success_at": "2026-09-03T17:08:06.292Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-09-03T13:34:25.695Z"
+      "last_attempted_at": "2026-09-03T17:08:06.292Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-09-03T13:31:13.340Z",
@@ -558,5 +558,5 @@
     "red": 12,
     "total": 67
   },
-  "generated_at": "2026-09-03T16:28:43.189Z"
+  "generated_at": "2026-09-03T17:08:08.824Z"
 }
