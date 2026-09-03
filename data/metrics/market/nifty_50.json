@@ -4,18 +4,17 @@
   "display_subtitle": "NSE benchmark index",
   "section": "market",
   "sub_cluster": "equity",
-  "value": 23914.45,
+  "value": 23873.45,
   "unit": "Index",
   "value_format": "decimal_2",
-  "as_of": "2026-09-02T16:37:48.346Z",
+  "as_of": "2026-09-03T13:32:39.232Z",
   "as_of_period": "live",
-  "mom_pct": -2.85,
-  "yoy_pct": -3.24,
+  "mom_pct": -3.05,
+  "yoy_pct": -3.48,
   "vs_5y_avg_pct": 41.6,
   "sparkline_12m": [
     24175.65,
     24175.65,
-    24175.65,
     24080.4,
     24080.4,
     24080.4,
@@ -24,10 +23,11 @@
     24055.8,
     23914.45,
     23914.45,
-    23914.45
+    23914.45,
+    23873.45
   ],
   "baseline_30d": 22730,
-  "deviation_from_baseline_pct": 5.2,
+  "deviation_from_baseline_pct": 5,
   "status": "med",
   "shock_eligible": true,
   "shock_rule": "intraday move > 3% OR drawdown > 8% from rolling 60d high",
@@ -56,7 +56,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-09-02T16:37:48.350Z",
+  "last_verified_at": "2026-09-03T13:32:39.235Z",
   "why_it_matters": "The headline equity index. A market risk dashboard without Nifty is incomplete; the level + drawdown vs rolling high contextualise every other risk signal.",
   "formula": null,
   "trigger_thresholds": [
@@ -78,6 +78,6 @@
   ],
   "notes": "Live during market hours; we publish 15:30 IST close as canonical. 1D/1M/YTD percentages computed at fetch time.",
   "data_origin": "live",
-  "last_live_fetch_at": "2026-09-02T16:37:48.350Z",
+  "last_live_fetch_at": "2026-09-03T13:32:39.235Z",
   "_source_count_actual": 1
 }
