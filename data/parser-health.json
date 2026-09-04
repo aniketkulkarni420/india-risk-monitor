@@ -177,20 +177,20 @@
       "last_failure_reason": "OLD DATA rejected: as_of 2026-06-26 is 8d old (> 7d allowance for Daily) — refusing to verify stale release"
     },
     "high_yield_credit_spread": {
-      "last_success_at": "2026-09-03T13:34:30.028Z",
+      "last_success_at": "2026-09-04T12:35:51.971Z",
       "last_success_value": 172,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-05-14T11:31:00.945Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:crisil_v1: https://tradingeconomics.com/india/government-bond-yield: pattern not matched (selector tuning neede | llm:google_news_llm_v1: No google_news_llm config for high_yield_credit_spread",
-      "last_attempted_at": "2026-09-03T13:34:30.028Z"
+      "last_attempted_at": "2026-09-04T12:35:51.971Z"
     },
     "drewry_wci": {
-      "last_success_at": "2026-09-03T13:34:31.811Z",
-      "last_success_value": 4473,
+      "last_success_at": "2026-09-04T12:35:53.391Z",
+      "last_success_value": 4465,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:34:31.811Z",
+      "last_attempted_at": "2026-09-04T12:35:53.391Z",
       "last_failure_at": "2026-08-30T14:26:28.479Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:drewry_v1: https://www.drewry.co.uk/world-container-index-assessed-by-drewry → 429 | llm:google_news_llm_v1: drewry_wci: 2 candidates, none yielded value · https://news.google.com/rss/articles/CBMiqg"
     },
@@ -461,18 +461,18 @@
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:rbi_wss_v1: not registered | json_api:dbnomics_v1: No dbnomics config for fx_reserves",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-03T13:34:30.024Z",
-      "last_success_value": 729.3,
-      "last_attempted_at": "2026-09-03T13:34:30.024Z"
+      "last_success_at": "2026-09-04T12:35:51.966Z",
+      "last_success_value": 740.8,
+      "last_attempted_at": "2026-09-04T12:35:51.966Z"
     },
     "reservoir_levels": {
       "last_failure_at": "2026-09-03T13:34:31.968Z",
       "last_failure_reason": "tiered: all 1 tiers failed · llm:google_news_llm_v1: google_news_llm: empty feed for \"India reservoir storage level CWC percent capacity\"",
-      "consecutive_failures": 56,
-      "status": "red",
-      "last_success_at": "2026-07-14T10:56:50.632Z",
-      "last_success_value": 26,
-      "last_attempted_at": "2026-09-03T13:34:31.968Z"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-09-04T12:36:17.253Z",
+      "last_success_value": 56.76,
+      "last_attempted_at": "2026-09-04T12:36:17.253Z"
     },
     "fii_index_fut_positioning": {
       "last_attempted_at": "2026-09-03T16:28:41.993Z",
@@ -553,10 +553,10 @@
     }
   },
   "summary": {
-    "green": 52,
+    "green": 53,
     "amber": 2,
-    "red": 13,
+    "red": 12,
     "total": 67
   },
-  "generated_at": "2026-09-04T09:53:55.378Z"
+  "generated_at": "2026-09-04T12:36:17.253Z"
 }
