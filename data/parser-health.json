@@ -292,11 +292,11 @@
       "last_attempted_at": "2026-09-04T09:47:10.686Z"
     },
     "iip_growth": {
-      "last_success_at": "2026-09-03T13:34:36.875Z",
+      "last_success_at": "2026-09-05T08:27:15.348Z",
       "last_success_value": 6.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:34:36.875Z"
+      "last_attempted_at": "2026-09-05T08:27:15.348Z"
     },
     "wpi_inflation": {
       "last_success_at": "2026-06-05T14:08:46.466Z",
@@ -306,11 +306,11 @@
       "last_attempted_at": "2026-06-05T14:08:46.466Z"
     },
     "cpi_inflation": {
-      "last_success_at": "2026-09-03T13:34:36.965Z",
+      "last_success_at": "2026-09-05T08:27:15.554Z",
       "last_success_value": 4.45,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:34:36.965Z"
+      "last_attempted_at": "2026-09-05T08:27:15.554Z"
     },
     "naukri_jobspeak": {
       "last_success_at": "2026-06-11T12:00:34.465Z",
@@ -324,80 +324,80 @@
       "last_failure_reason": "tiered: all 4 tiers failed · pdf:eaindustry_ieci_v1: fetch failed | rss:publisher_rss_v1: publisher_rss_v1: 3 articles tried · https://indiancementreview.com/2026/09/ultratech-cement-expa: A | llm:google_news_llm_v1: google_news_llm: empty ",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-04T09:52:31.796Z",
+      "last_success_at": "2026-09-05T08:27:17.668Z",
       "last_success_value": 40.7,
-      "last_attempted_at": "2026-09-04T09:52:31.796Z"
+      "last_attempted_at": "2026-09-05T08:27:17.668Z"
     },
     "steel_consumption": {
-      "last_success_at": "2026-09-03T13:34:57.306Z",
+      "last_success_at": "2026-09-05T08:27:17.779Z",
       "last_success_value": 14.4,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:34:57.306Z"
+      "last_attempted_at": "2026-09-05T08:27:17.779Z"
     },
     "pmi_combined": {
-      "last_success_at": "2026-09-03T13:34:57.489Z",
+      "last_success_at": "2026-09-05T08:27:17.923Z",
       "last_success_value": 54.6,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:34:57.489Z"
+      "last_attempted_at": "2026-09-05T08:27:17.923Z"
     },
     "eway_bills": {
       "last_failure_at": "2026-09-04T09:47:52.608Z",
       "last_failure_reason": "eway_bills: 2 candidates, none yielded value · https://news.google.com/rss/articles/CBMiowFBVV95cUxQV282SFR: All LLM providers failed: groq: groq 404: {\"error\":{\"message\":\"The model `llama- | https://news.google.com/rss/articles/CBMizgFBVV9",
-      "consecutive_failures": 2,
-      "status": "amber",
-      "last_success_at": "2026-09-03T09:58:59.952Z",
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-09-05T08:27:32.160Z",
       "last_success_value": 136.76999999999998,
-      "last_attempted_at": "2026-09-04T09:47:52.608Z"
+      "last_attempted_at": "2026-09-05T08:27:32.160Z"
     },
     "fastag_toll": {
-      "last_failure_at": "2026-09-04T09:48:19.789Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · llm:google_news_llm_v1: fastag_toll: 6 candidates, none yielded value · https://news.google.com/rss/articles/CBMiqwFBVV95cUx | xlsx:npci_rps_v1: NPCI RPS: implausible FASTag value ₹752169.624634 Cr | rss:google_",
-      "consecutive_failures": 37,
+      "last_failure_at": "2026-09-05T08:27:47.998Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · llm:google_news_llm_v1: fastag_toll: 6 candidates, none yielded value · https://news.google.com/rss/articles/CBMiuAFBVV95cUx | xlsx:npci_rps_v1: NPCI RPS: implausible FASTag value ₹752169.624634 Cr | rss:google_",
+      "consecutive_failures": 38,
       "status": "red",
       "last_success_at": "2026-08-12T08:48:32.342Z",
       "last_success_value": 7143,
-      "last_attempted_at": "2026-09-04T09:48:19.789Z"
+      "last_attempted_at": "2026-09-05T08:27:47.998Z"
     },
     "rail_freight": {
       "last_failure_at": "2026-09-03T13:35:32.011Z",
       "last_failure_reason": "tiered: all 5 tiers failed · rss:google_news_rss_v1: google_news_rss: empty feed for \"Indian Railways freight loading million tonnes\" | llm:google_news_llm_v1: rail_freight: 6 candidates, none yielded value · https://news.google.com/rss/art",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-04T09:48:21.009Z",
-      "last_success_value": 141.3,
-      "last_attempted_at": "2026-09-04T09:48:21.009Z"
+      "last_success_at": "2026-09-05T08:27:48.526Z",
+      "last_success_value": 141,
+      "last_attempted_at": "2026-09-05T08:27:48.526Z"
     },
     "port_cargo": {
-      "last_failure_at": "2026-09-04T09:52:28.990Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: publisher_rss_v1: 2 articles tried · https://www.maritimegateway.com/voc-port-floats-rfp-for-feas: A | llm:google_news_llm_v1: port_cargo: 6 candidates, none yielded value · https://news.go",
-      "consecutive_failures": 34,
+      "last_failure_at": "2026-09-05T08:28:40.234Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: publisher_rss_v1: 5 articles tried · https://www.maritimegateway.com/sri-lanka-and-india-near-fin: A | llm:google_news_llm_v1: port_cargo: 6 candidates, none yielded value · https://news.go",
+      "consecutive_failures": 35,
       "status": "red",
       "last_success_at": "2026-08-13T10:21:08.717Z",
       "last_success_value": 60,
-      "last_attempted_at": "2026-09-04T09:52:28.990Z"
+      "last_attempted_at": "2026-09-05T08:28:40.234Z"
     },
     "fiscal_deficit_pct": {
-      "last_success_at": "2026-09-03T13:35:32.193Z",
+      "last_success_at": "2026-09-05T08:28:40.441Z",
       "last_success_value": 97.8,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:35:32.193Z"
+      "last_attempted_at": "2026-09-05T08:28:40.441Z"
     },
     "govt_capex_runrate": {
-      "last_success_at": "2026-09-03T13:35:32.218Z",
+      "last_success_at": "2026-09-05T08:28:40.464Z",
       "last_success_value": 102.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:35:32.218Z"
+      "last_attempted_at": "2026-09-05T08:28:40.464Z"
     },
     "credit_deposit_growth": {
-      "last_success_at": "2026-09-03T13:35:32.518Z",
+      "last_success_at": "2026-09-05T08:28:40.488Z",
       "last_success_value": 18.3,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-03T13:35:32.518Z"
+      "last_attempted_at": "2026-09-05T08:28:40.488Z"
     },
     "repo_rate": {
       "last_success_at": "2026-09-03T13:35:38.561Z",
@@ -553,10 +553,10 @@
     }
   },
   "summary": {
-    "green": 52,
-    "amber": 2,
+    "green": 53,
+    "amber": 1,
     "red": 13,
     "total": 67
   },
-  "generated_at": "2026-09-05T06:34:38.393Z"
+  "generated_at": "2026-09-05T08:28:40.488Z"
 }
