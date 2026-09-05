@@ -4,10 +4,10 @@
   "display_subtitle": "All-India, monthly · domestic + import",
   "section": "economy",
   "sub_cluster": "tax_demand",
-  "value": 200000,
+  "value": 199000,
   "unit": "₹ Cr",
   "value_format": "currency_inr_cr",
-  "as_of": "2026-09-01T20:15:00.000Z",
+  "as_of": "2026-09-02T01:18:00.000Z",
   "as_of_period": "monthly",
   "mom_pct": 0,
   "yoy_pct": 28.04,
@@ -20,11 +20,11 @@
     211000,
     211000,
     211000,
-    211000,
     200000,
     200000,
     200000,
-    200000
+    200000,
+    199000
   ],
   "baseline_30d": null,
   "deviation_from_baseline_pct": null,
@@ -58,7 +58,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-09-03T13:34:32.397Z",
+  "last_verified_at": "2026-09-05T12:38:08.494Z",
   "why_it_matters": "GST collection is the cleanest real-time read on nominal demand and formal economy activity. Released 1st of every month with single-day lag — earlier than IIP, more frequent than CPI.",
   "formula": null,
   "linked_metrics": [
@@ -70,7 +70,7 @@
   "notes": "Drawer shows split: domestic collection vs imports, CGST/SGST/IGST/Cess composition, and YoY growth by major state.",
   "_unit_fix": "2026-05-28 · relabeled Lakh Cr→Cr to match parser output (parsers emit crore); converted 6 stale lakh-crore sparkline entries ×100000",
   "data_origin": "primary",
-  "last_live_fetch_at": "2026-09-03T13:34:32.397Z",
+  "last_live_fetch_at": "2026-09-05T12:38:08.494Z",
   "_history_state": "accruing",
   "_source_count_actual": 1,
   "_reliability_optimized_at": "2026-06-19T06:11:27.905Z"
