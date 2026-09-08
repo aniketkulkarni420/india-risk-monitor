@@ -757,7 +757,27 @@
         "json_api:hormuz_watch_v1"
       ],
       "reason": "google_news_llm_v1=confident(0.13), hormuz_multitracker_v1=dead(0.27), hormuz_v1=dead(0.00), hormuz_watch_v1=dead(0.00)"
+    },
+    {
+      "ts": "2026-09-08T05:31:54.770Z",
+      "metric_id": "fastag_toll",
+      "action": "reorder+quarantine",
+      "from": [
+        "llm:google_news_llm_v1",
+        "xlsx:npci_rps_v1",
+        "rss:google_news_rss_v1"
+      ],
+      "to": [
+        "xlsx:npci_rps_v1",
+        "llm:google_news_llm_v1",
+        "rss:google_news_rss_v1"
+      ],
+      "quarantined": [
+        "llm:google_news_llm_v1",
+        "rss:google_news_rss_v1"
+      ],
+      "reason": "npci_rps_v1=confident(0.03), google_news_llm_v1=dead(0.03), google_news_rss_v1=dead(0.00)"
     }
   ],
-  "last_run": "2026-09-07T05:34:47.173Z"
+  "last_run": "2026-09-08T05:31:54.770Z"
 }
