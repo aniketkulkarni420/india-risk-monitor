@@ -509,8 +509,8 @@
       "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: in cooldown | html_render:web_llm_v1: in cooldown"
     },
     "net_sip_inflows": {
-      "last_attempted_at": "2026-09-10T13:36:08.128Z",
-      "last_success_at": "2026-09-10T13:36:08.128Z",
+      "last_attempted_at": "2026-09-12T08:43:36.450Z",
+      "last_success_at": "2026-09-12T08:43:36.450Z",
       "last_success_value": 32297,
       "consecutive_failures": 0,
       "status": "green",
@@ -518,20 +518,20 @@
       "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: google_news_rss: 67 items, none matched · tried: Smallcap funds stand out with 55% SIP penetration,  | llm:google_news_llm_v1: net_sip_inflows: 3 candidates, none yielded value · https://"
     },
     "mf_net_equity_flows": {
-      "last_attempted_at": "2026-09-10T13:36:09.666Z",
-      "last_success_at": "2026-09-10T13:36:09.666Z",
+      "last_attempted_at": "2026-09-12T08:43:38.235Z",
+      "last_success_at": "2026-09-12T08:43:38.235Z",
       "last_success_value": 29328.62,
       "consecutive_failures": 0,
       "status": "green"
     },
     "core_cpi": {
-      "last_attempted_at": "2026-09-10T13:36:24.558Z",
+      "last_attempted_at": "2026-09-12T08:44:00.500Z",
       "last_failure_at": "2026-09-10T13:36:24.558Z",
       "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: google_news_rss: 58 items, none matched · tried:  | llm:google_news_llm_v1: core_cpi: 5 candidates, none yielded value · https://news.google.com/rss/articles/CBMiiAJBVV95cUxQZG",
-      "consecutive_failures": 47,
-      "status": "red",
-      "last_success_at": "2026-07-30T11:21:14.872Z",
-      "last_success_value": 3
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-09-12T08:44:00.500Z",
+      "last_success_value": 4
     },
     "eight_core_industries": {
       "last_attempted_at": "2026-09-10T13:36:26.052Z",
@@ -553,10 +553,10 @@
     }
   },
   "summary": {
-    "green": 55,
+    "green": 56,
     "amber": 2,
-    "red": 10,
+    "red": 9,
     "total": 67
   },
-  "generated_at": "2026-09-12T06:45:18.667Z"
+  "generated_at": "2026-09-12T08:44:00.500Z"
 }
