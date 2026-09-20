@@ -534,22 +534,22 @@
       "last_success_value": 4
     },
     "eight_core_industries": {
-      "last_attempted_at": "2026-09-19T17:24:08.028Z",
+      "last_attempted_at": "2026-09-20T09:25:35.171Z",
       "last_success_at": "2026-07-20T07:42:55.592Z",
       "last_success_value": 0.5,
-      "consecutive_failures": 67,
+      "consecutive_failures": 68,
       "status": "red",
-      "last_failure_at": "2026-09-19T17:24:08.028Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · xlsx:ici_xlsx_v1: in cooldown | rss:pib_rss_v1: in cooldown | llm:google_news_llm_v1: in cooldown"
+      "last_failure_at": "2026-09-20T09:25:35.171Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · xlsx:ici_xlsx_v1: ICI XLSX link not found on eaindustry.nic.in | rss:pib_rss_v1: No pib_rss config for eight_core_industries | llm:google_news_llm_v1: No google_news_llm config for eight_core_industries"
     },
     "epfo_payrolls": {
-      "last_attempted_at": "2026-09-19T17:24:08.029Z",
+      "last_attempted_at": "2026-09-20T09:25:52.378Z",
       "last_success_at": "2026-08-20T05:06:48.587Z",
       "last_success_value": 19.29,
-      "consecutive_failures": 33,
+      "consecutive_failures": 34,
       "status": "red",
-      "last_failure_at": "2026-09-19T17:24:08.029Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · llm:google_news_llm_v1: in cooldown | rss:google_news_rss_v1: in cooldown | rss:pib_rss_v1: in cooldown"
+      "last_failure_at": "2026-09-20T09:25:52.378Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · llm:google_news_llm_v1: epfo_payrolls: 1 candidates, none yielded value · https://news.google.com/rss/articles/CBMikgFBVV95c | rss:google_news_rss_v1: google_news_rss: 91 items, none matched · tried: EPFO net me"
     }
   },
   "summary": {
@@ -558,5 +558,5 @@
     "red": 13,
     "total": 67
   },
-  "generated_at": "2026-09-20T07:19:56.579Z"
+  "generated_at": "2026-09-20T09:25:52.378Z"
 }
