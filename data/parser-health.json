@@ -127,27 +127,27 @@
       "last_attempted_at": "2026-09-25T17:15:52.185Z"
     },
     "gsec_curve": {
-      "last_success_at": "2026-09-25T18:02:17.543Z",
+      "last_success_at": "2026-09-25T18:33:23.319Z",
       "last_success_value": 7.11,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-07-01T16:07:41.069Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/india/government-bond-yield → 405 | llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters",
-      "last_attempted_at": "2026-09-25T18:02:17.543Z"
+      "last_attempted_at": "2026-09-25T18:33:23.319Z"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-09-25T18:02:17.759Z",
+      "last_success_at": "2026-09-25T18:33:23.356Z",
       "last_success_value": 2.29,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-25T18:02:17.759Z"
+      "last_attempted_at": "2026-09-25T18:33:23.356Z"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-09-25T18:02:18.108Z",
+      "last_success_at": "2026-09-25T18:33:23.423Z",
       "last_success_value": 332216.48,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-25T18:02:18.108Z",
+      "last_attempted_at": "2026-09-25T18:33:23.423Z",
       "last_failure_at": "2026-07-01T16:07:41.096Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:rbi_mmo_v1: https://tradingeconomics.com/india/money-supply-m3 → 405 | json_api:dbnomics_v1: No dbnomics config for banking_liquidity | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/indi"
     },
@@ -156,23 +156,23 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 2 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63 | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-25T18:02:20.692Z",
+      "last_success_at": "2026-09-25T18:33:26.007Z",
       "last_success_value": -38,
-      "last_attempted_at": "2026-09-25T18:02:20.692Z"
+      "last_attempted_at": "2026-09-25T18:33:26.007Z"
     },
     "inr_usd": {
-      "last_success_at": "2026-09-25T18:02:20.773Z",
-      "last_success_value": 95.884,
+      "last_success_at": "2026-09-25T18:33:26.509Z",
+      "last_success_value": 95.883,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-25T18:02:20.773Z"
+      "last_attempted_at": "2026-09-25T18:33:26.509Z"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-09-25T18:02:20.833Z",
+      "last_success_at": "2026-09-25T18:33:26.811Z",
       "last_success_value": 191,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-25T18:02:20.833Z",
+      "last_attempted_at": "2026-09-25T18:33:26.811Z",
       "last_failure_at": "2026-07-04T15:44:33.274Z",
       "last_failure_reason": "OLD DATA rejected: as_of 2026-06-26 is 8d old (> 7d allowance for Daily) — refusing to verify stale release"
     },
@@ -439,13 +439,13 @@
       "last_attempted_at": "2026-09-25T17:15:50.512Z"
     },
     "fpi_debt_flows": {
-      "last_failure_at": "2026-09-25T18:02:17.341Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: google_news_llm: 1 items, none passed filters | ht",
-      "consecutive_failures": 1,
+      "last_failure_at": "2026-09-25T18:33:23.148Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: in cooldown | html_render:moneycontrol_v1: in cool",
+      "consecutive_failures": 2,
       "status": "amber",
       "last_success_at": "2026-09-25T12:08:30.329Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-09-25T18:02:17.341Z"
+      "last_attempted_at": "2026-09-25T18:33:23.148Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-09-25T09:02:40.394Z",
@@ -558,5 +558,5 @@
     "red": 12,
     "total": 67
   },
-  "generated_at": "2026-09-25T18:02:20.833Z"
+  "generated_at": "2026-09-25T18:33:26.811Z"
 }
