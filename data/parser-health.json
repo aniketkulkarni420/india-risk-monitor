@@ -156,9 +156,9 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 2 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63 | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-25T18:33:26.007Z",
+      "last_success_at": "2026-09-26T11:42:57.761Z",
       "last_success_value": -38,
-      "last_attempted_at": "2026-09-25T18:33:26.007Z"
+      "last_attempted_at": "2026-09-26T11:42:57.761Z"
     },
     "inr_usd": {
       "last_success_at": "2026-09-25T18:33:26.509Z",
@@ -204,11 +204,11 @@
       "last_attempted_at": "2026-06-11T11:58:11.498Z"
     },
     "india_crude_basket": {
-      "last_success_at": "2026-09-26T06:57:11.327Z",
+      "last_success_at": "2026-09-26T11:44:15.631Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-09-26T06:57:11.327Z"
+      "last_attempted_at": "2026-09-26T11:44:15.631Z"
     },
     "gst_gross": {
       "last_failure_at": "2026-05-11T05:00:21.341Z",
@@ -274,22 +274,22 @@
       "last_attempted_at": "2026-06-11T12:00:26.546Z"
     },
     "pol_demand": {
-      "last_failure_at": "2026-09-25T12:06:55.724Z",
+      "last_failure_at": "2026-09-26T11:43:01.481Z",
       "last_failure_reason": "ppac_v1: PT_Consumption PDF link not found on index",
-      "consecutive_failures": 160,
+      "consecutive_failures": 161,
       "status": "red",
       "last_success_at": "2026-06-16T14:30:11.738Z",
       "last_success_value": 19.47,
-      "last_attempted_at": "2026-09-25T12:06:55.724Z"
+      "last_attempted_at": "2026-09-26T11:43:01.481Z"
     },
     "air_pax": {
       "last_failure_at": "2026-08-09T09:53:12.206Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:dgca_v1: air_pax: all sources failed [https://www.business-standard.com/topic/domestic-air-passenger-traffic: | llm:google_news_llm_v1: air_pax: 4 candidates, none yielded value · https://news.goog",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-25T12:06:58.237Z",
+      "last_success_at": "2026-09-26T11:43:02.226Z",
       "last_success_value": 132.67,
-      "last_attempted_at": "2026-09-25T12:06:58.237Z"
+      "last_attempted_at": "2026-09-26T11:43:02.226Z"
     },
     "iip_growth": {
       "last_success_at": "2026-09-25T09:04:55.048Z",
@@ -324,9 +324,9 @@
       "last_failure_reason": "tiered: all 4 tiers failed · pdf:eaindustry_ieci_v1: fetch failed | rss:publisher_rss_v1: publisher_rss_v1: 3 articles tried · https://indiancementreview.com/2026/09/ultratech-cement-expa: A | llm:google_news_llm_v1: google_news_llm: empty ",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-25T12:07:07.392Z",
+      "last_success_at": "2026-09-26T11:44:09.335Z",
       "last_success_value": 40.7,
-      "last_attempted_at": "2026-09-25T12:07:07.392Z"
+      "last_attempted_at": "2026-09-26T11:44:09.335Z"
     },
     "steel_consumption": {
       "last_success_at": "2026-09-25T09:04:57.755Z",
@@ -343,40 +343,40 @@
       "last_attempted_at": "2026-09-25T09:04:57.896Z"
     },
     "eway_bills": {
-      "last_failure_at": "2026-09-25T12:06:59.620Z",
+      "last_failure_at": "2026-09-26T11:43:03.426Z",
       "last_failure_reason": "google_news_llm: 71 items, none passed filters",
-      "consecutive_failures": 17,
+      "consecutive_failures": 18,
       "status": "red",
       "last_success_at": "2026-09-13T12:49:12.622Z",
       "last_success_value": 139.8,
-      "last_attempted_at": "2026-09-25T12:06:59.620Z"
+      "last_attempted_at": "2026-09-26T11:43:03.426Z"
     },
     "fastag_toll": {
       "last_failure_at": "2026-09-19T13:07:29.294Z",
       "last_failure_reason": "tiered: all 3 tiers failed · xlsx:npci_rps_v1: NPCI RPS XLSX HTTP 504 | llm:google_news_llm_v1: fastag_toll: 6 candidates, none yielded value · https://news.google.com/rss/articles/CBMipgFBVV95cUx | rss:google_news_rss_v1: google_news_rss: ",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-25T12:07:02.845Z",
+      "last_success_at": "2026-09-26T11:43:13.154Z",
       "last_success_value": 7592.9,
-      "last_attempted_at": "2026-09-25T12:07:02.845Z"
+      "last_attempted_at": "2026-09-26T11:43:13.154Z"
     },
     "rail_freight": {
       "last_failure_at": "2026-09-03T13:35:32.011Z",
       "last_failure_reason": "tiered: all 5 tiers failed · rss:google_news_rss_v1: google_news_rss: empty feed for \"Indian Railways freight loading million tonnes\" | llm:google_news_llm_v1: rail_freight: 6 candidates, none yielded value · https://news.google.com/rss/art",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-25T12:07:04.202Z",
+      "last_success_at": "2026-09-26T11:43:14.300Z",
       "last_success_value": 137.9,
-      "last_attempted_at": "2026-09-25T12:07:04.202Z"
+      "last_attempted_at": "2026-09-26T11:43:14.300Z"
     },
     "port_cargo": {
-      "last_failure_at": "2026-09-25T12:07:04.695Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: in cooldown | llm:google_news_llm_v1: in cooldown | html_render:web_llm_v1: in cooldown",
-      "consecutive_failures": 67,
+      "last_failure_at": "2026-09-26T11:44:06.574Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: publisher_rss_v1: 5 articles tried · https://www.maritimegateway.com/centre-approves-rs-13-crore-: A | llm:google_news_llm_v1: port_cargo: 6 candidates, none yielded value · https://news.go",
+      "consecutive_failures": 68,
       "status": "red",
       "last_success_at": "2026-08-13T10:21:08.717Z",
       "last_success_value": 60,
-      "last_attempted_at": "2026-09-25T12:07:04.695Z"
+      "last_attempted_at": "2026-09-26T11:44:06.574Z"
     },
     "fiscal_deficit_pct": {
       "last_success_at": "2026-09-25T09:06:46.283Z",
@@ -434,18 +434,18 @@
       "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: This operation was aborted | llm:google_news_llm_v1: block_deals_notional: 5 candidates, none yielded value · https://news.google.com/rss/articles/CBMi0A | html_render:bse_v1: bse_v1: all 2 ",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-09-25T17:15:50.512Z",
+      "last_success_at": "2026-09-26T11:44:16.522Z",
       "last_success_value": 2682.6,
-      "last_attempted_at": "2026-09-25T17:15:50.512Z"
+      "last_attempted_at": "2026-09-26T11:44:16.522Z"
     },
     "fpi_debt_flows": {
       "last_failure_at": "2026-09-25T18:33:23.148Z",
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: in cooldown | html_render:moneycontrol_v1: in cool",
-      "consecutive_failures": 2,
-      "status": "amber",
-      "last_success_at": "2026-09-25T12:08:30.329Z",
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-09-26T11:45:17.569Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-09-25T18:33:23.148Z"
+      "last_attempted_at": "2026-09-26T11:45:17.569Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-09-26T06:57:04.215Z",
@@ -553,10 +553,10 @@
     }
   },
   "summary": {
-    "green": 53,
-    "amber": 1,
+    "green": 54,
+    "amber": 0,
     "red": 13,
     "total": 67
   },
-  "generated_at": "2026-09-26T06:57:11.327Z"
+  "generated_at": "2026-09-26T11:45:17.569Z"
 }
