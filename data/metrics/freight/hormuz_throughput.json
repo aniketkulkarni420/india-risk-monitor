@@ -41,8 +41,8 @@
     "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "llm:google_news_llm_v1",
       "html_scrape:hormuz_multitracker_v1",
+      "llm:google_news_llm_v1",
       "html_scrape:hormuz_v1",
       "json_api:hormuz_watch_v1"
     ]
@@ -122,5 +122,5 @@
       "hormuzmonitor.com: All LLM providers failed: groq: groq 404: {\"error\":{\"message\":\"The model `llama-"
     ]
   },
-  "_reliability_optimized_at": "2026-09-07T05:34:47.173Z"
+  "_reliability_optimized_at": "2026-09-28T06:13:49.587Z"
 }
