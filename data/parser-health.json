@@ -156,9 +156,9 @@
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: in cooldown | llm:google_news_llm_v1: in cooldown",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-10-10T10:09:52.246Z",
+      "last_success_at": "2026-10-10T13:55:49.640Z",
       "last_success_value": -20,
-      "last_attempted_at": "2026-10-10T10:09:52.246Z"
+      "last_attempted_at": "2026-10-10T13:55:49.640Z"
     },
     "inr_usd": {
       "last_success_at": "2026-10-10T10:09:52.273Z",
@@ -204,11 +204,11 @@
       "last_attempted_at": "2026-06-11T11:58:11.498Z"
     },
     "india_crude_basket": {
-      "last_success_at": "2026-10-10T10:05:27.892Z",
+      "last_success_at": "2026-10-10T13:59:56.583Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-10-10T10:05:27.892Z"
+      "last_attempted_at": "2026-10-10T13:59:56.583Z"
     },
     "gst_gross": {
       "last_failure_at": "2026-05-11T05:00:21.341Z",
@@ -274,22 +274,22 @@
       "last_attempted_at": "2026-06-11T12:00:26.546Z"
     },
     "pol_demand": {
-      "last_failure_at": "2026-10-10T10:10:00.283Z",
+      "last_failure_at": "2026-10-10T13:55:53.812Z",
       "last_failure_reason": "ppac_v1: PT_Consumption PDF link not found on index",
-      "consecutive_failures": 199,
+      "consecutive_failures": 200,
       "status": "red",
       "last_success_at": "2026-06-16T14:30:11.738Z",
       "last_success_value": 19.47,
-      "last_attempted_at": "2026-10-10T10:10:00.283Z"
+      "last_attempted_at": "2026-10-10T13:55:53.812Z"
     },
     "air_pax": {
       "last_failure_at": "2026-08-09T09:53:12.206Z",
       "last_failure_reason": "tiered: all 2 tiers failed · press_release:dgca_v1: air_pax: all sources failed [https://www.business-standard.com/topic/domestic-air-passenger-traffic: | llm:google_news_llm_v1: air_pax: 4 candidates, none yielded value · https://news.goog",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-10-10T10:10:00.424Z",
+      "last_success_at": "2026-10-10T13:55:54.397Z",
       "last_success_value": 132.67,
-      "last_attempted_at": "2026-10-10T10:10:00.424Z"
+      "last_attempted_at": "2026-10-10T13:55:54.397Z"
     },
     "iip_growth": {
       "last_success_at": "2026-09-28T10:08:46.046Z",
@@ -326,9 +326,9 @@
       "last_failure_reason": "tiered: all 4 tiers failed · pdf:eaindustry_ieci_v1: fetch failed | rss:publisher_rss_v1: publisher_rss_v1: 5 articles tried · https://indiancementreview.com/2026/10/cement-prices-rise-rs: A | llm:google_news_llm_v1: google_news_llm: 62 ite",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-10-10T10:10:02.862Z",
+      "last_success_at": "2026-10-10T13:59:49.956Z",
       "last_success_value": 40.7,
-      "last_attempted_at": "2026-10-10T10:10:02.862Z"
+      "last_attempted_at": "2026-10-10T13:59:49.956Z"
     },
     "steel_consumption": {
       "last_success_at": "2026-10-10T10:10:02.977Z",
@@ -349,36 +349,36 @@
       "last_failure_reason": "eway_bills: 2 candidates, none yielded value · https://news.google.com/rss/articles/CBMi3AFBVV95cUxPNFhlaGt: All LLM providers failed: groq: groq 404: {\"error\":{\"message\":\"The model `llama- | https://news.google.com/rss/articles/CBMijAFBVV9",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-10-10T10:10:18.380Z",
-      "last_success_value": 141.5,
-      "last_attempted_at": "2026-10-10T10:10:18.380Z"
+      "last_success_at": "2026-10-10T13:59:45.327Z",
+      "last_success_value": 139.07999999999998,
+      "last_attempted_at": "2026-10-10T13:59:45.327Z"
     },
     "fastag_toll": {
-      "last_failure_at": "2026-10-10T10:12:10.707Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · xlsx:npci_rps_v1: NPCI RPS list API HTTP 403 | llm:google_news_llm_v1: fastag_toll: 6 candidates, none yielded value · https://news.google.com/rss/articles/CBMipgFBVV95cUx | rss:google_news_rss_v1: google_news_r",
-      "consecutive_failures": 2,
-      "status": "amber",
+      "last_failure_at": "2026-10-10T13:59:45.906Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · xlsx:npci_rps_v1: NPCI RPS list API HTTP 403 | llm:google_news_llm_v1: in cooldown | rss:google_news_rss_v1: in cooldown",
+      "consecutive_failures": 3,
+      "status": "red",
       "last_success_at": "2026-10-08T16:25:25.279Z",
       "last_success_value": 7592.9,
-      "last_attempted_at": "2026-10-10T10:12:10.707Z"
+      "last_attempted_at": "2026-10-10T13:59:45.906Z"
     },
     "rail_freight": {
       "last_failure_at": "2026-09-03T13:35:32.011Z",
       "last_failure_reason": "tiered: all 5 tiers failed · rss:google_news_rss_v1: google_news_rss: empty feed for \"Indian Railways freight loading million tonnes\" | llm:google_news_llm_v1: rail_freight: 6 candidates, none yielded value · https://news.google.com/rss/art",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-10-10T10:12:11.243Z",
+      "last_success_at": "2026-10-10T13:59:46.977Z",
       "last_success_value": 120.76,
-      "last_attempted_at": "2026-10-10T10:12:11.243Z"
+      "last_attempted_at": "2026-10-10T13:59:46.977Z"
     },
     "port_cargo": {
-      "last_failure_at": "2026-10-10T10:12:57.978Z",
-      "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: publisher_rss_v1: 2 articles tried · https://www.maritimegateway.com/indias-1-trillion-exports-ta: A | llm:google_news_llm_v1: port_cargo: 6 candidates, none yielded value · https://news.go",
-      "consecutive_failures": 106,
+      "last_failure_at": "2026-10-10T13:59:47.340Z",
+      "last_failure_reason": "tiered: all 3 tiers failed · rss:publisher_rss_v1: in cooldown | llm:google_news_llm_v1: in cooldown | html_render:web_llm_v1: in cooldown",
+      "consecutive_failures": 107,
       "status": "red",
       "last_success_at": "2026-08-13T10:21:08.717Z",
       "last_success_value": 60,
-      "last_attempted_at": "2026-10-10T10:12:57.978Z"
+      "last_attempted_at": "2026-10-10T13:59:47.340Z"
     },
     "fiscal_deficit_pct": {
       "last_success_at": "2026-10-10T10:12:58.110Z",
@@ -432,22 +432,22 @@
       "last_attempted_at": "2026-06-11T12:00:35.421Z"
     },
     "block_deals_notional": {
-      "last_failure_at": "2026-10-10T10:08:14.058Z",
-      "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: nse_api_v1: block_deals_notional — no extractable value from https://www.nseindia.com/api/block-deal | llm:google_news_llm_v1: block_deals_notional: 5 candidates, none yielded value · https:",
-      "consecutive_failures": 4,
+      "last_failure_at": "2026-10-10T13:59:56.956Z",
+      "last_failure_reason": "tiered: all 4 tiers failed · json_api:nse_api_v1: in cooldown | llm:google_news_llm_v1: in cooldown | html_render:bse_v1: in cooldown",
+      "consecutive_failures": 5,
       "status": "red",
       "last_success_at": "2026-10-08T18:53:05.132Z",
       "last_success_value": 861,
-      "last_attempted_at": "2026-10-10T10:08:14.058Z"
+      "last_attempted_at": "2026-10-10T13:59:56.956Z"
     },
     "fpi_debt_flows": {
       "last_failure_at": "2026-09-26T17:54:57.329Z",
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: google_news_llm: 1 items, none passed filters | ht",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-10-10T10:09:49.737Z",
+      "last_success_at": "2026-10-10T14:01:13.880Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-10-10T10:09:49.737Z"
+      "last_attempted_at": "2026-10-10T14:01:13.880Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-10-10T10:04:54.644Z",
@@ -556,9 +556,9 @@
   },
   "summary": {
     "green": 54,
-    "amber": 1,
-    "red": 12,
+    "amber": 0,
+    "red": 13,
     "total": 67
   },
-  "generated_at": "2026-10-10T10:13:18.896Z"
+  "generated_at": "2026-10-10T14:01:13.880Z"
 }
