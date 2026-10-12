@@ -127,52 +127,52 @@
       "last_attempted_at": "2026-10-12T21:19:08.655Z"
     },
     "gsec_curve": {
-      "last_success_at": "2026-10-12T18:58:12.482Z",
+      "last_success_at": "2026-10-12T21:50:25.039Z",
       "last_success_value": 7.39,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-07-01T16:07:41.069Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/india/government-bond-yield → 405 | llm:google_news_llm_v1: google_news_llm: 100 items, none passed filters",
-      "last_attempted_at": "2026-10-12T18:58:12.482Z"
+      "last_attempted_at": "2026-10-12T21:50:25.039Z"
     },
     "real_10y_yield": {
-      "last_success_at": "2026-10-12T18:58:12.485Z",
-      "last_success_value": 2.57,
+      "last_success_at": "2026-10-12T21:50:25.047Z",
+      "last_success_value": 1.85,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-10-12T18:58:12.485Z"
+      "last_attempted_at": "2026-10-12T21:50:25.047Z"
     },
     "banking_liquidity": {
-      "last_success_at": "2026-10-12T18:58:12.593Z",
+      "last_success_at": "2026-10-12T21:50:25.148Z",
       "last_success_value": 337664.75,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-10-12T18:58:12.593Z",
+      "last_attempted_at": "2026-10-12T21:50:25.148Z",
       "last_failure_at": "2026-07-01T16:07:41.096Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:rbi_mmo_v1: https://tradingeconomics.com/india/money-supply-m3 → 405 | json_api:dbnomics_v1: No dbnomics config for banking_liquidity | html_scrape:tradingeconomics_v1: https://tradingeconomics.com/indi"
     },
     "wacr_repo_spread": {
-      "last_failure_at": "2026-10-12T18:58:16.393Z",
+      "last_failure_at": "2026-10-12T21:50:27.574Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:rbi_mmo_daily_v1: rbi_mmo_daily_v1: 2 URLs failed · https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63 | llm:google_news_llm_v1: in cooldown",
-      "consecutive_failures": 2,
-      "status": "amber",
+      "consecutive_failures": 3,
+      "status": "red",
       "last_success_at": "2026-10-11T19:10:34.317Z",
       "last_success_value": -20,
-      "last_attempted_at": "2026-10-12T18:58:16.393Z"
+      "last_attempted_at": "2026-10-12T21:50:27.574Z"
     },
     "inr_usd": {
-      "last_success_at": "2026-10-12T18:58:18.043Z",
-      "last_success_value": 95.973,
+      "last_success_at": "2026-10-12T21:50:27.678Z",
+      "last_success_value": 95.986,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-10-12T18:58:18.043Z"
+      "last_attempted_at": "2026-10-12T21:50:27.678Z"
     },
     "ind_us_10y_spread": {
-      "last_success_at": "2026-10-12T18:58:18.202Z",
+      "last_success_at": "2026-10-12T21:50:27.907Z",
       "last_success_value": 215,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-10-12T18:58:18.202Z",
+      "last_attempted_at": "2026-10-12T21:50:27.907Z",
       "last_failure_at": "2026-09-29T15:42:49.990Z",
       "last_failure_reason": "OLD DATA rejected: as_of 2026-09-03 is 26d old (> 7d allowance for Daily) — refusing to verify stale release"
     },
@@ -445,9 +445,9 @@
       "last_failure_reason": "tiered: all 4 tiers failed · html_render:playwright_render_v1: fpi_debt_flows: playwright failed [https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx: page.goto:  | llm:google_news_llm_v1: google_news_llm: 1 items, none passed filters | ht",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-10-12T18:57:58.296Z",
+      "last_success_at": "2026-10-12T21:50:24.718Z",
       "last_success_value": 1,
-      "last_attempted_at": "2026-10-12T18:57:58.296Z"
+      "last_attempted_at": "2026-10-12T21:50:24.718Z"
     },
     "vlcc_tanker_rates": {
       "last_failure_at": "2026-10-12T18:55:22.801Z",
@@ -556,9 +556,9 @@
   },
   "summary": {
     "green": 51,
-    "amber": 2,
-    "red": 14,
+    "amber": 1,
+    "red": 15,
     "total": 67
   },
-  "generated_at": "2026-10-12T21:19:08.656Z"
+  "generated_at": "2026-10-12T21:50:27.907Z"
 }
