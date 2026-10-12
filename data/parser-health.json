@@ -511,26 +511,26 @@
       "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: in cooldown | html_render:web_llm_v1: in cooldown"
     },
     "net_sip_inflows": {
-      "last_attempted_at": "2026-10-11T19:12:05.400Z",
-      "last_success_at": "2026-10-11T10:20:54.006Z",
-      "last_success_value": 32297,
-      "consecutive_failures": 2,
-      "status": "amber",
+      "last_attempted_at": "2026-10-12T12:16:04.109Z",
+      "last_success_at": "2026-10-12T12:16:04.109Z",
+      "last_success_value": 32490,
+      "consecutive_failures": 0,
+      "status": "green",
       "last_failure_at": "2026-10-11T19:12:05.400Z",
       "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: google_news_rss: 52 items, none matched · tried: SIP Inflows at Record Rs 32,297 Cr: Can Weak Return | llm:google_news_llm_v1: net_sip_inflows: 5 candidates, none yielded value · https://"
     },
     "mf_net_equity_flows": {
-      "last_attempted_at": "2026-10-11T19:12:08.627Z",
-      "last_success_at": "2026-10-11T19:12:08.627Z",
-      "last_success_value": 29328.62,
+      "last_attempted_at": "2026-10-12T12:16:05.686Z",
+      "last_success_at": "2026-10-12T12:16:05.686Z",
+      "last_success_value": 38306.55,
       "consecutive_failures": 0,
       "status": "green"
     },
     "core_cpi": {
-      "last_attempted_at": "2026-10-11T19:12:15.247Z",
-      "last_failure_at": "2026-10-11T19:12:15.247Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: core_cpi: 2 candidates, none yielded value · https://news.google.com/rss/articles/CBMivgFBVV95cUxOVG | rss:google_news_rss_v1: google_news_rss: 66 items, none matched · tried: ",
-      "consecutive_failures": 49,
+      "last_attempted_at": "2026-10-12T12:16:12.137Z",
+      "last_failure_at": "2026-10-12T12:16:12.137Z",
+      "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: core_cpi: 3 candidates, none yielded value · https://news.google.com/rss/articles/CBMivgFBVV95cUxOVG | rss:google_news_rss_v1: google_news_rss: 69 items, none matched · tried: ",
+      "consecutive_failures": 50,
       "status": "red",
       "last_success_at": "2026-09-12T08:44:00.500Z",
       "last_success_value": 4
@@ -555,10 +555,10 @@
     }
   },
   "summary": {
-    "green": 51,
-    "amber": 3,
+    "green": 52,
+    "amber": 2,
     "red": 13,
     "total": 67
   },
-  "generated_at": "2026-10-12T08:24:05.710Z"
+  "generated_at": "2026-10-12T12:16:12.137Z"
 }
