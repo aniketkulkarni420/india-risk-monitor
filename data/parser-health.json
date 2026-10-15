@@ -3,10 +3,10 @@
     "hormuz_throughput": {
       "last_success_at": "2026-10-04T07:39:25.438Z",
       "last_success_value": 1,
-      "consecutive_failures": 54,
+      "consecutive_failures": 55,
       "status": "red",
-      "last_attempted_at": "2026-10-15T05:55:49.711Z",
-      "last_failure_at": "2026-10-15T05:55:49.711Z",
+      "last_attempted_at": "2026-10-15T06:49:41.068Z",
+      "last_failure_at": "2026-10-15T06:49:41.068Z",
       "last_failure_reason": "tiered: all 4 tiers failed · html_scrape:hormuz_multitracker_v1: in cooldown | llm:google_news_llm_v1: in cooldown | html_scrape:hormuz_v1: in cooldown"
     },
     "baltic_dry_index": {
@@ -19,40 +19,40 @@
       "last_failure_reason": "tiered: all 3 tiers failed · html_scrape:tradingeconomics_v1: https://tradingeconomics.com/commodity/baltic → 405 | json_api:dbnomics_v1: No dbnomics config for baltic_dry_index | llm:google_news_llm_v1: google_news_llm: 27 items, none pass"
     },
     "brent_crude": {
-      "last_success_at": "2026-10-15T05:55:49.957Z",
-      "last_success_value": 94.1,
+      "last_success_at": "2026-10-15T06:49:41.285Z",
+      "last_success_value": 94.11,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-10-15T05:55:49.957Z",
+      "last_attempted_at": "2026-10-15T06:49:41.285Z",
       "last_failure_at": "2026-06-06T05:49:41.139Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:public_oil_v1: https://tradingeconomics.com/commodity/brent-crude-oil → 405 | json_api:dbnomics_v1: No dbnomics config for brent_crude | html_scrape:tradingeconomics_v1: No TE extractor mapped for brent"
     },
     "gold_usd": {
-      "last_success_at": "2026-10-15T05:55:50.023Z",
-      "last_success_value": 4139.36,
+      "last_success_at": "2026-10-15T06:49:41.394Z",
+      "last_success_value": 4134.36,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-10-15T05:55:50.023Z",
+      "last_attempted_at": "2026-10-15T06:49:41.394Z",
       "last_failure_at": "2026-10-08T10:52:07.321Z",
       "last_failure_reason": "tiered: all 3 tiers failed · json_api:public_gold_v1: https://tradingeconomics.com/commodity/gold: pattern not matched (selector tuning needed) | json_api:dbnomics_v1: No dbnomics config for gold_usd | llm:google_news_llm_v1: No google_news"
     },
     "dxy": {
-      "last_success_at": "2026-10-15T05:55:50.103Z",
-      "last_success_value": 102.107,
+      "last_success_at": "2026-10-15T06:49:41.421Z",
+      "last_success_value": 102.149,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-10-15T05:55:50.103Z",
+      "last_attempted_at": "2026-10-15T06:49:41.421Z",
       "last_failure_at": "2026-06-06T05:49:41.178Z",
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:public_dxy_v1: https://tradingeconomics.com/united-states/currency → 405 | json_api:dbnomics_v1: No dbnomics config for dxy"
     },
     "power_demand": {
-      "last_failure_at": "2026-10-15T05:55:50.105Z",
+      "last_failure_at": "2026-10-15T06:49:41.422Z",
       "last_failure_reason": "tiered: all 2 tiers failed · rss:google_news_rss_v1: in cooldown | json_api:gridindia_v1: in cooldown",
-      "consecutive_failures": 24,
+      "consecutive_failures": 25,
       "status": "red",
       "last_success_at": "2026-10-10T10:04:55.509Z",
       "last_success_value": 236,
-      "last_attempted_at": "2026-10-15T05:55:50.105Z"
+      "last_attempted_at": "2026-10-15T06:49:41.422Z"
     },
     "fii_equity_daily": {
       "last_success_at": "2026-10-14T17:15:37.848Z",
@@ -204,11 +204,11 @@
       "last_attempted_at": "2026-06-11T11:58:11.498Z"
     },
     "india_crude_basket": {
-      "last_success_at": "2026-10-15T05:56:35.698Z",
+      "last_success_at": "2026-10-15T06:50:06.095Z",
       "last_success_value": 91.7,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-10-15T05:56:35.698Z"
+      "last_attempted_at": "2026-10-15T06:50:06.095Z"
     },
     "gst_gross": {
       "last_failure_at": "2026-05-11T05:00:21.341Z",
@@ -450,13 +450,13 @@
       "last_attempted_at": "2026-10-14T18:35:07.144Z"
     },
     "vlcc_tanker_rates": {
-      "last_failure_at": "2026-10-15T05:55:49.714Z",
+      "last_failure_at": "2026-10-15T06:49:41.071Z",
       "last_failure_reason": "tiered: all 1 tiers failed · llm:google_news_llm_v1: in cooldown",
-      "consecutive_failures": 379,
+      "consecutive_failures": 380,
       "status": "red",
       "last_success_at": "2026-07-17T04:58:25.551Z",
       "last_success_value": 1939,
-      "last_attempted_at": "2026-10-15T05:55:49.714Z"
+      "last_attempted_at": "2026-10-15T06:49:41.071Z"
     },
     "fx_reserves": {
       "last_failure_at": "2026-05-14T11:31:00.916Z",
@@ -493,22 +493,22 @@
       "last_success_value": 0.79
     },
     "baltic_dirty_tanker": {
-      "last_attempted_at": "2026-10-15T05:55:49.713Z",
+      "last_attempted_at": "2026-10-15T06:49:41.070Z",
       "last_success_at": "2026-08-20T09:43:04.410Z",
       "last_success_value": 2631,
-      "consecutive_failures": 244,
+      "consecutive_failures": 245,
       "status": "red",
-      "last_failure_at": "2026-10-15T05:55:49.713Z",
+      "last_failure_at": "2026-10-15T06:49:41.070Z",
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:hormuz_bdti_v1: in cooldown | llm:google_news_llm_v1: in cooldown"
     },
     "gift_nifty": {
-      "last_attempted_at": "2026-10-15T05:56:28.870Z",
+      "last_attempted_at": "2026-10-15T06:50:00.263Z",
       "last_success_at": "2026-10-15T04:57:47.531Z",
       "last_success_value": 22601,
-      "consecutive_failures": 1,
+      "consecutive_failures": 2,
       "status": "amber",
-      "last_failure_at": "2026-10-15T05:56:28.870Z",
-      "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: gift_nifty: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMi8wFBVV95cUxQ | html_render:web_llm_v1: web_llm_v1: all 2 sources failed · https://www.moneycontrol."
+      "last_failure_at": "2026-10-15T06:50:00.263Z",
+      "last_failure_reason": "tiered: all 2 tiers failed · llm:google_news_llm_v1: gift_nifty: 4 candidates, none yielded value · https://news.google.com/rss/articles/CBMi8wFBVV95cUxQ | html_render:web_llm_v1: in cooldown"
     },
     "net_sip_inflows": {
       "last_attempted_at": "2026-10-14T14:32:18.444Z",
@@ -560,5 +560,5 @@
     "red": 14,
     "total": 67
   },
-  "generated_at": "2026-10-15T05:56:35.698Z"
+  "generated_at": "2026-10-15T06:50:06.095Z"
 }
