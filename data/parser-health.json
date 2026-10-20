@@ -536,17 +536,17 @@
       "last_success_value": 4
     },
     "eight_core_industries": {
-      "last_attempted_at": "2026-10-19T16:30:26.054Z",
+      "last_attempted_at": "2026-10-20T09:35:35.155Z",
       "last_success_at": "2026-07-20T07:42:55.592Z",
       "last_success_value": 0.5,
-      "consecutive_failures": 119,
+      "consecutive_failures": 120,
       "status": "red",
-      "last_failure_at": "2026-10-19T16:30:26.054Z",
+      "last_failure_at": "2026-10-20T09:35:35.155Z",
       "last_failure_reason": "tiered: all 3 tiers failed · xlsx:ici_xlsx_v1: ICI XLSX link not found on eaindustry.nic.in | rss:pib_rss_v1: No pib_rss config for eight_core_industries | llm:google_news_llm_v1: No google_news_llm config for eight_core_industries"
     },
     "epfo_payrolls": {
-      "last_attempted_at": "2026-10-19T16:30:26.408Z",
-      "last_success_at": "2026-10-19T16:30:26.408Z",
+      "last_attempted_at": "2026-10-20T09:35:35.633Z",
+      "last_success_at": "2026-10-20T09:35:35.633Z",
       "last_success_value": 16.02,
       "consecutive_failures": 0,
       "status": "green",
@@ -560,5 +560,5 @@
     "red": 11,
     "total": 67
   },
-  "generated_at": "2026-10-20T06:59:14.874Z"
+  "generated_at": "2026-10-20T09:35:35.633Z"
 }
