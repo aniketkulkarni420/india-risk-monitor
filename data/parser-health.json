@@ -177,20 +177,20 @@
       "last_failure_reason": "OLD DATA rejected: as_of 2026-09-03 is 26d old (> 7d allowance for Daily) — refusing to verify stale release"
     },
     "high_yield_credit_spread": {
-      "last_success_at": "2026-10-21T14:30:55.173Z",
-      "last_success_value": 195,
+      "last_success_at": "2026-10-23T13:12:42.454Z",
+      "last_success_value": 196,
       "consecutive_failures": 0,
       "status": "green",
       "last_failure_at": "2026-05-14T11:31:00.945Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:crisil_v1: https://tradingeconomics.com/india/government-bond-yield: pattern not matched (selector tuning neede | llm:google_news_llm_v1: No google_news_llm config for high_yield_credit_spread",
-      "last_attempted_at": "2026-10-21T14:30:55.173Z"
+      "last_attempted_at": "2026-10-23T13:12:42.454Z"
     },
     "drewry_wci": {
-      "last_success_at": "2026-10-21T14:30:56.579Z",
-      "last_success_value": 4485,
+      "last_success_at": "2026-10-23T13:12:43.616Z",
+      "last_success_value": 4585,
       "consecutive_failures": 0,
       "status": "green",
-      "last_attempted_at": "2026-10-21T14:30:56.579Z",
+      "last_attempted_at": "2026-10-23T13:12:43.616Z",
       "last_failure_at": "2026-10-05T18:22:04.741Z",
       "last_failure_reason": "tiered: all 2 tiers failed · html_scrape:drewry_v1: https://www.drewry.co.uk/world-container-index-assessed-by-drewry → 429 | llm:google_news_llm_v1: drewry_wci: 2 candidates, none yielded value · https://news.google.com/rss/articles/CBMiuA"
     },
@@ -463,18 +463,18 @@
       "last_failure_reason": "tiered: all 2 tiers failed · json_api:rbi_wss_v1: not registered | json_api:dbnomics_v1: No dbnomics config for fx_reserves",
       "consecutive_failures": 0,
       "status": "green",
-      "last_success_at": "2026-10-21T14:30:55.169Z",
-      "last_success_value": 726,
-      "last_attempted_at": "2026-10-21T14:30:55.169Z"
+      "last_success_at": "2026-10-23T13:12:42.450Z",
+      "last_success_value": 721,
+      "last_attempted_at": "2026-10-23T13:12:42.450Z"
     },
     "reservoir_levels": {
       "last_failure_at": "2026-10-21T14:30:57.148Z",
       "last_failure_reason": "tiered: all 1 tiers failed · llm:google_news_llm_v1: google_news_llm: 48 items, none passed filters",
-      "consecutive_failures": 75,
-      "status": "red",
-      "last_success_at": "2026-09-04T12:36:17.253Z",
-      "last_success_value": 56.76,
-      "last_attempted_at": "2026-10-21T14:30:57.148Z"
+      "consecutive_failures": 0,
+      "status": "green",
+      "last_success_at": "2026-10-23T13:18:19.054Z",
+      "last_success_value": 66.7,
+      "last_attempted_at": "2026-10-23T13:18:19.054Z"
     },
     "fii_index_fut_positioning": {
       "last_attempted_at": "2026-10-22T17:14:23.948Z",
@@ -555,10 +555,10 @@
     }
   },
   "summary": {
-    "green": 54,
+    "green": 55,
     "amber": 2,
-    "red": 11,
+    "red": 10,
     "total": 67
   },
-  "generated_at": "2026-10-23T06:52:45.368Z"
+  "generated_at": "2026-10-23T13:18:19.054Z"
 }
