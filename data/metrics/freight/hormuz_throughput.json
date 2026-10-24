@@ -14,7 +14,6 @@
   "vs_5y_avg_pct": null,
   "sparkline_12m": [
     10,
-    10,
     1,
     1,
     1,
@@ -24,6 +23,7 @@
     1,
     1,
     1,
+    8.03,
     8.03
   ],
   "_history_state": "accruing",
@@ -60,7 +60,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-10-24T04:52:59.925Z",
+  "last_verified_at": "2026-10-24T05:57:43.786Z",
   "_source_static": true,
   "_snapshot_payload": {
     "vessel_count_inbound": 38,
@@ -98,8 +98,8 @@
     "Mumbai port arrivals 7-day moving avg"
   ],
   "notes": "AIS data has a ~2hr lag. Manual cross-check vs Reuters wire daily during shock periods. 2026-06-11: canonical source switched to Hormuz Watch /api/snapshot (near-real-time AIS); manual override retired — live tool data outranks a hand-pinned value.",
-  "data_origin": "local_cache",
-  "last_live_fetch_at": "2026-10-24T04:52:59.925Z",
+  "data_origin": "primary",
+  "last_live_fetch_at": "2026-10-24T05:57:43.786Z",
   "pct_of_normal": 236.4,
   "throughput_mbd_est": 49.6,
   "incidents_30d": 11,
