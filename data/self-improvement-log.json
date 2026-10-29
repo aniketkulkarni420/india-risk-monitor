@@ -892,7 +892,28 @@
         "json_api:hormuz_watch_v1"
       ],
       "reason": "google_news_llm_v1=confident(0.03), hormuz_multitracker_v1=dead(0.00), hormuz_v1=dead(0.00), hormuz_watch_v1=dead(0.00)"
+    },
+    {
+      "ts": "2026-10-29T06:41:03.117Z",
+      "metric_id": "cement_dispatches",
+      "action": "reorder+quarantine",
+      "from": [
+        "pdf:eaindustry_ieci_v1",
+        "rss:publisher_rss_v1",
+        "llm:google_news_llm_v1",
+        "email:email_pipeline_v1"
+      ],
+      "to": [
+        "pdf:eaindustry_ieci_v1",
+        "llm:google_news_llm_v1",
+        "rss:publisher_rss_v1",
+        "email:email_pipeline_v1"
+      ],
+      "quarantined": [
+        "email:email_pipeline_v1"
+      ],
+      "reason": "eaindustry_ieci_v1=confident(0.93), google_news_llm_v1=unknown(0.00), publisher_rss_v1=confident(0.20), email_pipeline_v1=dead(0.00)"
     }
   ],
-  "last_run": "2026-10-24T05:17:23.068Z"
+  "last_run": "2026-10-29T06:41:03.117Z"
 }
