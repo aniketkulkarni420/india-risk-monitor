@@ -332,8 +332,22 @@ const RISK_WEIGHTS = [3,2,3,3,2,2];
 // Main entry · mutates metrics map in-place
 // ──────────────────────────────────────────────────────────────────────
 
+// Date stamp for a composite recomputed at bundle time. The stored as_of was the
+// date the composite JSON was last written by hand (5 May 2026), so the page
+// showed May dates beside scores computed today. Value math is untouched.
+function stampComputed(m, metrics, feederIds, nowIso) {
+  m.as_of = nowIso;
+  m.last_verified_at = nowIso;
+  m.computed_at = nowIso;
+  if (feederIds) {
+    const dates = feederIds.map(id => metrics.get(id)?.as_of).filter(Boolean).sort();
+    m.inputs_as_of = dates.length ? { oldest: dates[0], newest: dates[dates.length - 1] } : null;
+  }
+}
+
 export function recomputeComposites(metrics) {
   const changes = [];
+  const nowIso = new Date().toISOString();
 
   // 1 · Drivers
   for (const d of DRIVER_DEFS) {
@@ -348,6 +362,7 @@ export function recomputeComposites(metrics) {
     const oldVal = dm.value;
     const health = feederHealth(metrics, d.ids);
     dm.feeder_freshness = health;
+    stampComputed(dm, metrics, d.ids, nowIso);
 
     if (health.missing_pct > MISSING_DATA_THRESHOLD * 100) {
       dm.value = null;
@@ -393,6 +408,7 @@ export function recomputeComposites(metrics) {
     if (applyManualOverride(irs)) {
       changes.push({ id: 'india_risk_score', source: 'manual_override', new: irs.value });
     } else {
+      stampComputed(irs, metrics, RISK_DRIVERS, nowIso);
       const driverInputs = RISK_DRIVERS.map((id, i) => {
         const d = metrics.get(id);
         return { id, value: (d && typeof d.value === 'number') ? d.value : null, weight: RISK_WEIGHTS[i] };

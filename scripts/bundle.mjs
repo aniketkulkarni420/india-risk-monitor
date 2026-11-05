@@ -294,6 +294,14 @@ if (sparklineSanitized > 0) console.log(`  · sparkline sanitized (unit-shift re
 // Composite re-derivation pass · drivers + risk score must reflect freshly-recomputed
 // statuses on the underlying metrics. Without this they keep old composite scores from
 // the prior ingest run (e.g. driver_oil_physical stays at 92 even after Brent drops below shock).
+// Sector breadth is derived from the sectors heatmap, so its honest date is the
+// heatmap's as_of, not the date the composite JSON was last saved.
+if (metrics.driver_sector_breadth && sectors?.as_of) {
+  metrics.driver_sector_breadth.as_of = sectors.as_of;
+  metrics.driver_sector_breadth.inputs_as_of = { oldest: sectors.as_of, newest: sectors.as_of };
+  if (sectors.last_verified_at) metrics.driver_sector_breadth.last_verified_at = sectors.last_verified_at;
+}
+
 const metricsMap = new Map(Object.entries(metrics));
 const compositeChanges = recomputeComposites(metricsMap);
 // Re-stamp composite status from new score after recompute

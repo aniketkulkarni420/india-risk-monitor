@@ -9,7 +9,7 @@ import { COMPARISON_SPEC, getDisplayPeriods } from './components/ComparisonSpec.
 // StickyTOC removed 2026-05-06 — Tab Bar handles section nav now
 import { wire as wireDrawer, open as openDrawer } from './components/MetricDrawer.mjs';
 import { wireCmdK, openCmdK } from './components/CmdKPalette.mjs';
-import { el, formatValue, formatTrend, formatAsOf, statusClass, rangeTick, pillWithDirection, heatmapClass } from './components/utils.mjs';
+import { el, formatValue, formatTrend, formatAsOf, formatAsOfLong, statusClass, rangeTick, pillWithDirection, heatmapClass } from './components/utils.mjs';
 import {
   renderDriverBars, renderHorizonCard, renderRegimeBanner, renderPersistenceChips,
   renderCumulativeLine, renderDivergingBars, renderYieldCurve, renderInflationBars,
@@ -211,6 +211,17 @@ if (ph && ph.summary && ph.summary.total > 0) {
 // HERO — vital signs panel (replaces 4-tile deck)
 // ──────────────────────────────────────────────────────────────
 const risk = M('india_risk_score');
+// Score availability · the bundle nulls the composite when >30% of drivers lack
+// fresh feeders. Never print the literal "null": show a clear unavailable state.
+const riskOk = !!risk && typeof risk.value === 'number';
+const _driverNames = { driver_oil_physical: 'Oil', driver_freight: 'Freight', driver_institutional_flows: 'Flows',
+  driver_india_macro: 'Macro', driver_real_economy: 'Real economy', driver_sector_breadth: 'Sector breadth' };
+const riskMissingDrivers = ['driver_oil_physical', 'driver_freight', 'driver_institutional_flows',
+  'driver_india_macro', 'driver_real_economy', 'driver_sector_breadth']
+  .filter(id => typeof M(id)?.value !== 'number').map(id => _driverNames[id]);
+const riskUnavailableNote = riskMissingDrivers.length
+  ? `${riskMissingDrivers.join(' and ')} ${riskMissingDrivers.length === 1 ? 'driver lacks' : 'drivers lack'} fresh data (${riskMissingDrivers.length} of 6)`
+  : 'Not enough fresh data';
 const heroHost = document.getElementById('hero-decks');
 heroHost.innerHTML = '';
 heroHost.style.display = 'block';
@@ -219,12 +230,15 @@ heroHost.style.display = 'block';
 const driverIds = ['driver_oil_physical', 'driver_freight', 'driver_institutional_flows',
                    'driver_india_macro', 'driver_sector_breadth', 'driver_real_economy'];
 const drivers = driverIds.map(M).filter(Boolean).map(d => ({
-  label: (d.status === 'shock' ? '⚠ ' : '') + d.display_name,
-  value: d.value,
-  status: d.status,
-  delta: d.mom_pct ? Math.round(d.value * d.mom_pct / 100 * (d.mom_pct > 0 ? 1 : -1)) * (d.mom_pct > 0 ? 1 : -1) : null,
+  label: (typeof d.value === 'number' && d.status === 'shock' ? '⚠ ' : '') + d.display_name,
+  value: typeof d.value === 'number' ? d.value : null,
+  status: typeof d.value === 'number' ? d.status : 'unavailable',
+  delta: typeof d.value === 'number' && d.mom_pct ? Math.round(d.value * d.mom_pct / 100) : null,
+  // Show the data date when a driver's inputs are more than 7 days old
+  note: d.inputs_as_of?.oldest && (Date.now() - new Date(d.as_of).getTime()) > 7 * 86400000
+    ? 'data as on ' + formatAsOfLong(d.as_of) : null,
   metric_id: d.metric_id
-})).sort((a, b) => b.value - a.value);
+})).sort((a, b) => (b.value ?? -1) - (a.value ?? -1));
 
 // A sparkline is "real history" only when it has at least 4 unique values.
 // Below that threshold we hide the chart to avoid showing a near-flat line
@@ -238,10 +252,12 @@ const vital = el('div', { class: 'hero-vital', onclick: (e) => { e.stopPropagati
 
 // Header row · label + dual delta · clearer "vs last week" / "vs yesterday" labels
 const wwDelta = (risk.mom_pct ?? 0) > 0 ? '+' : '';
-const wwVal = risk.mom_pct != null ? wwDelta + Math.round(risk.value * risk.mom_pct / 100) : null;
-const dodVal = risk.dod_delta != null ? (risk.dod_delta > 0 ? '+' : '') + risk.dod_delta : null;
+const wwVal = riskOk && risk.mom_pct != null ? wwDelta + Math.round(risk.value * risk.mom_pct / 100) : null;
+const dodVal = riskOk && risk.dod_delta != null ? (risk.dod_delta > 0 ? '+' : '') + risk.dod_delta : null;
 vital.appendChild(el('div', { class: 'hv-score-row' }, [
-  el('span', { class: 'hv-score-label' }, 'India Risk Score'),
+  el('span', { class: 'hv-score-label' }, ['India Risk Score', risk?.as_of
+    ? el('span', { style: { marginLeft: '10px', fontFamily: 'var(--mono)', fontSize: '11px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: '0' } }, (riskOk ? 'computed ' : 'checked ') + formatAsOfLong(risk.as_of))
+    : null].filter(Boolean)),
   el('span', { class: 'hv-delta', title: 'Change vs prior reference (week / day)' }, [
     wwVal != null ? el('span', { title: 'Score change vs reading from 7 days ago' }, ['vs last week ', el('b', { style: { color: risk.mom_pct >= 0 ? 'var(--red)' : 'var(--green)' } }, wwVal + ' pts')]) : null,
     dodVal != null ? el('span', { style: { marginLeft: '14px' }, title: 'Score change vs yesterday' }, ['vs yesterday ', el('b', { style: { color: risk.dod_delta >= 0 ? 'var(--red)' : 'var(--green)' } }, dodVal + ' pts')]) : null
@@ -250,10 +266,14 @@ vital.appendChild(el('div', { class: 'hv-score-row' }, [
 
 // Score row · big number + inline 12-week sparkline (only if real history) + status pill
 const scoreRow = el('div', { class: 'hv-score-row', style: { alignItems: 'flex-end', gap: '14px' } }, [
-  el('div', { class: 'hv-score-big' }, String(risk.value)),
-  el('div', { class: 'hv-score-sub' }, '/ 100')
+  riskOk
+    ? el('div', { class: 'hv-score-big' }, String(Math.round(risk.value)))
+    : el('div', { class: 'hv-score-big hv-score-na', style: { fontSize: '34px', lineHeight: '1.1' } }, 'Not available'),
+  riskOk
+    ? el('div', { class: 'hv-score-sub' }, '/ 100')
+    : el('div', { class: 'hv-score-sub', style: { maxWidth: '360px' } }, riskUnavailableNote)
 ]);
-if (hasRealHistory(risk.sparkline_12m)) {
+if (riskOk && hasRealHistory(risk.sparkline_12m)) {
   const riskHist = risk.sparkline_12m;
   const minV = Math.min(...riskHist), maxV = Math.max(...riskHist), range = (maxV - minV) || 1;
   const points = riskHist.map((v, i) => {
@@ -266,18 +286,20 @@ if (hasRealHistory(risk.sparkline_12m)) {
   const sparkSvg = el('svg', { class: 'hv-spark-inline', width: '140', height: '40', viewBox: '0 0 140 40' }, []);
   sparkSvg.innerHTML = `<polyline fill="none" stroke="var(--accent)" stroke-width="1.8" points="${points}"/><circle cx="${lastX}" cy="${lastY}" r="3" fill="var(--accent)"/>`;
   scoreRow.appendChild(sparkSvg);
-} else {
+} else if (riskOk) {
   // Honest placeholder · no fake trend line
   scoreRow.appendChild(el('span', { class: 'hv-spark-pending', style: { fontSize: '11px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginLeft: '14px' } }, '12w trend · history accruing'));
 }
 scoreRow.appendChild(el('div', { style: { marginLeft: 'auto' } }, [
-  el('span', { class: 'pill ' + statusClass(risk.status) }, risk.status[0].toUpperCase() + risk.status.slice(1))
+  riskOk
+    ? el('span', { class: 'pill ' + statusClass(risk.status) }, risk.status[0].toUpperCase() + risk.status.slice(1))
+    : el('span', { class: 'pill pill-na' }, 'No score')
 ]));
 vital.appendChild(scoreRow);
 
 vital.appendChild(el('div', { class: 'hv-band-track' }, [
-  el('div', { class: 'hv-band-marker', style: { left: risk.value + '%' } })
-]));
+  riskOk ? el('div', { class: 'hv-band-marker', style: { left: risk.value + '%' } }) : null
+].filter(Boolean)));
 vital.appendChild(el('div', { class: 'hv-band-zones' }, [
   el('span', { style: { color: '#79c79a' }, title: '0–35: stress contained · normal markets' }, 'LOW 0–35 · contained'),
   el('span', { style: { color: '#e9c466' }, title: '35–65: elevated stress · monitor closely' }, 'MED 35–65 · elevated'),
@@ -502,7 +524,7 @@ function buildHeroH1() {
   if (!r) return 'Loading risk read…';
 
   // Driver sorted by value (highest stress first)
-  const topDriver = drivers.length ? drivers.slice().sort((a, b) => b.value - a.value)[0] : null;
+  const topDriver = drivers.find(d => typeof d.value === 'number') || null;
   // Brent + Hormuz state
   const brent = M('brent_crude');
   const hormuz = M('hormuz_throughput');
@@ -552,7 +574,7 @@ document.getElementById('hero-h1').textContent = buildHeroH1();
 
 // Browser tab title · live with current risk score so users with multiple
 // tabs open can scan their bar without switching context.
-if (risk && typeof risk.value === 'number') {
+if (riskOk) {
   const status = (risk.status || '').toUpperCase();
   document.title = `India Risk ${risk.value}${status ? ' · ' + status : ''} · IRM`;
 }
@@ -580,10 +602,10 @@ function setupCollapsibleHero() {
   if (brent && brent.value >= 95) {
     leadParts.push(`Brent $${brent.value.toFixed(2)}`);
   }
-  if (risk && risk.dod_delta != null) {
+  if (riskOk && risk.dod_delta != null) {
     leadParts.push(`risk ${risk.value}/100${risk.dod_delta >= 0 ? ' +' : ' '}${risk.dod_delta} today`);
   }
-  if (leadParts.length === 0 && risk) leadParts.push(`Risk ${risk.value}/100 · ${risk.status}`);
+  if (leadParts.length === 0 && risk) leadParts.push(riskOk ? `Risk ${Math.round(risk.value)}/100 · ${risk.status}` : 'Risk score not available');
   const condLead = el('div', { class: 'hero-condensed-lead' }, leadParts.join(' · '));
   // Insert just after hero-h1
   const h1 = document.getElementById('hero-h1');
@@ -778,8 +800,19 @@ function renderClusterCards(metrics, opts = {}) {
   return wrap;
 }
 
-function buildSectionFooter(srcNames) {
-  return { count: srcNames.length, names: srcNames, last_verified: new Date().toISOString() };
+// Footer date comes from the section's own metrics (newest and oldest as_of),
+// never from the visitor's clock. The old version stamped new Date(), so every
+// footer read "Last verified <today>" even when panels held months-old data.
+function buildSectionFooter(srcNames, section) {
+  let dates;
+  if (section === 'sectors') dates = DATA.sectors?.as_of ? [DATA.sectors.as_of] : [];
+  else dates = Object.values(DATA.metrics).filter(m => m.section === section).map(m => m.as_of).filter(Boolean);
+  dates = dates.map(d => new Date(d)).filter(d => !isNaN(d)).sort((a, b) => a - b);
+  return {
+    count: srcNames.length, names: srcNames,
+    newest: dates.length ? dates[dates.length - 1].toISOString() : null,
+    oldest: dates.length ? dates[0].toISOString() : null
+  };
 }
 
 // ════════════════════════ FLOWS — V60 HYBRID (2026-05-12) ════════════════════════
@@ -922,7 +955,7 @@ body.appendChild(renderSectionFrame({
     { date: '2026-05-08', severity: 'high',  label: 'F&O OI build' },
     { date: '2026-05-11', severity: 'med',   label: 'FII MTD −8.4k' }
   ]),
-  sources: buildSectionFooter(['NSE', 'SEBI', 'NSDL', 'AMFI']),
+  sources: buildSectionFooter(['NSE', 'SEBI', 'NSDL', 'AMFI'], 'flows'),
   children: [flowsBody]
 }));
 
@@ -1057,7 +1090,7 @@ body.appendChild(renderSectionFrame({
     { date: '2026-05-01', severity: 'low',   label: 'CPI 3.40%' },
     { date: '2026-05-11', severity: 'low',   label: 'Real 10Y +3.35%' }
   ]),
-  sources: buildSectionFooter(['RBI', 'MoSPI', 'CCIL', 'CGA', 'S&P PMI']),
+  sources: buildSectionFooter(['RBI', 'MoSPI', 'CCIL', 'CGA', 'S&P PMI'], 'macro'),
   children: [macroBody]
 }));
 
@@ -1279,7 +1312,7 @@ body.appendChild(renderSectionFrame({
     { date: '2026-05-11', severity: 'low',   label: 'UPI +18.7% DoD' },
     { date: '2026-05-12', severity: 'med',   label: 'POL 19.3 MT' }
   ]),
-  sources: buildSectionFooter(['GST', 'FADA', 'GridIndia', 'NPCI', 'IHMCL', 'JPC']),
+  sources: buildSectionFooter(['GST', 'FADA', 'GridIndia', 'NPCI', 'IHMCL', 'JPC'], 'economy'),
   children: [econBody]
 }));
 
@@ -1429,7 +1462,7 @@ body.appendChild(renderSectionFrame({
     { date: '2026-05-07', severity: 'low',   label: 'WCI −19% DoD' },
     { date: '2026-05-12', severity: 'shock', label: 'Brent $99' }
   ]),
-  sources: buildSectionFooter(['MarineTraffic', 'PPAC', 'Drewry', 'Baltic Exchange']),
+  sources: buildSectionFooter(['MarineTraffic', 'PPAC', 'Drewry', 'Baltic Exchange'], 'freight'),
   children: [freightBody]
 }));
 
@@ -1570,7 +1603,7 @@ body.appendChild(renderSectionFrame({
     { date: '2026-05-11', severity: 'low',   label: 'PE 20.7× cheap' },
     { date: '2026-05-11', severity: 'low',   label: 'BNF +7.9pp lead' }
   ]),
-  sources: buildSectionFooter(['NSE', 'CRISIL', 'FRED', 'Reuters']),
+  sources: buildSectionFooter(['NSE', 'CRISIL', 'FRED', 'Reuters'], 'market'),
   children: [marketBody]
 }));
 
@@ -1672,7 +1705,7 @@ body.appendChild(renderSectionFrame({
     { date: '2026-05-08', severity: 'med',   label: 'Cap goods rerate' },
     { date: '2026-05-11', severity: 'low',   label: 'Autos +18.6 YTD' }
   ]),
-  sources: buildSectionFooter(['NSE', 'Trendlyne', 'Screener']),
+  sources: buildSectionFooter(['NSE', 'Trendlyne', 'Screener'], 'sectors'),
   children: [sectorsBody]
 }));
 
@@ -1882,10 +1915,10 @@ const isMobileMQ = window.matchMedia('(max-width: 700px)');
     m.status === 'shock' && !m.metric_id.startsWith('driver_') && m.metric_id !== 'india_risk_score'
   ).length;
 
-  document.getElementById('rt-score').textContent = String(risk.value);
+  document.getElementById('rt-score').textContent = riskOk ? String(Math.round(risk.value)) : 'n/a';
   const statusEl = document.getElementById('rt-status');
-  statusEl.textContent = (risk.status || '').toUpperCase();
-  statusEl.classList.add('s-' + (risk.status || 'normal'));
+  statusEl.textContent = riskOk ? (risk.status || '').toUpperCase() : 'NO SCORE';
+  statusEl.classList.add('s-' + (riskOk ? (risk.status || 'normal') : 'normal'));
   if (totalShocks > 0) {
     document.getElementById('rt-shocks-sep').style.display = '';
     const shocksEl = document.getElementById('rt-shocks');

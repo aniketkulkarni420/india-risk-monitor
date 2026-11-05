@@ -104,6 +104,7 @@ svg, img, video, canvas { max-width: 100%; }
 .pill-low   { background: var(--green-soft); color: #79c79a; }
 .pill-med   { background: var(--amber-soft); color: #e9c466; }
 .pill-high  { background: var(--red-soft); color: #e88; }
+.pill-na    { background: rgba(255,255,255,.06); color: var(--ink-3); }
 .pill-shock { background: var(--red); color: #1a0808; font-weight: 700; letter-spacing: .1em; padding: 3px 12px; }
 /* 10B: status pill with directional indicator inside */
 .pill .pill-dir {

@@ -39,14 +39,17 @@ function vizTitleEl(title, asof) {
 export function renderDriverBars(items, opts = {}) {
   const { showDelta = true, showArrow = false, labelWidth = 130, max = 100, deltaUnit = '' } = opts;
   const rows = items.map(item => {
-    const pct = Math.max(0, Math.min(100, (item.value / (item.max || max)) * 100));
+    const hasVal = typeof item.value === 'number' && Number.isFinite(item.value);
+    const pct = hasVal ? Math.max(0, Math.min(100, (item.value / (item.max || max)) * 100)) : 0;
     const color = statusColor(item.status);
     const cells = [
-      el('span', { class: 'driver-bar-label' }, item.label),
+      el('span', { class: 'driver-bar-label' }, item.note
+        ? [item.label, el('span', { class: 'driver-bar-note', style: { display: 'block', fontSize: '10px', color: 'var(--ink-3)', fontFamily: 'var(--mono)' } }, item.note)]
+        : item.label),
       el('div', { class: 'driver-bar-track' }, [
         el('div', { class: 'driver-bar-fill', style: { width: pct + '%', background: color } })
       ]),
-      el('span', { class: 'driver-bar-value', style: { color } }, String(item.value))
+      el('span', { class: 'driver-bar-value', style: { color }, title: hasVal ? '' : 'Not available: feeders lack fresh data' }, hasVal ? String(Math.round(item.value)) : 'n/a')
     ];
     if (showArrow) {
       // Direction arrow based on delta sign · ↑ red (rising stress) / ↓ green (easing) / → grey (flat)
@@ -1074,7 +1077,7 @@ export function buildHeroNarrative(driverEntries, riskMetric) {
   const top2 = sorted[1];
   const calmest = sorted[sorted.length - 1];
   const lead = `Stress is led by <b>${top1.label.replace(/^⚠\s/, '')} ${Math.round(top1.value)}</b> and <b>${top2.label.replace(/^⚠\s/, '')} ${Math.round(top2.value)}</b>.`;
-  const tail = ` Real economy holding at <b>${Math.round(calmest.value)}</b>.`;
+  const tail = ` ${calmest.label.replace(/^⚠\s/, '')} lowest at <b>${Math.round(calmest.value)}</b>.`;
   return el('div', {
     class: 'hv-narrative',
     style: {

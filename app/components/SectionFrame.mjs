@@ -12,7 +12,7 @@
 //   onLensClick?: (lens_id) => void
 //   children: HTMLElement[]             — section body (PrimaryDisplay + SupportingTable)
 
-import { el, formatAsOf } from './utils.mjs';
+import { el, formatAsOf, formatAsOfLong } from './utils.mjs';
 
 export function renderSectionFrame(props) {
   const { section_id, title, question, lens_row, sources, onLensClick, children, timeline } = props;
@@ -51,7 +51,11 @@ export function renderSectionFrame(props) {
     footer = el('div', { class: 'sf-footer' }, [
       el('div', { class: 'sf-footer-text' }, [
         sources.count ? `${sources.count} sources` : null,
-        sources.last_verified ? ` · Last verified ${formatAsOf(sources.last_verified)}` : null,
+        sources.newest
+          ? (sources.oldest && sources.oldest.slice(0, 10) !== sources.newest.slice(0, 10)
+              ? ` · Data as on ${formatAsOfLong(sources.oldest)} to ${formatAsOfLong(sources.newest)}`
+              : ` · Data as on ${formatAsOfLong(sources.newest)}`)
+          : null,
         namesText ? ' · ' : null,
         namesText ? el('span', { style: { color: 'var(--ink-2)' } }, namesText) : null
       ].filter(Boolean)),
