@@ -4,13 +4,13 @@
 // Renders: SectionHeader + optional LensRow + slot for content + SectionFooter
 //
 // Props:
-//   section_id: string                  — anchor id (#flows, #macro, etc.)
-//   title: string                       — section title
-//   question: string                    — one-line "what this section answers"
-//   lens_row?: [{ id, label, active }]  — optional 3-4 chip filter row
-//   sources?: { count, names: [], last_verified }  — for footer
+//   section_id: string, anchor id (#flows, #macro, etc.)
+//   title: string, section title
+//   question: string, one-line "what this section answers"
+//   lens_row?: [{ id, label, active }], optional 3-4 chip filter row
+//   sources?: { count, names: [], last_verified }, for footer
 //   onLensClick?: (lens_id) => void
-//   children: HTMLElement[]             — section body (PrimaryDisplay + SupportingTable)
+//   children: HTMLElement[], section body (PrimaryDisplay + SupportingTable)
 
 import { el, formatAsOf, formatAsOfLong } from './utils.mjs';
 

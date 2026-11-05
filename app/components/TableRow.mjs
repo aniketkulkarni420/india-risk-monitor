@@ -1,4 +1,4 @@
-// TableRow · Pattern 1 — compact dual-trend
+// TableRow · Pattern 1, compact dual-trend
 // The dense metric primitive. ≥80% of metric renders use this.
 //
 // Cells: name+subtitle | current | MoM | YoY | sparkline | status pill
@@ -73,7 +73,7 @@ function renderInlineExpand(metric) {
       el('div', { class: 'inline-expand-col' }, [
         el('div', { class: 'inline-expand-label' }, '12m sparkline + range'),
         renderSparkline({ data: spark, width: 220, height: 44, trend_direction: dir, fill: true }),
-        range ? el('div', { class: 'inline-expand-rangelabel' }, range.label + ' · ' + range.lo + '–' + range.hi) : null
+        range ? el('div', { class: 'inline-expand-rangelabel' }, range.label + ' · ' + range.lo + '-' + range.hi) : null
       ].filter(Boolean)),
       // Thresholds / why column
       el('div', { class: 'inline-expand-col' }, [
@@ -103,7 +103,7 @@ function rowDetectState(metric, override) {
   return 'default';
 }
 
-// Compact source name for the per-row pill — strip noise, max 14 chars
+// Compact source name for the per-row pill, strip noise, max 14 chars
 function sourceShort(name) {
   if (!name) return '';
   return name

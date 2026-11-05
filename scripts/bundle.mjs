@@ -442,6 +442,23 @@ function fixSourceUrls(obj) {
 for (const m of Object.values(metrics)) fixSourceUrls(m);
 fixSourceUrls(sectors);
 
+// House style: no em dash, en dash or typographic minus in visible text.
+// Metric JSON (display names, notes, why_it_matters) is written by ingest and
+// by hand, so normalise every string at bundle time.
+function plainDashes(t) {
+  return t.replace(/\s+\u2014\s+/g, ', ').replace(/\u2014/g, '-')
+    .replace(/(\d)\s*\u2013\s*(\d)/g, '$1-$2').replace(/\s+\u2013\s+/g, ', ')
+    .replace(/[\u2013\u2212]/g, '-');
+}
+function plainDashesDeep(o) {
+  if (Array.isArray(o)) { for (let i = 0; i < o.length; i++) o[i] = typeof o[i] === 'string' ? plainDashes(o[i]) : (plainDashesDeep(o[i]), o[i]); return; }
+  if (o && typeof o === 'object') for (const k of Object.keys(o)) {
+    if (typeof o[k] === 'string') o[k] = plainDashes(o[k]); else plainDashesDeep(o[k]);
+  }
+}
+plainDashesDeep(metrics);
+plainDashesDeep(sectors);
+
 const bundle = {
   generated_at: new Date().toISOString(),
   metric_count: Object.keys(metrics).length,

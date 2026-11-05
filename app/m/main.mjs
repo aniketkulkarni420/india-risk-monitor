@@ -1,6 +1,6 @@
 // Mobile assembly · Phase 7 + 5.5 redesign applied
 // Hero: vital-signs panel (band + 6 driver bars) + Today bullet rows
-// Section pills inherit redesign — Flows uses regime banner + horizon cards;
+// Section pills inherit redesign, Flows uses regime banner + horizon cards;
 // Real Economy shows cluster summary + auto small multiples; tables stay Pattern 1.
 
 import { renderTableRow, renderTableHeader } from '../components/TableRow.mjs';
@@ -29,22 +29,25 @@ const supply = M('supply_chain_state');
 
 document.getElementById('m-h1').textContent = supply?.status === 'shock'
   ? 'Stress is high, but activity hasn’t broken.'
-  : (risk?.value > 65 ? 'Risk elevated. Watching the next move.' : 'Risk contained.');
+  : typeof risk?.value !== 'number' ? 'Risk score not available today.'
+  : (risk.value > 65 ? 'Risk elevated. Watching the next move.' : 'Risk contained.');
 
 document.getElementById('m-stress').appendChild(
-  el('span', { class: 'pill ' + statusClass(risk?.status || 'med') },
-    `Stress · ${risk?.value || '—'} / 100`)
+  typeof risk?.value === 'number'
+    ? el('span', { class: 'pill ' + statusClass(risk.status || 'med') }, `Stress · ${Math.round(risk.value)} / 100`)
+    : el('span', { class: 'pill pill-na' }, 'Stress score not available')
 );
 
 // ── Vital signs · condensed (replaces single primary tile)
 const driverIds = ['driver_oil_physical', 'driver_freight', 'driver_institutional_flows',
                    'driver_india_macro', 'driver_sector_breadth', 'driver_real_economy'];
 const drivers = driverIds.map(M).filter(Boolean).map(d => ({
-  label: (d.status === 'shock' ? '⚠ ' : '') + d.display_name,
-  value: d.value, status: d.status,
-  delta: d.mom_pct ? Math.round(d.value * d.mom_pct / 100) : null,
+  label: (typeof d.value === 'number' && d.status === 'shock' ? '⚠ ' : '') + d.display_name,
+  value: typeof d.value === 'number' ? d.value : null,
+  status: typeof d.value === 'number' ? d.status : 'unavailable',
+  delta: typeof d.value === 'number' && d.mom_pct ? Math.round(d.value * d.mom_pct / 100) : null,
   metric_id: d.metric_id
-})).sort((a, b) => b.value - a.value);
+})).sort((a, b) => (b.value ?? -1) - (a.value ?? -1));
 
 const primaryHost = document.getElementById('m-primary');
 primaryHost.innerHTML = '';
@@ -66,13 +69,15 @@ today.style.background = 'transparent';
 today.style.borderLeft = 'none';
 today.style.padding = '0';
 today.style.marginTop = '14px';
-today.appendChild(renderTodayBullets([
-  { html: '<a>Hormuz</a> 2/day vs 140 baseline · <b>14d in</b>', drawer_metric_id: 'hormuz_throughput' },
-  { html: '<a>Brent</a> $98.40 · <b>+18% MoM</b>', drawer_metric_id: 'brent_crude' },
-  { html: '<a>VLCC</a> rates <b>+220% MoM</b>', drawer_metric_id: 'vlcc_tanker_rates' },
-  { html: '<a>DII absorbing</a> at <b>1.30×</b>', drawer_metric_id: 'absorption_ratio' },
-  { html: '<a>Real economy</a> · GST <b>+11.5% YoY</b>', drawer_metric_id: 'gst_gross' }
-], { onClick: openDrawer }));
+// Bullets from live metrics (the old list was fixed May 2026 text).
+const mb = [];
+const _h = M('hormuz_throughput'), _b = M('brent_crude'), _f = M('fii_equity_daily'), _d = M('dii_daily'), _g = M('gst_gross');
+const _inr = (v) => (v < 0 ? '-' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(v))) + ' Cr';
+if (_h) mb.push({ html: `<a>Hormuz</a> ${Math.round(_h.value)}/day vs ${_h.baseline_30d || 140} baseline${_h._source_static ? ' · provisional' : ''}`, drawer_metric_id: 'hormuz_throughput' });
+if (_b) mb.push({ html: `<a>Brent</a> $${Math.round(_b.value)} · <b>${formatTrend(_b.mom_pct)} MoM</b>`, drawer_metric_id: 'brent_crude' });
+if (_f && _d) mb.push({ html: `<a>FII</a> ${_inr(_f.value)} · DII ${_inr(_d.value)} · <b>${formatAsOf(_f.as_of)}</b>`, drawer_metric_id: 'fii_equity_daily' });
+if (_g) mb.push({ html: `<a>Real economy</a> · GST ₹${(_g.value / 100000).toFixed(2)} lakh crore · <b>${formatTrend(_g.yoy_pct)} YoY</b>`, drawer_metric_id: 'gst_gross' });
+today.appendChild(renderTodayBullets(mb, { onClick: openDrawer }));
 
 // ──────────────────────────────────────────────────────────────
 // Section pills
@@ -101,26 +106,30 @@ function pill(id, name, meta, body) {
 const sectionsEl = document.getElementById('m-sections');
 sectionsEl.innerHTML = '';
 
-// Flows · regime + horizon cards (stacked)
+// Flows · live day figures only (the old cards were fixed May 2026 numbers)
+const _fd = M('fii_equity_daily'), _dd = M('dii_daily');
+const _fv = typeof _fd?.value === 'number' ? _fd.value : null;
+const _dv = typeof _dd?.value === 'number' ? _dd.value : null;
+const _flowRead = _fv == null || _dv == null ? 'Flow data pending'
+  : _fv >= 0 && _dv < 0 ? 'FII net buyers, DII net sellers'
+  : _fv >= 0 ? 'FII and DII both net buyers'
+  : _dv >= 0 ? 'FII net sellers, DII net buyers' : 'FII and DII both net sellers';
 const flowsBody = el('div', {}, [
-  el('div', { style: { background: 'var(--surface-2)', borderLeft: '3px solid var(--green)', borderRadius: '0 6px 6px 0', padding: '10px 14px', marginBottom: '12px', fontSize: '12px' } }, [
-    el('div', { style: { color: 'var(--green)', fontWeight: 700, fontSize: '14px' } }, 'DII Absorption'),
-    el('div', { style: { color: 'var(--ink-2)', marginTop: '2px' } }, 'FII selling — DII buying enough · 8 sessions')
+  el('div', { style: { background: 'var(--surface-2)', borderLeft: '3px solid var(--accent)', borderRadius: '0 6px 6px 0', padding: '10px 14px', marginBottom: '12px', fontSize: '12px' } }, [
+    el('div', { style: { color: 'var(--ink)', fontWeight: 700, fontSize: '14px' } }, _flowRead),
+    el('div', { style: { color: 'var(--ink-2)', marginTop: '2px' } }, _fd?.as_of ? 'NSE provisional · ' + formatAsOf(_fd.as_of) : '')
   ]),
-  el('div', { class: 'horizon-grid' }, [
-    renderHorizonCard('Today', -392, 'net ₹ Cr', -2103, 1712),
-    renderHorizonCard('5 sess.', 4291, 'net ₹ Cr', -12400, 16691),
-    renderHorizonCard('MTD', 4291, '₹ Cr · 1.30× absorb', -14305, 18596),
-    renderHorizonCard('CYTD', 52820, 'net ₹ Cr', -42180, 95000)
-  ]),
+  _fv != null && _dv != null ? el('div', { class: 'horizon-grid' }, [
+    renderHorizonCard('Today', Math.round(_fv + _dv), 'net ₹ Cr', Math.round(_fv), Math.round(_dv))
+  ]) : null,
   el('div', { class: 'sub-head' }, 'Supporting'),
   buildTable(['net_sip_inflows', 'mf_net_equity_flows', 'fpi_debt_flows', 'fii_index_fut_positioning', 'block_deals_notional'])
-]);
-sectionsEl.appendChild(pill('flows', 'Flows', 'Absorption 1.30× · 8-sess streak', flowsBody));
+].filter(Boolean));
+sectionsEl.appendChild(pill('flows', 'Flows', _flowRead, flowsBody));
 
 // Macro
 sectionsEl.appendChild(pill('macro', 'Macro',
-  `INR ${M('inr_usd')?.value || '—'} · 10Y ${M('gsec_curve')?.value || '—'}% · CPI ${M('cpi_inflation')?.value || '—'}%`,
+  `INR ₹${Math.round(M('inr_usd')?.value) || '-'} · 10Y ${M('gsec_curve')?.value ?? '-'}% · CPI ${M('cpi_inflation')?.value ?? '-'}%`,
   buildTable(['inr_usd', 'fx_reserves', 'trade_deficit', 'cad_pct_gdp',
               'banking_liquidity', 'wacr_repo_spread', 'repo_rate', 'gsec_curve',
               'real_10y_yield', 'cpi_inflation', 'core_cpi', 'pmi_combined',
@@ -129,13 +138,6 @@ sectionsEl.appendChild(pill('macro', 'Macro',
 
 // Real Economy · cluster summary + auto small multiples
 const econBody = el('div', {}, [
-  el('div', { class: 'cluster-grid' }, [
-    el('div', { class: 'cluster-card' }, [el('div', { class: 'cc-label' }, 'Tax & demand'), el('div', { class: 'cc-value', style: { color: 'var(--green)' } }, '+11.5%')]),
-    el('div', { class: 'cluster-card' }, [el('div', { class: 'cc-label' }, 'Movement'), el('div', { class: 'cc-value', style: { color: 'var(--green)' } }, '+8.5%')]),
-    el('div', { class: 'cluster-card' }, [el('div', { class: 'cc-label' }, 'Production'), el('div', { class: 'cc-value', style: { color: 'var(--green)' } }, '+6.4%')]),
-    el('div', { class: 'cluster-card' }, [el('div', { class: 'cc-label' }, 'Auto'), el('div', { class: 'cc-value', style: { color: 'var(--green)' } }, '+8.5%')]),
-    el('div', { class: 'cluster-card' }, [el('div', { class: 'cc-label' }, 'Discretionary'), el('div', { class: 'cc-value', style: { color: 'var(--green)' } }, '+4.2%')])
-  ]),
   el('div', { class: 'sub-head' }, 'Auto · YoY %'),
   renderSmallMultiples(
     ['auto_3w', 'auto_tractor', 'auto_2w', 'auto_cv', 'auto_pv'].map(M).filter(Boolean).map(m => ({
@@ -151,18 +153,18 @@ const econBody = el('div', {}, [
               'port_cargo', 'air_pax', 'pol_demand', 'power_demand', 'cement_dispatches',
               'steel_consumption', 'epfo_payrolls', 'reservoir_levels'])
 ]);
-sectionsEl.appendChild(pill('economy', 'Real economy', 'GST +11.5% YoY · 18 metrics', econBody));
+sectionsEl.appendChild(pill('economy', 'Real economy', `GST ${formatTrend(M('gst_gross')?.yoy_pct)} YoY · 18 metrics`, econBody));
 
 // Freight
 sectionsEl.appendChild(pill('freight', 'Freight & supply chain',
-  `Hormuz ${M('hormuz_throughput')?.value} ships · Brent $${M('brent_crude')?.value}`,
+  `Hormuz ${Math.round(M('hormuz_throughput')?.value)} ships · Brent $${Math.round(M('brent_crude')?.value)}`,
   buildTable(['hormuz_throughput', 'brent_crude', 'india_crude_basket', 'drewry_wci',
               'baltic_dirty_tanker', 'vlcc_tanker_rates'])
 ));
 
 // Market
 sectionsEl.appendChild(pill('market', 'Market context',
-  `Nifty ${M('nifty_50')?.value?.toFixed(0)} · India VIX ${M('india_vix')?.value}`,
+  `Nifty ${new Intl.NumberFormat('en-IN').format(Math.round(M('nifty_50')?.value))} · India VIX ${Math.round(M('india_vix')?.value)}`,
   buildTable(['nifty_50', 'bank_nifty', 'gift_nifty', 'nifty_pe_5y', 'india_vix', 'nifty_pcr',
               'gold_usd', 'dxy', 'ind_us_10y_spread', 'high_yield_credit_spread'])
 ));

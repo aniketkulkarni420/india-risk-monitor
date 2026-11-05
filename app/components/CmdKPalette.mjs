@@ -3,7 +3,7 @@
 // Trigger: ⌘K / Ctrl+K. Searches metrics, sections, sources. Jump in one keystroke.
 //
 // API:
-//   wire({ metrics, sections, openMetric }) — call once on boot
+//   wire({ metrics, sections, openMetric }), call once on boot
 //   open() / closeCmdK()
 
 import { el, statusClass } from './utils.mjs';

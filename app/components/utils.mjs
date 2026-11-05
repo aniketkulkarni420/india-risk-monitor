@@ -2,13 +2,13 @@
 // Pure functions, no DOM. Imported by every component.
 
 // ──────────────────────────────────────────────────────────────
-// Value formatting — respects metric.value_format
+// Value formatting, respects metric.value_format
 // ──────────────────────────────────────────────────────────────
 const INR = new Intl.NumberFormat('en-IN');
 const NUM = new Intl.NumberFormat('en-US');
 
 export function formatValue(value, value_format, unit) {
-  if (value === null || value === undefined) return '—';
+  if (value === null || value === undefined) return '-';
   if (typeof value === 'string') return value;
   if (typeof value !== 'number') return String(value);
 
@@ -20,11 +20,12 @@ export function formatValue(value, value_format, unit) {
     case 'decimal_1':       return value.toFixed(1) + u;
     case 'decimal_2':       return value.toFixed(2) + u;
     case 'percent':         return value.toFixed(2) + '%';
-    case 'currency_inr_cr': return (value < 0 ? '−' : '') + '₹' + INR.format(Math.abs(Math.round(value))) + ' Cr';
+    case 'currency_inr_cr': return (value < 0 ? '-' : '') + '₹' + INR.format(Math.abs(Math.round(value))) + ' Cr';
     case 'currency_inr_lcr':return '₹' + value.toFixed(2) + ' L Cr';
     case 'currency_usd_bn': return '$' + value.toFixed(1) + ' Bn';
     case 'currency_usd_mn': return '$' + value.toFixed(1) + ' Mn';
-    case 'currency_usd_per_unit': return '$' + INR.format(Math.round(value)) + (unit ? ' / ' + unit.replace(/^\/\s*/, '').trim() : '');
+    // unit may arrive as "$ / 40ft" or "/ 40ft": strip the currency and slash so it reads "$4,429 / 40ft"
+    case 'currency_usd_per_unit': { const uu = unit ? unit.replace(/^\s*\$?\s*\/?\s*/, '').trim() : ''; return '$' + INR.format(Math.round(value)) + (uu ? ' / ' + uu : ''); }
     case 'ratio_x':         return value.toFixed(2) + '×';
     case 'bps':             return (value > 0 ? '+' : '') + Math.round(value) + ' bps';
     case 'index':           return INR.format(Math.round(value)) + (unit ? ' ' + unit.trim() : '');
@@ -34,7 +35,7 @@ export function formatValue(value, value_format, unit) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Trend labels — period-aware
+// Trend labels, period-aware
 // Schema fields mom_pct + yoy_pct are POSITIONAL (first/second trend).
 // Their displayed labels depend on as_of_period:
 //   live, 24h     → 1D / 1W
@@ -58,16 +59,16 @@ export function trendLabels(as_of_period) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Trend formatting — adds sign + %
+// Trend formatting, adds sign + %
 // ──────────────────────────────────────────────────────────────
 export function formatTrend(pct) {
-  if (pct === null || pct === undefined) return '—';
+  if (pct === null || pct === undefined) return '-';
   const sign = pct > 0 ? '+' : '';
   return sign + pct.toFixed(1) + '%';
 }
 
 // ──────────────────────────────────────────────────────────────
-// Trend colour — based on direction (good/bad/neutral) and sign
+// Trend colour, based on direction (good/bad/neutral) and sign
 // ──────────────────────────────────────────────────────────────
 export function trendClass(pct, trend_direction = 'neutral') {
   if (pct === null || pct === undefined || pct === 0) return 'trend-flat';
@@ -85,7 +86,7 @@ export function statusClass(status) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// As-of formatter — short date, time only for live
+// As-of formatter, short date, time only for live
 // ──────────────────────────────────────────────────────────────
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 export function formatAsOf(iso) {
@@ -94,7 +95,7 @@ export function formatAsOf(iso) {
   return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
 }
 
-// Long-form as-of including year — used for viz titles where space allows
+// Long-form as-of including year, used for viz titles where space allows
 export function formatAsOfLong(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -109,7 +110,7 @@ export function asOfLabel(iso, opts = {}) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// DOM helper — concise element creator
+// DOM helper, concise element creator
 // ──────────────────────────────────────────────────────────────
 export function el(tag, attrs = {}, children = []) {
   const node = tag.includes('svg') || tag === 'path' || tag === 'polyline' || tag === 'polygon' ||

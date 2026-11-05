@@ -81,20 +81,20 @@ function renderRow(m) {
     ]),
     el('td', {}, [el('span', { class: 'section-tag' }, m.section)]),
     el('td', {}, [
-      el('a', { class: 'src-link', href: primary.url || '#', target: '_blank', rel: 'noopener' }, primary.name || '—'),
+      el('a', { class: 'src-link', href: primary.url || '#', target: '_blank', rel: 'noopener' }, primary.name || '-'),
       el('span', { class: 'src-meta' }, [primary.type, primary.frequency].filter(Boolean).join(' · '))
     ]),
     el('td', { class: 'crosschecks' },
       crosschecks.length === 0
-        ? '—'
+        ? '-'
         : crosschecks.map((cc, i) => el('span', {}, [
             i > 0 ? el('br', {}) : null,
             el('a', { href: cc.url || '#', target: '_blank', rel: 'noopener' }, cc.name)
           ]))
     ),
-    el('td', { class: 'freq' }, primary.frequency || '—'),
+    el('td', { class: 'freq' }, primary.frequency || '-'),
     el('td', {}, [el('span', { class: 'verif ' + (m.verification_state || '') }, (m.verification_state || '').replace('_', ' '))]),
-    el('td', { class: 'last' }, formatAsOf(m.last_verified_at) || '—')
+    el('td', { class: 'last' }, formatAsOf(m.last_verified_at) || '-')
   ]);
 }
 
@@ -136,7 +136,7 @@ search.addEventListener('input', () => {
 });
 
 // ──────────────────────────────────────────────────────────────
-// Source directory — unique EXTERNAL sources, ranked by usage.
+// Source directory, unique EXTERNAL sources, ranked by usage.
 // Hides internal "IRM derived" + "reconciliation" entries (audit-internal,
 // not user-facing third-party data sources).
 // ──────────────────────────────────────────────────────────────
@@ -156,7 +156,7 @@ for (const m of metrics) {
   }
   for (const cc of (m.source_crosscheck || [])) {
     if (cc.name && !isInternal(cc)) {
-      if (!sourceMap.has(cc.name)) sourceMap.set(cc.name, { name: cc.name, url: cc.url, type: cc.type, frequency: '—', count: 0, primary: 0 });
+      if (!sourceMap.has(cc.name)) sourceMap.set(cc.name, { name: cc.name, url: cc.url, type: cc.type, frequency: '-', count: 0, primary: 0 });
       sourceMap.get(cc.name).count++;
     }
   }
@@ -170,7 +170,7 @@ dirHost.innerHTML = '';
 for (const s of sourcesList) {
   dirHost.appendChild(el('div', { class: 'source-card' }, [
     el('div', { class: 'sc-name' }, s.name),
-    el('div', { class: 'sc-meta' }, `${s.type} · ${s.frequency || '—'}`),
+    el('div', { class: 'sc-meta' }, `${s.type} · ${s.frequency || '-'}`),
     s.url && s.url !== '#' ? el('a', { class: 'sc-link', href: s.url, target: '_blank', rel: 'noopener' }, s.url.replace(/^https?:\/\//, '').slice(0, 48)) : null,
     el('div', { class: 'sc-usage' }, `Used by ${s.count} metric${s.count > 1 ? 's' : ''} · ${s.primary} primary, ${s.count - s.primary} cross-check`)
   ]));
