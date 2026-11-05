@@ -91,7 +91,7 @@ async function load() {
   const ovBody = document.querySelector('#overrides-table tbody');
   for (const ov of (ph.manual_overrides || [])) {
     ovBody.insertAdjacentHTML('beforeend', `
-      <tr><td class="sans">${ov.metric_id}</td><td>${ov.value}</td><td>${ov.as_of?.slice(0,10) || '-'}</td><td>${ov.expires_at?.slice(0,10) || '-'}</td><td style="font-size:11px"><a href="${ov.source_url}" target="_blank" style="color:var(--accent)">${ov.source_name || 'link'}</a></td></tr>
+      <tr><td class="sans">${ov.metric_id}</td><td>${ov.value ?? (ov.note ? ov.note : "-")}</td><td>${ov.as_of?.slice(0,10) || '-'}</td><td>${ov.expires_at?.slice(0,10) || '-'}</td><td style="font-size:11px">${ov.source_url ? `<a href="${ov.source_url}" target="_blank" style="color:var(--accent)">${ov.source_name || "link"}</a>` : "-"}</td></tr>
     `);
   }
   if (!ovBody.children.length) ovBody.innerHTML = '<tr><td colspan="5" style="color:var(--ink-3)">No active manual overrides</td></tr>';

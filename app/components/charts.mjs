@@ -511,12 +511,12 @@ export function renderFlowsFocused(data) {
     el('div', { class: 'flow-grid' }, [
       el('div', { class: 'flow-cell' }, [
         el('div', { class: 'flow-cell-label' }, 'FII equity'),
-        el('div', { class: 'flow-cell-value neg' }, data.fii.formatted),
+        el('div', { class: 'flow-cell-value ' + (data.fii.value < 0 ? 'neg' : 'pos') }, data.fii.formatted),
         data.fii.sub ? el('div', { class: 'flow-cell-sub' }, data.fii.sub) : null
       ].filter(Boolean)),
       el('div', { class: 'flow-cell' }, [
         el('div', { class: 'flow-cell-label' }, 'DII equity'),
-        el('div', { class: 'flow-cell-value pos' }, data.dii.formatted),
+        el('div', { class: 'flow-cell-value ' + (data.dii.value < 0 ? 'neg' : 'pos') }, data.dii.formatted),
         data.dii.sub ? el('div', { class: 'flow-cell-sub' }, data.dii.sub) : null
       ].filter(Boolean)),
       el('div', { class: 'flow-cell' }, [

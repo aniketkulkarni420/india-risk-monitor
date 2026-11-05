@@ -280,7 +280,7 @@ const scoreRow = el('div', { class: 'hv-score-row', style: { alignItems: 'flex-e
     : el('div', { class: 'hv-score-big hv-score-na', style: { fontSize: '34px', lineHeight: '1.1' } }, 'Not available'),
   riskOk
     ? el('div', { class: 'hv-score-sub' }, '/ 100')
-    : el('div', { class: 'hv-score-sub', style: { maxWidth: '360px' } }, riskUnavailableNote)
+    : el('div', { class: 'hv-score-sub', style: { maxWidth: '360px', fontSize: '13px', lineHeight: '1.4' } }, riskUnavailableNote)
 ]);
 if (riskOk && hasRealHistory(risk.sparkline_12m)) {
   const riskHist = risk.sparkline_12m;
@@ -360,7 +360,10 @@ function vitalTile(metric_id, label, valueFn) {
     ]),
     el('div', { class: 'vital-tile-value' + (m.status === 'shock' || m.status === 'high' ? ' is-stress' : '') },
       valueFn ? valueFn(m) : formatValue(m.value, m.value_format, m.unit)),
-    isRate
+    m.section === 'flows'
+      // Day flows: a % change of a net flow (e.g. -255% MoM) carries no meaning
+      ? el('div', { class: 'vital-tile-sub' }, 'as on ' + formatAsOf(m.as_of))
+      : isRate
       ? el('div', { class: 'vital-tile-sub' }, (bpsMove != null ? (bpsMove > 0 ? '+' : '') + bpsMove + ' bps · ' : '') + 'as on ' + formatAsOf(m.as_of))
       : trend != null
       ? el('div', { class: 'vital-tile-sub ' + trendCls }, formatTrend(trend) + ' ' + trendLabel)
@@ -684,7 +687,7 @@ function todayBullets() {
     const above95 = brent.value >= 95;
     out.push({
       icon: above95 ? 'shock' : (brent.status === 'high' ? 'watch' : 'calm'),
-      html: `<b>Brent crude</b> at $${brent.value.toFixed(2)} per barrel. ${formatTrend(brent.mom_pct)} MoM${above95 ? ', <i>above $95 shock threshold</i>' : ''}`,
+      html: `<b>Brent crude</b> at $${Math.round(brent.value)} per barrel. ${formatTrend(brent.mom_pct)} MoM${above95 ? ', <i>above $95 shock threshold</i>' : ''}`,
       drawer_metric_id: 'brent_crude'
     });
   }
@@ -725,7 +728,7 @@ function todayBullets() {
     if (Math.abs(lead) >= 0.3) {
       out.push({
         icon: 'calm',
-        html: `<b>${lead > 0 ? 'Banks beating Nifty' : 'Nifty beating Banks'}</b> by ${Math.abs(lead).toFixed(1)} points YoY. <i>${nifty.value.toFixed(0)} vs ${bnk.value.toFixed(0)}</i>`,
+        html: `<b>${lead > 0 ? 'Banks beating Nifty' : 'Nifty beating Banks'}</b> by ${Math.abs(lead).toFixed(1)} points YoY. <i>Nifty ${formatTrend(nifty.yoy_pct)}, Bank Nifty ${formatTrend(bnk.yoy_pct)}</i>`,
         drawer_metric_id: lead > 0 ? 'bank_nifty' : 'nifty_50'
       });
     }
