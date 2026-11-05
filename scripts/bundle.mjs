@@ -414,6 +414,34 @@ const freshnessReport = (() => {
   };
 })();
 
+// Source-link fixes applied at bundle time (QA 5 Nov 2026). The metric JSON
+// files keep their stored URLs so ingest commits on main do not conflict;
+// visitors get working links. irm.local was a placeholder domain.
+const SITE = 'https://india-risk-monitor.pages.dev';
+const URL_FIXES = [
+  [/^https?:\/\/irm\.local\/methodology\/.*$/, SITE + '/methodology.html'],
+  [/^https:\/\/www\.nseindia\.com\/reports\/?$/, 'https://www.nseindia.com/all-reports-derivatives'],
+  [/^https:\/\/archives\.nseindia\.com\/content\/nsccl\/?$/, 'https://www.nseindia.com/all-reports-derivatives'],
+  [/^https:\/\/www\.nseindia\.com\/products-services\/indices-banknifty$/, 'https://www.nseindia.com/market-data/index-performances'],
+  [/^https:\/\/www\.nseindia\.com\/products-services\/indices-india-vix-index$/, 'https://www.nseindia.com/reports-indices-historical-vix'],
+  [/^https:\/\/www\.nseindia\.com\/products-services\/indices-overview$/, 'https://www.nseindia.com/reports-indices-yield'],
+  [/^https:\/\/www\.sebi\.gov\.in\/statistics\/foreign-portfolio-investors-fpis-data\.html$/, 'https://www.fpi.nsdl.co.in/web/Reports/Latest.aspx'],
+  [/^https:\/\/trendlyne\.com\/markets\/sector\/?$/, 'https://trendlyne.com/equity/sector-industry-analysis/'],
+  [/^https:\/\/www\.rbi\.org\.in\/Scripts\/Money_Market\.aspx$/, 'https://www.rbi.org.in/Scripts/BS_ViewMMO.aspx']
+];
+function fixUrl(u) {
+  if (typeof u !== 'string') return u;
+  for (const [re, to] of URL_FIXES) if (re.test(u)) return to;
+  return u;
+}
+function fixSourceUrls(obj) {
+  if (!obj) return;
+  if (obj.source_primary) obj.source_primary.url = fixUrl(obj.source_primary.url);
+  for (const c of obj.source_crosscheck || []) c.url = fixUrl(c.url);
+}
+for (const m of Object.values(metrics)) fixSourceUrls(m);
+fixSourceUrls(sectors);
+
 const bundle = {
   generated_at: new Date().toISOString(),
   metric_count: Object.keys(metrics).length,

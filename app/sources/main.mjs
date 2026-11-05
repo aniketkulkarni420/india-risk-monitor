@@ -142,7 +142,7 @@ search.addEventListener('input', () => {
 // ──────────────────────────────────────────────────────────────
 const isInternal = (s) =>
   !s || !s.url ||
-  s.url.startsWith('https://irm.local') ||
+  s.url.startsWith('https://irm.local') || s.url.includes('india-risk-monitor.pages.dev/methodology') ||
   /reconciliation/i.test(s.name) ||
   s.type === 'Manual estimate';
 
