@@ -180,7 +180,10 @@ function metricSparkPoints(metric, count) {
 // Prior copy "Live 50/70" read as "30% missing". New copy frames as
 // progress: "Sources: 50 verified · 20 backfilling" — same data, different
 // emotional weight. When >=90% verified, switches to a clean "Updated X" stamp.
-const allMetricsList = Object.values(DATA.metrics);
+// Counts use the input signals only. The 10 composites (risk score, drivers,
+// regimes) are computed from those signals, so counting them as "verified
+// sources" inflated the totals (page said 71, meta said 70 and 60).
+const allMetricsList = Object.values(DATA.metrics).filter(m => m.section !== 'composites');
 const totalMetrics = allMetricsList.length;
 const verified = allMetricsList.filter(m => m.verification_state === 'verified').length;
 const backfilling = totalMetrics - verified;
@@ -190,7 +193,7 @@ if (freshRatio >= 0.9) {
   const newest = allMetricsList.map(m => m.as_of).sort().pop();
   asofEl.textContent = 'Updated ' + formatAsOf(newest);
 } else {
-  const tooltip = `${verified} sources updating live · ${backfilling} backfilling history. Tap any metric for source detail.`;
+  const tooltip = `${totalMetrics} signals: ${verified} verified against a second source · ${backfilling} on primary source only or backfilling. Tap any metric for source detail.`;
   asofEl.innerHTML = `<span style="color: var(--ink-2);" title="${tooltip}">Sources: <b style="color:var(--ink)">${verified}</b> verified · ${backfilling} backfilling</span>`;
 }
 
@@ -1757,24 +1760,25 @@ body.appendChild(renderSectionFrame({
 // shows "12m history: 1 of 20 verified" honestly so users see backfill state.
 // ──────────────────────────────────────────────────────────────
 const allMetrics = Object.values(DATA.metrics);
-const verifN = allMetrics.filter(m => m.verification_state === 'verified').length;
-const xcheckN = allMetrics.filter(m => m.verification_state === 'crosscheck_pending').length;
+const signalMetrics = allMetrics.filter(m => m.section !== 'composites');
+const verifN = signalMetrics.filter(m => m.verification_state === 'verified').length;
+const xcheckN = signalMetrics.filter(m => m.verification_state === 'crosscheck_pending').length;
 // "Source pending" = anything not yet verified + not yet cross-checked.
 // Captures unregistered parsers, failed parsers, and seed-only metrics.
-const sourcePendingN = allMetrics.length - verifN - xcheckN;
+const sourcePendingN = signalMetrics.length - verifN - xcheckN;
 // "12m history" count = metrics where sparkline_12m has at least 12 distinct
 // non-null values AND the metric has been verified live. Today: GST only.
 const has12mHistory = (m) => m.verification_state === 'verified'
   && Array.isArray(m.sparkline_12m)
   && m.sparkline_12m.length >= 12
   && new Set(m.sparkline_12m.filter(v => v != null)).size >= 6;  // 6+ unique values means real history, not mock-padded
-const histN = allMetrics.filter(has12mHistory).length;
+const histN = signalMetrics.filter(has12mHistory).length;
 
 body.appendChild(el('div', { class: 'dashboard-trust-band' }, [
   el('a', { class: 'dtb-card', href: './sources/', style: { textDecoration: 'none' } }, [
     el('div', { class: 'dtb-label' }, 'Verified live'),
     el('div', { class: 'dtb-value', style: { color: 'var(--green)' } }, String(verifN)),
-    el('div', { class: 'dtb-sub' }, `of ${allMetrics.length} · primary + cross-check`)
+    el('div', { class: 'dtb-sub' }, `of ${signalMetrics.length} signals · primary + cross-check`)
   ]),
   el('a', { class: 'dtb-card', href: './sources/', style: { textDecoration: 'none' } }, [
     el('div', { class: 'dtb-label' }, 'Source pending'),

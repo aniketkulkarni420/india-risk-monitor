@@ -436,3 +436,9 @@ const bundle = {
 
 writeFileSync(OUT, JSON.stringify(bundle), 'utf8');
 console.log(`✓ bundled ${bundle.metric_count} metrics + ${sectors ? sectors.sectors.length : 0} sectors → app/dist/data.json (${(JSON.stringify(bundle).length / 1024).toFixed(1)} KB)`);
+
+// Static API (/api/v1/*.json, incl. health.json) is generated from the bundle.
+// Before 2026-11-05 no build step ran generate-api.mjs, so /api/v1/health.json
+// fell through to the dashboard HTML and /sources/health showed
+// "Unexpected token '<'". Running it here covers every build command.
+await import('./generate-api.mjs');

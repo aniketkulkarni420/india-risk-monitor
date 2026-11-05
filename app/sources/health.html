@@ -33,7 +33,7 @@
 <nav><a href="/">← Dashboard</a> <a href="/methodology.html">Methodology</a> <a href="/api/v1/health.json">API · health JSON</a></nav>
 
 <h1>Sources health</h1>
-<p class="lede">Per-parser status of all 60 metrics. Updated every 6 hours by the India self-hosted runner. Last update: <span id="last-update">loading…</span></p>
+<p class="lede">Per-parser status for the 61 public-data signals. Updated every 6 hours by the India self-hosted runner. Last update: <span id="last-update">loading…</span></p>
 
 <div class="summary" id="summary"></div>
 
@@ -48,11 +48,18 @@
 
 <script>
 async function load() {
-  const res = await fetch('/api/v1/health.json');
-  const data = await res.json();
-  const ph = await (await fetch('/dist/data.json')).json().then(d => d.parser_health || {});
+  // Read parser health from the bundle (always present); the static API file is
+  // a convenience copy and may be missing on an older deploy.
+  const bundle = await (await fetch('/dist/data.json')).json();
+  const ph = bundle.parser_health || {};
+  let data = { generated_at: ph.generated_at, summary: ph.summary };
+  try {
+    const res = await fetch('/api/v1/health.json');
+    if (res.ok && (res.headers.get('content-type') || '').includes('json')) data = await res.json();
+  } catch (e) { /* fall back to bundle copy */ }
 
-  document.getElementById('last-update').textContent = new Date(data.generated_at).toLocaleString();
+  const ts = data.generated_at || bundle.generated_at;
+  document.getElementById('last-update').textContent = ts ? new Date(ts).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }) + ' IST' : 'not available';
 
   // Summary
   const s = data.summary || ph.summary || { green: 0, amber: 0, red: 0, total: 0 };
