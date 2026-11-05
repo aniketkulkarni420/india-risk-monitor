@@ -51,7 +51,8 @@ function inferenceLine(panelId) {
       const parts = [];
       parts.push(`Brent at $${fmt(b.value)} per barrel.`);
       if (above95) parts.push(`Sitting above the $95 shock line.`);
-      if (b.mom_pct != null) parts.push(`Up ${fmt(b.mom_pct, 1)}% on the month.`);
+      if (b.mom_pct != null && Math.abs(b.mom_pct) >= 0.5) parts.push(`${b.mom_pct > 0 ? 'Up' : 'Down'} ${Math.round(Math.abs(b.mom_pct))}% on the month.`);
+      else if (b.mom_pct != null) parts.push('Flat on the month.');
       if (spread != null && Math.abs(spread) > 0.5) {
         parts.push(spread < 0 ? `India basket trailing by $${Math.abs(spread).toFixed(2)}.` : `India basket above Brent by $${spread.toFixed(2)}.`);
       }
@@ -94,10 +95,10 @@ function inferenceLine(panelId) {
         else parts.push(`VIX at ${fmt(vix.value, 2)}, elevated.`);
       }
       if (gold) {
-        if (gold.value > 2500) parts.push(`Gold at $${Math.round(gold.value)}, still near all time highs.`);
-        else parts.push(`Gold at $${Math.round(gold.value)}.`);
+        const gs = (gold.sparkline_12m || []).filter(v => typeof v === 'number');
+        const nearTop = gs.length && gold.value >= Math.max(...gs) * 0.99;
+        parts.push(`Gold at $${new Intl.NumberFormat('en-US').format(Math.round(gold.value))}${nearTop ? ', at the top of its recent range.' : '.'}`);
       }
-      if (vix && gold && vix.value < 22 && gold.value > 2500) parts.push(`Someone is hedging.`);
       return parts.join(' ');
     }
     case 'equity': {
@@ -160,6 +161,11 @@ function metricSparkPoints(metric, count) {
   const n = count && count <= sl.length ? count : sl.length;
   const slice = sl.slice(-n);
   const asOf = metric.as_of ? new Date(metric.as_of) : new Date();
+  const freq = metric.source_primary?.frequency;
+  if (freq === 'Daily' || freq === 'Live') {
+    // Daily readings: label only the last point with its real date.
+    return slice.map((v, i) => ({ label: i === n - 1 ? formatAsOf(metric.as_of) : '', value: typeof v === 'number' ? v : (v?.value ?? 0) }));
+  }
   return slice.map((v, i) => {
     const monthsBack = n - 1 - i;
     const d = new Date(asOf.getFullYear(), asOf.getMonth() - monthsBack, 1);
@@ -357,8 +363,10 @@ const vitalRow = el('div', { class: 'vital-row' }, [
   vitalTile('brent_crude',    'Brent'),
   vitalTile('india_vix',      'VIX'),
   vitalTile('real_10y_yield', 'Real 10Y'),
-  vitalTile('fii_equity_mtd', 'FII MTD',
-    m => '−₹' + Math.abs(Math.round(m.value/1000)).toFixed(1) + 'k Cr')
+  // FII tile shows the day's net from NSE (the MTD metric held the same daily
+  // figure, and the old formatter always printed a minus sign).
+  vitalTile('fii_equity_daily', 'FII net (day)',
+    m => (m.value < 0 ? '-' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(m.value))) + ' Cr')
 ].filter(Boolean));
 vital.appendChild(vitalRow);
 
@@ -564,7 +572,7 @@ function buildHeroH1() {
   }
   if (!secondary && fii && abs) {
     const fmt = (v) => (v >= 0 ? '+₹' : '−₹') + Math.abs(v).toLocaleString('en-IN', { maximumFractionDigits: 0 }) + ' Cr';
-    secondary = `FII flow ${fmt(fii.value)} · DII covering ${(abs.value * 100).toFixed(0)}%`;
+    secondary = fii.value < 0 ? `FII flow ${fmt(fii.value)} · DII covering ${(abs.value * 100).toFixed(0)}%` : `FII net buyers ${fmt(fii.value)}`;
   }
   if (secondary) clauses.push(secondary);
 
@@ -675,18 +683,28 @@ function todayBullets() {
       drawer_metric_id: 'vlcc_tanker_rates'
     });
   }
-  if (absorp) {
-    out.push({
-      icon: absorp.value >= 1 ? 'calm' : 'watch',
-      html: `<b>DII absorption</b> ${absorp.value.toFixed(2)}×. <i>${absorp.value >= 1 ? 'DII offsetting FII selling' : 'DII not fully absorbing FII outflows'}</i>`,
-      drawer_metric_id: 'absorption_ratio'
-    });
+  const fiiDayB = M('fii_equity_daily'), diiDayB = M('dii_daily');
+  if (fiiDayB && diiDayB && typeof fiiDayB.value === 'number' && typeof diiDayB.value === 'number') {
+    const f = (v) => (v < 0 ? '-' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(v))) + ' Cr';
+    if (fiiDayB.value >= 0) {
+      out.push({
+        icon: 'calm',
+        html: `<b>FII net buyers</b> at ${f(fiiDayB.value)}, DII ${f(diiDayB.value)}. <i>${formatAsOf(fiiDayB.as_of)}</i>`,
+        drawer_metric_id: 'fii_equity_daily'
+      });
+    } else if (absorp) {
+      out.push({
+        icon: absorp.value >= 1 ? 'calm' : 'watch',
+        html: `<b>FII net sellers</b> at ${f(fiiDayB.value)}, DII ${f(diiDayB.value)}. <i>${absorp.value >= 1 ? 'DII offsetting FII selling' : 'DII not fully absorbing FII selling'}</i>`,
+        drawer_metric_id: 'absorption_ratio'
+      });
+    }
   }
   if (gst) {
     const auto2wYoY = auto2w?.yoy_pct;
     out.push({
       icon: 'calm',
-      html: `<b>Real economy</b>. GST ${formatValue(gst.value, 'currency_inr_lcr')} (${formatTrend(gst.yoy_pct)} YoY)${auto2wYoY != null ? `, auto 2W ${formatTrend(auto2wYoY)}` : ''}`,
+      html: `<b>Real economy</b>. GST ₹${(gst.value / 100000).toFixed(2)} lakh crore (${formatTrend(gst.yoy_pct)} YoY)${auto2wYoY != null ? `, auto 2W ${formatTrend(auto2wYoY)}` : ''}`,
       drawer_metric_id: 'gst_gross'
     });
   }
@@ -829,59 +847,74 @@ const diiMtdH = M('dii_mtd');
 const absorpM = M('absorption_ratio');
 const fnoOi = M('fii_index_fut_positioning');
 const blockDeals = M('block_deals_notional');
-const _absRatio = absorpM?.value;
+const num = (m) => (m && typeof m.value === 'number' && Number.isFinite(m.value)) ? m.value : null;
+// The NSE fiidiiTradeReact source publishes the day's net only. The ingest
+// writes that same daily figure into the MTD and CYTD metrics, so when they
+// equal the daily value they are not real month or year totals: hide them.
+const sameAsDaily = (agg, day) => num(agg) != null && num(day) != null && num(agg) === num(day);
+const fiiMtdReal = !sameAsDaily(fiiMtd, fiiDay);
+const diiMtdReal = !sameAsDaily(diiMtdH, diiDay);
+const fiiCytdReal = !sameAsDaily(fiiCytdH, fiiDay) && !sameAsDaily(fiiCytdH, fiiMtd);
+const fiiD = num(fiiDay), diiD = num(diiDay);
+const fiiBuying = fiiD != null && fiiD > 0;
+const _absRatio = num(absorpM);
 const _absPct = _absRatio != null ? Math.round(_absRatio * 100) : null;
-const fiiVal = (m, fb) => (m && typeof m.value === 'number') ? Math.round(m.value) : fb;
-const diiCytdH = diiMtdH ? Math.round((diiMtdH.value || 0) * 4) : 95000;
-const fiiCytd = fiiCytdH?.value ?? -42180;
-const diiCytd = diiCytdH;
-const netCytd = diiCytd + fiiCytd;
-const inrFmt = (v) => (v < 0 ? '−' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(v))) + ' Cr';
-const shortFmt = (v) => (v < 0 ? '−' : '+') + '₹' + (Math.abs(v) >= 1000 ? (Math.abs(v)/1000).toFixed(1) + 'k' : Math.round(Math.abs(v)));
+// Absorption (DII buying / FII selling) only means something on an FII selling day.
+const absMeaningful = _absRatio != null && fiiD != null && fiiD < 0;
+const inrFmt = (v) => (v < 0 ? '-' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(v))) + ' Cr';
+const absFmt = (v) => '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(v))) + ' Cr';
+const flowsReadToday = fiiD == null || diiD == null ? 'Flow data pending'
+  : fiiBuying && diiD < 0 ? 'FII net buyers, DII net sellers'
+  : fiiBuying ? 'FII and DII both net buyers'
+  : diiD > 0 ? 'FII net sellers, DII net buyers'
+  : 'FII and DII both net sellers';
 
 // V60 Lens 1 · 4-lens regime strip
 flowsBody.appendChild(renderLensRow([
   {
     label: 'DII Absorb',
-    value: _absRatio != null ? _absRatio.toFixed(2) + '×' : '—',
-    pill: _absRatio != null ? { text: 'REGIME · 8d', klass: _absRatio >= 1 ? 'green' : 'amber' } : null,
-    read: _absRatio != null ? `DII covering ${_absPct}% of FII selling` : 'Ratio pending'
+    value: absMeaningful ? _absRatio.toFixed(2) + '×' : 'n/a',
+    pill: absMeaningful ? { text: 'REGIME · 8d', klass: _absRatio >= 1 ? 'green' : 'amber' } : null,
+    read: absMeaningful ? `DII covering ${_absPct}% of FII selling` : (fiiBuying ? 'FII net buyers: nothing to absorb' : 'Ratio pending')
   },
   {
-    label: 'FII MTD',
-    value: fiiMtd ? shortFmt(fiiMtd.value) : '—',
-    valueClass: (fiiMtd?.value ?? 0) < 0 ? 'neg' : 'pos',
-    pill: { text: (fiiMtd?.value ?? 0) < -15000 ? 'STRESS' : (fiiMtd?.value ?? 0) < 0 ? 'SOFT' : 'INFLOW', klass: (fiiMtd?.value ?? 0) < -15000 ? 'red' : 'amber' },
-    read: 'cumulative this month'
+    label: 'FII net (day)',
+    value: fiiD != null ? inrFmt(fiiD) : 'n/a',
+    valueClass: (fiiD ?? 0) < 0 ? 'neg' : 'pos',
+    pill: fiiD == null ? null : { text: fiiD < -5000 ? 'STRESS' : fiiD < 0 ? 'SELLING' : 'BUYING', klass: fiiD < -5000 ? 'red' : fiiD < 0 ? 'amber' : 'green' },
+    read: fiiDay?.as_of ? 'cash market · ' + formatAsOf(fiiDay.as_of) : 'cash market'
   },
   {
-    label: 'F&O OI',
-    value: fnoOi ? formatTrend(fnoOi.value) : '—',
-    valueClass: (fnoOi?.value ?? 0) > 0 ? 'pos' : 'neg',
+    label: 'FII index futures',
+    value: num(fnoOi) != null ? (fnoOi.value < 0 ? '-' : '+') + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(fnoOi.value))) : 'n/a',
+    valueClass: (num(fnoOi) ?? 0) > 0 ? 'pos' : 'neg',
     pill: { text: fnoOi?.status === 'high' || fnoOi?.status === 'shock' ? 'HIGH' : 'NORMAL', klass: fnoOi?.status === 'high' ? 'red' : 'amber' },
-    read: (fnoOi?.value ?? 0) < 0 ? 'positioning unwinding' : 'longs building'
+    read: num(fnoOi) == null ? 'pending' : (fnoOi.value < 0 ? 'contracts net short' : 'contracts net long')
   },
   {
     label: 'Block deals',
-    value: blockDeals ? '₹' + new Intl.NumberFormat('en-IN').format(Math.round(blockDeals.value/1000)) + 'k' : '—',
-    pill: { text: (blockDeals?.value ?? 0) > 5000 ? 'NOTABLE' : 'NORMAL', klass: (blockDeals?.value ?? 0) > 5000 ? 'amber' : 'blue' },
-    read: '5d avg notional'
+    value: num(blockDeals) != null ? formatValue(blockDeals.value, 'currency_inr_cr') : 'n/a',
+    pill: { text: (num(blockDeals) ?? 0) > 5000 ? 'NOTABLE' : 'NORMAL', klass: (num(blockDeals) ?? 0) > 5000 ? 'amber' : 'blue' },
+    read: 'notional · ' + (blockDeals?.as_of ? formatAsOf(blockDeals.as_of) : '')
   }
 ]));
 
-// V60 Lens 2 · cards-as-tabs period strip
-const todayNet = fiiVal(fiiDay, -2103) + fiiVal(diiDay, 1712);
-const mtdNet   = fiiVal(fiiMtd, -14305) + fiiVal(diiMtdH, 18596);
-const cytdNet  = fiiVal(fiiCytdH, -42180) + diiCytdH;
-const last5Net = 4291;
-const periods = ['today', '5sess', 'mtd', 'cytd'];
-let activePeriod = 'mtd';
-const periodData = {
-  today: { label: 'Today', net: todayNet, fii: fiiVal(fiiDay, -2103), dii: fiiVal(diiDay, 1712), sub: 'net ₹ Cr · 1 session', focusedHeader: 'Today · ' + (fiiDay?.as_of ? formatAsOf(fiiDay.as_of) : ''), narrative: 'Single-session read · use period tabs above for cumulative picture.' },
-  '5sess': { label: 'Weekly', net: last5Net, fii: -12400, dii: 16691, sub: 'net ₹ Cr · 5d avg', focusedHeader: 'Weekly · last 5 sessions', narrative: 'Short-window absorption pattern · 5-day net positive despite FII selling.' },
-  mtd: { label: 'MTD', net: mtdNet, fii: fiiVal(fiiMtd, -14305), dii: fiiVal(diiMtdH, 18596), sub: 'net ₹ Cr · absorption ' + (absorpM ? absorpM.value.toFixed(2) + '×' : '—'), focusedHeader: 'MTD · ' + (fiiMtd?.as_of ? formatAsOf(fiiMtd.as_of) : 'May 2026'), narrative: _absRatio != null && _absRatio >= 1 ? `DII covering ${_absPct}% of FII selling. Stable regime · becomes stress if FII intensifies AND DII slows.` : `DII covering ${_absPct ?? '—'}% of FII outflow. Becomes "stress" if FII selling intensifies AND DII slows simultaneously.` },
-  cytd: { label: 'CYTD', net: cytdNet, fii: fiiVal(fiiCytdH, -42180), dii: diiCytdH, sub: 'net ₹ Cr · year-to-date', focusedHeader: 'CYTD · ' + new Date().getFullYear(), narrative: 'Calendar-year cumulative · structural pattern. Net positive YTD on DII strength.' }
-};
+// V60 Lens 2 · cards-as-tabs period strip. Only periods with real data are
+// shown. The former Weekly tab, CYTD DII (MTD × 4) and the cumulative chart
+// were hard-coded May 2026 placeholders and are removed.
+const periodData = {};
+if (fiiD != null && diiD != null) {
+  periodData.today = { label: 'Today', net: fiiD + diiD, fii: fiiD, dii: diiD, sub: '1 session',
+    focusedHeader: 'Today · ' + (fiiDay?.as_of ? formatAsOf(fiiDay.as_of) : ''),
+    narrative: `FII ${fiiD >= 0 ? 'bought' : 'sold'} a net ${absFmt(fiiD)} and DII ${diiD >= 0 ? 'bought' : 'sold'} a net ${absFmt(diiD)}.`
+      + (fiiBuying ? ' No FII selling to absorb.' : absMeaningful ? ` DII covering ${_absPct}% of FII selling.` : '') };
+}
+if (fiiMtdReal && diiMtdReal && num(fiiMtd) != null && num(diiMtdH) != null) {
+  periodData.mtd = { label: 'MTD', net: fiiMtd.value + diiMtdH.value, fii: fiiMtd.value, dii: diiMtdH.value, sub: 'month to date',
+    focusedHeader: 'MTD · ' + (fiiMtd?.as_of ? formatAsOf(fiiMtd.as_of) : ''), narrative: 'Month-to-date cash market net.' };
+}
+const periods = Object.keys(periodData);
+let activePeriod = periods.includes('mtd') ? 'mtd' : periods[0];
 
 const periodTabsHost = el('div', {});
 const focusedHost = el('div', {});
@@ -891,21 +924,22 @@ flowsBody.appendChild(focusedHost);
 function renderFlowsActive() {
   const p = periodData[activePeriod];
   periodTabsHost.innerHTML = '';
+  focusedHost.innerHTML = '';
+  if (!p) return;
   periodTabsHost.appendChild(renderCardsAsTabs(periods.map(id => ({
-    id, label: periodData[id].label, net: shortFmt(periodData[id].net), sub: periodData[id].sub.split(' · ')[1] || '',
+    id, label: periodData[id].label, net: inrFmt(periodData[id].net), sub: periodData[id].sub,
     netClass: periodData[id].net >= 0 ? 'pos' : 'neg',
     active: id === activePeriod
   })), (id) => { activePeriod = id; renderFlowsActive(); }));
-  focusedHost.innerHTML = '';
   focusedHost.appendChild(renderFlowsFocused({
     period_label: p.focusedHeader || p.label,
-    period_sub: _absRatio != null ? `Absorption ${_absRatio.toFixed(2)}× · 8 sessions` : '',
-    fii: { value: p.fii, formatted: inrFmt(p.fii), sub: 'NSE FII bhavcopy' },
-    dii: { value: p.dii, formatted: inrFmt(p.dii), sub: 'AMFI MF flows' },
-    net: { value: p.net, formatted: inrFmt(p.net), sub: p.sub.split(' · ')[1] || '' },
-    narrative_lead: _absRatio != null && _absRatio >= 1 ? `DII Absorption regime · 8 sessions:` : `DII Absorption · 8 sessions:`,
+    period_sub: flowsReadToday,
+    fii: { value: p.fii, formatted: inrFmt(p.fii), sub: 'NSE provisional' },
+    dii: { value: p.dii, formatted: inrFmt(p.dii), sub: 'NSE provisional' },
+    net: { value: p.net, formatted: inrFmt(p.net), sub: p.sub },
+    narrative_lead: 'Read:',
     narrative: p.narrative,
-    absorption: activePeriod === 'mtd' ? _absRatio : null
+    absorption: absMeaningful ? _absRatio : null
   }));
 }
 renderFlowsActive();
@@ -917,29 +951,12 @@ if (fnoOi && fnoOi.sparkline_12m) {
   flowsBody.appendChild(renderPersistenceBar(last5));
 }
 
-// Cumulative chart · V60 says "kept · lower priority" · collapsed by default
-const diiCumPoints = [
-  { label: 'Jan 1', value: 0 }, { label: 'Feb 1', value: 28000 }, { label: 'Mar 1', value: 58000 },
-  { label: 'Apr 1', value: 84000 }, { label: 'Apr 28', value: 95000 }
-];
-const fiiCumPoints = [
-  { label: 'Jan 1', value: 0 }, { label: 'Feb 1', value: -10000 }, { label: 'Mar 1', value: -22000 },
-  { label: 'Apr 1', value: -32000 }, { label: 'Apr 28', value: -42180 }
-];
-const cumDetails = el('details', { class: 'flows-cumulative-collapse' }, [
-  el('summary', {}, 'Cumulative chart · 2026 YTD · ' + inrFmt(netCytd) + ' net market'),
-  renderCumulativeLine([
-    { name: 'DII cumulative', color: 'var(--green)', points: diiCumPoints, current: '+95,000 Cr' },
-    { name: 'FII cumulative', color: 'var(--red)', points: fiiCumPoints, current: '−42,180 Cr' }
-  ], { title: 'FII vs DII · cumulative ₹ Cr · 2026 YTD', summary: 'Net market: ' + inrFmt(netCytd) + ' · DII pulling away', asof: '1 Jan – 5 May 2026' })
-]);
-flowsBody.appendChild(cumDetails);
-
 // Sectoral diverging bars REMOVED per Aniket 2026-05-12 decision · was mock data, no NSDL parser yet.
 
 // Supporting composite (auto-promote anomalies + summary + change hint built-in)
 flowsBody.appendChild(renderSupportingTier(
-  ['fpi_debt_flows', 'fii_index_fut_positioning', 'block_deals_notional', 'fii_equity_mtd', 'dii_mtd', 'fii_equity_cytd'],
+  ['fpi_debt_flows', 'fii_index_fut_positioning', 'block_deals_notional',
+   fiiMtdReal ? 'fii_equity_mtd' : null, diiMtdReal ? 'dii_mtd' : null, fiiCytdReal ? 'fii_equity_cytd' : null].filter(Boolean),
   M,
   { sectionId: 'flows', title: 'Supporting metrics' }
 ));
@@ -1403,33 +1420,42 @@ const indiaCrude = M('india_crude_basket');
 const brentValue = brent?.value ?? null;
 const indiaValue = indiaCrude?.value ?? null;
 const brentSpread = +(indiaValue - brentValue).toFixed(2);
-// Days above $95 shock = count of last sparkline points >= 95 (conservative)
-const daysAboveShock = (brent?.sparkline_12m || brentPoints.map(p => p.value))
-  .filter(v => (typeof v === 'number' ? v : v.value) >= 95).length;
+// Window facts come from the live sparkline (last N daily readings), never
+// from fixed May 2026 text.
+const brentSpark = (brent?.sparkline_12m || []).filter(v => typeof v === 'number');
+const brentN = brentSpark.length;
+const daysAboveShock = brentSpark.filter(v => v >= 95).length;
+const brentHi = brentN ? Math.max(...brentSpark) : null;
+const brentLo = brentN ? Math.min(...brentSpark) : null;
+const brentWindow = brentN ? `last ${brentN} readings to ${formatAsOfLong(brent.as_of)}` : '';
+const brentShockText = brentValue >= 95 && indiaValue >= 95 ? 'both above the $95 shock line'
+  : brentValue >= 95 ? 'Brent above the $95 shock line'
+  : indiaValue >= 95 ? 'India basket above $95, Brent below'
+  : 'both below the $95 shock line';
 const brentChart = renderPairedLine(
   [
     { name: 'Brent crude', color: 'var(--red)', points: brentPoints, current: '$' + brentValue.toFixed(2) + ' / bbl' },
     { name: 'India crude basket (PPAC)', color: 'var(--accent)', points: indiaPoints, current: '$' + indiaValue.toFixed(2) + ' / bbl' }
   ],
-  { title: '90-day trail · USD per barrel', thresholdLine: 95, summary: `Spread ${brentSpread >= 0 ? '+' : ''}${brentSpread} · both above $95 shock since 21 Apr`, asof: 'window: 5 Feb – 5 May 2026' }
+  { title: 'Recent trail · USD per barrel', thresholdLine: 95, summary: `Spread ${brentSpread >= 0 ? '+' : '-'}$${Math.abs(brentSpread).toFixed(2)} · ${brentShockText}`, asof: brentWindow }
 );
 const brentPanel = renderHeadlinePanel({
   eyebrow: brentValue >= 95 ? '⚠ Shock · Brent crude above $95' : 'Brent crude · ICE 1-month',
   eyebrowColor: brentValue >= 95 ? 'var(--red)' : 'var(--ink-2)',
   value: '$' + brentValue.toFixed(2) + ' / bbl',
-  metaLine: 'Brent ICE futures · Trading Economics · ' + (brent?.as_of ? formatAsOf(brent.as_of) : '5 May 2026'),
+  metaLine: 'Brent ICE futures · Trading Economics · ' + (brent?.as_of ? formatAsOf(brent.as_of) : ''),
   threshold: '$95 / bbl',
   mom: brent?.mom_pct != null ? { text: formatTrend(brent.mom_pct), color: brent.mom_pct > 0 ? 'var(--red)' : 'var(--green)' } : null,
   yoy: brent?.yoy_pct != null ? { text: formatTrend(brent.yoy_pct), color: brent.yoy_pct > 0 ? 'var(--red)' : 'var(--green)' } : null,
   // 5Y percentile removed (no reliable free 5Y daily Brent source); will return in V2 once FRED backfill runs from CI
   status: brentValue >= 95 ? 'shock' : 'high',
   statusPill: brentValue >= 95 ? 'SHOCK' : 'HIGH',
-  statusSub: `Above $95 since 21 Apr · ${daysAboveShock} sessions`,
+  statusSub: brentN ? `Above $95 in ${daysAboveShock} of the last ${brentN} readings` : '',
   chart: brentChart,
   matrix: [
     { label: 'India crude basket', value: '$' + indiaValue.toFixed(2), sub1: indiaCrude?.yoy_pct != null ? formatTrend(indiaCrude.yoy_pct) + ' YoY' : '+34.2% YoY', sub1Color: 'var(--red)', sub2: 'PPAC daily', asof: indiaCrude?.as_of ? formatAsOf(indiaCrude.as_of) : '5 May', tooltip: 'India crude basket = weighted avg of Dubai (75%) + Brent (25%) — what India actually pays' },
-    { label: 'Brent–India spread', value: (brentSpread >= 0 ? '+$' : '−$') + Math.abs(brentSpread).toFixed(2), sub1: brentSpread < 0 ? 'India trades below Brent' : 'India trades above Brent', sub2: 'live derived', asof: 'now', tooltip: 'Spread = India basket − Brent. Negative is the norm.' },
-    { label: '90-day high · low', value: '$107 · $76', sub1: 'range $31', sub2: 'peak: 28 Apr 2026', asof: 'derived', tooltip: '90-day rolling high and low for Brent' },
+    { label: 'Brent-India spread', value: (brentSpread >= 0 ? '+$' : '-$') + Math.abs(brentSpread).toFixed(2), sub1: brentSpread < 0 ? 'India trades below Brent' : 'India trades above Brent', sub2: 'live derived', asof: indiaCrude?.as_of ? formatAsOf(indiaCrude.as_of) : '', tooltip: 'Spread = India basket minus Brent. Negative is the norm.' },
+    { label: 'Recent high · low', value: brentN ? '$' + Math.round(brentHi) + ' · $' + Math.round(brentLo) : 'n/a', sub1: brentN ? 'range $' + Math.round(brentHi - brentLo) : '', sub2: brentN ? `last ${brentN} readings` : '', asof: brent?.as_of ? formatAsOf(brent.as_of) : '', tooltip: 'High and low of the recent daily Brent readings shown in the chart' },
     { label: 'India weekly oil bill', value: '$' + (indiaValue * 5.1 * 7 / 1000).toFixed(1) + ' Bn', sub1: 'estimate', sub1Color: 'var(--ink-2)', sub2: 'basket × 5.1 Mb/d × 7 days', asof: 'live formula', tooltip: 'India crude imports ≈ 5.1 Mb/d (PPAC). Weekly bill = basket price × imports × 7. Real number on next CI backfill.' }
   ]
 });
@@ -1438,11 +1464,16 @@ const brentInf = inferenceLineEl('brent');
 if (brentInf) freightBody.appendChild(brentInf);
 
 // 3-up tanker / container / bulk small multiples
+// Freight indices · live metrics, each with its own date (they refresh on
+// different days, so there is no single panel date).
+const _fx = (m) => m && typeof m.mom_pct === 'number' ? m.mom_pct : null;
+const _fxColor = (v) => v == null ? 'var(--ink-3)' : v > 0 ? 'var(--red)' : 'var(--green)';
+const _vlcc = M('vlcc_tanker_rates'), _wci = M('drewry_wci'), _bdti = M('baltic_dirty_tanker');
 freightBody.appendChild(renderSmallMultiples([
-  { label: 'VLCC tanker', deltaPct: 220.4, color: 'var(--red)', valueFormatted: '1,842 WS', tooltip: 'Worldscale points · benchmark for spot tanker rates · Baltic Dirty Tanker Index' },
-  { label: 'Drewry WCI', deltaPct: 14.6, color: 'var(--amber)', valueFormatted: '$2,840 / 40ft', tooltip: 'Drewry World Container Index · global avg spot rate per 40-ft container' },
-  { label: 'Baltic Dry', deltaPct: 8.4, color: 'var(--amber)', valueFormatted: '2,840 idx', tooltip: 'Baltic Dry Index · dry-bulk shipping rates · 1985=1000' }
-], { title: 'Freight indices · MoM %', asof: 'as on 2 May 2026' }));
+  _vlcc ? { label: 'VLCC tanker', deltaPct: _fx(_vlcc), color: _fxColor(_fx(_vlcc)), valueFormatted: new Intl.NumberFormat('en-IN').format(Math.round(_vlcc.value)) + ' WS', asof: formatAsOfLong(_vlcc.as_of), tooltip: 'Worldscale points · benchmark for spot tanker rates' } : null,
+  _wci ? { label: 'Drewry WCI', deltaPct: _fx(_wci), color: _fxColor(_fx(_wci)), valueFormatted: '$' + new Intl.NumberFormat('en-US').format(Math.round(_wci.value)) + ' per 40ft', asof: formatAsOfLong(_wci.as_of), tooltip: 'Drewry World Container Index · global avg spot rate per 40-ft container' } : null,
+  _bdti ? { label: 'Baltic Dirty Tanker', deltaPct: _fx(_bdti), color: _fxColor(_fx(_bdti)), valueFormatted: new Intl.NumberFormat('en-IN').format(Math.round(_bdti.value)) + ' index', asof: formatAsOfLong(_bdti.as_of), tooltip: 'Baltic Dirty Tanker Index · crude tanker rates' } : null
+].filter(Boolean), { title: 'Freight indices · MoM %' }));
 
 // Port dwell as supporting row
 freightBody.appendChild(renderSupportingTier(
@@ -1473,29 +1504,33 @@ const marketBody = el('div', { class: 'section-body-stack' });
 const niftyM = M('nifty_50');
 const bankM = M('bank_nifty');
 const peM = M('nifty_pe_5y');
+// Fixed 5Y reference band for Nifty trailing PE (static reference values).
+const PE_REF = { min: 15.2, sigmaMinus: 18.6, mean: 21.0, sigmaPlus: 23.8, max: 27.2 };
+const peDesc = (v) => v > PE_REF.sigmaPlus ? 'above +1σ' : v > PE_REF.mean ? 'above mean, below +1σ' : v > PE_REF.sigmaMinus ? 'below mean' : 'below -1σ';
+const _vixM = M('india_vix'), _inrM = M('inr_usd');
 const niftyPoints = metricSparkPoints(niftyM) || Array.from({length: 9}, (_,i) => ({ label: ['Jan','','Feb','','Mar','','Apr','',''][i], value: [100, 101, 102, 102.5, 104, 105, 106.5, 105.5, 104.2][i] }));
 const bankPoints = metricSparkPoints(bankM) || Array.from({length: 9}, (_,i) => ({ label: ['Jan','','Feb','','Mar','','Apr','',''][i], value: [100, 100.5, 101.5, 101, 103, 105, 108, 106.5, 104.5][i] }));
 const equityChart = renderIndexedOverlay([
   { name: 'Nifty 50', color: 'var(--accent)', points: niftyPoints },
   { name: 'Bank Nifty', color: 'var(--blue)', points: bankPoints }
-], { title: '90-day indexed trail · base = 100' });
+], { title: 'Indexed trail · base = 100 · last ' + (niftyM?.sparkline_12m?.length || 0) + ' readings' });
 const equityPanel = renderHeadlinePanel({
   eyebrow: 'Equity benchmarks · live',
   value: niftyM ? formatValue(niftyM.value, 'index', niftyM.unit || 'idx') : '24,180 idx',
-  metaLine: 'Nifty 50 · NSE · ' + (niftyM?.as_of ? formatAsOf(niftyM.as_of) : '5 May 2026'),
+  metaLine: 'Nifty 50 · NSE · ' + (niftyM?.as_of ? formatAsOf(niftyM.as_of) : ''),
   mom: niftyM?.mom_pct != null ? { text: formatTrend(niftyM.mom_pct), color: niftyM.mom_pct >= 0 ? 'var(--green)' : 'var(--red)' } : { text: '+1.4%', color: 'var(--green)' },
   yoy: niftyM?.yoy_pct != null ? { text: formatTrend(niftyM.yoy_pct), color: niftyM.yoy_pct >= 0 ? 'var(--green)' : 'var(--red)' } : { text: '+12.8%', color: 'var(--green)' },
-  percentile: peM ? { label: 'Nifty PE ', text: peM.value.toFixed(1) + '×', color: peM.value > 23 ? 'var(--red)' : 'var(--amber)' } : { label: 'Nifty PE ', text: '22.8×', color: 'var(--amber)' },
-  status: 'med',
-  statusPill: 'WATCH',
-  statusSub: 'Above 5Y mean PE · valuations stretched',
+  percentile: peM ? { label: 'Nifty PE ', text: peM.value.toFixed(1) + '×', color: peM.value > PE_REF.sigmaPlus ? 'var(--red)' : 'var(--amber)' } : null,
+  status: peM && peM.value > PE_REF.mean ? 'med' : 'low',
+  statusPill: peM && peM.value > PE_REF.mean ? 'WATCH' : 'NORMAL',
+  statusSub: peM ? (peM.value > PE_REF.sigmaPlus ? 'PE above +1σ of its 5Y range' : peM.value > PE_REF.mean ? 'PE above its 5Y mean' : 'PE below its 5Y mean') : '',
   chart: equityChart,
   matrix: [
-    { label: 'Bank Nifty', value: bankM ? formatValue(bankM.value, 'index') : '52,640', sub1: bankM?.yoy_pct != null ? formatTrend(bankM.yoy_pct) + ' YoY' : '+9.4% YoY', sub1Color: 'var(--green)', sub2: bankM?.mom_pct != null ? formatTrend(bankM.mom_pct) + ' MoM' : '+0.6% MoM', asof: bankM?.as_of ? formatAsOf(bankM.as_of) : '5 May', tooltip: 'NSE Bank Nifty · 12 large-cap banks' },
-    { label: '52w high · low', value: '24,860 · 21,310', sub1: 'range 16.6%', sub2: 'high: 28 Apr · low: 4 Sep 25', asof: 'derived', tooltip: 'Trailing 52-week range for Nifty 50' },
-    { label: 'Nifty PE vs 5Y', value: peM ? peM.value.toFixed(1) + '×' : '22.8×', sub1: 'mean 21.0× · +1σ 23.8×', sub1Color: 'var(--amber)', sub2: 'stretched but not extreme', asof: peM?.as_of ? formatAsOf(peM.as_of) : '5 May', tooltip: 'Trailing PE vs 5-year distribution' },
-    { label: 'YTD return (USD)', value: '+5.2%', sub1: '+9.4% in INR', sub1Color: 'var(--green)', sub2: 'INR weakness eats 4.2pp', asof: 'derived', tooltip: 'YTD Nifty return adjusted for INR/USD depreciation' }
-  ]
+    bankM ? { label: 'Bank Nifty', value: formatValue(bankM.value, 'index'), sub1: bankM.yoy_pct != null ? formatTrend(bankM.yoy_pct) + ' YoY' : '', sub1Color: (bankM.yoy_pct ?? 0) >= 0 ? 'var(--green)' : 'var(--red)', sub2: bankM.mom_pct != null ? formatTrend(bankM.mom_pct) + ' MoM' : '', asof: formatAsOf(bankM.as_of), tooltip: 'NSE Bank Nifty · 12 large-cap banks' } : null,
+    _vixM ? { label: 'India VIX', value: String(Math.round(_vixM.value)), sub1: _vixM.mom_pct != null ? formatTrend(_vixM.mom_pct) + ' MoM' : '', sub1Color: (_vixM.mom_pct ?? 0) > 0 ? 'var(--red)' : 'var(--green)', sub2: 'NSE implied volatility', asof: formatAsOf(_vixM.as_of), tooltip: 'India VIX · NSE 30-day implied volatility' } : null,
+    peM ? { label: 'Nifty PE vs 5Y', value: peM.value.toFixed(1) + '×', sub1: `mean ${PE_REF.mean.toFixed(1)}× · +1σ ${PE_REF.sigmaPlus.toFixed(1)}×`, sub1Color: 'var(--amber)', sub2: peDesc(peM.value), asof: formatAsOf(peM.as_of), tooltip: 'Trailing PE vs 5-year reference band' } : null,
+    _inrM ? { label: 'INR / $', value: '₹' + _inrM.value.toFixed(2), sub1: _inrM.yoy_pct != null ? formatTrend(_inrM.yoy_pct) + ' YoY' : '', sub1Color: (_inrM.yoy_pct ?? 0) > 0 ? 'var(--red)' : 'var(--green)', sub2: 'RBI reference rate', asof: formatAsOf(_inrM.as_of), tooltip: 'Rupee per US dollar' } : null
+  ].filter(Boolean)
 });
 marketBody.appendChild(equityPanel);
 const equityInf = inferenceLineEl('equity');
@@ -1505,9 +1540,9 @@ if (equityInf) marketBody.appendChild(equityInf);
 const valWrap = el('div', { class: 'viz-wrap' });
 valWrap.appendChild(el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between' } }, [
   el('span', {}, 'Nifty PE · trailing · vs 5Y range'),
-  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, 'as on 5 May 2026')
+  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, peM?.as_of ? 'as on ' + formatAsOfLong(peM.as_of) : '')
 ]));
-valWrap.appendChild(renderValuationBand({ value: 22.8, min: 15.2, sigmaMinus: 18.6, mean: 21.0, sigmaPlus: 23.8, max: 27.2, asof: '5 May 2026' }));
+if (peM) valWrap.appendChild(renderValuationBand({ value: peM.value, ...PE_REF, asof: formatAsOfLong(peM.as_of) }));
 marketBody.appendChild(valWrap);
 
 // Panel 3 + 4 row · VIX/DXY pair + IND-US spread
@@ -1515,14 +1550,20 @@ const sentimentSpreadRow = el('div', { style: { display: 'grid', gridTemplateCol
 const vixWrap = el('div', { class: 'viz-wrap' });
 vixWrap.appendChild(el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between' } }, [
   el('span', {}, 'Sentiment · VIX + Gold'),
-  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, 'as on 5 May 2026')
+  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, M('india_vix')?.as_of ? 'as on ' + formatAsOfLong(M('india_vix').as_of) : '')
 ]));
 // VIX + Gold sentiment row — live values, computed reference-band markers
 const vixM = M('india_vix');
 const goldM = M('gold_usd');
-// Reference bands: VIX 5Y range 9-35 mean 18; Gold 5Y range $1,620-$2,690 mean $2,000
+// Reference bands: VIX 5Y range 9-35 mean 18. Gold uses the low and high of
+// its recent daily readings (the old fixed $1,620 to $2,690 band sat far
+// below today's price).
 const vixPos = vixM ? Math.max(0, Math.min(100, ((vixM.value - 9) / (35 - 9)) * 100)) : 49;
-const goldPos = goldM ? Math.max(0, Math.min(100, ((goldM.value - 1620) / (2690 - 1620)) * 100)) : 88;
+const goldSpark = (goldM?.sparkline_12m || []).filter(v => typeof v === 'number');
+const goldLo = goldSpark.length ? Math.min(...goldSpark) : null;
+const goldHi = goldSpark.length ? Math.max(...goldSpark) : null;
+const goldPos = goldM && goldHi > goldLo ? Math.max(0, Math.min(100, ((goldM.value - goldLo) / (goldHi - goldLo)) * 100)) : 50;
+const usd0 = (v) => '$' + new Intl.NumberFormat('en-US').format(Math.round(v));
 vixWrap.appendChild(el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px', padding: '4px 0' } }, [
   el('div', { title: 'India VIX · NSE 30-day implied volatility · 5Y range 9–35; >25 = elevated stress' }, [
     el('div', { class: 'cs-label' }, 'INDIA VIX'),
@@ -1549,7 +1590,9 @@ vixWrap.appendChild(el('div', { style: { display: 'grid', gridTemplateColumns: '
       el('div', { style: { position: 'absolute', left: goldPos + '%', top: '-3px', width: '2px', height: '12px', background: 'var(--ink)' } })
     ]),
     el('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: '9.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '3px' } }, [
-      el('span', {}, '5Y low $1,620'), el('span', {}, 'mean $2,000'), el('span', {}, 'all-time high $2,690')
+      goldSpark.length ? el('span', {}, 'low ' + usd0(goldLo)) : null,
+      goldSpark.length ? el('span', {}, `last ${goldSpark.length} readings`) : null,
+      goldSpark.length ? el('span', {}, 'high ' + usd0(goldHi)) : null
     ])
   ])
 ]));
@@ -1558,8 +1601,8 @@ sentimentSpreadRow.appendChild(vixWrap);
 
 const spreadWrap = el('div', { class: 'viz-wrap' });
 spreadWrap.appendChild(el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between' } }, [
-  el('span', {}, 'India 10Y vs US 10Y spread · 24 months'),
-  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, 'as on 5 May 2026')
+  el('span', {}, 'India 10Y vs US 10Y spread'),
+  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, M('ind_us_10y_spread')?.as_of ? 'as on ' + formatAsOfLong(M('ind_us_10y_spread').as_of) : '')
 ]));
 const spreadM = M('ind_us_10y_spread');
 const spreadValue = spreadM?.value ?? 256;
