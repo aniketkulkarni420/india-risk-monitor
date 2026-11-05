@@ -1,4 +1,4 @@
-// Main page assembly · Phase 5.5 — Redesign per IRM_DataViz_Audit_v2 + IRM_Design_Audit
+// Main page assembly · Phase 5.5, Redesign per IRM_DataViz_Audit_v2 + IRM_Design_Audit
 // Composes: Hero (vital signs) → Today bullets → Flows (5 lenses) → Macro (5 panels)
 //   → Real Economy (cluster cards) → Freight (chart-led) → Market (4 panels) → Sectors (ranked)
 
@@ -6,10 +6,10 @@ import { renderTableRow, renderTableHeader } from './components/TableRow.mjs';
 import { renderSectionFrame } from './components/SectionFrame.mjs';
 import { renderSupportingTier } from './components/SupportingTier.mjs';
 import { COMPARISON_SPEC, getDisplayPeriods } from './components/ComparisonSpec.mjs';
-// StickyTOC removed 2026-05-06 — Tab Bar handles section nav now
+// StickyTOC removed 2026-05-06, Tab Bar handles section nav now
 import { wire as wireDrawer, open as openDrawer } from './components/MetricDrawer.mjs';
 import { wireCmdK, openCmdK } from './components/CmdKPalette.mjs';
-import { el, formatValue, formatTrend, formatAsOf, statusClass, rangeTick, pillWithDirection, heatmapClass } from './components/utils.mjs';
+import { el, formatValue, formatTrend, formatAsOf, formatAsOfLong, statusClass, rangeTick, pillWithDirection, heatmapClass } from './components/utils.mjs';
 import {
   renderDriverBars, renderHorizonCard, renderRegimeBanner, renderPersistenceChips,
   renderCumulativeLine, renderDivergingBars, renderYieldCurve, renderInflationBars,
@@ -36,7 +36,7 @@ const M = (id) => DATA.metrics[id] || null;
 wireDrawer(M);
 
 // Punchy auto-inference: short, human-sounding 1-line readout per panel.
-// Pulls from live metrics. No em dashes. No "—". Tone: punchy, data-first,
+// Pulls from live metrics. No em dashes. No "-". Tone: punchy, data-first,
 // matches Aniket's voice file.
 function inferenceLine(panelId) {
   const fmt = (n, dp = 2) => Number(n).toFixed(dp);
@@ -51,7 +51,8 @@ function inferenceLine(panelId) {
       const parts = [];
       parts.push(`Brent at $${fmt(b.value)} per barrel.`);
       if (above95) parts.push(`Sitting above the $95 shock line.`);
-      if (b.mom_pct != null) parts.push(`Up ${fmt(b.mom_pct, 1)}% on the month.`);
+      if (b.mom_pct != null && Math.abs(b.mom_pct) >= 0.5) parts.push(`${b.mom_pct > 0 ? 'Up' : 'Down'} ${Math.round(Math.abs(b.mom_pct))}% on the month.`);
+      else if (b.mom_pct != null) parts.push('Flat on the month.');
       if (spread != null && Math.abs(spread) > 0.5) {
         parts.push(spread < 0 ? `India basket trailing by $${Math.abs(spread).toFixed(2)}.` : `India basket above Brent by $${spread.toFixed(2)}.`);
       }
@@ -94,10 +95,10 @@ function inferenceLine(panelId) {
         else parts.push(`VIX at ${fmt(vix.value, 2)}, elevated.`);
       }
       if (gold) {
-        if (gold.value > 2500) parts.push(`Gold at $${Math.round(gold.value)}, still near all time highs.`);
-        else parts.push(`Gold at $${Math.round(gold.value)}.`);
+        const gs = (gold.sparkline_12m || []).filter(v => typeof v === 'number');
+        const nearTop = gs.length && gold.value >= Math.max(...gs) * 0.99;
+        parts.push(`Gold at $${new Intl.NumberFormat('en-US').format(Math.round(gold.value))}${nearTop ? ', at the top of its recent range.' : '.'}`);
       }
-      if (vix && gold && vix.value < 22 && gold.value > 2500) parts.push(`Someone is hedging.`);
       return parts.join(' ');
     }
     case 'equity': {
@@ -160,6 +161,11 @@ function metricSparkPoints(metric, count) {
   const n = count && count <= sl.length ? count : sl.length;
   const slice = sl.slice(-n);
   const asOf = metric.as_of ? new Date(metric.as_of) : new Date();
+  const freq = metric.source_primary?.frequency;
+  if (freq === 'Daily' || freq === 'Live') {
+    // Daily readings: label only the last point with its real date.
+    return slice.map((v, i) => ({ label: i === n - 1 ? formatAsOf(metric.as_of) : '', value: typeof v === 'number' ? v : (v?.value ?? 0) }));
+  }
   return slice.map((v, i) => {
     const monthsBack = n - 1 - i;
     const d = new Date(asOf.getFullYear(), asOf.getMonth() - monthsBack, 1);
@@ -172,9 +178,12 @@ function metricSparkPoints(metric, count) {
 // ──────────────────────────────────────────────────────────────
 // Topbar freshness counter · reframed 2026-05-06
 // Prior copy "Live 50/70" read as "30% missing". New copy frames as
-// progress: "Sources: 50 verified · 20 backfilling" — same data, different
+// progress: "Sources: 50 verified · 20 backfilling", same data, different
 // emotional weight. When >=90% verified, switches to a clean "Updated X" stamp.
-const allMetricsList = Object.values(DATA.metrics);
+// Counts use the input signals only. The 10 composites (risk score, drivers,
+// regimes) are computed from those signals, so counting them as "verified
+// sources" inflated the totals (page said 71, meta said 70 and 60).
+const allMetricsList = Object.values(DATA.metrics).filter(m => m.section !== 'composites');
 const totalMetrics = allMetricsList.length;
 const verified = allMetricsList.filter(m => m.verification_state === 'verified').length;
 const backfilling = totalMetrics - verified;
@@ -184,7 +193,7 @@ if (freshRatio >= 0.9) {
   const newest = allMetricsList.map(m => m.as_of).sort().pop();
   asofEl.textContent = 'Updated ' + formatAsOf(newest);
 } else {
-  const tooltip = `${verified} sources updating live · ${backfilling} backfilling history. Tap any metric for source detail.`;
+  const tooltip = `${totalMetrics} signals: ${verified} verified against a second source · ${backfilling} on primary source only or backfilling. Tap any metric for source detail.`;
   asofEl.innerHTML = `<span style="color: var(--ink-2);" title="${tooltip}">Sources: <b style="color:var(--ink)">${verified}</b> verified · ${backfilling} backfilling</span>`;
 }
 
@@ -208,9 +217,20 @@ if (ph && ph.summary && ph.summary.total > 0) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// HERO — vital signs panel (replaces 4-tile deck)
+// HERO, vital signs panel (replaces 4-tile deck)
 // ──────────────────────────────────────────────────────────────
 const risk = M('india_risk_score');
+// Score availability · the bundle nulls the composite when >30% of drivers lack
+// fresh feeders. Never print the literal "null": show a clear unavailable state.
+const riskOk = !!risk && typeof risk.value === 'number';
+const _driverNames = { driver_oil_physical: 'Oil', driver_freight: 'Freight', driver_institutional_flows: 'Flows',
+  driver_india_macro: 'Macro', driver_real_economy: 'Real economy', driver_sector_breadth: 'Sector breadth' };
+const riskMissingDrivers = ['driver_oil_physical', 'driver_freight', 'driver_institutional_flows',
+  'driver_india_macro', 'driver_real_economy', 'driver_sector_breadth']
+  .filter(id => typeof M(id)?.value !== 'number').map(id => _driverNames[id]);
+const riskUnavailableNote = riskMissingDrivers.length
+  ? `${riskMissingDrivers.join(' and ')} ${riskMissingDrivers.length === 1 ? 'driver lacks' : 'drivers lack'} fresh data (${riskMissingDrivers.length} of 6)`
+  : 'Not enough fresh data';
 const heroHost = document.getElementById('hero-decks');
 heroHost.innerHTML = '';
 heroHost.style.display = 'block';
@@ -219,12 +239,15 @@ heroHost.style.display = 'block';
 const driverIds = ['driver_oil_physical', 'driver_freight', 'driver_institutional_flows',
                    'driver_india_macro', 'driver_sector_breadth', 'driver_real_economy'];
 const drivers = driverIds.map(M).filter(Boolean).map(d => ({
-  label: (d.status === 'shock' ? '⚠ ' : '') + d.display_name,
-  value: d.value,
-  status: d.status,
-  delta: d.mom_pct ? Math.round(d.value * d.mom_pct / 100 * (d.mom_pct > 0 ? 1 : -1)) * (d.mom_pct > 0 ? 1 : -1) : null,
+  label: (typeof d.value === 'number' && d.status === 'shock' ? '⚠ ' : '') + d.display_name,
+  value: typeof d.value === 'number' ? d.value : null,
+  status: typeof d.value === 'number' ? d.status : 'unavailable',
+  delta: typeof d.value === 'number' && d.mom_pct ? Math.round(d.value * d.mom_pct / 100) : null,
+  // Show the data date when a driver's inputs are more than 7 days old
+  note: d.inputs_as_of?.oldest && (Date.now() - new Date(d.as_of).getTime()) > 7 * 86400000
+    ? 'data as on ' + formatAsOfLong(d.as_of) : null,
   metric_id: d.metric_id
-})).sort((a, b) => b.value - a.value);
+})).sort((a, b) => (b.value ?? -1) - (a.value ?? -1));
 
 // A sparkline is "real history" only when it has at least 4 unique values.
 // Below that threshold we hide the chart to avoid showing a near-flat line
@@ -238,10 +261,12 @@ const vital = el('div', { class: 'hero-vital', onclick: (e) => { e.stopPropagati
 
 // Header row · label + dual delta · clearer "vs last week" / "vs yesterday" labels
 const wwDelta = (risk.mom_pct ?? 0) > 0 ? '+' : '';
-const wwVal = risk.mom_pct != null ? wwDelta + Math.round(risk.value * risk.mom_pct / 100) : null;
-const dodVal = risk.dod_delta != null ? (risk.dod_delta > 0 ? '+' : '') + risk.dod_delta : null;
+const wwVal = riskOk && risk.mom_pct != null ? wwDelta + Math.round(risk.value * risk.mom_pct / 100) : null;
+const dodVal = riskOk && risk.dod_delta != null ? (risk.dod_delta > 0 ? '+' : '') + risk.dod_delta : null;
 vital.appendChild(el('div', { class: 'hv-score-row' }, [
-  el('span', { class: 'hv-score-label' }, 'India Risk Score'),
+  el('span', { class: 'hv-score-label' }, ['India Risk Score', risk?.as_of
+    ? el('span', { style: { marginLeft: '10px', fontFamily: 'var(--mono)', fontSize: '11px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: '0' } }, (riskOk ? 'computed ' : 'checked ') + formatAsOfLong(risk.as_of))
+    : null].filter(Boolean)),
   el('span', { class: 'hv-delta', title: 'Change vs prior reference (week / day)' }, [
     wwVal != null ? el('span', { title: 'Score change vs reading from 7 days ago' }, ['vs last week ', el('b', { style: { color: risk.mom_pct >= 0 ? 'var(--red)' : 'var(--green)' } }, wwVal + ' pts')]) : null,
     dodVal != null ? el('span', { style: { marginLeft: '14px' }, title: 'Score change vs yesterday' }, ['vs yesterday ', el('b', { style: { color: risk.dod_delta >= 0 ? 'var(--red)' : 'var(--green)' } }, dodVal + ' pts')]) : null
@@ -250,10 +275,14 @@ vital.appendChild(el('div', { class: 'hv-score-row' }, [
 
 // Score row · big number + inline 12-week sparkline (only if real history) + status pill
 const scoreRow = el('div', { class: 'hv-score-row', style: { alignItems: 'flex-end', gap: '14px' } }, [
-  el('div', { class: 'hv-score-big' }, String(risk.value)),
-  el('div', { class: 'hv-score-sub' }, '/ 100')
+  riskOk
+    ? el('div', { class: 'hv-score-big' }, String(Math.round(risk.value)))
+    : el('div', { class: 'hv-score-big hv-score-na', style: { fontSize: '34px', lineHeight: '1.1' } }, 'Not available'),
+  riskOk
+    ? el('div', { class: 'hv-score-sub' }, '/ 100')
+    : el('div', { class: 'hv-score-sub', style: { maxWidth: '360px', fontSize: '13px', lineHeight: '1.4' } }, riskUnavailableNote)
 ]);
-if (hasRealHistory(risk.sparkline_12m)) {
+if (riskOk && hasRealHistory(risk.sparkline_12m)) {
   const riskHist = risk.sparkline_12m;
   const minV = Math.min(...riskHist), maxV = Math.max(...riskHist), range = (maxV - minV) || 1;
   const points = riskHist.map((v, i) => {
@@ -266,22 +295,24 @@ if (hasRealHistory(risk.sparkline_12m)) {
   const sparkSvg = el('svg', { class: 'hv-spark-inline', width: '140', height: '40', viewBox: '0 0 140 40' }, []);
   sparkSvg.innerHTML = `<polyline fill="none" stroke="var(--accent)" stroke-width="1.8" points="${points}"/><circle cx="${lastX}" cy="${lastY}" r="3" fill="var(--accent)"/>`;
   scoreRow.appendChild(sparkSvg);
-} else {
+} else if (riskOk) {
   // Honest placeholder · no fake trend line
   scoreRow.appendChild(el('span', { class: 'hv-spark-pending', style: { fontSize: '11px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginLeft: '14px' } }, '12w trend · history accruing'));
 }
 scoreRow.appendChild(el('div', { style: { marginLeft: 'auto' } }, [
-  el('span', { class: 'pill ' + statusClass(risk.status) }, risk.status[0].toUpperCase() + risk.status.slice(1))
+  riskOk
+    ? el('span', { class: 'pill ' + statusClass(risk.status) }, risk.status[0].toUpperCase() + risk.status.slice(1))
+    : el('span', { class: 'pill pill-na' }, 'No score')
 ]));
 vital.appendChild(scoreRow);
 
 vital.appendChild(el('div', { class: 'hv-band-track' }, [
-  el('div', { class: 'hv-band-marker', style: { left: risk.value + '%' } })
-]));
+  riskOk ? el('div', { class: 'hv-band-marker', style: { left: risk.value + '%' } }) : null
+].filter(Boolean)));
 vital.appendChild(el('div', { class: 'hv-band-zones' }, [
-  el('span', { style: { color: '#79c79a' }, title: '0–35: stress contained · normal markets' }, 'LOW 0–35 · contained'),
-  el('span', { style: { color: '#e9c466' }, title: '35–65: elevated stress · monitor closely' }, 'MED 35–65 · elevated'),
-  el('span', { style: { color: '#e88' }, title: '65–100: breakdown risk · multiple shocks active' }, 'HIGH 65–100 · breakdown')
+  el('span', { style: { color: '#79c79a' }, title: '0-35: stress contained · normal markets' }, 'LOW 0-35 · contained'),
+  el('span', { style: { color: '#e9c466' }, title: '35-65: elevated stress · monitor closely' }, 'MED 35-65 · elevated'),
+  el('span', { style: { color: '#e88' }, title: '65-100: breakdown risk · multiple shocks active' }, 'HIGH 65-100 · breakdown')
 ]));
 
 // 1A+1B · Vital-sign tile row · 6 always-visible tiles above the fold
@@ -297,6 +328,11 @@ function vitalTile(metric_id, label, valueFn) {
   const trend = m.dod_pct ?? m.mom_pct;
   const trendCls = trend == null ? '' : heatmapClass(trend, m.trend_direction);
   const trendLabel = m.dod_pct != null ? 'DoD' : 'MoM';
+  // Rates (unit %) move in basis points: a % change of a yield ("-21.9%")
+  // misreads. Use the last two readings instead.
+  const isRate = (m.unit || '').trim() === '%';
+  const sl = (m.sparkline_12m || []).filter(v => typeof v === 'number');
+  const bpsMove = isRate && sl.length >= 2 ? Math.round((sl[sl.length - 1] - sl[sl.length - 2]) * 100) : null;
   const star = el('button', {
     class: 'star-btn' + (isOn ? ' on' : ''),
     'data-metric-id': metric_id,
@@ -324,19 +360,28 @@ function vitalTile(metric_id, label, valueFn) {
     ]),
     el('div', { class: 'vital-tile-value' + (m.status === 'shock' || m.status === 'high' ? ' is-stress' : '') },
       valueFn ? valueFn(m) : formatValue(m.value, m.value_format, m.unit)),
-    trend != null
+    m.section === 'flows'
+      // Day flows: a % change of a net flow (e.g. -255% MoM) carries no meaning
+      ? el('div', { class: 'vital-tile-sub' }, 'as on ' + formatAsOf(m.as_of))
+      : isRate
+      ? el('div', { class: 'vital-tile-sub' }, (bpsMove != null ? (bpsMove > 0 ? '+' : '') + bpsMove + ' bps · ' : '') + 'as on ' + formatAsOf(m.as_of))
+      : trend != null
       ? el('div', { class: 'vital-tile-sub ' + trendCls }, formatTrend(trend) + ' ' + trendLabel)
-      : el('div', { class: 'vital-tile-sub' }, m.as_of ? 'as on ' + formatAsOf(m.as_of) : '—')
+      : el('div', { class: 'vital-tile-sub' }, m.as_of ? 'as on ' + formatAsOf(m.as_of) : '-')
   ]);
 }
 const vitalRow = el('div', { class: 'vital-row' }, [
-  vitalTile('nifty_50',       'Nifty'),
-  vitalTile('inr_usd',        'INR / $'),
-  vitalTile('brent_crude',    'Brent'),
-  vitalTile('india_vix',      'VIX'),
-  vitalTile('real_10y_yield', 'Real 10Y'),
-  vitalTile('fii_equity_mtd', 'FII MTD',
-    m => '−₹' + Math.abs(Math.round(m.value/1000)).toFixed(1) + 'k Cr')
+  // Headline tiles show whole numbers (house rule); the real yield stays at
+  // two decimals because whole percent would hide every move.
+  vitalTile('nifty_50',       'Nifty',   m => new Intl.NumberFormat('en-IN').format(Math.round(m.value))),
+  vitalTile('inr_usd',        'INR / $', m => '₹' + Math.round(m.value)),
+  vitalTile('brent_crude',    'Brent',   m => '$' + Math.round(m.value) + ' / bbl'),
+  vitalTile('india_vix',      'VIX',     m => String(Math.round(m.value))),
+  vitalTile('real_10y_yield', 'Real 10Y', m => m.value.toFixed(2) + '%'),
+  // FII tile shows the day's net from NSE (the MTD metric held the same daily
+  // figure, and the old formatter always printed a minus sign).
+  vitalTile('fii_equity_daily', 'FII net (day)',
+    m => (m.value < 0 ? '-' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(m.value))) + ' Cr')
 ].filter(Boolean));
 vital.appendChild(vitalRow);
 
@@ -366,7 +411,7 @@ function buildAttributionLine() {
     const colour = m.trend_direction === 'bad' ? (m.dod_pct > 0 ? 'var(--red)' : 'var(--green)')
                  : m.trend_direction === 'good' ? (m.dod_pct > 0 ? 'var(--green)' : 'var(--red)')
                  : (m.dod_pct > 0 ? 'var(--red)' : 'var(--green)');
-    const shortName = (m.display_name || m.metric_id).slice(0, 22);
+    const shortName = m.display_name || m.metric_id;
     return `<span style="color:${colour};font-family:var(--mono)">${sign}${m.dod_pct.toFixed(1)}%</span> <span style="color:var(--ink-2)">${shortName}</span>`;
   });
   return el('div', {
@@ -393,7 +438,7 @@ const driverBarsEl = renderDriverBars(drivers, { showArrow: true, labelWidth: 14
 const driverExpansion = el('div', { class: 'hero-driver-expansion', style: { marginTop: '14px' } });
 
 // Build the inline expansion panel for a driver (currently only Oil & physical
-// is wired — pilot. If Aniket approves, extend mapping to all 6 drivers).
+// is wired, pilot. If Aniket approves, extend mapping to all 6 drivers).
 function buildDriverExpansion(driverId) {
   if (driverId !== 'driver_oil_physical') return null;
   const brentM = M('brent_crude');
@@ -429,12 +474,12 @@ function buildDriverExpansion(driverId) {
         sub1Color: 'var(--red)',
         sub2: 'PPAC daily',
         asof: indiaM?.as_of ? formatAsOf(indiaM.as_of) : '5 May',
-        tooltip: 'India crude basket = Dubai (75%) + Brent (25%) — what India actually pays'
+        tooltip: 'India crude basket = Dubai (75%) + Brent (25%), what India actually pays'
       },
       {
         label: 'Hormuz throughput',
         value: hormuzM ? formatValue(hormuzM.value, 'integer', 'ships/day') : '2 ships/day',
-        sub1: hormuzM?.mom_pct != null ? formatTrend(hormuzM.mom_pct) + ' MoM' : '−98.6% MoM',
+        sub1: hormuzM?.mom_pct != null ? formatTrend(hormuzM.mom_pct) + ' MoM' : '-98.6% MoM',
         sub1Color: 'var(--red)',
         sub2: 'baseline 140 · 1.4% of normal',
         asof: hormuzM?.as_of ? formatAsOf(hormuzM.as_of) : 'pending',
@@ -502,7 +547,7 @@ function buildHeroH1() {
   if (!r) return 'Loading risk read…';
 
   // Driver sorted by value (highest stress first)
-  const topDriver = drivers.length ? drivers.slice().sort((a, b) => b.value - a.value)[0] : null;
+  const topDriver = drivers.find(d => typeof d.value === 'number') || null;
   // Brent + Hormuz state
   const brent = M('brent_crude');
   const hormuz = M('hormuz_throughput');
@@ -522,7 +567,7 @@ function buildHeroH1() {
     else clauses.push(`${topDriver.label} contained (${topDriver.value}/100)`);
   }
 
-  // 2: most concrete signal — try Brent + Hormuz, then auto, then flows
+  // 2: most concrete signal, try Brent + Hormuz, then auto, then flows
   let secondary = null;
   // 2026-05-12 · Hormuz value tagged with [PROVISIONAL] when source is static
   // so the user immediately sees the number isn't live AIS data
@@ -541,8 +586,8 @@ function buildHeroH1() {
     secondary = `auto retail ${dir} ${Math.abs(autoMomAvg).toFixed(0)}% MoM across all 5 segments`;
   }
   if (!secondary && fii && abs) {
-    const fmt = (v) => (v >= 0 ? '+₹' : '−₹') + Math.abs(v).toLocaleString('en-IN', { maximumFractionDigits: 0 }) + ' Cr';
-    secondary = `FII flow ${fmt(fii.value)} · DII covering ${(abs.value * 100).toFixed(0)}%`;
+    const fmt = (v) => (v >= 0 ? '+₹' : '-₹') + Math.abs(v).toLocaleString('en-IN', { maximumFractionDigits: 0 }) + ' Cr';
+    secondary = fii.value < 0 ? `FII flow ${fmt(fii.value)} · DII covering ${(abs.value * 100).toFixed(0)}%` : `FII net buyers ${fmt(fii.value)}`;
   }
   if (secondary) clauses.push(secondary);
 
@@ -552,14 +597,14 @@ document.getElementById('hero-h1').textContent = buildHeroH1();
 
 // Browser tab title · live with current risk score so users with multiple
 // tabs open can scan their bar without switching context.
-if (risk && typeof risk.value === 'number') {
+if (riskOk) {
   const status = (risk.status || '').toUpperCase();
   document.title = `India Risk ${risk.value}${status ? ' · ' + status : ''} · IRM`;
 }
 const heroLead = document.getElementById('hero-lead');
 if (heroLead) heroLead.style.display = 'none';
 
-// B · Collapsible hero (mobile only) — adds a condensed lead line + toggle
+// B · Collapsible hero (mobile only), adds a condensed lead line + toggle
 // shown only in collapsed state. Default state: collapsed on mobile,
 // remembered via localStorage. Desktop ignores entirely (CSS-driven).
 function setupCollapsibleHero() {
@@ -569,7 +614,7 @@ function setupCollapsibleHero() {
   const initialCollapsed = stored == null ? true : stored === 'true';
   document.body.dataset.heroCollapsed = String(initialCollapsed);
 
-  // Build condensed lead — one-line summary used when collapsed
+  // Build condensed lead, one-line summary used when collapsed
   const hormuz = M('hormuz_throughput');
   const brent = M('brent_crude');
   const leadParts = [];
@@ -580,16 +625,16 @@ function setupCollapsibleHero() {
   if (brent && brent.value >= 95) {
     leadParts.push(`Brent $${brent.value.toFixed(2)}`);
   }
-  if (risk && risk.dod_delta != null) {
+  if (riskOk && risk.dod_delta != null) {
     leadParts.push(`risk ${risk.value}/100${risk.dod_delta >= 0 ? ' +' : ' '}${risk.dod_delta} today`);
   }
-  if (leadParts.length === 0 && risk) leadParts.push(`Risk ${risk.value}/100 · ${risk.status}`);
+  if (leadParts.length === 0 && risk) leadParts.push(riskOk ? `Risk ${Math.round(risk.value)}/100 · ${risk.status}` : 'Risk score not available');
   const condLead = el('div', { class: 'hero-condensed-lead' }, leadParts.join(' · '));
   // Insert just after hero-h1
   const h1 = document.getElementById('hero-h1');
   h1.parentNode.insertBefore(condLead, h1.nextSibling);
 
-  // Toggle button — appended at end of hero-card
+  // Toggle button, appended at end of hero-card
   const toggle = el('button', {
     class: 'hero-collapse-toggle',
     'aria-expanded': String(!initialCollapsed),
@@ -615,7 +660,7 @@ todayWrap.style.display = 'block';
 // Show the divider between Today bullets and Vital Signs
 const heroDivider = document.getElementById('hero-divider');
 if (heroDivider) heroDivider.style.display = 'block';
-// Today bullets — derived from live metrics with status icons.
+// Today bullets, derived from live metrics with status icons.
 // icon: 'shock' (red ◆) / 'watch' (amber ●) / 'calm' (green ✓)
 function todayBullets() {
   const hormuz = M('hormuz_throughput');
@@ -642,7 +687,7 @@ function todayBullets() {
     const above95 = brent.value >= 95;
     out.push({
       icon: above95 ? 'shock' : (brent.status === 'high' ? 'watch' : 'calm'),
-      html: `<b>Brent crude</b> at $${brent.value.toFixed(2)} per barrel. ${formatTrend(brent.mom_pct)} MoM${above95 ? ', <i>above $95 shock threshold</i>' : ''}`,
+      html: `<b>Brent crude</b> at $${Math.round(brent.value)} per barrel. ${formatTrend(brent.mom_pct)} MoM${above95 ? ', <i>above $95 shock threshold</i>' : ''}`,
       drawer_metric_id: 'brent_crude'
     });
   }
@@ -653,18 +698,28 @@ function todayBullets() {
       drawer_metric_id: 'vlcc_tanker_rates'
     });
   }
-  if (absorp) {
-    out.push({
-      icon: absorp.value >= 1 ? 'calm' : 'watch',
-      html: `<b>DII absorption</b> ${absorp.value.toFixed(2)}×. <i>${absorp.value >= 1 ? 'DII offsetting FII selling' : 'DII not fully absorbing FII outflows'}</i>`,
-      drawer_metric_id: 'absorption_ratio'
-    });
+  const fiiDayB = M('fii_equity_daily'), diiDayB = M('dii_daily');
+  if (fiiDayB && diiDayB && typeof fiiDayB.value === 'number' && typeof diiDayB.value === 'number') {
+    const f = (v) => (v < 0 ? '-' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(v))) + ' Cr';
+    if (fiiDayB.value >= 0) {
+      out.push({
+        icon: 'calm',
+        html: `<b>FII net buyers</b> at ${f(fiiDayB.value)}, DII ${f(diiDayB.value)}. <i>${formatAsOf(fiiDayB.as_of)}</i>`,
+        drawer_metric_id: 'fii_equity_daily'
+      });
+    } else if (absorp) {
+      out.push({
+        icon: absorp.value >= 1 ? 'calm' : 'watch',
+        html: `<b>FII net sellers</b> at ${f(fiiDayB.value)}, DII ${f(diiDayB.value)}. <i>${absorp.value >= 1 ? 'DII offsetting FII selling' : 'DII not fully absorbing FII selling'}</i>`,
+        drawer_metric_id: 'absorption_ratio'
+      });
+    }
   }
   if (gst) {
     const auto2wYoY = auto2w?.yoy_pct;
     out.push({
       icon: 'calm',
-      html: `<b>Real economy</b>. GST ${formatValue(gst.value, 'currency_inr_lcr')} (${formatTrend(gst.yoy_pct)} YoY)${auto2wYoY != null ? `, auto 2W ${formatTrend(auto2wYoY)}` : ''}`,
+      html: `<b>Real economy</b>. GST ₹${(gst.value / 100000).toFixed(2)} lakh crore (${formatTrend(gst.yoy_pct)} YoY)${auto2wYoY != null ? `, auto 2W ${formatTrend(auto2wYoY)}` : ''}`,
       drawer_metric_id: 'gst_gross'
     });
   }
@@ -673,7 +728,7 @@ function todayBullets() {
     if (Math.abs(lead) >= 0.3) {
       out.push({
         icon: 'calm',
-        html: `<b>${lead > 0 ? 'Banks beating Nifty' : 'Nifty beating Banks'}</b> by ${Math.abs(lead).toFixed(1)} points YoY. <i>${nifty.value.toFixed(0)} vs ${bnk.value.toFixed(0)}</i>`,
+        html: `<b>${lead > 0 ? 'Banks beating Nifty' : 'Nifty beating Banks'}</b> by ${Math.abs(lead).toFixed(1)} points YoY. <i>Nifty ${formatTrend(nifty.yoy_pct)}, Bank Nifty ${formatTrend(bnk.yoy_pct)}</i>`,
         drawer_metric_id: lead > 0 ? 'bank_nifty' : 'nifty_50'
       });
     }
@@ -761,7 +816,7 @@ function renderClusterCards(metrics, opts = {}) {
       ]),
       trendRows.length ? el('div', { class: 'cc-cell-trends' }, trendRows) : null,
       el('div', { class: 'cc-cell-asof' }, [
-        m.as_of ? 'as on ' + shortAsOf(m.as_of) : 'as of —',
+        m.as_of ? 'as on ' + shortAsOf(m.as_of) : 'as of -',
         m.source_primary?.name ? [' · ', el('span', { class: 'src' }, shortSourceName(m.source_primary.name))] : null,
         m.is_stale ? [' · ', el('span', {
           class: 'stale-inline',
@@ -778,11 +833,22 @@ function renderClusterCards(metrics, opts = {}) {
   return wrap;
 }
 
-function buildSectionFooter(srcNames) {
-  return { count: srcNames.length, names: srcNames, last_verified: new Date().toISOString() };
+// Footer date comes from the section's own metrics (newest and oldest as_of),
+// never from the visitor's clock. The old version stamped new Date(), so every
+// footer read "Last verified <today>" even when panels held months-old data.
+function buildSectionFooter(srcNames, section) {
+  let dates;
+  if (section === 'sectors') dates = DATA.sectors?.as_of ? [DATA.sectors.as_of] : [];
+  else dates = Object.values(DATA.metrics).filter(m => m.section === section).map(m => m.as_of).filter(Boolean);
+  dates = dates.map(d => new Date(d)).filter(d => !isNaN(d)).sort((a, b) => a - b);
+  return {
+    count: srcNames.length, names: srcNames,
+    newest: dates.length ? dates[dates.length - 1].toISOString() : null,
+    oldest: dates.length ? dates[0].toISOString() : null
+  };
 }
 
-// ════════════════════════ FLOWS — V60 HYBRID (2026-05-12) ════════════════════════
+// ════════════════════════ FLOWS, V60 HYBRID (2026-05-12) ════════════════════════
 // Layout: 4-lens regime strip → cards-as-tabs period strip → focused 3-cell + bar trio + narrative
 // → F&O persistence bar → cumulative chart (de-emphasized) → supporting composite
 const flowsBody = el('div', { class: 'section-body-stack' });
@@ -796,59 +862,74 @@ const diiMtdH = M('dii_mtd');
 const absorpM = M('absorption_ratio');
 const fnoOi = M('fii_index_fut_positioning');
 const blockDeals = M('block_deals_notional');
-const _absRatio = absorpM?.value;
+const num = (m) => (m && typeof m.value === 'number' && Number.isFinite(m.value)) ? m.value : null;
+// The NSE fiidiiTradeReact source publishes the day's net only. The ingest
+// writes that same daily figure into the MTD and CYTD metrics, so when they
+// equal the daily value they are not real month or year totals: hide them.
+const sameAsDaily = (agg, day) => num(agg) != null && num(day) != null && num(agg) === num(day);
+const fiiMtdReal = !sameAsDaily(fiiMtd, fiiDay);
+const diiMtdReal = !sameAsDaily(diiMtdH, diiDay);
+const fiiCytdReal = !sameAsDaily(fiiCytdH, fiiDay) && !sameAsDaily(fiiCytdH, fiiMtd);
+const fiiD = num(fiiDay), diiD = num(diiDay);
+const fiiBuying = fiiD != null && fiiD > 0;
+const _absRatio = num(absorpM);
 const _absPct = _absRatio != null ? Math.round(_absRatio * 100) : null;
-const fiiVal = (m, fb) => (m && typeof m.value === 'number') ? Math.round(m.value) : fb;
-const diiCytdH = diiMtdH ? Math.round((diiMtdH.value || 0) * 4) : 95000;
-const fiiCytd = fiiCytdH?.value ?? -42180;
-const diiCytd = diiCytdH;
-const netCytd = diiCytd + fiiCytd;
-const inrFmt = (v) => (v < 0 ? '−' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(v))) + ' Cr';
-const shortFmt = (v) => (v < 0 ? '−' : '+') + '₹' + (Math.abs(v) >= 1000 ? (Math.abs(v)/1000).toFixed(1) + 'k' : Math.round(Math.abs(v)));
+// Absorption (DII buying / FII selling) only means something on an FII selling day.
+const absMeaningful = _absRatio != null && fiiD != null && fiiD < 0;
+const inrFmt = (v) => (v < 0 ? '-' : '+') + '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(v))) + ' Cr';
+const absFmt = (v) => '₹' + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(v))) + ' Cr';
+const flowsReadToday = fiiD == null || diiD == null ? 'Flow data pending'
+  : fiiBuying && diiD < 0 ? 'FII net buyers, DII net sellers'
+  : fiiBuying ? 'FII and DII both net buyers'
+  : diiD > 0 ? 'FII net sellers, DII net buyers'
+  : 'FII and DII both net sellers';
 
 // V60 Lens 1 · 4-lens regime strip
 flowsBody.appendChild(renderLensRow([
   {
     label: 'DII Absorb',
-    value: _absRatio != null ? _absRatio.toFixed(2) + '×' : '—',
-    pill: _absRatio != null ? { text: 'REGIME · 8d', klass: _absRatio >= 1 ? 'green' : 'amber' } : null,
-    read: _absRatio != null ? `DII covering ${_absPct}% of FII selling` : 'Ratio pending'
+    value: absMeaningful ? _absRatio.toFixed(2) + '×' : 'n/a',
+    pill: absMeaningful ? { text: 'REGIME · 8d', klass: _absRatio >= 1 ? 'green' : 'amber' } : null,
+    read: absMeaningful ? `DII covering ${_absPct}% of FII selling` : (fiiBuying ? 'FII net buyers: nothing to absorb' : 'Ratio pending')
   },
   {
-    label: 'FII MTD',
-    value: fiiMtd ? shortFmt(fiiMtd.value) : '—',
-    valueClass: (fiiMtd?.value ?? 0) < 0 ? 'neg' : 'pos',
-    pill: { text: (fiiMtd?.value ?? 0) < -15000 ? 'STRESS' : (fiiMtd?.value ?? 0) < 0 ? 'SOFT' : 'INFLOW', klass: (fiiMtd?.value ?? 0) < -15000 ? 'red' : 'amber' },
-    read: 'cumulative this month'
+    label: 'FII net (day)',
+    value: fiiD != null ? inrFmt(fiiD) : 'n/a',
+    valueClass: (fiiD ?? 0) < 0 ? 'neg' : 'pos',
+    pill: fiiD == null ? null : { text: fiiD < -5000 ? 'STRESS' : fiiD < 0 ? 'SELLING' : 'BUYING', klass: fiiD < -5000 ? 'red' : fiiD < 0 ? 'amber' : 'green' },
+    read: fiiDay?.as_of ? 'cash market · ' + formatAsOf(fiiDay.as_of) : 'cash market'
   },
   {
-    label: 'F&O OI',
-    value: fnoOi ? formatTrend(fnoOi.value) : '—',
-    valueClass: (fnoOi?.value ?? 0) > 0 ? 'pos' : 'neg',
+    label: 'FII index futures',
+    value: num(fnoOi) != null ? (fnoOi.value < 0 ? '-' : '+') + new Intl.NumberFormat('en-IN').format(Math.abs(Math.round(fnoOi.value))) : 'n/a',
+    valueClass: (num(fnoOi) ?? 0) > 0 ? 'pos' : 'neg',
     pill: { text: fnoOi?.status === 'high' || fnoOi?.status === 'shock' ? 'HIGH' : 'NORMAL', klass: fnoOi?.status === 'high' ? 'red' : 'amber' },
-    read: (fnoOi?.value ?? 0) < 0 ? 'positioning unwinding' : 'longs building'
+    read: num(fnoOi) == null ? 'pending' : (fnoOi.value < 0 ? 'contracts net short' : 'contracts net long')
   },
   {
     label: 'Block deals',
-    value: blockDeals ? '₹' + new Intl.NumberFormat('en-IN').format(Math.round(blockDeals.value/1000)) + 'k' : '—',
-    pill: { text: (blockDeals?.value ?? 0) > 5000 ? 'NOTABLE' : 'NORMAL', klass: (blockDeals?.value ?? 0) > 5000 ? 'amber' : 'blue' },
-    read: '5d avg notional'
+    value: num(blockDeals) != null ? formatValue(blockDeals.value, 'currency_inr_cr') : 'n/a',
+    pill: { text: (num(blockDeals) ?? 0) > 5000 ? 'NOTABLE' : 'NORMAL', klass: (num(blockDeals) ?? 0) > 5000 ? 'amber' : 'blue' },
+    read: 'notional · ' + (blockDeals?.as_of ? formatAsOf(blockDeals.as_of) : '')
   }
 ]));
 
-// V60 Lens 2 · cards-as-tabs period strip
-const todayNet = fiiVal(fiiDay, -2103) + fiiVal(diiDay, 1712);
-const mtdNet   = fiiVal(fiiMtd, -14305) + fiiVal(diiMtdH, 18596);
-const cytdNet  = fiiVal(fiiCytdH, -42180) + diiCytdH;
-const last5Net = 4291;
-const periods = ['today', '5sess', 'mtd', 'cytd'];
-let activePeriod = 'mtd';
-const periodData = {
-  today: { label: 'Today', net: todayNet, fii: fiiVal(fiiDay, -2103), dii: fiiVal(diiDay, 1712), sub: 'net ₹ Cr · 1 session', focusedHeader: 'Today · ' + (fiiDay?.as_of ? formatAsOf(fiiDay.as_of) : ''), narrative: 'Single-session read · use period tabs above for cumulative picture.' },
-  '5sess': { label: 'Weekly', net: last5Net, fii: -12400, dii: 16691, sub: 'net ₹ Cr · 5d avg', focusedHeader: 'Weekly · last 5 sessions', narrative: 'Short-window absorption pattern · 5-day net positive despite FII selling.' },
-  mtd: { label: 'MTD', net: mtdNet, fii: fiiVal(fiiMtd, -14305), dii: fiiVal(diiMtdH, 18596), sub: 'net ₹ Cr · absorption ' + (absorpM ? absorpM.value.toFixed(2) + '×' : '—'), focusedHeader: 'MTD · ' + (fiiMtd?.as_of ? formatAsOf(fiiMtd.as_of) : 'May 2026'), narrative: _absRatio != null && _absRatio >= 1 ? `DII covering ${_absPct}% of FII selling. Stable regime · becomes stress if FII intensifies AND DII slows.` : `DII covering ${_absPct ?? '—'}% of FII outflow. Becomes "stress" if FII selling intensifies AND DII slows simultaneously.` },
-  cytd: { label: 'CYTD', net: cytdNet, fii: fiiVal(fiiCytdH, -42180), dii: diiCytdH, sub: 'net ₹ Cr · year-to-date', focusedHeader: 'CYTD · ' + new Date().getFullYear(), narrative: 'Calendar-year cumulative · structural pattern. Net positive YTD on DII strength.' }
-};
+// V60 Lens 2 · cards-as-tabs period strip. Only periods with real data are
+// shown. The former Weekly tab, CYTD DII (MTD × 4) and the cumulative chart
+// were hard-coded May 2026 placeholders and are removed.
+const periodData = {};
+if (fiiD != null && diiD != null) {
+  periodData.today = { label: 'Today', net: fiiD + diiD, fii: fiiD, dii: diiD, sub: '1 session',
+    focusedHeader: 'Today · ' + (fiiDay?.as_of ? formatAsOf(fiiDay.as_of) : ''),
+    narrative: `FII ${fiiD >= 0 ? 'bought' : 'sold'} a net ${absFmt(fiiD)} and DII ${diiD >= 0 ? 'bought' : 'sold'} a net ${absFmt(diiD)}.`
+      + (fiiBuying ? ' No FII selling to absorb.' : absMeaningful ? ` DII covering ${_absPct}% of FII selling.` : '') };
+}
+if (fiiMtdReal && diiMtdReal && num(fiiMtd) != null && num(diiMtdH) != null) {
+  periodData.mtd = { label: 'MTD', net: fiiMtd.value + diiMtdH.value, fii: fiiMtd.value, dii: diiMtdH.value, sub: 'month to date',
+    focusedHeader: 'MTD · ' + (fiiMtd?.as_of ? formatAsOf(fiiMtd.as_of) : ''), narrative: 'Month-to-date cash market net.' };
+}
+const periods = Object.keys(periodData);
+let activePeriod = periods.includes('mtd') ? 'mtd' : periods[0];
 
 const periodTabsHost = el('div', {});
 const focusedHost = el('div', {});
@@ -858,21 +939,22 @@ flowsBody.appendChild(focusedHost);
 function renderFlowsActive() {
   const p = periodData[activePeriod];
   periodTabsHost.innerHTML = '';
+  focusedHost.innerHTML = '';
+  if (!p) return;
   periodTabsHost.appendChild(renderCardsAsTabs(periods.map(id => ({
-    id, label: periodData[id].label, net: shortFmt(periodData[id].net), sub: periodData[id].sub.split(' · ')[1] || '',
+    id, label: periodData[id].label, net: inrFmt(periodData[id].net), sub: periodData[id].sub,
     netClass: periodData[id].net >= 0 ? 'pos' : 'neg',
     active: id === activePeriod
   })), (id) => { activePeriod = id; renderFlowsActive(); }));
-  focusedHost.innerHTML = '';
   focusedHost.appendChild(renderFlowsFocused({
     period_label: p.focusedHeader || p.label,
-    period_sub: _absRatio != null ? `Absorption ${_absRatio.toFixed(2)}× · 8 sessions` : '',
-    fii: { value: p.fii, formatted: inrFmt(p.fii), sub: 'NSE FII bhavcopy' },
-    dii: { value: p.dii, formatted: inrFmt(p.dii), sub: 'AMFI MF flows' },
-    net: { value: p.net, formatted: inrFmt(p.net), sub: p.sub.split(' · ')[1] || '' },
-    narrative_lead: _absRatio != null && _absRatio >= 1 ? `DII Absorption regime · 8 sessions:` : `DII Absorption · 8 sessions:`,
+    period_sub: flowsReadToday,
+    fii: { value: p.fii, formatted: inrFmt(p.fii), sub: 'NSE provisional' },
+    dii: { value: p.dii, formatted: inrFmt(p.dii), sub: 'NSE provisional' },
+    net: { value: p.net, formatted: inrFmt(p.net), sub: p.sub },
+    narrative_lead: 'Read:',
     narrative: p.narrative,
-    absorption: activePeriod === 'mtd' ? _absRatio : null
+    absorption: absMeaningful ? _absRatio : null
   }));
 }
 renderFlowsActive();
@@ -884,29 +966,12 @@ if (fnoOi && fnoOi.sparkline_12m) {
   flowsBody.appendChild(renderPersistenceBar(last5));
 }
 
-// Cumulative chart · V60 says "kept · lower priority" · collapsed by default
-const diiCumPoints = [
-  { label: 'Jan 1', value: 0 }, { label: 'Feb 1', value: 28000 }, { label: 'Mar 1', value: 58000 },
-  { label: 'Apr 1', value: 84000 }, { label: 'Apr 28', value: 95000 }
-];
-const fiiCumPoints = [
-  { label: 'Jan 1', value: 0 }, { label: 'Feb 1', value: -10000 }, { label: 'Mar 1', value: -22000 },
-  { label: 'Apr 1', value: -32000 }, { label: 'Apr 28', value: -42180 }
-];
-const cumDetails = el('details', { class: 'flows-cumulative-collapse' }, [
-  el('summary', {}, 'Cumulative chart · 2026 YTD · ' + inrFmt(netCytd) + ' net market'),
-  renderCumulativeLine([
-    { name: 'DII cumulative', color: 'var(--green)', points: diiCumPoints, current: '+95,000 Cr' },
-    { name: 'FII cumulative', color: 'var(--red)', points: fiiCumPoints, current: '−42,180 Cr' }
-  ], { title: 'FII vs DII · cumulative ₹ Cr · 2026 YTD', summary: 'Net market: ' + inrFmt(netCytd) + ' · DII pulling away', asof: '1 Jan – 5 May 2026' })
-]);
-flowsBody.appendChild(cumDetails);
-
 // Sectoral diverging bars REMOVED per Aniket 2026-05-12 decision · was mock data, no NSDL parser yet.
 
 // Supporting composite (auto-promote anomalies + summary + change hint built-in)
 flowsBody.appendChild(renderSupportingTier(
-  ['fpi_debt_flows', 'fii_index_fut_positioning', 'block_deals_notional', 'fii_equity_mtd', 'dii_mtd', 'fii_equity_cytd'],
+  ['fpi_debt_flows', 'fii_index_fut_positioning', 'block_deals_notional',
+   fiiMtdReal ? 'fii_equity_mtd' : null, diiMtdReal ? 'dii_mtd' : null, fiiCytdReal ? 'fii_equity_cytd' : null].filter(Boolean),
   M,
   { sectionId: 'flows', title: 'Supporting metrics' }
 ));
@@ -920,16 +985,16 @@ body.appendChild(renderSectionFrame({
     { date: '2026-04-28', severity: 'low',   label: 'DII covering' },
     { date: '2026-05-04', severity: 'high',  label: 'Blocks ₹8.5k' },
     { date: '2026-05-08', severity: 'high',  label: 'F&O OI build' },
-    { date: '2026-05-11', severity: 'med',   label: 'FII MTD −8.4k' }
+    { date: '2026-05-11', severity: 'med',   label: 'FII MTD -8.4k' }
   ]),
-  sources: buildSectionFooter(['NSE', 'SEBI', 'NSDL', 'AMFI']),
+  sources: buildSectionFooter(['NSE', 'SEBI', 'NSDL', 'AMFI'], 'flows'),
   children: [flowsBody]
 }));
 
-// ════════════════════════ MACRO — 5 PANELS ════════════════════════
+// ════════════════════════ MACRO, 5 PANELS ════════════════════════
 const macroBody = el('div', { class: 'section-body-stack' });
 
-// Panel 1 · Yield curve with Option A stat strip — live-derived where possible.
+// Panel 1 · Yield curve with Option A stat strip, live-derived where possible.
 // Note: gsec sub-tenors aren't yet broken out into separate metrics. We display
 // the live real_10y_yield + repo_rate, and use the curve metric's stored snapshot
 // for 1Y/5Y/10Y until those tenors get individual ingest parsers.
@@ -943,8 +1008,8 @@ const yieldStrip = renderStatStrip([
   { label: '1Y G-sec', value: gsec1y.toFixed(2) + '%', sub: 'derived: repo + 10 bps', color: 'var(--ink)' },
   { label: '5Y G-sec', value: gsec5y.toFixed(2) + '%', sub: 'CCIL FBIL', color: 'var(--ink)' },
   { label: '10Y G-sec', value: gsec10y.toFixed(2) + '%', sub: real10y?.as_of ? 'as on ' + formatAsOf(real10y.as_of) : '', color: 'var(--amber)' },
-  { label: 'Real 10Y', value: real10y ? formatTrend(real10y.value).replace(/^\+/, '+') : '—', sub: '10Y − CPI · ' + (cpi ? cpi.value.toFixed(2) + '%' : '—'), color: real10y && real10y.value > 0 ? 'var(--green)' : 'var(--red)' },
-  { label: 'Repo rate', value: repo ? repo.value.toFixed(2) + '%' : '—', sub: 'RBI MPC', color: 'var(--ink-2)' }
+  { label: 'Real 10Y', value: real10y ? formatTrend(real10y.value).replace(/^\+/, '+') : '-', sub: '10Y - CPI · ' + (cpi ? cpi.value.toFixed(2) + '%' : '-'), color: real10y && real10y.value > 0 ? 'var(--green)' : 'var(--red)' },
+  { label: 'Repo rate', value: repo ? repo.value.toFixed(2) + '%' : '-', sub: 'RBI MPC', color: 'var(--ink-2)' }
 ]);
 macroBody.appendChild(yieldStrip);
 macroBody.appendChild(renderYieldCurve(
@@ -957,7 +1022,7 @@ if (yieldInf) macroBody.appendChild(yieldInf);
 
 // Panel 2+3 · Inflation + Currency strip side by side
 const inflationCurrencyRow = el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '18px' } });
-// Inflation bars — live where metric exists; Core/Food are MoSPI sub-series we don't yet ingest separately
+// Inflation bars, live where metric exists; Core/Food are MoSPI sub-series we don't yet ingest separately
 const cpiM = M('cpi_inflation');
 const wpiM = M('core_cpi');
 const inflationItems = [
@@ -967,7 +1032,7 @@ const inflationItems = [
 inflationCurrencyRow.appendChild(renderInflationBars(
   inflationItems,
   4.0,
-  { note: ((cpiM && cpiM.value < 4) ? 'CPI below 4% — RBI has room. ' : 'CPI above 4% target. ') + ((wpiM && wpiM.value > (cpiM?.value ?? 4)) ? 'WPI running hotter than CPI.' : 'WPI in line with CPI.'),
+  { note: ((cpiM && cpiM.value < 4) ? 'CPI below 4%, RBI has room. ' : 'CPI above 4% target. ') + ((wpiM && wpiM.value > (cpiM?.value ?? 4)) ? 'WPI running hotter than CPI.' : 'WPI in line with CPI.'),
     asof: cpiM?.as_of ? formatAsOf(cpiM.as_of) + ' release' : '' }
 ));
 const currencyWrap = el('div', { class: 'viz-wrap' });
@@ -976,12 +1041,12 @@ const inrM = M('inr_usd');
 const dxyM = M('dxy');
 const fxM = M('fx_reserves');
 currencyWrap.appendChild(renderCurrencyStrip([
-  { label: 'INR / USD', value: inrM ? '₹' + inrM.value.toFixed(2) : '—', tooltip: 'Indian Rupee per US Dollar · RBI reference rate', sparkline: inrM?.sparkline_12m || [], mom_pct: inrM?.mom_pct, yoy_pct: inrM?.yoy_pct, trend_direction: 'bad', asof: inrM?.as_of ? formatAsOf(inrM.as_of) : '', range: inrM ? rangeTick(inrM) : null },
-  { label: 'DXY', value: dxyM ? dxyM.value.toFixed(2) : '—', tooltip: 'US Dollar Index — USD vs basket of 6 majors. Above 100 = strong dollar.', sparkline: dxyM?.sparkline_12m || [], mom_pct: dxyM?.mom_pct, yoy_pct: dxyM?.yoy_pct, trend_direction: 'bad', asof: dxyM?.as_of ? formatAsOf(dxyM.as_of) : '', range: dxyM ? rangeTick(dxyM) : null },
-  { label: 'FX reserves', value: fxM ? '$' + fxM.value.toFixed(1) + ' Bn' : '—', tooltip: 'India FX reserves · weekly RBI release', sparkline: fxM?.sparkline_12m?.slice() || [], mom_pct: fxM?.mom_pct, yoy_pct: fxM?.yoy_pct, trend_direction: 'bad', asof: fxM?.as_of ? formatAsOf(fxM.as_of) : '', range: fxM ? rangeTick(fxM) : null }
+  { label: 'INR / USD', value: inrM ? '₹' + inrM.value.toFixed(2) : '-', tooltip: 'Indian Rupee per US Dollar · RBI reference rate', sparkline: inrM?.sparkline_12m || [], mom_pct: inrM?.mom_pct, yoy_pct: inrM?.yoy_pct, trend_direction: 'bad', asof: inrM?.as_of ? formatAsOf(inrM.as_of) : '', range: inrM ? rangeTick(inrM) : null },
+  { label: 'DXY', value: dxyM ? dxyM.value.toFixed(2) : '-', tooltip: 'US Dollar Index, USD vs basket of 6 majors. Above 100 = strong dollar.', sparkline: dxyM?.sparkline_12m || [], mom_pct: dxyM?.mom_pct, yoy_pct: dxyM?.yoy_pct, trend_direction: 'bad', asof: dxyM?.as_of ? formatAsOf(dxyM.as_of) : '', range: dxyM ? rangeTick(dxyM) : null },
+  { label: 'FX reserves', value: fxM ? '$' + fxM.value.toFixed(1) + ' Bn' : '-', tooltip: 'India FX reserves · weekly RBI release', sparkline: fxM?.sparkline_12m?.slice() || [], mom_pct: fxM?.mom_pct, yoy_pct: fxM?.yoy_pct, trend_direction: 'bad', asof: fxM?.as_of ? formatAsOf(fxM.as_of) : '', range: fxM ? rangeTick(fxM) : null }
 ]));
 currencyWrap.appendChild(el('div', { class: 'viz-legend-row' }, [
-  el('span', { style: { color: 'var(--ink-2)' } }, 'All three weakening together — classic dollar-strength regime.')
+  el('span', { style: { color: 'var(--ink-2)' } }, 'All three weakening together, classic dollar-strength regime.')
 ]));
 inflationCurrencyRow.appendChild(currencyWrap);
 macroBody.appendChild(inflationCurrencyRow);
@@ -1011,21 +1076,21 @@ const r10yRange = r10yM ? rangeTick(r10yM) : null;
 const gaugeRow = el('div', { class: 'gauge-row' }, [
   el('div', { class: 'gauge-cell calm' }, [
     el('div', { class: 'gauge-label' }, 'PMI COMPOSITE'),
-    el('div', { class: 'gauge-value', style: { color: pmiM && pmiM.value >= 50 ? 'var(--green)' : 'var(--red)' } }, pmiM ? pmiM.value.toFixed(1) : '—'),
+    el('div', { class: 'gauge-value', style: { color: pmiM && pmiM.value >= 50 ? 'var(--green)' : 'var(--red)' } }, pmiM ? pmiM.value.toFixed(1) : '-'),
     el('div', { class: 'gauge-track' }),
     el('div', { class: 'gauge-hint' }, 'expansion above 50' + (pmiM?.as_of ? ' · ' + formatAsOf(pmiM.as_of) : '')),
     pmiRange ? renderRangeTick(pmiRange, { compact: true }) : null
   ].filter(Boolean)),
   el('div', { class: 'gauge-cell warm' }, [
     el('div', { class: 'gauge-label' }, 'IIP YOY'),
-    el('div', { class: 'gauge-value', style: { color: iipM && iipM.value >= 0 ? 'var(--green)' : 'var(--red)' } }, iipM ? formatTrend(iipM.value) : '—'),
+    el('div', { class: 'gauge-value', style: { color: iipM && iipM.value >= 0 ? 'var(--green)' : 'var(--red)' } }, iipM ? formatTrend(iipM.value) : '-'),
     el('div', { class: 'gauge-track' }),
     el('div', { class: 'gauge-hint' }, 'growth above 0%' + (iipM?.as_of ? ' · ' + formatAsOf(iipM.as_of) : '')),
     iipRange ? renderRangeTick(iipRange, { compact: true }) : null
   ].filter(Boolean)),
   el('div', { class: 'gauge-cell warm' }, [
     el('div', { class: 'gauge-label' }, 'REAL 10Y'),
-    el('div', { class: 'gauge-value', style: { color: r10yM && r10yM.value > 0 ? 'var(--green)' : 'var(--red)' } }, r10yM ? formatTrend(r10yM.value) : '—'),
+    el('div', { class: 'gauge-value', style: { color: r10yM && r10yM.value > 0 ? 'var(--green)' : 'var(--red)' } }, r10yM ? formatTrend(r10yM.value) : '-'),
     el('div', { class: 'gauge-track' }),
     el('div', { class: 'gauge-hint' }, 'positive carry' + (r10yM?.as_of ? ' · ' + formatAsOf(r10yM.as_of) : '')),
     r10yRange ? renderRangeTick(r10yRange, { compact: true }) : null
@@ -1049,7 +1114,7 @@ macroBody.appendChild(renderSupportingTier(
 body.appendChild(renderSectionFrame({
   section_id: 'macro',
   title: 'India macro',
-  question: 'FX, rates, inflation, fiscal, liquidity — the structural backdrop.',
+  question: 'FX, rates, inflation, fiscal, liquidity, the structural backdrop.',
   timeline: renderTimelineStrip([
     { date: '2026-04-09', severity: 'med',   label: 'MPC pause 5.25%' },
     { date: '2026-04-24', severity: 'high',  label: 'INR breach 95' },
@@ -1057,15 +1122,15 @@ body.appendChild(renderSectionFrame({
     { date: '2026-05-01', severity: 'low',   label: 'CPI 3.40%' },
     { date: '2026-05-11', severity: 'low',   label: 'Real 10Y +3.35%' }
   ]),
-  sources: buildSectionFooter(['RBI', 'MoSPI', 'CCIL', 'CGA', 'S&P PMI']),
+  sources: buildSectionFooter(['RBI', 'MoSPI', 'CCIL', 'CGA', 'S&P PMI'], 'macro'),
   children: [macroBody]
 }));
 
-// ════════════════════════ REAL ECONOMY — CLUSTER CARDS ════════════════════════
+// ════════════════════════ REAL ECONOMY, CLUSTER CARDS ════════════════════════
 const econBody = el('div', { class: 'section-body-stack' });
 
 // Compute cluster headline from live metrics: average YoY across cluster.
-// Falls back to label '—' if no metric in the cluster has yoy_pct.
+// Falls back to label '-' if no metric in the cluster has yoy_pct.
 function clusterAvgYoY(metricIds) {
   const ms = metricIds.map(M).filter(m => m && m.yoy_pct != null);
   if (!ms.length) return null;
@@ -1073,7 +1138,7 @@ function clusterAvgYoY(metricIds) {
 }
 function clusterHeadline(metricIds) {
   const avg = clusterAvgYoY(metricIds);
-  return avg == null ? '—' : (avg > 0 ? '+' : '') + avg.toFixed(1) + '%';
+  return avg == null ? '-' : (avg > 0 ? '+' : '') + avg.toFixed(1) + '%';
 }
 const clusters = [
   { id: 'tax', label: 'Tax & demand', sub: 'GST · UPI · e-way',
@@ -1092,7 +1157,7 @@ const clusters = [
     feature: 'reservoir_levels', featureLabel: 'Reservoir · % capacity' }
 ].map(c => ({ ...c, value: clusterHeadline(c.metrics) }));
 
-// Helper — month labels relative to as_of (12 months back, oldest → newest)
+// Helper, month labels relative to as_of (12 months back, oldest → newest)
 const _MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function monthLabelsEndingAt(iso) {
   if (!iso) return _MO.slice();
@@ -1141,7 +1206,7 @@ function buildClusterSynthesis(c, metrics) {
     }
   }
 
-  // PRODUCTION · YoY for power, MoM for cement/steel — pick the worst
+  // PRODUCTION · YoY for power, MoM for cement/steel, pick the worst
   if (c.id === 'production') {
     const power = metrics.find(m => m.metric_id === 'power_demand');
     if (power && power.yoy_pct != null && power.yoy_pct < -5) {
@@ -1194,7 +1259,7 @@ function showCluster(c) {
   clusterGrid.querySelectorAll('.cluster-card').forEach(card => card.classList.toggle('active', card.dataset.cluster === c.id));
   expansionMount.innerHTML = '';
 
-  // Pattern A — numbers cards via small-multiples (every cluster gets this)
+  // Pattern A, numbers cards via small-multiples (every cluster gets this)
   const metrics = c.metrics.map(M).filter(Boolean);
   const newest = metrics.map(m => m.as_of).filter(Boolean).sort().pop();
 
@@ -1224,7 +1289,7 @@ function showCluster(c) {
   }));
 
   if (c.id !== 'auto') {
-    // E — seasonality strip on the cluster's most cyclical metric
+    // E, seasonality strip on the cluster's most cyclical metric
     if (c.feature) {
       const fm = M(c.feature);
       if (fm && fm.sparkline_12m) {
@@ -1244,13 +1309,13 @@ function showCluster(c) {
 }
 
 clusters.forEach(c => {
-  // Drop the misleading "avg YoY · —" headline (was averaging only 1 of 4 metrics
+  // Drop the misleading "avg YoY · -" headline (was averaging only 1 of 4 metrics
   // for most clusters because yoy_pct is null for ~80% of Real Economy metrics).
-  // Show count + freshest as-of instead — every number on the card is real now.
+  // Show count + freshest as-of instead, every number on the card is real now.
   const cms = c.metrics.map(M).filter(Boolean);
   const verifiedCount = cms.filter(m => m.verification_state === 'verified').length;
   const newestDate = cms.map(m => m.as_of).filter(Boolean).sort().pop();
-  const newestStr = newestDate ? new Date(newestDate).getDate() + ' ' + _MO[new Date(newestDate).getMonth()] : '—';
+  const newestStr = newestDate ? new Date(newestDate).getDate() + ' ' + _MO[new Date(newestDate).getMonth()] : '-';
   const card = el('div', { class: 'cluster-card', 'data-cluster': c.id, onclick: () => showCluster(c) }, [
     el('div', { class: 'cc-label' }, c.label),
     el('div', { class: 'cc-value', style: { fontSize: '20px', color: 'var(--ink)' } }, [
@@ -1266,7 +1331,7 @@ clusters.forEach(c => {
 });
 econBody.appendChild(clusterGrid);
 econBody.appendChild(expansionMount);
-showCluster(clusters[3]); // open Auto by default — most data-rich
+showCluster(clusters[3]); // open Auto by default, most data-rich
 
 body.appendChild(renderSectionFrame({
   section_id: 'economy',
@@ -1274,21 +1339,21 @@ body.appendChild(renderSectionFrame({
   question: 'Click any cluster to drill in · tax · movement · production · auto · discretionary.',
   timeline: renderTimelineStrip([
     { date: '2026-04-25', severity: 'low',   label: 'Reservoir 47.2%' },
-    { date: '2026-04-30', severity: 'high',  label: 'FADA Tractor −16%' },
-    { date: '2026-05-01', severity: 'med',   label: 'GST −5.3% MoM' },
+    { date: '2026-04-30', severity: 'high',  label: 'FADA Tractor -16%' },
+    { date: '2026-05-01', severity: 'med',   label: 'GST -5.3% MoM' },
     { date: '2026-05-11', severity: 'low',   label: 'UPI +18.7% DoD' },
     { date: '2026-05-12', severity: 'med',   label: 'POL 19.3 MT' }
   ]),
-  sources: buildSectionFooter(['GST', 'FADA', 'GridIndia', 'NPCI', 'IHMCL', 'JPC']),
+  sources: buildSectionFooter(['GST', 'FADA', 'GridIndia', 'NPCI', 'IHMCL', 'JPC'], 'economy'),
   children: [econBody]
 }));
 
-// ════════════════════════ FREIGHT — CHART-LED ════════════════════════
+// ════════════════════════ FREIGHT, CHART-LED ════════════════════════
 const freightBody = el('div', { class: 'section-body-stack' });
 
 // Hormuz cliff (kept from prior)
 // Plausibility guard · suppress MoM/YoY display when sparkline has < 4 unique
-// values AND |trend| > 200% — math is correct but semantically meaningless.
+// values AND |trend| > 200%, math is correct but semantically meaningless.
 // Show "history accruing" instead.
 function trendIsTrustworthy(m, trendValue) {
   if (trendValue == null) return false;
@@ -1323,10 +1388,10 @@ function buildHormuzPrimary() {
       el('div', { class: 'hp-meta' }, [
         m.unit + ' · 24h average',
         el('span', { style: { borderLeft: '1px solid #3a1c1c', paddingLeft: '14px', color: 'var(--ink-3)' } },
-          ['Normal baseline: ', el('b', {}, m.baseline_30d || '—')])
+          ['Normal baseline: ', el('b', {}, m.baseline_30d || '-')])
       ]),
       el('div', { class: 'hp-trends' }, [
-        // When source is static, the meaningful read is pct_of_normal + inbound/outbound split — NOT MoM/YoY
+        // When source is static, the meaningful read is pct_of_normal + inbound/outbound split, NOT MoM/YoY
         showMom && !isStatic
           ? el('span', {}, ['MoM ', el('b', {}, formatTrend(m.mom_pct))])
           : el('span', { style: { color: 'var(--ink-3)', fontStyle: 'italic' }, title: 'Source is static · MoM math meaningless · awaiting live AIS' }, 'history accruing'),
@@ -1353,7 +1418,7 @@ function buildHormuzPrimary() {
 }
 freightBody.appendChild(buildHormuzPrimary());
 
-// Brent + India crude paired line — pull points from live sparklines
+// Brent + India crude paired line, pull points from live sparklines
 const _brentLookup = M('brent_crude');
 const _indiaLookup = M('india_crude_basket');
 const brentPoints = metricSparkPoints(_brentLookup) || Array.from({length: 9}, (_, i) => ({
@@ -1364,39 +1429,48 @@ const indiaPoints = metricSparkPoints(_indiaLookup) || Array.from({length: 9}, (
   label: ['Jan','','Feb','','Mar','','Apr','',''][i],
   value: [75.0, 76.7, 78.6, 80.8, 82.4, 83.8, 85.0, 90.5, 96.84][i]
 }));
-// Brent vs India crude — Option C headline panel (shock-eligible · biggest physical driver)
+// Brent vs India crude, Option C headline panel (shock-eligible · biggest physical driver)
 const brent = M('brent_crude');
 const indiaCrude = M('india_crude_basket');
 const brentValue = brent?.value ?? null;
 const indiaValue = indiaCrude?.value ?? null;
 const brentSpread = +(indiaValue - brentValue).toFixed(2);
-// Days above $95 shock = count of last sparkline points >= 95 (conservative)
-const daysAboveShock = (brent?.sparkline_12m || brentPoints.map(p => p.value))
-  .filter(v => (typeof v === 'number' ? v : v.value) >= 95).length;
+// Window facts come from the live sparkline (last N daily readings), never
+// from fixed May 2026 text.
+const brentSpark = (brent?.sparkline_12m || []).filter(v => typeof v === 'number');
+const brentN = brentSpark.length;
+const daysAboveShock = brentSpark.filter(v => v >= 95).length;
+const brentHi = brentN ? Math.max(...brentSpark) : null;
+const brentLo = brentN ? Math.min(...brentSpark) : null;
+const brentWindow = brentN ? `last ${brentN} readings to ${formatAsOfLong(brent.as_of)}` : '';
+const brentShockText = brentValue >= 95 && indiaValue >= 95 ? 'both above the $95 shock line'
+  : brentValue >= 95 ? 'Brent above the $95 shock line'
+  : indiaValue >= 95 ? 'India basket above $95, Brent below'
+  : 'both below the $95 shock line';
 const brentChart = renderPairedLine(
   [
     { name: 'Brent crude', color: 'var(--red)', points: brentPoints, current: '$' + brentValue.toFixed(2) + ' / bbl' },
     { name: 'India crude basket (PPAC)', color: 'var(--accent)', points: indiaPoints, current: '$' + indiaValue.toFixed(2) + ' / bbl' }
   ],
-  { title: '90-day trail · USD per barrel', thresholdLine: 95, summary: `Spread ${brentSpread >= 0 ? '+' : ''}${brentSpread} · both above $95 shock since 21 Apr`, asof: 'window: 5 Feb – 5 May 2026' }
+  { title: 'Recent trail · USD per barrel', thresholdLine: 95, summary: `Spread ${brentSpread >= 0 ? '+' : '-'}$${Math.abs(brentSpread).toFixed(2)} · ${brentShockText}`, asof: brentWindow }
 );
 const brentPanel = renderHeadlinePanel({
   eyebrow: brentValue >= 95 ? '⚠ Shock · Brent crude above $95' : 'Brent crude · ICE 1-month',
   eyebrowColor: brentValue >= 95 ? 'var(--red)' : 'var(--ink-2)',
   value: '$' + brentValue.toFixed(2) + ' / bbl',
-  metaLine: 'Brent ICE futures · Trading Economics · ' + (brent?.as_of ? formatAsOf(brent.as_of) : '5 May 2026'),
+  metaLine: 'Brent ICE futures · Trading Economics · ' + (brent?.as_of ? formatAsOf(brent.as_of) : ''),
   threshold: '$95 / bbl',
   mom: brent?.mom_pct != null ? { text: formatTrend(brent.mom_pct), color: brent.mom_pct > 0 ? 'var(--red)' : 'var(--green)' } : null,
   yoy: brent?.yoy_pct != null ? { text: formatTrend(brent.yoy_pct), color: brent.yoy_pct > 0 ? 'var(--red)' : 'var(--green)' } : null,
   // 5Y percentile removed (no reliable free 5Y daily Brent source); will return in V2 once FRED backfill runs from CI
   status: brentValue >= 95 ? 'shock' : 'high',
   statusPill: brentValue >= 95 ? 'SHOCK' : 'HIGH',
-  statusSub: `Above $95 since 21 Apr · ${daysAboveShock} sessions`,
+  statusSub: brentN ? `Above $95 in ${daysAboveShock} of the last ${brentN} readings` : '',
   chart: brentChart,
   matrix: [
-    { label: 'India crude basket', value: '$' + indiaValue.toFixed(2), sub1: indiaCrude?.yoy_pct != null ? formatTrend(indiaCrude.yoy_pct) + ' YoY' : '+34.2% YoY', sub1Color: 'var(--red)', sub2: 'PPAC daily', asof: indiaCrude?.as_of ? formatAsOf(indiaCrude.as_of) : '5 May', tooltip: 'India crude basket = weighted avg of Dubai (75%) + Brent (25%) — what India actually pays' },
-    { label: 'Brent–India spread', value: (brentSpread >= 0 ? '+$' : '−$') + Math.abs(brentSpread).toFixed(2), sub1: brentSpread < 0 ? 'India trades below Brent' : 'India trades above Brent', sub2: 'live derived', asof: 'now', tooltip: 'Spread = India basket − Brent. Negative is the norm.' },
-    { label: '90-day high · low', value: '$107 · $76', sub1: 'range $31', sub2: 'peak: 28 Apr 2026', asof: 'derived', tooltip: '90-day rolling high and low for Brent' },
+    { label: 'India crude basket', value: '$' + indiaValue.toFixed(2), sub1: indiaCrude?.yoy_pct != null ? formatTrend(indiaCrude.yoy_pct) + ' YoY' : '+34.2% YoY', sub1Color: 'var(--red)', sub2: 'PPAC daily', asof: indiaCrude?.as_of ? formatAsOf(indiaCrude.as_of) : '5 May', tooltip: 'India crude basket = weighted avg of Dubai (75%) + Brent (25%), what India actually pays' },
+    { label: 'Brent-India spread', value: (brentSpread >= 0 ? '+$' : '-$') + Math.abs(brentSpread).toFixed(2), sub1: brentSpread < 0 ? 'India trades below Brent' : 'India trades above Brent', sub2: 'live derived', asof: indiaCrude?.as_of ? formatAsOf(indiaCrude.as_of) : '', tooltip: 'Spread = India basket minus Brent. Negative is the norm.' },
+    { label: 'Recent high · low', value: brentN ? '$' + Math.round(brentHi) + ' · $' + Math.round(brentLo) : 'n/a', sub1: brentN ? 'range $' + Math.round(brentHi - brentLo) : '', sub2: brentN ? `last ${brentN} readings` : '', asof: brent?.as_of ? formatAsOf(brent.as_of) : '', tooltip: 'High and low of the recent daily Brent readings shown in the chart' },
     { label: 'India weekly oil bill', value: '$' + (indiaValue * 5.1 * 7 / 1000).toFixed(1) + ' Bn', sub1: 'estimate', sub1Color: 'var(--ink-2)', sub2: 'basket × 5.1 Mb/d × 7 days', asof: 'live formula', tooltip: 'India crude imports ≈ 5.1 Mb/d (PPAC). Weekly bill = basket price × imports × 7. Real number on next CI backfill.' }
   ]
 });
@@ -1405,11 +1479,16 @@ const brentInf = inferenceLineEl('brent');
 if (brentInf) freightBody.appendChild(brentInf);
 
 // 3-up tanker / container / bulk small multiples
+// Freight indices · live metrics, each with its own date (they refresh on
+// different days, so there is no single panel date).
+const _fx = (m) => m && typeof m.mom_pct === 'number' ? m.mom_pct : null;
+const _fxColor = (v) => v == null ? 'var(--ink-3)' : v > 0 ? 'var(--red)' : 'var(--green)';
+const _vlcc = M('vlcc_tanker_rates'), _wci = M('drewry_wci'), _bdti = M('baltic_dirty_tanker');
 freightBody.appendChild(renderSmallMultiples([
-  { label: 'VLCC tanker', deltaPct: 220.4, color: 'var(--red)', valueFormatted: '1,842 WS', tooltip: 'Worldscale points · benchmark for spot tanker rates · Baltic Dirty Tanker Index' },
-  { label: 'Drewry WCI', deltaPct: 14.6, color: 'var(--amber)', valueFormatted: '$2,840 / 40ft', tooltip: 'Drewry World Container Index · global avg spot rate per 40-ft container' },
-  { label: 'Baltic Dry', deltaPct: 8.4, color: 'var(--amber)', valueFormatted: '2,840 idx', tooltip: 'Baltic Dry Index · dry-bulk shipping rates · 1985=1000' }
-], { title: 'Freight indices · MoM %', asof: 'as on 2 May 2026' }));
+  _vlcc ? { label: 'VLCC tanker', deltaPct: _fx(_vlcc), color: _fxColor(_fx(_vlcc)), valueFormatted: new Intl.NumberFormat('en-IN').format(Math.round(_vlcc.value)) + ' WS', asof: formatAsOfLong(_vlcc.as_of), tooltip: 'Worldscale points · benchmark for spot tanker rates' } : null,
+  _wci ? { label: 'Drewry WCI', deltaPct: _fx(_wci), color: _fxColor(_fx(_wci)), valueFormatted: '$' + new Intl.NumberFormat('en-US').format(Math.round(_wci.value)) + ' per 40ft', asof: formatAsOfLong(_wci.as_of), tooltip: 'Drewry World Container Index · global avg spot rate per 40-ft container' } : null,
+  _bdti ? { label: 'Baltic Dirty Tanker', deltaPct: _fx(_bdti), color: _fxColor(_fx(_bdti)), valueFormatted: new Intl.NumberFormat('en-IN').format(Math.round(_bdti.value)) + ' index', asof: formatAsOfLong(_bdti.as_of), tooltip: 'Baltic Dirty Tanker Index · crude tanker rates' } : null
+].filter(Boolean), { title: 'Freight indices · MoM %' }));
 
 // Port dwell as supporting row
 freightBody.appendChild(renderSupportingTier(
@@ -1426,43 +1505,47 @@ body.appendChild(renderSectionFrame({
     { date: '2026-04-18', severity: 'high',  label: 'Hormuz drops to 92' },
     { date: '2026-04-24', severity: 'high',  label: 'VLCC +120% wk' },
     { date: '2026-05-04', severity: 'shock', label: 'VLCC +220%' },
-    { date: '2026-05-07', severity: 'low',   label: 'WCI −19% DoD' },
+    { date: '2026-05-07', severity: 'low',   label: 'WCI -19% DoD' },
     { date: '2026-05-12', severity: 'shock', label: 'Brent $99' }
   ]),
-  sources: buildSectionFooter(['MarineTraffic', 'PPAC', 'Drewry', 'Baltic Exchange']),
+  sources: buildSectionFooter(['MarineTraffic', 'PPAC', 'Drewry', 'Baltic Exchange'], 'freight'),
   children: [freightBody]
 }));
 
-// ════════════════════════ MARKET CONTEXT — 4 PANELS ════════════════════════
+// ════════════════════════ MARKET CONTEXT, 4 PANELS ════════════════════════
 const marketBody = el('div', { class: 'section-body-stack' });
 
-// Panel 1 · Indexed equity overlay (Option C headline panel) — points from live sparklines
+// Panel 1 · Indexed equity overlay (Option C headline panel), points from live sparklines
 const niftyM = M('nifty_50');
 const bankM = M('bank_nifty');
 const peM = M('nifty_pe_5y');
+// Fixed 5Y reference band for Nifty trailing PE (static reference values).
+const PE_REF = { min: 15.2, sigmaMinus: 18.6, mean: 21.0, sigmaPlus: 23.8, max: 27.2 };
+const peDesc = (v) => v > PE_REF.sigmaPlus ? 'above +1σ' : v > PE_REF.mean ? 'above mean, below +1σ' : v > PE_REF.sigmaMinus ? 'below mean' : 'below -1σ';
+const _vixM = M('india_vix'), _inrM = M('inr_usd');
 const niftyPoints = metricSparkPoints(niftyM) || Array.from({length: 9}, (_,i) => ({ label: ['Jan','','Feb','','Mar','','Apr','',''][i], value: [100, 101, 102, 102.5, 104, 105, 106.5, 105.5, 104.2][i] }));
 const bankPoints = metricSparkPoints(bankM) || Array.from({length: 9}, (_,i) => ({ label: ['Jan','','Feb','','Mar','','Apr','',''][i], value: [100, 100.5, 101.5, 101, 103, 105, 108, 106.5, 104.5][i] }));
 const equityChart = renderIndexedOverlay([
   { name: 'Nifty 50', color: 'var(--accent)', points: niftyPoints },
   { name: 'Bank Nifty', color: 'var(--blue)', points: bankPoints }
-], { title: '90-day indexed trail · base = 100' });
+], { title: 'Indexed trail · base = 100 · last ' + (niftyM?.sparkline_12m?.length || 0) + ' readings' });
 const equityPanel = renderHeadlinePanel({
   eyebrow: 'Equity benchmarks · live',
   value: niftyM ? formatValue(niftyM.value, 'index', niftyM.unit || 'idx') : '24,180 idx',
-  metaLine: 'Nifty 50 · NSE · ' + (niftyM?.as_of ? formatAsOf(niftyM.as_of) : '5 May 2026'),
+  metaLine: 'Nifty 50 · NSE · ' + (niftyM?.as_of ? formatAsOf(niftyM.as_of) : ''),
   mom: niftyM?.mom_pct != null ? { text: formatTrend(niftyM.mom_pct), color: niftyM.mom_pct >= 0 ? 'var(--green)' : 'var(--red)' } : { text: '+1.4%', color: 'var(--green)' },
   yoy: niftyM?.yoy_pct != null ? { text: formatTrend(niftyM.yoy_pct), color: niftyM.yoy_pct >= 0 ? 'var(--green)' : 'var(--red)' } : { text: '+12.8%', color: 'var(--green)' },
-  percentile: peM ? { label: 'Nifty PE ', text: peM.value.toFixed(1) + '×', color: peM.value > 23 ? 'var(--red)' : 'var(--amber)' } : { label: 'Nifty PE ', text: '22.8×', color: 'var(--amber)' },
-  status: 'med',
-  statusPill: 'WATCH',
-  statusSub: 'Above 5Y mean PE · valuations stretched',
+  percentile: peM ? { label: 'Nifty PE ', text: peM.value.toFixed(1) + '×', color: peM.value > PE_REF.sigmaPlus ? 'var(--red)' : 'var(--amber)' } : null,
+  status: peM && peM.value > PE_REF.mean ? 'med' : 'low',
+  statusPill: peM && peM.value > PE_REF.mean ? 'WATCH' : 'NORMAL',
+  statusSub: peM ? (peM.value > PE_REF.sigmaPlus ? 'PE above +1σ of its 5Y range' : peM.value > PE_REF.mean ? 'PE above its 5Y mean' : 'PE below its 5Y mean') : '',
   chart: equityChart,
   matrix: [
-    { label: 'Bank Nifty', value: bankM ? formatValue(bankM.value, 'index') : '52,640', sub1: bankM?.yoy_pct != null ? formatTrend(bankM.yoy_pct) + ' YoY' : '+9.4% YoY', sub1Color: 'var(--green)', sub2: bankM?.mom_pct != null ? formatTrend(bankM.mom_pct) + ' MoM' : '+0.6% MoM', asof: bankM?.as_of ? formatAsOf(bankM.as_of) : '5 May', tooltip: 'NSE Bank Nifty · 12 large-cap banks' },
-    { label: '52w high · low', value: '24,860 · 21,310', sub1: 'range 16.6%', sub2: 'high: 28 Apr · low: 4 Sep 25', asof: 'derived', tooltip: 'Trailing 52-week range for Nifty 50' },
-    { label: 'Nifty PE vs 5Y', value: peM ? peM.value.toFixed(1) + '×' : '22.8×', sub1: 'mean 21.0× · +1σ 23.8×', sub1Color: 'var(--amber)', sub2: 'stretched but not extreme', asof: peM?.as_of ? formatAsOf(peM.as_of) : '5 May', tooltip: 'Trailing PE vs 5-year distribution' },
-    { label: 'YTD return (USD)', value: '+5.2%', sub1: '+9.4% in INR', sub1Color: 'var(--green)', sub2: 'INR weakness eats 4.2pp', asof: 'derived', tooltip: 'YTD Nifty return adjusted for INR/USD depreciation' }
-  ]
+    bankM ? { label: 'Bank Nifty', value: formatValue(bankM.value, 'index'), sub1: bankM.yoy_pct != null ? formatTrend(bankM.yoy_pct) + ' YoY' : '', sub1Color: (bankM.yoy_pct ?? 0) >= 0 ? 'var(--green)' : 'var(--red)', sub2: bankM.mom_pct != null ? formatTrend(bankM.mom_pct) + ' MoM' : '', asof: formatAsOf(bankM.as_of), tooltip: 'NSE Bank Nifty · 12 large-cap banks' } : null,
+    _vixM ? { label: 'India VIX', value: String(Math.round(_vixM.value)), sub1: _vixM.mom_pct != null ? formatTrend(_vixM.mom_pct) + ' MoM' : '', sub1Color: (_vixM.mom_pct ?? 0) > 0 ? 'var(--red)' : 'var(--green)', sub2: 'NSE implied volatility', asof: formatAsOf(_vixM.as_of), tooltip: 'India VIX · NSE 30-day implied volatility' } : null,
+    peM ? { label: 'Nifty PE vs 5Y', value: peM.value.toFixed(1) + '×', sub1: `mean ${PE_REF.mean.toFixed(1)}× · +1σ ${PE_REF.sigmaPlus.toFixed(1)}×`, sub1Color: 'var(--amber)', sub2: peDesc(peM.value), asof: formatAsOf(peM.as_of), tooltip: 'Trailing PE vs 5-year reference band' } : null,
+    _inrM ? { label: 'INR / $', value: '₹' + _inrM.value.toFixed(2), sub1: _inrM.yoy_pct != null ? formatTrend(_inrM.yoy_pct) + ' YoY' : '', sub1Color: (_inrM.yoy_pct ?? 0) > 0 ? 'var(--red)' : 'var(--green)', sub2: 'RBI reference rate', asof: formatAsOf(_inrM.as_of), tooltip: 'Rupee per US dollar' } : null
+  ].filter(Boolean)
 });
 marketBody.appendChild(equityPanel);
 const equityInf = inferenceLineEl('equity');
@@ -1472,9 +1555,9 @@ if (equityInf) marketBody.appendChild(equityInf);
 const valWrap = el('div', { class: 'viz-wrap' });
 valWrap.appendChild(el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between' } }, [
   el('span', {}, 'Nifty PE · trailing · vs 5Y range'),
-  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, 'as on 5 May 2026')
+  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, peM?.as_of ? 'as on ' + formatAsOfLong(peM.as_of) : '')
 ]));
-valWrap.appendChild(renderValuationBand({ value: 22.8, min: 15.2, sigmaMinus: 18.6, mean: 21.0, sigmaPlus: 23.8, max: 27.2, asof: '5 May 2026' }));
+if (peM) valWrap.appendChild(renderValuationBand({ value: peM.value, ...PE_REF, asof: formatAsOfLong(peM.as_of) }));
 marketBody.appendChild(valWrap);
 
 // Panel 3 + 4 row · VIX/DXY pair + IND-US spread
@@ -1482,20 +1565,26 @@ const sentimentSpreadRow = el('div', { style: { display: 'grid', gridTemplateCol
 const vixWrap = el('div', { class: 'viz-wrap' });
 vixWrap.appendChild(el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between' } }, [
   el('span', {}, 'Sentiment · VIX + Gold'),
-  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, 'as on 5 May 2026')
+  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, M('india_vix')?.as_of ? 'as on ' + formatAsOfLong(M('india_vix').as_of) : '')
 ]));
-// VIX + Gold sentiment row — live values, computed reference-band markers
+// VIX + Gold sentiment row, live values, computed reference-band markers
 const vixM = M('india_vix');
 const goldM = M('gold_usd');
-// Reference bands: VIX 5Y range 9-35 mean 18; Gold 5Y range $1,620-$2,690 mean $2,000
+// Reference bands: VIX 5Y range 9-35 mean 18. Gold uses the low and high of
+// its recent daily readings (the old fixed $1,620 to $2,690 band sat far
+// below today's price).
 const vixPos = vixM ? Math.max(0, Math.min(100, ((vixM.value - 9) / (35 - 9)) * 100)) : 49;
-const goldPos = goldM ? Math.max(0, Math.min(100, ((goldM.value - 1620) / (2690 - 1620)) * 100)) : 88;
+const goldSpark = (goldM?.sparkline_12m || []).filter(v => typeof v === 'number');
+const goldLo = goldSpark.length ? Math.min(...goldSpark) : null;
+const goldHi = goldSpark.length ? Math.max(...goldSpark) : null;
+const goldPos = goldM && goldHi > goldLo ? Math.max(0, Math.min(100, ((goldM.value - goldLo) / (goldHi - goldLo)) * 100)) : 50;
+const usd0 = (v) => '$' + new Intl.NumberFormat('en-US').format(Math.round(v));
 vixWrap.appendChild(el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px', padding: '4px 0' } }, [
-  el('div', { title: 'India VIX · NSE 30-day implied volatility · 5Y range 9–35; >25 = elevated stress' }, [
+  el('div', { title: 'India VIX · NSE 30-day implied volatility · 5Y range 9-35; >25 = elevated stress' }, [
     el('div', { class: 'cs-label' }, 'INDIA VIX'),
-    el('div', { class: 'cs-value' }, vixM ? vixM.value.toFixed(2) : '—'),
+    el('div', { class: 'cs-value' }, vixM ? vixM.value.toFixed(2) : '-'),
     el('div', { class: 'cs-trends' }, [
-      el('span', {}, ['MoM ', el('b', { style: { color: vixM && vixM.mom_pct > 0 ? 'var(--red)' : 'var(--green)', fontFamily: 'var(--mono)' } }, vixM ? formatTrend(vixM.mom_pct) : '—')]),
+      el('span', {}, ['MoM ', el('b', { style: { color: vixM && vixM.mom_pct > 0 ? 'var(--red)' : 'var(--green)', fontFamily: 'var(--mono)' } }, vixM ? formatTrend(vixM.mom_pct) : '-')]),
       vixM?.as_of ? el('span', { style: { marginLeft: '12px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', fontSize: '11px' } }, 'as on ' + formatAsOf(vixM.as_of)) : null
     ].filter(Boolean)),
     el('div', { style: { marginTop: '8px', height: '6px', background: 'linear-gradient(to right, var(--green), var(--amber) 50%, var(--red))', borderRadius: '3px', position: 'relative', opacity: 0.55 } }, [
@@ -1507,16 +1596,18 @@ vixWrap.appendChild(el('div', { style: { display: 'grid', gridTemplateColumns: '
   ]),
   el('div', { title: 'Gold spot · USD per troy ounce · safe-haven asset · rises when risk rises' }, [
     el('div', { class: 'cs-label' }, 'GOLD'),
-    el('div', { class: 'cs-value' }, goldM ? '$' + new Intl.NumberFormat('en-US').format(Math.round(goldM.value)) + ' / oz' : '—'),
+    el('div', { class: 'cs-value' }, goldM ? '$' + new Intl.NumberFormat('en-US').format(Math.round(goldM.value)) + ' / oz' : '-'),
     el('div', { class: 'cs-trends' }, [
-      el('span', {}, ['MoM ', el('b', { style: { color: goldM && goldM.mom_pct > 0 ? 'var(--red)' : 'var(--green)', fontFamily: 'var(--mono)' } }, goldM ? formatTrend(goldM.mom_pct) : '—')]),
+      el('span', {}, ['MoM ', el('b', { style: { color: goldM && goldM.mom_pct > 0 ? 'var(--red)' : 'var(--green)', fontFamily: 'var(--mono)' } }, goldM ? formatTrend(goldM.mom_pct) : '-')]),
       goldM?.as_of ? el('span', { style: { marginLeft: '12px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', fontSize: '11px' } }, 'as on ' + formatAsOf(goldM.as_of)) : null
     ].filter(Boolean)),
     el('div', { style: { marginTop: '8px', height: '6px', background: 'linear-gradient(to right, var(--green), var(--amber) 60%, var(--red))', borderRadius: '3px', position: 'relative', opacity: 0.55 } }, [
       el('div', { style: { position: 'absolute', left: goldPos + '%', top: '-3px', width: '2px', height: '12px', background: 'var(--ink)' } })
     ]),
     el('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: '9.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '3px' } }, [
-      el('span', {}, '5Y low $1,620'), el('span', {}, 'mean $2,000'), el('span', {}, 'all-time high $2,690')
+      goldSpark.length ? el('span', {}, 'low ' + usd0(goldLo)) : null,
+      goldSpark.length ? el('span', {}, `last ${goldSpark.length} readings`) : null,
+      goldSpark.length ? el('span', {}, 'high ' + usd0(goldHi)) : null
     ])
   ])
 ]));
@@ -1525,8 +1616,8 @@ sentimentSpreadRow.appendChild(vixWrap);
 
 const spreadWrap = el('div', { class: 'viz-wrap' });
 spreadWrap.appendChild(el('div', { class: 'viz-title', style: { display: 'flex', justifyContent: 'space-between' } }, [
-  el('span', {}, 'India 10Y vs US 10Y spread · 24 months'),
-  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, 'as on 5 May 2026')
+  el('span', {}, 'India 10Y vs US 10Y spread'),
+  el('span', { style: { fontSize: '10.5px', color: 'var(--ink-3)', textTransform: 'none', letterSpacing: 0 } }, M('ind_us_10y_spread')?.as_of ? 'as on ' + formatAsOfLong(M('ind_us_10y_spread').as_of) : '')
 ]));
 const spreadM = M('ind_us_10y_spread');
 const spreadValue = spreadM?.value ?? 256;
@@ -1537,14 +1628,14 @@ const spreadPoints = metricSparkPoints(spreadM) || Array.from({length: 13}, (_, 
   value: [320, 312, 305, 298, 290, 282, 275, 268, 260, 254, 246, 252, 256][i]
 }));
 spreadWrap.appendChild(renderStatStrip([
-  { label: 'IND–US 10Y spread', value: Math.round(spreadValue) + ' bps', sub: spreadM?.as_of ? 'as on ' + formatAsOf(spreadM.as_of) : '', color: spreadValue < 200 ? 'var(--red)' : 'var(--amber)' },
+  { label: 'IND-US 10Y spread', value: Math.round(spreadValue) + ' bps', sub: spreadM?.as_of ? 'as on ' + formatAsOf(spreadM.as_of) : '', color: spreadValue < 200 ? 'var(--red)' : 'var(--amber)' },
   { label: 'India 10Y', value: gsec10y.toFixed(2) + '%', sub: 'CCIL FBIL', color: 'var(--ink)' },
   { label: 'US 10Y', value: usTreasury10y.toFixed(2) + '%', sub: 'FRED · derived', color: 'var(--ink)' },
   { label: '5Y avg spread', value: fiveYAvgSpread + ' bps', sub: 'currently ' + Math.abs(Math.round(fiveYAvgSpread - spreadValue)) + ' bps ' + (spreadValue < fiveYAvgSpread ? 'below' : 'above'), color: 'var(--ink-2)' },
   { label: 'Watch threshold', value: '200 bps', sub: Math.round(spreadValue - 200) + ' bps headroom', color: 'var(--red)' }
 ]));
 spreadWrap.appendChild(renderCumulativeLine(
-  [{ name: 'IND–US 10Y spread', color: 'var(--accent)', points: spreadPoints, current: Math.round(spreadValue) + ' bps' }],
+  [{ name: 'IND-US 10Y spread', color: 'var(--accent)', points: spreadPoints, current: Math.round(spreadValue) + ' bps' }],
   { width: 600, height: 160, padTop: 16, padBottom: 26, summary: spreadValue < fiveYAvgSpread ? 'Compressing · in watch zone (200 bps)' : 'Above 5Y average' }
 ));
 sentimentSpreadRow.appendChild(spreadWrap);
@@ -1570,11 +1661,11 @@ body.appendChild(renderSectionFrame({
     { date: '2026-05-11', severity: 'low',   label: 'PE 20.7× cheap' },
     { date: '2026-05-11', severity: 'low',   label: 'BNF +7.9pp lead' }
   ]),
-  sources: buildSectionFooter(['NSE', 'CRISIL', 'FRED', 'Reuters']),
+  sources: buildSectionFooter(['NSE', 'CRISIL', 'FRED', 'Reuters'], 'market'),
   children: [marketBody]
 }));
 
-// ════════════════════════ SECTORS — RANKED LIST ════════════════════════
+// ════════════════════════ SECTORS, RANKED LIST ════════════════════════
 const sectorsBody = el('div', { class: 'section-body-stack' });
 
 // Order sectors by overall pressure: red > amber > green > neutral
@@ -1668,37 +1759,38 @@ body.appendChild(renderSectionFrame({
   timeline: renderTimelineStrip([
     { date: '2026-04-18', severity: 'low',   label: 'Shipping +28%' },
     { date: '2026-04-25', severity: 'med',   label: 'Road EPC rerate' },
-    { date: '2026-05-04', severity: 'high',  label: 'OMC −8% Brent' },
+    { date: '2026-05-04', severity: 'high',  label: 'OMC -8% Brent' },
     { date: '2026-05-08', severity: 'med',   label: 'Cap goods rerate' },
     { date: '2026-05-11', severity: 'low',   label: 'Autos +18.6 YTD' }
   ]),
-  sources: buildSectionFooter(['NSE', 'Trendlyne', 'Screener']),
+  sources: buildSectionFooter(['NSE', 'Trendlyne', 'Screener'], 'sectors'),
   children: [sectorsBody]
 }));
 
 // ──────────────────────────────────────────────────────────────
-// Trust band — above footer (Design Audit §12). V1 reframe (2026-05-05):
+// Trust band, above footer (Design Audit §12). V1 reframe (2026-05-05):
 // shows "12m history: 1 of 20 verified" honestly so users see backfill state.
 // ──────────────────────────────────────────────────────────────
 const allMetrics = Object.values(DATA.metrics);
-const verifN = allMetrics.filter(m => m.verification_state === 'verified').length;
-const xcheckN = allMetrics.filter(m => m.verification_state === 'crosscheck_pending').length;
+const signalMetrics = allMetrics.filter(m => m.section !== 'composites');
+const verifN = signalMetrics.filter(m => m.verification_state === 'verified').length;
+const xcheckN = signalMetrics.filter(m => m.verification_state === 'crosscheck_pending').length;
 // "Source pending" = anything not yet verified + not yet cross-checked.
 // Captures unregistered parsers, failed parsers, and seed-only metrics.
-const sourcePendingN = allMetrics.length - verifN - xcheckN;
+const sourcePendingN = signalMetrics.length - verifN - xcheckN;
 // "12m history" count = metrics where sparkline_12m has at least 12 distinct
 // non-null values AND the metric has been verified live. Today: GST only.
 const has12mHistory = (m) => m.verification_state === 'verified'
   && Array.isArray(m.sparkline_12m)
   && m.sparkline_12m.length >= 12
   && new Set(m.sparkline_12m.filter(v => v != null)).size >= 6;  // 6+ unique values means real history, not mock-padded
-const histN = allMetrics.filter(has12mHistory).length;
+const histN = signalMetrics.filter(has12mHistory).length;
 
 body.appendChild(el('div', { class: 'dashboard-trust-band' }, [
   el('a', { class: 'dtb-card', href: './sources/', style: { textDecoration: 'none' } }, [
     el('div', { class: 'dtb-label' }, 'Verified live'),
     el('div', { class: 'dtb-value', style: { color: 'var(--green)' } }, String(verifN)),
-    el('div', { class: 'dtb-sub' }, `of ${allMetrics.length} · primary + cross-check`)
+    el('div', { class: 'dtb-sub' }, `of ${signalMetrics.length} signals · primary + cross-check`)
   ]),
   el('a', { class: 'dtb-card', href: './sources/', style: { textDecoration: 'none' } }, [
     el('div', { class: 'dtb-label' }, 'Source pending'),
@@ -1729,7 +1821,7 @@ function sectionStats(sectionId) {
   };
 }
 
-// StickyTOC removed (2026-05-06) — Tab Bar already handles section navigation.
+// StickyTOC removed (2026-05-06), Tab Bar already handles section navigation.
 // Two stacked nav surfaces was redundant and the right-rail vertical strip
 // looked like a "vertical tab bar" on first glance.
 
@@ -1845,7 +1937,7 @@ setActiveTab(getInitialTab(), { skipHash: !location.hash, skipScroll: true });
 window.addEventListener('hashchange', () => setActiveTab(getInitialTab()));
 
 // ──────────────────────────────────────────────────────────────
-// Cmd-K palette — global navigation
+// Cmd-K palette, global navigation
 // Section actions navigate via hash (triggers tab switch)
 // ──────────────────────────────────────────────────────────────
 const cmdkSections = TABS.filter(t => t.id !== 'all').map(t => ({
@@ -1882,10 +1974,10 @@ const isMobileMQ = window.matchMedia('(max-width: 700px)');
     m.status === 'shock' && !m.metric_id.startsWith('driver_') && m.metric_id !== 'india_risk_score'
   ).length;
 
-  document.getElementById('rt-score').textContent = String(risk.value);
+  document.getElementById('rt-score').textContent = riskOk ? String(Math.round(risk.value)) : 'n/a';
   const statusEl = document.getElementById('rt-status');
-  statusEl.textContent = (risk.status || '').toUpperCase();
-  statusEl.classList.add('s-' + (risk.status || 'normal'));
+  statusEl.textContent = riskOk ? (risk.status || '').toUpperCase() : 'NO SCORE';
+  statusEl.classList.add('s-' + (riskOk ? (risk.status || 'normal') : 'normal'));
   if (totalShocks > 0) {
     document.getElementById('rt-shocks-sep').style.display = '';
     const shocksEl = document.getElementById('rt-shocks');

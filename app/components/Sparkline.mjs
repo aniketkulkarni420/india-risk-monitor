@@ -2,11 +2,11 @@
 // Used by DisplayTile and TableRow.
 //
 // Props:
-//   data: number[]                      — required; if empty → renders dashed line + "history pending"
+//   data: number[], required; if empty → renders dashed line + "history pending"
 //   width: number = 80
 //   height: number = 22
-//   fill: bool = false                  — area fill under line
-//   color: string                       — stroke color (default: auto-pick by trend direction)
+//   fill: bool = false, area fill under line
+//   color: string, stroke color (default: auto-pick by trend direction)
 //   trend_direction: 'good'|'bad'|'neutral'
 //
 // Returns: SVG element
@@ -35,7 +35,7 @@ export function renderSparkline(props = {}) {
     pad = 2
   } = props;
 
-  // Empty-state: dashed flat line — never just empty
+  // Empty-state: dashed flat line, never just empty
   if (!data || data.length === 0) {
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('class', 'spark spark-empty-svg');

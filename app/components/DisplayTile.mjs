@@ -1,11 +1,11 @@
-// DisplayTile · Pattern 2 — tile + sparkline + MoM/YoY/5Y
+// DisplayTile · Pattern 2, tile + sparkline + MoM/YoY/5Y
 // The Tier-1 metric primitive. Hero decks (×4), section primaries, mobile primary.
 // Max 8 instances per page.
 //
 // Props:
 //   metric: full metric object
 //   size: 'hero' | 'section' | 'mobile'
-//   show_5y: bool = true   — hide vs_5y_avg_pct on mobile if false
+//   show_5y: bool = true, hide vs_5y_avg_pct on mobile if false
 //   onClick: optional callback (default: open ?metric=metric_id deep-link)
 
 import { el, formatValue, formatTrend, trendClass, statusClass, formatAsOf, isHistoryPending, isShock, trendLabels } from './utils.mjs';
@@ -61,7 +61,7 @@ export function renderDisplayTile(metric, opts = {}) {
   // Trends row
   let trendsContent;
   if (state === 'history-pending') {
-    trendsContent = [el('div', { class: 'dt-history-pending' }, 'history pending — building from ' + formatAsOf(metric.last_verified_at))];
+    trendsContent = [el('div', { class: 'dt-history-pending' }, 'history pending, building from ' + formatAsOf(metric.last_verified_at))];
   } else {
     trendsContent = [];
     const labels = trendLabels(metric.as_of_period);

@@ -4,7 +4,7 @@
 //
 // Why this exists: previously every metric tried to display dod/mom/yoy
 // regardless of whether they made sense for that metric. CPI inflation
-// (a March-31 YoY reading) was being shown with "+0.08% DoD" — pure float
+// (a March-31 YoY reading) was being shown with "+0.08% DoD", pure float
 // noise. This spec maps each metric_id → the periods that are actually
 // meaningful for that metric.
 //

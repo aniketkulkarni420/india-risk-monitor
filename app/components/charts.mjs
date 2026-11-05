@@ -39,14 +39,17 @@ function vizTitleEl(title, asof) {
 export function renderDriverBars(items, opts = {}) {
   const { showDelta = true, showArrow = false, labelWidth = 130, max = 100, deltaUnit = '' } = opts;
   const rows = items.map(item => {
-    const pct = Math.max(0, Math.min(100, (item.value / (item.max || max)) * 100));
+    const hasVal = typeof item.value === 'number' && Number.isFinite(item.value);
+    const pct = hasVal ? Math.max(0, Math.min(100, (item.value / (item.max || max)) * 100)) : 0;
     const color = statusColor(item.status);
     const cells = [
-      el('span', { class: 'driver-bar-label' }, item.label),
+      el('span', { class: 'driver-bar-label' }, item.note
+        ? [item.label, el('span', { class: 'driver-bar-note', style: { display: 'block', fontSize: '10px', color: 'var(--ink-3)', fontFamily: 'var(--mono)' } }, item.note)]
+        : item.label),
       el('div', { class: 'driver-bar-track' }, [
         el('div', { class: 'driver-bar-fill', style: { width: pct + '%', background: color } })
       ]),
-      el('span', { class: 'driver-bar-value', style: { color } }, String(item.value))
+      el('span', { class: 'driver-bar-value', style: { color }, title: hasVal ? '' : 'Not available: feeders lack fresh data' }, hasVal ? String(Math.round(item.value)) : 'n/a')
     ];
     if (showArrow) {
       // Direction arrow based on delta sign · ↑ red (rising stress) / ↓ green (easing) / → grey (flat)
@@ -140,7 +143,7 @@ export function renderCumulativeLine(series, opts = {}) {
       el('div', { class: 'cl-thin-msg' }, [
         el('div', { style: { fontSize: '12px', color: 'var(--ink-2)' } }, 'history accruing'),
         el('div', { style: { fontSize: '10.5px', color: 'var(--ink-3)', fontFamily: 'var(--mono)', marginTop: '4px' } },
-          'Need ≥4 unique values to render trend · ' + series.map(s => s.name + ': ' + (s.current || '—')).join(' · ')),
+          'Need ≥4 unique values to render trend · ' + series.map(s => s.name + ': ' + (s.current || '-')).join(' · ')),
         opts.summary ? el('div', { style: { fontSize: '11px', color: 'var(--ink-3)', marginTop: '6px' } }, opts.summary) : null
       ].filter(Boolean))
     ].filter(Boolean));
@@ -333,7 +336,7 @@ export function renderInflationBars(items, target, opts = {}) {
     t.textContent = v + '%'; svg.appendChild(t);
   }
 
-  // Target line (no inline text — goes in legend)
+  // Target line (no inline text, goes in legend)
   const targetY = yScale(target);
   svg.appendChild(svgEl('line', { x1: padLeft, y1: targetY, x2: width - padRight, y2: targetY, stroke: 'var(--accent)', 'stroke-dasharray': '3,4', 'stroke-width': 1.5 }));
 
@@ -508,12 +511,12 @@ export function renderFlowsFocused(data) {
     el('div', { class: 'flow-grid' }, [
       el('div', { class: 'flow-cell' }, [
         el('div', { class: 'flow-cell-label' }, 'FII equity'),
-        el('div', { class: 'flow-cell-value neg' }, data.fii.formatted),
+        el('div', { class: 'flow-cell-value ' + (data.fii.value < 0 ? 'neg' : 'pos') }, data.fii.formatted),
         data.fii.sub ? el('div', { class: 'flow-cell-sub' }, data.fii.sub) : null
       ].filter(Boolean)),
       el('div', { class: 'flow-cell' }, [
         el('div', { class: 'flow-cell-label' }, 'DII equity'),
-        el('div', { class: 'flow-cell-value pos' }, data.dii.formatted),
+        el('div', { class: 'flow-cell-value ' + (data.dii.value < 0 ? 'neg' : 'pos') }, data.dii.formatted),
         data.dii.sub ? el('div', { class: 'flow-cell-sub' }, data.dii.sub) : null
       ].filter(Boolean)),
       el('div', { class: 'flow-cell' }, [
@@ -572,14 +575,14 @@ export function renderFlowsFocused(data) {
 }
 
 function formatNumberShort(v) {
-  if (v == null) return '—';
-  const sign = v < 0 ? '−' : '+';
+  if (v == null) return '-';
+  const sign = v < 0 ? '-' : '+';
   const a = Math.abs(v);
   return sign + Math.round(a).toLocaleString('en-IN');
 }
 
 export function renderAbsorptionGauge(ratio) {
-  // Clamp to 0–1.5× for display
+  // Clamp to 0-1.5× for display
   const v = Math.max(0, Math.min(1.5, ratio));
   const pct = (v / 1.5) * 100;
   return el('div', { class: 'absorb-gauge-wrap' }, [
@@ -611,7 +614,7 @@ export function renderPersistenceBar(sessions) {
 // ──────────────────────────────────────────────────────────────
 // renderRangeTick · 3A · 12m range bar + marker + qualitative label
 // info comes from utils.rangeTick(metric): { positionPct, label, lo, hi }
-// opts: { compact: bool — hides lo/hi labels under the bar }
+// opts: { compact: bool, hides lo/hi labels under the bar }
 // ──────────────────────────────────────────────────────────────
 export function renderRangeTick(info, opts = {}) {
   if (!info) return null;
@@ -865,7 +868,7 @@ export function renderValuationBand({ value, min, sigmaMinus, mean, sigmaPlus, m
     ]),
     el('div', { class: 'vb-axis' }, [
       el('span', {}, `${min.toFixed(1)} min`),
-      el('span', {}, `−1σ ${sigmaMinus.toFixed(1)}`),
+      el('span', {}, `-1σ ${sigmaMinus.toFixed(1)}`),
       el('span', {}, `${mean.toFixed(1)} mean`),
       el('span', {}, `+1σ ${sigmaPlus.toFixed(1)}`),
       el('span', {}, `${max.toFixed(1)} max`)
@@ -913,7 +916,7 @@ export function renderPercentileStrip({ dist, percentile, valueLabel, lowLabel, 
 // Used in Real Economy cluster expansions (Option 1 placement) to show
 // whether a metric's reading is structural growth or just seasonal rhythm.
 // curr / prior: arrays of 12 numeric values, oldest → newest, ending at as_of
-// labels: array of 12 month names (e.g. ['May','Jun', ...]) — caller-provided
+// labels: array of 12 month names (e.g. ['May','Jun', ...]), caller-provided
 // ──────────────────────────────────────────────────────────────
 export function renderSeasonalityStrip({ curr, prior, labels, title, asof, summary, valueFormatter }) {
   const max = Math.max(...curr, ...prior, 1);
@@ -940,7 +943,7 @@ export function renderSeasonalityStrip({ curr, prior, labels, title, asof, summa
     el('span', { class: 'viz-legend-item' }, [el('span', { class: 'viz-swatch', style: { background: 'var(--accent)' } }), 'last 12m']),
     el('span', { class: 'viz-legend-item' }, [el('span', { class: 'viz-swatch', style: { background: 'var(--ink-3)' } }), 'prior 12m']),
     el('span', { style: { marginLeft: 'auto', color: 'var(--ink-2)' } },
-      summary || `Above prior in ${above} of 12 — ${above >= 9 ? 'structural growth' : above >= 6 ? 'mostly above trend' : above >= 3 ? 'mixed' : 'below trend'}.`)
+      summary || `Above prior in ${above} of 12, ${above >= 9 ? 'structural growth' : above >= 6 ? 'mostly above trend' : above >= 3 ? 'mixed' : 'below trend'}.`)
   ]);
   wrap.appendChild(lege);
   return wrap;
@@ -948,7 +951,7 @@ export function renderSeasonalityStrip({ curr, prior, labels, title, asof, summa
 
 // ──────────────────────────────────────────────────────────────
 // renderStatStrip · Option A · 5-cell horizontal stats above a chart
-// items: [{ label, value, sub, color }] — caller picks 3-5 cells
+// items: [{ label, value, sub, color }], caller picks 3-5 cells
 // Designed to sit directly above an existing viz; collapses on small screens.
 // ──────────────────────────────────────────────────────────────
 export function renderStatStrip(items, opts = {}) {
@@ -978,7 +981,7 @@ export function renderHeadlinePanel({
   chart, chartTitle, chartAsof,
   matrix, asof, eyebrowColor
 }) {
-  // Header card — alarming red bg if shock, neutral panel-2 otherwise
+  // Header card, alarming red bg if shock, neutral panel-2 otherwise
   const isShock = status === 'shock';
   const headerStyle = isShock
     ? { background: 'rgba(58,28,28,0.55)', border: '1px solid rgba(120,40,40,0.6)' }
@@ -1074,7 +1077,7 @@ export function buildHeroNarrative(driverEntries, riskMetric) {
   const top2 = sorted[1];
   const calmest = sorted[sorted.length - 1];
   const lead = `Stress is led by <b>${top1.label.replace(/^⚠\s/, '')} ${Math.round(top1.value)}</b> and <b>${top2.label.replace(/^⚠\s/, '')} ${Math.round(top2.value)}</b>.`;
-  const tail = ` Real economy holding at <b>${Math.round(calmest.value)}</b>.`;
+  const tail = ` ${calmest.label.replace(/^⚠\s/, '')} lowest at <b>${Math.round(calmest.value)}</b>.`;
   return el('div', {
     class: 'hv-narrative',
     style: {

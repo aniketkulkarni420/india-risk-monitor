@@ -1,4 +1,4 @@
-/* IRM component library — Phase 3 atomics
+/* IRM component library, Phase 3 atomics
    Locked tokens. Used by DisplayTile, TableRow, Sparkline, Band.
    No additional component CSS may be added without retiring an entry. */
 
@@ -87,7 +87,7 @@ svg, img, video, canvas { max-width: 100%; }
 }
 
 /* ────────────────────────────────────────────────────────────── */
-/* Pills (status) — used by both TableRow and DisplayTile         */
+/* Pills (status), used by both TableRow and DisplayTile         */
 /* ────────────────────────────────────────────────────────────── */
 .pill {
   display: inline-flex;
@@ -104,6 +104,7 @@ svg, img, video, canvas { max-width: 100%; }
 .pill-low   { background: var(--green-soft); color: #79c79a; }
 .pill-med   { background: var(--amber-soft); color: #e9c466; }
 .pill-high  { background: var(--red-soft); color: #e88; }
+.pill-na    { background: rgba(255,255,255,.06); color: var(--ink-3); }
 .pill-shock { background: var(--red); color: #1a0808; font-weight: 700; letter-spacing: .1em; padding: 3px 12px; }
 /* 10B: status pill with directional indicator inside */
 .pill .pill-dir {
@@ -191,7 +192,7 @@ svg, img, video, canvas { max-width: 100%; }
 }
 .vital-tile-label { font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); letter-spacing: .06em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
 .vital-tile-label .star-btn { padding: 0; font-size: 11px; }
-.vital-tile-value { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+.vital-tile-value { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; white-space: nowrap; }
 .vital-tile-value.is-stress { color: var(--red); }
 .vital-tile-sub { font-family: var(--mono); font-size: 9.5px; color: var(--ink-3); margin-top: 3px; padding: 1px 4px; border-radius: 2px; display: inline-block; }
 .vital-tile .pill { font-size: 9px; padding: 1px 5px; }
@@ -218,7 +219,7 @@ svg, img, video, canvas { max-width: 100%; }
 .lens-pill.amber { background: rgba(233,196,102,.18); color: var(--amber); }
 .lens-pill.red   { background: rgba(232,136,136,.18); color: var(--red); }
 .lens-pill.blue  { background: rgba(139,183,216,.18); color: var(--blue); }
-.lens-value { font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); margin: 4px 0; }
+.lens-value { font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); margin: 4px 0; white-space: nowrap; }
 .lens-value.pos { color: var(--green); }
 .lens-value.neg { color: var(--red); }
 .lens-read { font-size: 11px; color: var(--ink-3); line-height: 1.4; }
@@ -551,7 +552,7 @@ tr.tr-inline-expand > td {
 .trend-dn   { color: var(--red); }
 
 /* ────────────────────────────────────────────────────────────── */
-/* DisplayTile — Pattern 2                                         */
+/* DisplayTile, Pattern 2                                         */
 /* ────────────────────────────────────────────────────────────── */
 .display-tile {
   background: var(--surface);
@@ -591,7 +592,7 @@ tr.tr-inline-expand > td {
 .dt-history-pending { font-size: 11px; color: var(--ink-3); font-style: italic; margin-top: 8px; }
 
 /* ────────────────────────────────────────────────────────────── */
-/* TableRow — Pattern 1                                            */
+/* TableRow, Pattern 1                                            */
 /* ────────────────────────────────────────────────────────────── */
 table.metric-table { width: 100%; border-collapse: collapse; font-family: var(--sans); }
 table.metric-table th { text-align: left; color: var(--ink-3); font-weight: 500; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 10px 8px; border-bottom: 1px solid var(--line); }
@@ -611,7 +612,7 @@ table.metric-table tr { cursor: pointer; transition: background .15s; }
 table.metric-table tr:hover td { background: rgba(255,255,255,.015); }
 
 /* ────────────────────────────────────────────────────────────── */
-/* Sparkline — primitive SVG                                       */
+/* Sparkline, primitive SVG                                       */
 /* ────────────────────────────────────────────────────────────── */
 .spark {
   display: inline-block;
@@ -625,7 +626,7 @@ table.metric-table tr:hover td { background: rgba(255,255,255,.015); }
 .spark-empty { color: var(--ink-3); font-style: italic; font-size: 11px; font-family: var(--sans); }
 
 /* ────────────────────────────────────────────────────────────── */
-/* Band — risk-score viz                                           */
+/* Band, risk-score viz                                           */
 /* ────────────────────────────────────────────────────────────── */
 .band-wrap { padding: 8px 0; font-family: var(--sans); }
 .band-track {
@@ -1362,7 +1363,7 @@ table.heatmap th:first-child { text-align: left; padding-left: 12px; }
 .md-chip:hover { color: var(--accent); border-color: var(--accent); }
 
 /* ────────────────────────────────────────────────────────────── */
-/* CHARTS — Phase 5.5 viz vocabulary                              */
+/* CHARTS, Phase 5.5 viz vocabulary                              */
 /* ────────────────────────────────────────────────────────────── */
 
 /* Generic viz-wrap shell used by all chart helpers */
@@ -1715,7 +1716,7 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
   line-height: 1;
 }
 
-/* Dashboard trust band (above footer) — visually grouped with footer */
+/* Dashboard trust band (above footer), visually grouped with footer */
 .dashboard-trust-band {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
   margin: 48px 0 0; padding: 32px 0 0; border-top: 1px solid var(--line);
@@ -1728,7 +1729,7 @@ body[data-active-tab]:not([data-active-tab="all"]) .section-frame[data-active="t
 .dtb-sub { font-size: 10.5px; color: var(--ink-3); margin-top: 4px; }
 @media (max-width: 700px) { .dashboard-trust-band { grid-template-columns: repeat(2, 1fr); } }
 
-/* StickyTOC upgraded — counts + shock badges */
+/* StickyTOC upgraded, counts + shock badges */
 .toc-link-upgraded {
   display: flex; justify-content: space-between; align-items: center; gap: 8px;
   padding: 5px 0; font-size: 12.5px; text-decoration: none; color: var(--ink-3);
@@ -2248,3 +2249,7 @@ body.swiping #body { transition: none; }
 .hero-skeleton .skel-line.w-40 { width: 40%; }
 .hero-skeleton .skel-line.w-90 { width: 90%; }
 .hero-skeleton .skel-line.tall { height: 38px; }
+
+/* QA 5 Nov 2026: keep a sign with its number on phones (no "+" on its own line) */
+.cs-value, .stat-value, .matrix-cell .value, .hp-matrix-cell .value, .cat-tab .ct-net,
+.cc-cell-value, .ff-value, .hp-value, .driver-bar-value, .sm-delta { white-space: nowrap; }

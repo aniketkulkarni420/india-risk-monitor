@@ -2,7 +2,7 @@
 // Replaces the orb. Horizontal track with low/med/high zones + marker.
 //
 // Props:
-//   value: number                       — required
+//   value: number, required
 //   min: number = 0
 //   max: number = 100
 //   zones: [{ label, end, color, class }] = standard low/med/high
@@ -42,7 +42,7 @@ export function renderBand(props = {}) {
   const zonesRow = el('div', { class: 'band-zones' });
   let cursor = min;
   for (const z of zones) {
-    zonesRow.appendChild(el('span', { class: z.class || '' }, `${z.label} ${cursor}–${z.end}`));
+    zonesRow.appendChild(el('span', { class: z.class || '' }, `${z.label} ${cursor}-${z.end}`));
     cursor = z.end;
   }
   wrap.appendChild(zonesRow);
@@ -56,7 +56,7 @@ export function renderBand(props = {}) {
       ctx.appendChild(el('span', {}, ['YoY ', el('b', {}, (context.yoy_pct > 0 ? '+' : '') + context.yoy_pct.toFixed(1))]));
     }
     if (context.range_min != null && context.range_max != null) {
-      ctx.appendChild(el('span', {}, ['1Y range ', el('b', {}, `${context.range_min}–${context.range_max}`)]));
+      ctx.appendChild(el('span', {}, ['1Y range ', el('b', {}, `${context.range_min}-${context.range_max}`)]));
     }
     wrap.appendChild(ctx);
   }

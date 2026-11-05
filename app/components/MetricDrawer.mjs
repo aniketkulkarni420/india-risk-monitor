@@ -9,11 +9,11 @@
 // Singleton pattern: one drawer mounted to <body>; open(metric) / close() / wire()
 //
 // API:
-//   wire(metricLookup)  — called once on app boot. metricLookup: (id) => metric|null
-//   open(metric_id)     — opens the drawer for a metric
-//   close()             — closes
+//   wire(metricLookup), called once on app boot. metricLookup: (id) => metric|null
+//   open(metric_id), opens the drawer for a metric
+//   close(), closes
 //
-// The drawer respects the data contract — every field in the schema can render here.
+// The drawer respects the data contract, every field in the schema can render here.
 
 import { el, formatValue, formatTrend, trendClass, statusClass, formatAsOf, isHistoryPending, trendLabels } from './utils.mjs';
 import { renderSparkline } from './Sparkline.mjs';
@@ -101,7 +101,7 @@ export function wire(metricLookup) {
 export function open(metric_id, opts = {}) {
   ensureMounted();
   if (!_lookup) {
-    console.warn('[MetricDrawer] not wired — call wire(lookup) on boot');
+    console.warn('[MetricDrawer] not wired, call wire(lookup) on boot');
     return;
   }
   const metric = _lookup(metric_id);
@@ -136,7 +136,7 @@ function _show(metric_id, opts) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Drawer content — sections in render order
+// Drawer content, sections in render order
 // ──────────────────────────────────────────────────────────────
 function renderError(metric_id, message) {
   _drawer.innerHTML = '';
@@ -154,7 +154,7 @@ function renderContent(metric) {
   _drawer.innerHTML = '';
   const pad = el('div', { class: 'md-pad' });
 
-  // Header — close button + status pill + title
+  // Header, close button + status pill + title
   pad.appendChild(el('button', { class: 'md-close', onclick: close, 'aria-label': 'Close' }, '×'));
 
   pad.appendChild(el('div', { class: 'md-status-row' }, [
@@ -176,7 +176,7 @@ function renderContent(metric) {
 
   if (isPending) {
     pad.appendChild(el('p', { class: 'md-history-pending' },
-      'history pending — building from ' + formatAsOf(metric.last_verified_at)));
+      'history pending, building from ' + formatAsOf(metric.last_verified_at)));
   } else {
     const labels = trendLabels(metric.as_of_period);
     const trendsRow = el('div', { class: 'md-trends' }, [
@@ -189,7 +189,7 @@ function renderContent(metric) {
     pad.appendChild(trendsRow);
   }
 
-  // Period selector + chart — wired to data/history/{metric_id}.csv.
+  // Period selector + chart, wired to data/history/{metric_id}.csv.
   // 2026-06-11 honesty rules:
   //  · Only SOURCE-TAGGED rows render (untagged = unprovable; the launch-era
   //    synthetic seeds have been purged, this guards against regressions).
@@ -197,7 +197,7 @@ function renderContent(metric) {
   //    "history accruing" note instead.
   //  · Period buttons appear only when their window actually has data.
   //  · Monthly metrics with ≥13 monthly points get a raw ↔ YoY% toggle
-  //    (YoY default — absolute monthly values are mostly seasonality).
+  //    (YoY default, absolute monthly values are mostly seasonality).
   pad.appendChild(el('div', { class: 'md-section-head' }, 'History chart'));
   const chartControls = el('div', { class: 'md-period-row' });
   pad.appendChild(chartControls);
@@ -301,7 +301,7 @@ function renderContent(metric) {
       chartHost.appendChild(el('div', { style: { color: 'var(--ink-3)', fontSize: '12px', fontStyle: 'italic', textAlign: 'center', padding: '40px 0' } },
         realCount
           ? `History accruing · ${realCount} real point${realCount === 1 ? '' : 's'} · since ${since}`
-          : 'History accruing — chart appears after the first few live captures'));
+          : 'History accruing, chart appears after the first few live captures'));
       return;
     }
 
@@ -324,7 +324,7 @@ function renderContent(metric) {
     ]));
   }
 
-  // Initial render — defer to next tick so DOM is mounted
+  // Initial render, defer to next tick so DOM is mounted
   setTimeout(async () => {
     const initial = await buildControls();
     renderChart(initial || '1Y');
@@ -373,7 +373,7 @@ function renderContent(metric) {
   pad.appendChild(srcList);
   pad.appendChild(el('div', { class: 'md-verification' }, [
     el('span', { class: 'lbl' }, 'Verification'),
-    el('span', { class: 'val' }, metric.verification_state || '—'),
+    el('span', { class: 'val' }, metric.verification_state || '-'),
     el('span', { class: 'lbl' }, 'Last verified'),
     el('span', { class: 'val' }, formatAsOf(metric.last_verified_at))
   ]));

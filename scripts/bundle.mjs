@@ -294,6 +294,14 @@ if (sparklineSanitized > 0) console.log(`  · sparkline sanitized (unit-shift re
 // Composite re-derivation pass · drivers + risk score must reflect freshly-recomputed
 // statuses on the underlying metrics. Without this they keep old composite scores from
 // the prior ingest run (e.g. driver_oil_physical stays at 92 even after Brent drops below shock).
+// Sector breadth is derived from the sectors heatmap, so its honest date is the
+// heatmap's as_of, not the date the composite JSON was last saved.
+if (metrics.driver_sector_breadth && sectors?.as_of) {
+  metrics.driver_sector_breadth.as_of = sectors.as_of;
+  metrics.driver_sector_breadth.inputs_as_of = { oldest: sectors.as_of, newest: sectors.as_of };
+  if (sectors.last_verified_at) metrics.driver_sector_breadth.last_verified_at = sectors.last_verified_at;
+}
+
 const metricsMap = new Map(Object.entries(metrics));
 const compositeChanges = recomputeComposites(metricsMap);
 // Re-stamp composite status from new score after recompute
@@ -406,6 +414,51 @@ const freshnessReport = (() => {
   };
 })();
 
+// Source-link fixes applied at bundle time (QA 5 Nov 2026). The metric JSON
+// files keep their stored URLs so ingest commits on main do not conflict;
+// visitors get working links. irm.local was a placeholder domain.
+const SITE = 'https://india-risk-monitor.pages.dev';
+const URL_FIXES = [
+  [/^https?:\/\/irm\.local\/methodology\/.*$/, SITE + '/methodology.html'],
+  [/^https:\/\/www\.nseindia\.com\/reports\/?$/, 'https://www.nseindia.com/all-reports-derivatives'],
+  [/^https:\/\/archives\.nseindia\.com\/content\/nsccl\/?$/, 'https://www.nseindia.com/all-reports-derivatives'],
+  [/^https:\/\/www\.nseindia\.com\/products-services\/indices-banknifty$/, 'https://www.nseindia.com/market-data/index-performances'],
+  [/^https:\/\/www\.nseindia\.com\/products-services\/indices-india-vix-index$/, 'https://www.nseindia.com/reports-indices-historical-vix'],
+  [/^https:\/\/www\.nseindia\.com\/products-services\/indices-overview$/, 'https://www.nseindia.com/reports-indices-yield'],
+  [/^https:\/\/www\.sebi\.gov\.in\/statistics\/foreign-portfolio-investors-fpis-data\.html$/, 'https://www.fpi.nsdl.co.in/web/Reports/Latest.aspx'],
+  [/^https:\/\/trendlyne\.com\/markets\/sector\/?$/, 'https://trendlyne.com/equity/sector-industry-analysis/'],
+  [/^https:\/\/www\.rbi\.org\.in\/Scripts\/Money_Market\.aspx$/, 'https://www.rbi.org.in/Scripts/BS_ViewMMO.aspx']
+];
+function fixUrl(u) {
+  if (typeof u !== 'string') return u;
+  for (const [re, to] of URL_FIXES) if (re.test(u)) return to;
+  return u;
+}
+function fixSourceUrls(obj) {
+  if (!obj) return;
+  if (obj.source_primary) obj.source_primary.url = fixUrl(obj.source_primary.url);
+  for (const c of obj.source_crosscheck || []) c.url = fixUrl(c.url);
+}
+for (const m of Object.values(metrics)) fixSourceUrls(m);
+fixSourceUrls(sectors);
+
+// House style: no em dash, en dash or typographic minus in visible text.
+// Metric JSON (display names, notes, why_it_matters) is written by ingest and
+// by hand, so normalise every string at bundle time.
+function plainDashes(t) {
+  return t.replace(/\s+\u2014\s+/g, ', ').replace(/\u2014/g, '-')
+    .replace(/(\d)\s*\u2013\s*(\d)/g, '$1-$2').replace(/\s+\u2013\s+/g, ', ')
+    .replace(/[\u2013\u2212]/g, '-');
+}
+function plainDashesDeep(o) {
+  if (Array.isArray(o)) { for (let i = 0; i < o.length; i++) o[i] = typeof o[i] === 'string' ? plainDashes(o[i]) : (plainDashesDeep(o[i]), o[i]); return; }
+  if (o && typeof o === 'object') for (const k of Object.keys(o)) {
+    if (typeof o[k] === 'string') o[k] = plainDashes(o[k]); else plainDashesDeep(o[k]);
+  }
+}
+plainDashesDeep(metrics);
+plainDashesDeep(sectors);
+
 const bundle = {
   generated_at: new Date().toISOString(),
   metric_count: Object.keys(metrics).length,
@@ -428,3 +481,9 @@ const bundle = {
 
 writeFileSync(OUT, JSON.stringify(bundle), 'utf8');
 console.log(`✓ bundled ${bundle.metric_count} metrics + ${sectors ? sectors.sectors.length : 0} sectors → app/dist/data.json (${(JSON.stringify(bundle).length / 1024).toFixed(1)} KB)`);
+
+// Static API (/api/v1/*.json, incl. health.json) is generated from the bundle.
+// Before 2026-11-05 no build step ran generate-api.mjs, so /api/v1/health.json
+// fell through to the dashboard HTML and /sources/health showed
+// "Unexpected token '<'". Running it here covers every build command.
+await import('./generate-api.mjs');
