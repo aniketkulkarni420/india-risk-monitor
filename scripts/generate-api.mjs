@@ -17,7 +17,10 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const BUNDLE = join(ROOT, 'app', 'dist', 'data.json');
-const API_ROOT = join(ROOT, 'app', 'dist', 'api', 'v1');
+// Pages serves app/ as the site root, so app/api/v1 is served at /api/v1.
+// (It was app/dist/api/v1, which went live at /dist/api/v1 and left /api/v1
+// falling through to the dashboard HTML.)
+const API_ROOT = join(ROOT, 'app', 'api', 'v1');
 
 mkdirSync(API_ROOT, { recursive: true });
 mkdirSync(join(API_ROOT, 'metrics'), { recursive: true });
