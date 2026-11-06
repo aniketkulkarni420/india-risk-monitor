@@ -302,6 +302,19 @@ if (metrics.driver_sector_breadth && sectors?.as_of) {
   if (sectors.last_verified_at) metrics.driver_sector_breadth.last_verified_at = sectors.last_verified_at;
 }
 
+// No source gives FII/DII month or year totals yet (NSE fiidiiTradeReact is
+// daily only), and the stored values are copies of the daily figure. Show
+// them as not available instead of a daily number under an MTD/CYTD label.
+for (const id of ['fii_equity_mtd', 'dii_mtd', 'fii_equity_cytd']) {
+  const m = metrics[id];
+  if (!m) continue;
+  m.value = null;
+  m.mom_pct = null; m.yoy_pct = null; m.dod_pct = null;
+  m.sparkline_12m = [];
+  m.verification_state = 'source_pending';
+  m.unavailable_reason = 'No source for this total yet: NSE publishes the day\'s net only.';
+}
+
 const metricsMap = new Map(Object.entries(metrics));
 const compositeChanges = recomputeComposites(metricsMap);
 // Re-stamp composite status from new score after recompute
