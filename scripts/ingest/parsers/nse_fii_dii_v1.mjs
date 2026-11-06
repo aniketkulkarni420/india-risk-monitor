@@ -49,6 +49,12 @@ async function fetchJson(url, cookies, attempt = 0) {
  * For `dii_daily` similarly.
  */
 function extractValue(payload, metric_id) {
+  // fiidiiTradeReact publishes the day's net only. It used to be written into
+  // fii_equity_mtd, dii_mtd and fii_equity_cytd as well, so those three held
+  // the daily figure under month and year labels (QA 5 Nov 2026).
+  if (/_mtd$|_cytd$/.test(metric_id)) {
+    throw new Error(`nse_fii_dii_v1 gives the daily net only; no ${metric_id} total in this endpoint`);
+  }
   const row = payload.find(r => {
     const cat = (r.category || '').toUpperCase();
     if (metric_id.startsWith('fii_')) return cat.includes('FII') || cat.includes('FPI');

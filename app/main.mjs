@@ -229,7 +229,7 @@ const riskMissingDrivers = ['driver_oil_physical', 'driver_freight', 'driver_ins
   'driver_india_macro', 'driver_real_economy', 'driver_sector_breadth']
   .filter(id => typeof M(id)?.value !== 'number').map(id => _driverNames[id]);
 const riskUnavailableNote = riskMissingDrivers.length
-  ? `${riskMissingDrivers.join(' and ')} ${riskMissingDrivers.length === 1 ? 'driver lacks' : 'drivers lack'} fresh data (${riskMissingDrivers.length} of 6)`
+  ? `${riskMissingDrivers.length > 1 ? riskMissingDrivers.slice(0, -1).join(', ') + ' and ' + riskMissingDrivers[riskMissingDrivers.length - 1] : riskMissingDrivers[0]} ${riskMissingDrivers.length === 1 ? 'driver lacks' : 'drivers lack'} fresh data (${riskMissingDrivers.length} of 6)`
   : 'Not enough fresh data';
 const heroHost = document.getElementById('hero-decks');
 heroHost.innerHTML = '';
@@ -238,14 +238,29 @@ heroHost.style.display = 'block';
 // Build driver list, sorted by value desc
 const driverIds = ['driver_oil_physical', 'driver_freight', 'driver_institutional_flows',
                    'driver_india_macro', 'driver_sector_breadth', 'driver_real_economy'];
+// Why a driver is excluded, in plain words: its stale feeders with their last
+// dates, or the stale sectors heatmap date for sector breadth.
+const _feederShort = { vlcc_tanker_rates: 'VLCC', baltic_dirty_tanker: 'Baltic tanker', hormuz_throughput: 'Hormuz',
+  drewry_wci: 'Drewry WCI', brent_crude: 'Brent', india_crude_basket: 'India basket', core_cpi: 'core CPI' };
+function driverNote(d) {
+  if (typeof d.value !== 'number') {
+    if (d.metric_id === 'driver_sector_breadth' && d.as_of) return 'excluded: sector data from ' + formatAsOfLong(d.as_of);
+    const stale = d.feeder_freshness?.stale_detail || [];
+    if (stale.length) return 'excluded: stale ' + stale.map(x => {
+      const fm = M(x.id);
+      return (_feederShort[x.id] || fm?.display_name || x.id) + (fm?.as_of ? ' (' + formatAsOf(fm.as_of) + ')' : '');
+    }).join(', ');
+    return 'excluded: not enough fresh data';
+  }
+  const stale = (d.feeder_freshness?.stale_detail || []).map(x => _feederShort[x.id] || M(x.id)?.display_name || x.id);
+  return stale.length ? 'excludes stale ' + stale.join(', ') : null;
+}
 const drivers = driverIds.map(M).filter(Boolean).map(d => ({
   label: (typeof d.value === 'number' && d.status === 'shock' ? '⚠ ' : '') + d.display_name,
   value: typeof d.value === 'number' ? d.value : null,
   status: typeof d.value === 'number' ? d.status : 'unavailable',
   delta: typeof d.value === 'number' && d.mom_pct ? Math.round(d.value * d.mom_pct / 100) : null,
-  // Show the data date when a driver's inputs are more than 7 days old
-  note: d.inputs_as_of?.oldest && (Date.now() - new Date(d.as_of).getTime()) > 7 * 86400000
-    ? 'data as on ' + formatAsOfLong(d.as_of) : null,
+  note: driverNote(d),
   metric_id: d.metric_id
 })).sort((a, b) => (b.value ?? -1) - (a.value ?? -1));
 
@@ -867,9 +882,9 @@ const num = (m) => (m && typeof m.value === 'number' && Number.isFinite(m.value)
 // writes that same daily figure into the MTD and CYTD metrics, so when they
 // equal the daily value they are not real month or year totals: hide them.
 const sameAsDaily = (agg, day) => num(agg) != null && num(day) != null && num(agg) === num(day);
-const fiiMtdReal = !sameAsDaily(fiiMtd, fiiDay);
-const diiMtdReal = !sameAsDaily(diiMtdH, diiDay);
-const fiiCytdReal = !sameAsDaily(fiiCytdH, fiiDay) && !sameAsDaily(fiiCytdH, fiiMtd);
+const fiiMtdReal = num(fiiMtd) != null && !sameAsDaily(fiiMtd, fiiDay);
+const diiMtdReal = num(diiMtdH) != null && !sameAsDaily(diiMtdH, diiDay);
+const fiiCytdReal = num(fiiCytdH) != null && !sameAsDaily(fiiCytdH, fiiDay) && !sameAsDaily(fiiCytdH, fiiMtd);
 const fiiD = num(fiiDay), diiD = num(diiDay);
 const fiiBuying = fiiD != null && fiiD > 0;
 const _absRatio = num(absorpM);

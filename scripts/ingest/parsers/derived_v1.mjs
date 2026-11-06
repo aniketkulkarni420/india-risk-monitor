@@ -161,7 +161,7 @@ const DERIVERS = {
     return { value: score, asof: new Date().toISOString() };
   },
   driver_institutional_flows: () => {
-    const score = avgFromMetrics(['fii_equity_daily','fii_equity_mtd','dii_daily','dii_mtd','absorption_ratio'], [2,2,2,2,3]);
+    const score = avgFromMetrics(['fii_equity_daily','dii_daily','absorption_ratio'], [2,2,3]);
     return { value: score, asof: new Date().toISOString() };
   },
   driver_india_macro: () => {
