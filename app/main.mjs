@@ -480,7 +480,7 @@ function buildDriverExpansion(driverId) {
         sub1Color: 'var(--red)',
         sub2: 'shock above $95',
         asof: brentM?.as_of ? formatAsOf(brentM.as_of) : '5 May',
-        tooltip: 'Brent ICE 1-month future · global oil benchmark'
+        tooltip: 'EIA Europe Brent Spot Price FOB (RBRTE) · daily'
       },
       {
         label: 'India crude basket',
@@ -1470,10 +1470,10 @@ const brentChart = renderPairedLine(
   { title: 'Recent trail · USD per barrel', thresholdLine: 95, summary: `Spread ${brentSpread >= 0 ? '+' : '-'}$${Math.abs(brentSpread).toFixed(2)} · ${brentShockText}`, asof: brentWindow }
 );
 const brentPanel = renderHeadlinePanel({
-  eyebrow: brentValue >= 95 ? '⚠ Shock · Brent crude above $95' : 'Brent crude · ICE 1-month',
+  eyebrow: brentValue >= 95 ? '⚠ Shock · Brent crude above $95' : 'Brent crude · EIA spot',
   eyebrowColor: brentValue >= 95 ? 'var(--red)' : 'var(--ink-2)',
   value: '$' + brentValue.toFixed(2) + ' / bbl',
-  metaLine: 'Brent ICE futures · Trading Economics · ' + (brent?.as_of ? formatAsOf(brent.as_of) : ''),
+  metaLine: 'EIA Europe Brent spot (RBRTE) · ' + (brent?.as_of ? formatAsOf(brent.as_of) : ''),
   threshold: '$95 / bbl',
   mom: brent?.mom_pct != null ? { text: formatTrend(brent.mom_pct), color: brent.mom_pct > 0 ? 'var(--red)' : 'var(--green)' } : null,
   yoy: brent?.yoy_pct != null ? { text: formatTrend(brent.yoy_pct), color: brent.yoy_pct > 0 ? 'var(--red)' : 'var(--green)' } : null,

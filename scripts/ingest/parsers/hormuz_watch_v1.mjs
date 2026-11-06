@@ -48,25 +48,27 @@ const CONFIGS = {
     }
   },
 
+  // Brent = EIA Europe Brent Spot Price FOB (series RBRTE), daily, read from
+  // Hormuz Watch /api/stooq so both sites show the same number (6 Nov 2026).
+  // /api/oil no longer carries a price level (ETF sentiment only), and the old
+  // fallbacks mixed ICE futures scrapes with this spot series.
   brent_crude: {
     fetch: async () => {
-      const j = await getJson('/api/oil');
-      const b = j.brent || {};
-      if (typeof b.level !== 'number' || !Number.isFinite(b.level)) throw new Error('oil API has no brent.level');
-      if (b.level < 20 || b.level > 250) throw new Error(`implausible brent: ${b.level}`);
-      if (j.stale) throw new Error(`oil API marked stale (${j.staleMin} min)`);
+      const j = await getJson('/api/stooq');
+      const v = j.today;
+      if (typeof v !== 'number' || !Number.isFinite(v)) throw new Error('/api/stooq has no numeric today');
+      if (v < 20 || v > 250) throw new Error(`implausible brent: ${v}`);
+      if (!/RBRTE/.test(String(j.source || ''))) throw new Error(`unexpected /api/stooq source: ${j.source}`);
+      if (!j.todayDate) throw new Error('/api/stooq has no todayDate');
       return {
-        value: b.level,
-        as_of: new Date().toISOString(),
+        value: v,
+        as_of: new Date(j.todayDate + 'T00:00:00Z').toISOString(),  // EIA observation date, not fetch time
         extra: {
-          _brent_sources: Array.isArray(b.sources) ? b.sources.join('+') : null,
-          _brent_confidence: b.confidence || null,
-          _brent_min: b.min ?? null,
-          _brent_max: b.max ?? null
+          _brent_series: 'EIA RBRTE (Europe Brent Spot Price FOB, daily)',
+          _brent_prev: typeof j.yesterday === 'number' ? j.yesterday : null,
+          _brent_prev_date: j.yesterdayDate || null
         },
-        source_note: `cross-verified · ${b.sources?.length || 1} sources · ${b.confidence || '?'} confidence`,
-        // Genuinely multi-source upstream: min/max provide the crosscheck spread
-        crosscheckable: Array.isArray(b.sources) && b.sources.length >= 2
+        source_note: 'EIA RBRTE daily via Hormuz Watch /api/stooq'
       };
     }
   }
