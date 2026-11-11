@@ -33,28 +33,20 @@
   "shock_rule": "value > $95 sustained 7d OR daily move > 8%",
   "trend_direction": "bad",
   "source_primary": {
-    "name": "Hormuz Watch oil API (cross-verified: Yahoo + OilPriceAPI)",
-    "url": "https://www.eia.gov/petroleum/data.php",
+    "name": "EIA Europe Brent Spot Price FOB (RBRTE), via Hormuz Watch",
+    "url": "https://www.eia.gov/dnav/pet/hist/RBRTED.htm",
     "type": "Official",
-    "frequency": "Live",
+    "frequency": "Daily",
     "parser": "tiered:tiered_v1",
     "tier_chain": [
-      "json_api:public_oil_v1",
-      "json_api:hormuz_watch_v1",
-      "json_api:dbnomics_v1",
-      "html_scrape:tradingeconomics_v1"
+      "json_api:hormuz_watch_v1"
     ]
   },
   "source_crosscheck": [
     {
-      "name": "Investing.com Brent",
-      "url": "https://www.investing.com/commodities/brent-oil",
-      "type": "Aggregator"
-    },
-    {
-      "name": "Trading Economics Brent",
-      "url": "https://tradingeconomics.com/commodity/brent-crude-oil",
-      "type": "Aggregator"
+      "name": "FRED DCOILBRENTEU (same EIA series)",
+      "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+      "type": "Official"
     }
   ],
   "verification_state": "verified",

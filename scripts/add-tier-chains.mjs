@@ -16,10 +16,10 @@ const METRICS_DIR = join(ROOT, 'data', 'metrics');
 const CHAINS = {
   // === Daily NSE flows (currently single source · NSE may block again) ===
   fii_equity_daily:    ['csv_download:nse_fii_dii_v1', 'html_render:moneycontrol_v1', 'llm:google_news_llm_v1'],
-  fii_equity_mtd:      ['csv_download:nse_fii_dii_v1', 'html_render:moneycontrol_v1', 'llm:google_news_llm_v1'],
-  fii_equity_cytd:     ['csv_download:nse_fii_dii_v1', 'html_render:moneycontrol_v1'],
+  fii_equity_mtd:      ['html_render:moneycontrol_v1', 'llm:google_news_llm_v1'],
+  fii_equity_cytd:     ['html_render:moneycontrol_v1'],
   dii_daily:           ['csv_download:nse_fii_dii_v1', 'html_render:moneycontrol_v1', 'llm:google_news_llm_v1'],
-  dii_mtd:             ['csv_download:nse_fii_dii_v1', 'html_render:moneycontrol_v1'],
+  dii_mtd:             ['html_render:moneycontrol_v1'],
 
   // === Daily market indices (NSE-direct, add aggregator fallback) ===
   nifty_50:            ['csv_download:nse_indices_v1', 'html_scrape:tradingeconomics_v1'],
@@ -35,7 +35,7 @@ const CHAINS = {
   // === Daily commodities (TE direct, add DBnomics + news fallback) ===
   gold_usd:            ['json_api:public_gold_v1', 'json_api:dbnomics_v1', 'llm:google_news_llm_v1'],
   dxy:                 ['json_api:public_dxy_v1', 'json_api:dbnomics_v1'],
-  brent_crude:         ['json_api:public_oil_v1', 'json_api:dbnomics_v1', 'html_scrape:tradingeconomics_v1'],
+  brent_crude:         ['json_api:hormuz_watch_v1'],  // one series only: EIA RBRTE via Hormuz Watch (6 Nov 2026)
   india_crude_basket:  ['press_release:ppac_v1', 'html_scrape:tradingeconomics_v1'],
   baltic_dry_index:    ['html_scrape:tradingeconomics_v1', 'json_api:dbnomics_v1'],
   hormuz_throughput:   ['html_scrape:hormuz_v1', 'llm:google_news_llm_v1'],

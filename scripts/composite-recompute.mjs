@@ -184,11 +184,14 @@ function feederHealth(metrics, ids) {
 // Driver score · z-score weighted + missing-data penalty
 // ──────────────────────────────────────────────────────────────────────
 
-function driverScore(metrics, ids, weights) {
+function driverScore(metrics, ids, weights, staleIds = new Set()) {
   let sum = 0, w = 0;
   const usedFeeders = [];
   const missingFeeders = [];
   for (let i = 0; i < ids.length; i++) {
+    // Stale feeders are excluded, not averaged in at their old value
+    // (approved 6 Nov 2026). Before this, core_cpi at 54 days still fed macro.
+    if (staleIds.has(ids[i])) { missingFeeders.push(ids[i]); continue; }
     const m = metrics.get(ids[i]);
     const { score, source } = feederScore(m);
     if (score === null) { missingFeeders.push(ids[i]); continue; }
@@ -320,7 +323,9 @@ function applyManualOverride(metric) {
 const DRIVER_DEFS = [
   { id: 'driver_oil_physical',        ids: ['brent_crude','india_crude_basket','hormuz_throughput','vlcc_tanker_rates'], weights: [3,2,3,2] },
   { id: 'driver_freight',             ids: ['drewry_wci','baltic_dirty_tanker','vlcc_tanker_rates'], weights: [3,2,3] },
-  { id: 'driver_institutional_flows', ids: ['fii_equity_daily','fii_equity_mtd','dii_daily','dii_mtd','absorption_ratio'], weights: [2,2,2,2,3] },
+  // fii_equity_mtd and dii_mtd removed (6 Nov 2026): they held the daily NSE
+  // figure, so the daily flows were counted twice. No month-total source yet.
+  { id: 'driver_institutional_flows', ids: ['fii_equity_daily','dii_daily','absorption_ratio'], weights: [2,2,3] },
   { id: 'driver_india_macro',         ids: ['inr_usd','cpi_inflation','core_cpi','iip_growth','fiscal_deficit_pct','cad_pct_gdp'], weights: [3,3,2,2,2,2] },
   { id: 'driver_real_economy',        ids: ['gst_gross','pmi_combined','iip_growth','steel_consumption','auto_2w','rail_freight'], weights: [3,2,2,2,2,2] }
 ];
@@ -370,7 +375,8 @@ export function recomputeComposites(metrics) {
       dm.score_state_reason = `${health.missing_pct.toFixed(0)}% of feeders stale/missing (threshold ${MISSING_DATA_THRESHOLD * 100}%)`;
       changes.push({ id: d.id, old: oldVal, new: null, reason: 'insufficient_data' });
     } else {
-      const res = driverScore(metrics, d.ids, d.weights);
+      const staleIds = new Set((health.stale_detail || []).map(x => x.id));
+      const res = driverScore(metrics, d.ids, d.weights, staleIds);
       dm.value = res.value;
       dm.score_state = 'fresh';
       dm.score_state_reason = null;
@@ -400,6 +406,17 @@ export function recomputeComposites(metrics) {
     sb.shock_indicator = rs.shock_indicator;
     sb.shock_direction = rs.shock_direction;
     sb.score_state = (typeof sb.value === 'number') ? 'fresh' : 'insufficient_data';
+    // Exclude when the sectors heatmap behind it is stale (approved 6 Nov 2026).
+    // bundle.mjs sets sb.as_of to the heatmap date before this runs.
+    const ageDays = sb.as_of ? (Date.now() - new Date(sb.as_of).getTime()) / 86400000 : Infinity;
+    const limit = stalenessDaysFor(sb);
+    if (ageDays > limit) {
+      sb._composite_was = sb.value;
+      changes.push({ id: 'driver_sector_breadth', old: sb.value, new: null, reason: 'insufficient_data' });
+      sb.value = null;
+      sb.score_state = 'insufficient_data';
+      sb.score_state_reason = `sector heatmap data is ${Math.round(ageDays)} days old (limit ${limit})`;
+    }
   }
 
   // 3 · India Risk Score · correlation-adjusted top-level
