@@ -28,7 +28,9 @@ on:
 
 jobs:
   burst:
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moved to 26.04 on 5 Nov 2026 and Playwright 1.59.1
+    # cannot install Chromium there, so every run failed at that step.
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     permissions:
       contents: write
