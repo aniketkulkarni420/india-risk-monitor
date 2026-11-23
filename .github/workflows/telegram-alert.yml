@@ -60,7 +60,16 @@ jobs:
         env:
           TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RED: ${{ steps.health.outputs.red }}
+          TOTAL: ${{ steps.health.outputs.total }}
+          PCT: ${{ steps.health.outputs.pct }}
+          RED_LIST: ${{ steps.redlist.outputs.list }}
         run: |
-          MSG="🔴 IRM Parser Health Alert%0A%0A${{ steps.health.outputs.red }} of ${{ steps.health.outputs.total }} parsers RED (${{ steps.health.outputs.pct }}%25)%0A%0ARed metrics:%0A${{ steps.redlist.outputs.list }}%0A%0ARepo: https://github.com/aniketkulkarni420/india-risk-monitor/actions"
-          curl -sS "https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_CHAT}&text=${MSG}&parse_mode=Markdown" \
+          # The text goes through curl --data-urlencode instead of being pasted into the URL:
+          # the runner's newer curl rejects a URL with raw spaces, newlines or emoji (curl: (3) URL rejected).
+          # Plain text, no parse_mode: metric names contain underscores that break Telegram Markdown.
+          MSG=$(printf '%s\n' "🔴 IRM Parser Health Alert" "" "${RED} of ${TOTAL} parsers RED (${PCT}%)" "" "Red metrics:" "${RED_LIST}" "" "Repo: https://github.com/aniketkulkarni420/india-risk-monitor/actions")
+          curl -sS -G "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TG_CHAT}" \
+            --data-urlencode "text=${MSG}" \
             -o /dev/null -w "Telegram API: %{http_code}\n"
