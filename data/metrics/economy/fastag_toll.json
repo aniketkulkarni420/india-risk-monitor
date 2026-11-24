@@ -23,7 +23,7 @@
     7592.9,
     7592.9,
     7592.9,
-    7592.9,
+    8223.64,
     8223.64
   ],
   "status": "low",
@@ -49,7 +49,7 @@
     }
   ],
   "verification_state": "verified",
-  "last_verified_at": "2026-11-23T21:19:17.390Z",
+  "last_verified_at": "2026-11-24T20:17:48.909Z",
   "why_it_matters": "FASTag toll = highway commercial + passenger movement. Complementary to e-way bills (which capture only inter-state goods).",
   "linked_metrics": [
     "eway_bills",
@@ -58,8 +58,8 @@
     "pol_demand"
   ],
   "notes": "Switched to official NPCI RPS XLSX 2026-06-11. File carries quarterly series (FY22-23→) plus current-FY monthly columns; parser prefers latest month. QoQ + YoY (same quarter prev FY) in extras.",
-  "data_origin": "primary",
-  "last_live_fetch_at": "2026-11-23T21:19:17.390Z",
+  "data_origin": "live",
+  "last_live_fetch_at": "2026-11-24T20:17:48.909Z",
   "_reliability_optimized_at": "2026-09-08T05:31:54.770Z",
   "period_label": "Oct 2026",
   "period_basis": "monthly",
